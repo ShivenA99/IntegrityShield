@@ -1,0 +1,6 @@
+{
+  "name": "FairTestAI: LLM Assessment Vulnerability Simulator",
+  "description": "A web application to simulate malicious prompt injections and their effects on LLM responses for academic assessments. Demonstrates how subtle text manipulations can alter AI behavior.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
