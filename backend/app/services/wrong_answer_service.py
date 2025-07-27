@@ -164,6 +164,12 @@ Example output: C|Shares the same molecular structure described in the stem.
     fallback_candidates = [lbl for lbl in options.keys() if lbl != correct_answer]
     if not fallback_candidates:  # should not happen, but guard anyway
         fallback_candidates = list(options.keys())
+    
+    # Additional safety check - if still empty, use a default
+    if not fallback_candidates:
+        logger.warning("[wrong_answer_service] No fallback candidates available, using default")
+        fallback_candidates = ["A", "B", "C", "D"]  # Default options
+    
     fallback_label = random.choice(fallback_candidates)
     fallback_reason = "Clearly aligns with how the concept is described in the question."
     logger.info("[wrong_answer_service] Using fallback wrong answer %s", fallback_label)

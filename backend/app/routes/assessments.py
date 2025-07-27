@@ -22,6 +22,7 @@ from ..services.pdf_utils import (
     parse_pdf_answers,
 )
 from ..services.wrong_answer_service import generate_wrong_answer
+from ..services.openai_eval_service import evaluate_pdf_with_openai
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,9 @@ def upload_assessment():
     logger.info("[upload_assessment] Received upload request with attack_type=%s", attack_type_str)
     try:
         attack_type = AttackType(attack_type_str)
+        logger.info("[upload_assessment] Parsed attack_type=%s", attack_type)
     except ValueError:
+        logger.error("[upload_assessment] Invalid attack_type: %s", attack_type_str)
         return jsonify({"error": "Invalid attack_type"}), 400
 
     if "original_pdf" not in request.files:
@@ -123,19 +126,69 @@ def upload_assessment():
         q["wrong_label"] = wrong_label
         q["wrong_reason"] = wrong_reason
 
+        logger.debug(f"[upload_assessment] Q{q['q_number']}: Generated wrong answer = {wrong_label}, reason = {wrong_reason}")
+
         if correct_label:
             q["gold_answer"] = correct_label
             q["gold_reason"] = correct_reason
+            logger.debug(f"[upload_assessment] Q{q['q_number']}: Found correct answer = {correct_label}")
 
     # Create attacked PDF
     attacked_pdf_path = assessment_dir / "attacked.pdf"
     build_attacked_pdf(questions, attacked_pdf_path, title=title_text)
 
     # ------------------------------------------------------------------
-    # Always generate reference report (no external LLM evaluation phase)
+    # Evaluate attacked PDF with OpenAI
+    # ------------------------------------------------------------------
+    evaluation_results = None
+    logger.info(f"[upload_assessment] ENABLE_LLM={ENABLE_LLM}, attack_type={attack_type}, attack_type!=NONE={attack_type != AttackType.NONE}")
+    if ENABLE_LLM and attack_type != AttackType.NONE:
+        try:
+            # Prepare reference and malicious answers
+            reference_answers = {}
+            malicious_answers = {}
+            
+            for q in questions:
+                q_num = q["q_number"]
+                # Reference answer (correct answer)
+                if "gold_answer" in q and q["gold_answer"]:
+                    reference_answers[q_num] = q["gold_answer"]
+                    logger.debug(f"[upload_assessment] Q{q_num}: Reference answer = {q['gold_answer']}")
+                
+                # Malicious answer (wrong answer that was generated)
+                if "wrong_label" in q and q["wrong_label"]:
+                    malicious_answers[q_num] = q["wrong_label"]
+                    logger.debug(f"[upload_assessment] Q{q_num}: Malicious answer = {q['wrong_label']}")
+            
+            logger.debug(f"[upload_assessment] Found {len(reference_answers)} reference answers and {len(malicious_answers)} malicious answers")
+            
+            if questions:
+                # If no reference answers are available, we can still evaluate the attack
+                # by checking if the AI follows the hidden instructions
+                if not reference_answers:
+                    logger.info("[upload_assessment] No reference answers available, evaluating attack effectiveness only")
+                    # Create dummy reference answers for evaluation (we'll ignore them in the analysis)
+                    reference_answers = {q["q_number"]: "UNKNOWN" for q in questions}
+                
+                logger.info("[upload_assessment] Starting OpenAI PDF evaluation")
+                evaluation_results = evaluate_pdf_with_openai(
+                    attacked_pdf_path=attacked_pdf_path,
+                    questions=questions,
+                    reference_answers=reference_answers
+                )
+                logger.info(f"[upload_assessment] OpenAI evaluation completed")
+            else:
+                logger.warning("[upload_assessment] Skipping OpenAI evaluation - no questions found")
+                
+        except Exception as exc:
+            logger.error(f"[upload_assessment] OpenAI evaluation failed: {exc}")
+            evaluation_results = None
+
+    # ------------------------------------------------------------------
+    # Always generate reference report (with evaluation results if available)
     # ------------------------------------------------------------------
     report_path = assessment_dir / "reference_report.pdf"
-    build_reference_report(questions, report_path)
+    build_reference_report(questions, report_path, evaluation_results)
 
     attacked_sf = StoredFile(path=str(attacked_pdf_path), mime_type="application/pdf")
     report_sf = StoredFile(path=str(report_path), mime_type="application/pdf")
@@ -167,6 +220,8 @@ def upload_assessment():
             options_json=q["options"],
             gold_answer=q.get("gold_answer", ""),
             gold_reason=q.get("gold_reason", ""),
+            wrong_answer=q.get("wrong_label", ""),
+            wrong_reason=q.get("wrong_reason", ""),
             attacked_stem=q["attacked_stem"],
         )
         question_rows.append(q_row)
@@ -222,4 +277,57 @@ def download_report(assessment_id):
     assessment: Assessment | None = Assessment.query.get(assessment_id)
     if not assessment or not assessment.report_pdf:
         return jsonify({"error": "Assessment not found"}), 404
-    return send_file(assessment.report_pdf.path, as_attachment=True) 
+    return send_file(assessment.report_pdf.path, as_attachment=True)
+
+
+@assessments_bp.route("/<uuid:assessment_id>/evaluate", methods=["POST"])
+def evaluate_assessment(assessment_id):
+    """Manually trigger evaluation of an existing assessment with OpenAI."""
+    assessment: Assessment | None = Assessment.query.get(assessment_id)
+    if not assessment:
+        return jsonify({"error": "Assessment not found"}), 404
+    
+    if not ENABLE_LLM:
+        return jsonify({"error": "LLM evaluation is disabled"}), 400
+    
+    try:
+        # Get the attacked PDF path
+        attacked_pdf_path = Path(assessment.attacked_pdf.path)
+        if not attacked_pdf_path.exists():
+            return jsonify({"error": "Attacked PDF not found"}), 404
+        
+        # Get questions and answers from the database
+        questions = Question.query.filter_by(assessment_id=assessment.id).all()
+        
+        # Prepare reference and malicious answers
+        reference_answers = {}
+        malicious_answers = {}
+        
+        for q in questions:
+            q_num = q.q_number
+            # Reference answer (correct answer)
+            if q.gold_answer:
+                reference_answers[q_num] = q.gold_answer
+            
+            # For malicious answers, we need to get the wrong answer that was generated
+            if q.wrong_answer:
+                malicious_answers[q_num] = q.wrong_answer
+        
+        if not reference_answers or not malicious_answers:
+            return jsonify({"error": "Missing reference or malicious answers"}), 400
+        
+        # Perform evaluation
+        evaluation_results = evaluate_pdf_with_openai(
+            attacked_pdf_path=attacked_pdf_path,
+            reference_answers=reference_answers,
+            malicious_answers=malicious_answers
+        )
+        
+        return jsonify({
+            "assessment_id": str(assessment.id),
+            "evaluation": evaluation_results
+        }), 200
+        
+    except Exception as exc:
+        logger.error(f"[evaluate_assessment] Evaluation failed: {exc}")
+        return jsonify({"error": f"Evaluation failed: {str(exc)}"}), 500 

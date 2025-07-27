@@ -63,6 +63,8 @@ class Question(db.Model):
     options_json = db.Column(MutableDict.as_mutable(JSONB), nullable=False)
     gold_answer = db.Column(db.Text, nullable=False)
     gold_reason = db.Column(db.Text, nullable=True)
+    wrong_answer = db.Column(db.Text, nullable=True)
+    wrong_reason = db.Column(db.Text, nullable=True)
     attacked_stem = db.Column(db.Text, nullable=True)
 
     assessment = relationship("Assessment", back_populates="questions")
