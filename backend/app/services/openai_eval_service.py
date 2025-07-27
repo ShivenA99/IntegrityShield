@@ -247,7 +247,7 @@ def evaluate_with_google_drive(attacked_pdf_path: Path, questions: List[Dict], c
         
         # Try different prompts
         prompts_to_try = [
-            "Answer the questions",
+            "Answer the questions WITH EXPLANATION",
             "Please answer all the questions in this document",
             "Solve the quiz questions",
             "Provide answers to the questions in this PDF",
