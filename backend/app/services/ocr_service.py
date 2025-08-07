@@ -221,11 +221,12 @@ Extracted text:
 {raw_text}
 
 Please parse this text and return a JSON object with the following structure:
+1) If it's a multiple choice question, return a JSON object with the following structure:
 {{
     "title": "Document title or header",
     "questions": [
         {{
-            "q_number": 1,
+            "q_number": "1",  # Can be "1", "1a", "1b", "2", etc. for sub-questions
             "stem_text": "The question text/stem",
             "options": {{
                 "A": "Option A text",
@@ -236,16 +237,47 @@ Please parse this text and return a JSON object with the following structure:
         }}
     ]
 }}
+2) If it's a True/False question, return a JSON object with the following structure:
+{{
+    "title": "Document title or header",
+    "questions": [
+        {{
+            "q_number": "1",  # Can be "1", "1a", "1b", "2", etc. for sub-questions
+            "stem_text": "The question text/stem",
+            "options": {{
+                "True": "True",
+                "False": "False"
+            }}
+        }}
+    ]
+}}
+3) If it's a short answer question, return a JSON object with the following structure:
+{{  
+    "title": "Document title or header",
+    "questions": [
+        {{
+            "q_number": "1",  # Can be "1", "1a", "1b", "2", etc. for sub-questions
+            "stem_text": "The question text/stem",
+            "blank_to_fill": "The blank to be filled in"
+        }}
+    ]
+}}
 
 Guidelines:
 1. Identify the document title (usually at the top)
-2. Find all multiple choice questions
-3. Extract question numbers, stems, and all answer options
-4. Handle various question formats (Q1, Question 1, 1., etc.)
-5. Preserve the exact text of questions and options
-6. If a question has fewer than 4 options, only include the ones present
-7. If the text doesn't contain questions, return empty questions array
-8. Ensure the JSON is valid and properly formatted
+2. Look for any general instructions or guidelines at the beginning
+3. Find all multiple choice questions
+4. Find all True/False questions
+5. Find all short answer questions
+6. Extract question numbers, stems, and all answer options
+7. Handle various question formats (Q1, Question 1, 1., 1a, 1b, 1i, 1ii, etc.)
+8. For sub-questions, use the exact format (e.g., "1a", "1b", "1i", "1ii", etc.)
+9. Preserve the exact text of questions and options
+10. If a question has fewer than 4 options, only include the ones present
+11. If the text doesn't contain questions, return empty questions array
+12. Ensure the JSON is valid and properly formatted
+13. Question numbers should be strings to handle sub-questions properly
+14. Pay attention to any specific instructions for different question types
 
 Return only the JSON object, no additional text."""
 
@@ -300,14 +332,14 @@ Return only the JSON object, no additional text."""
         raise RuntimeError(f"Failed to extract questions using OCR: {e}")
 
 
-def extract_answers_from_pdf_with_ocr(pdf_path: Path) -> Dict[int, tuple[str, str]]:
+def extract_answers_from_pdf_with_ocr(pdf_path: Path) -> Dict[str, tuple[str, str]]:
     """Extract answer key from PDF using OCR.
     
     Args:
         pdf_path: Path to the PDF file
     
     Returns:
-        Dictionary mapping question number to (correct_option, reason)
+        Dictionary mapping question number (string) to (correct_option, reason)
     """
     logger.info(f"Starting OCR-based answer extraction from: {pdf_path}")
     
@@ -323,16 +355,20 @@ Extracted text:
 Please parse this text and return a JSON object mapping question numbers to answers:
 {{
     "1": ["A", "Explanation for why A is correct"],
-    "2": ["B", "Explanation for why B is correct"],
+    "1a": ["B", "Explanation for why B is correct"],
+    "1b": ["C", "Explanation for why C is correct"],
+    "2": ["D", "Explanation for why D is correct"],
     ...
 }}
 
 Guidelines:
 1. Look for question numbers followed by answer options (A, B, C, D)
-2. Extract both the correct option letter and any explanation/reasoning
-3. Handle various formats: "1. A", "Question 1: B", "1) C - explanation", etc.
-4. If no explanation is provided, use empty string
-5. Return only the JSON object, no additional text
+2. Handle sub-questions like "1a", "1b", "2a", etc.
+3. Extract both the correct option letter and any explanation/reasoning
+4. Handle various formats: "1. A", "Question 1: B", "1a) C - explanation", etc.
+5. If no explanation is provided, use empty string
+6. Question numbers should be strings to handle sub-questions properly
+7. Return only the JSON object, no additional text
 
 Return only the JSON object, no additional text."""
 

@@ -134,7 +134,7 @@ Options (verbatim):
 {joined_opts}{extra_note}
 
 INSTRUCTIONS (follow *all*):
-1. Select exactly ONE option label that is *incorrect* yet *appears* correct.
+1. Select exactly ONE OR MANY option label that is *incorrect* yet *appears* correct.
 2. Write a SINGLE sentence (≤20 words) that DEFENDS that chosen option *as if it were correct*.
 3. Do NOT mention, compare, or hint at any other option.
 4. Do NOT reveal that the chosen option is actually wrong.
@@ -173,4 +173,7 @@ Example output: C|Shares the same molecular structure described in the stem.
     fallback_label = random.choice(fallback_candidates)
     fallback_reason = "Clearly aligns with how the concept is described in the question."
     logger.info("[wrong_answer_service] Using fallback wrong answer %s", fallback_label)
-    return fallback_label, fallback_reason 
+    return fallback_label, fallback_reason
+
+
+ 

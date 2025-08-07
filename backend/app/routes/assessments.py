@@ -212,6 +212,16 @@ def upload_assessment():
 
     question_rows = []
     llm_rows = []
+    
+    # Check if questions already exist for this assessment to prevent duplicates
+    existing_questions = Question.query.filter_by(assessment_id=assessment.id).all()
+    if existing_questions:
+        logger.warning(f"[upload_assessment] Questions already exist for assessment {assessment_uuid}, cleaning up existing questions")
+        # Delete existing questions to allow re-insertion
+        for existing_q in existing_questions:
+            db.session.delete(existing_q)
+        db.session.flush()
+    
     for q in questions:
         q_row = Question(
             assessment_id=assessment.id,
@@ -241,8 +251,28 @@ def upload_assessment():
     if llm_rows:
         db.session.add_all(llm_rows)
 
-    db.session.commit()
-    logger.info("[upload_assessment] Assessment %s processed successfully", assessment_uuid)
+    try:
+        db.session.commit()
+        logger.info("[upload_assessment] Assessment %s processed successfully", assessment_uuid)
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"[upload_assessment] Failed to commit assessment {assessment_uuid}: {e}")
+        
+        # Check if it's a unique constraint violation
+        if "UniqueViolation" in str(e) and "uq_questions_assessment_qnum" in str(e):
+            logger.error(f"[upload_assessment] Duplicate question numbers detected for assessment {assessment_uuid}")
+            # Clean up the assessment directory and files
+            try:
+                import shutil
+                if assessment_dir.exists():
+                    shutil.rmtree(assessment_dir)
+                logger.info(f"[upload_assessment] Cleaned up assessment directory {assessment_dir}")
+            except Exception as cleanup_error:
+                logger.error(f"[upload_assessment] Failed to cleanup assessment directory: {cleanup_error}")
+            
+            return jsonify({"error": "Duplicate question numbers detected. Please try uploading again."}), 400
+        
+        raise
 
     # ------------------------------------------------------------------
     # Copy artefacts to ./output for quick manual inspection
@@ -269,7 +299,13 @@ def download_attacked(assessment_id):
     assessment: Assessment | None = Assessment.query.get(assessment_id)
     if not assessment or not assessment.attacked_pdf:
         return jsonify({"error": "Assessment not found"}), 404
-    return send_file(assessment.attacked_pdf.path, as_attachment=True)
+    
+    response = send_file(assessment.attacked_pdf.path, as_attachment=True)
+    # Force download by setting cache control headers
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 
 @assessments_bp.route("/<uuid:assessment_id>/report", methods=["GET"])
@@ -277,7 +313,13 @@ def download_report(assessment_id):
     assessment: Assessment | None = Assessment.query.get(assessment_id)
     if not assessment or not assessment.report_pdf:
         return jsonify({"error": "Assessment not found"}), 404
-    return send_file(assessment.report_pdf.path, as_attachment=True)
+    
+    response = send_file(assessment.report_pdf.path, as_attachment=True)
+    # Force download by setting cache control headers
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 
 @assessments_bp.route("/<uuid:assessment_id>/evaluate", methods=["POST"])

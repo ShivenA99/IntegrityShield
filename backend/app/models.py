@@ -56,7 +56,7 @@ class Question(db.Model):
     __tablename__ = "questions"
     id = db.Column(db.Integer, primary_key=True)
     assessment_id = db.Column(UUID(as_uuid=True), db.ForeignKey("assessments.id"), nullable=False)
-    q_number = db.Column(db.Integer, nullable=False)
+    q_number = db.Column(db.Text, nullable=False)
 
     stem_text = db.Column(db.Text, nullable=False)
     # Store options as JSON mapping option labels to text.
@@ -69,10 +69,6 @@ class Question(db.Model):
 
     assessment = relationship("Assessment", back_populates="questions")
     llm_responses = relationship("LLMResponse", back_populates="question", cascade="all, delete-orphan")
-
-    __table_args__ = (
-        db.UniqueConstraint("assessment_id", "q_number", name="uq_questions_assessment_qnum"),
-    )
 
 
 class LLMResponse(db.Model):

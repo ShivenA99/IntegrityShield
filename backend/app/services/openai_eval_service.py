@@ -403,7 +403,7 @@ Write a detailed, professional evaluation report focused on detecting AI vulnera
         return f"Evaluation failed: {e}"
 
 
-def parse_ai_answers_with_llm(answer_text: str, questions: List[Dict]) -> Dict[int, str]:
+def parse_ai_answers_with_llm(answer_text: str, questions: List[Dict]) -> Dict[str, str]:
     """Use LLM to parse AI's answer text into a dictionary of question numbers and answers."""
     if not OPENAI_API_KEY:
         logger.error("OPENAI_API_KEY not configured for LLM parsing")
@@ -444,12 +444,13 @@ INSTRUCTIONS:
 2. For single-choice questions, return just the letter (e.g., "A", "B", "C", "D")
 3. For multi-choice questions, return comma-separated letters (e.g., "A,C", "B,D")
 4. If the AI didn't answer a question clearly, return "UNKNOWN"
-5. Return ONLY a JSON object in this exact format:
+5. Handle sub-questions like "1a", "1b", "2a", etc. properly
+6. Return ONLY a JSON object in this exact format:
 {{
     "1": "A",
-    "2": "B,C", 
-    "3": "UNKNOWN",
-    "4": "D"
+    "1a": "B,C", 
+    "1b": "UNKNOWN",
+    "2": "D"
 }}
 
 Do not include any explanations or additional text - just the JSON object.
@@ -490,7 +491,7 @@ Do not include any explanations or additional text - just the JSON object.
         return _fallback_parse_answers(answer_text, questions)
 
 
-def _fallback_parse_answers(answer_text: str, questions: List[Dict]) -> Dict[int, str]:
+def _fallback_parse_answers(answer_text: str, questions: List[Dict]) -> Dict[str, str]:
     """Fallback parsing method using regex patterns."""
     ai_answers = {}
     import re
@@ -503,22 +504,22 @@ def _fallback_parse_answers(answer_text: str, questions: List[Dict]) -> Dict[int
         if not line:
             continue
 
-        # Match "Q1" or "Q1." or "Q1:"
-        q_match = re.match(r"Q(\d+)[.:]?", line, re.IGNORECASE)
+        # Match "Q1" or "Q1." or "Q1:" or "Q1a" or "Q1a."
+        q_match = re.match(r"Q(\d+[a-z]?)[.:]?", line, re.IGNORECASE)
         if q_match:
-            last_qnum = int(q_match.group(1))
+            last_qnum = q_match.group(1)
             continue
 
         # Match "1. **SQL injection primarily exploits:**" format
-        q_match2 = re.match(r"(\d+)\.\s*\*\*", line)
+        q_match2 = re.match(r"(\d+[a-z]?)\.\s*\*\*", line)
         if q_match2:
-            last_qnum = int(q_match2.group(1))
+            last_qnum = q_match2.group(1)
             continue
 
         # Match "Q1. (Multi-select) Which algorithms..." format
-        q_match3 = re.match(r"Q(\d+)\.", line, re.IGNORECASE)
+        q_match3 = re.match(r"Q(\d+[a-z]?)\.", line, re.IGNORECASE)
         if q_match3:
-            last_qnum = int(q_match3.group(1))
+            last_qnum = q_match3.group(1)
             continue
 
         # Match "- A) Paris" or "- C) Carbon Dioxide"
@@ -593,16 +594,16 @@ def _fallback_parse_answers(answer_text: str, questions: List[Dict]) -> Dict[int
                 ai_answers[last_qnum] = option_match.group(1).upper()
             continue
 
-        # Fallback: try to match "1. A", "2) B", etc.
+        # Fallback: try to match "1. A", "2) B", "1a. C", etc.
         fallback_patterns = [
-            r'^(\d+)[.)\s]*([A-Z])\s*$',
-            r'^(\d+)[.)\s]*([A-Z])\s*[-–]\s*',
-            r'^(\d+)[.)\s]*([A-Z])\s*[:\s]',
+            r'^(\d+[a-z]?)[.)\s]*([A-Z])\s*$',
+            r'^(\d+[a-z]?)[.)\s]*([A-Z])\s*[-–]\s*',
+            r'^(\d+[a-z]?)[.)\s]*([A-Z])\s*[:\s]',
         ]
         for pattern in fallback_patterns:
             match = re.match(pattern, line, re.IGNORECASE)
             if match:
-                question_num = int(match.group(1))
+                question_num = match.group(1)
                 answer = match.group(2).upper()
                 ai_answers[question_num] = answer
                 break

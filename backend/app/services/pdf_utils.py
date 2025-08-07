@@ -55,7 +55,7 @@ def parse_pdf_questions(pdf_path: Path) -> Tuple[str, List[Dict]]:
 
     Each question dict has the shape::
         {
-            "q_number": int,
+            "q_number": str,  # Can be "1", "1a", "1b", etc. for sub-questions
             "stem_text": str,
             "options": {"A": "...", "B": "...", ...}
         }
@@ -77,7 +77,7 @@ def parse_pdf_questions(pdf_path: Path) -> Tuple[str, List[Dict]]:
             formatted_questions = []
             for q in questions:
                 formatted_questions.append({
-                    "q_number": q.get("q_number", 0),
+                    "q_number": str(q.get("q_number", 0)),  # Convert to string to handle sub-questions
                     "stem_text": q.get("stem_text", ""),
                     "options": q.get("options", {})
                 })
@@ -96,7 +96,8 @@ def parse_pdf_questions(pdf_path: Path) -> Tuple[str, List[Dict]]:
 
     # Split title (everything up to first question marker)
     import re
-    q_start_match = re.search(r"(?:Q|Question)?\s*1[.)]", text_blob, flags=re.I)
+    # Updated regex to handle sub-questions like "1a", "1b", etc.
+    q_start_match = re.search(r"(?:Q|Question)?\s*1[a-z]?[.)]", text_blob, flags=re.I)
     if q_start_match:
         title_text = text_blob[: q_start_match.start()].strip()
         rest_text = text_blob[q_start_match.start():]
@@ -108,13 +109,13 @@ def parse_pdf_questions(pdf_path: Path) -> Tuple[str, List[Dict]]:
     # Replace 'A.' with '\nA)' etc.
     rest_text = re.sub(r"\s*([A-D])\s*[.)]", lambda m: f"\n{m.group(1)})", rest_text)
 
-    # Split on Q<number>.) variations
-    matches = re.split(r"\n?(?:Q|Question)?\s*(\d+)[.)]\s*", rest_text, flags=re.I)
-    # split returns ["", "1", "question text...", "2", "question text...", ...]
+    # Updated regex to handle sub-questions: split on Q<number>[a-z]?) variations
+    matches = re.split(r"\n?(?:Q|Question)?\s*(\d+[a-z]?)[.)]\s*", rest_text, flags=re.I)
+    # split returns ["", "1", "question text...", "1a", "question text...", "2", "question text...", ...]
     if len(matches) < 3:
         return title_text, questions  # parsing failed gracefully
 
-    iterator = iter(matches[1:])  # skip first empty str
+    iterator = iter(matches[1:])
     for q_num, q_text in zip(iterator, iterator):
         # Further heuristics to extract options A-D lines
         opts_match = re.split(r"\n[A-D]\)", q_text)
@@ -145,7 +146,7 @@ def parse_pdf_questions(pdf_path: Path) -> Tuple[str, List[Dict]]:
             body = opt_match.group(2).strip()
             options[label] = body
         questions.append({
-            "q_number": int(q_num),
+            "q_number": str(q_num),  # Keep as string to handle sub-questions
             "stem_text": stem.lstrip(),  # ensure no leading whitespace/newlines
             "options": options,
         })
@@ -482,11 +483,12 @@ def _write_tex(use_geometry: bool = True):
             f.write(r"}")
             f.write("\n")
             
-            # Add instructions below the title
+            # Add comprehensive instructions below the title
             f.write(r"\textbf{Instructions:} ")
-            f.write(r"Select the correct option(s) for each question. ")
-            f.write(r"Some questions may have multiple correct answers. ")
-            f.write(r"Provide a short explanation for all.")
+            f.write(r"Answer all questions as directed. ")
+            f.write(r"For True/False questions, select i) or ii). ")
+            f.write(r"For multiple choice questions, select the best answer(s). ")
+            f.write(r"Provide brief explanations for your answers where requested.")
             f.write(r"\bigskip\par\noindent")
             f.write("\n")
 
@@ -511,19 +513,49 @@ def _write_tex(use_geometry: bool = True):
 
             visible_stem = q["attacked_stem"].replace(HIDDEN_INSTRUCTION_TEXT_PRIORITY_ALPHA, "").lstrip()
 
-            f.write(r"\textbf{Question ")
-            f.write(_escape_latex(str(q['q_number'])))
-            f.write(r")} ")
+            # Format question number properly - handle sub-questions like "1a", "1b", "1i", "1ii"
+            q_number = str(q['q_number'])
+            
+            # Check if it's a sub-question with letters (1a, 1b, 1i, 1ii, etc.)
+            if re.match(r'\d+[a-z]+', q_number, re.IGNORECASE):
+                # Extract the main number and sub-question
+                main_num = re.match(r'(\d+)', q_number).group(1)
+                sub_part = q_number[len(main_num):]
+                f.write(r"\textbf{Question ")
+                f.write(_escape_latex(main_num))
+                f.write(r"(")
+                f.write(_escape_latex(sub_part))
+                f.write(r")} ")
+            else:
+                # Regular question format: "1", "2", etc.
+                f.write(r"\textbf{Question ")
+                f.write(_escape_latex(q_number))
+                f.write(r")} ")
+            
             f.write(_escape_latex(visible_stem))
-            f.write(r"\\")
+            f.write(r"\par")
             f.write("\n")
 
-            for label, option in q["options"].items():
-                # Remove stray numeric fragments that sometimes sneak onto their own line
-                clean_opt = re.sub(r"\s+\d+\s*$", "", option.rstrip("(").strip())
-                f.write(_escape_latex(f"{label}) {clean_opt}"))
-                f.write(r"\\")
-                f.write("\n")
+            # Handle different option formats based on question type
+            options_list = list(q["options"].items())
+            
+            # Check if this is a True/False question
+            if len(options_list) == 2 and all(label in ["True", "False"] for label, _ in options_list):
+                # Format True/False questions with i) and ii)
+                for i, (label, option) in enumerate(options_list):
+                    roman_numeral = "i" if i == 0 else "ii"
+                    clean_opt = re.sub(r"\s+\d+\s*$", "", option.rstrip("(").strip())
+                    f.write(_escape_latex(f"{roman_numeral}) {clean_opt}"))
+                    f.write(r"\par")
+                    f.write("\n")
+            else:
+                # Format regular MCQ questions with A, B, C, D
+                for label, option in options_list:
+                    # Remove stray numeric fragments that sometimes sneak onto their own line
+                    clean_opt = re.sub(r"\s+\d+\s*$", "", option.rstrip("(").strip())
+                    f.write(_escape_latex(f"{label}) {clean_opt}"))
+                    f.write(r"\par")
+                    f.write("\n")
 
             # After the global instruction, add proper vertical space (without leaking commands as visible text)
             f.write(r"\bigskip\par\noindent")
@@ -586,11 +618,12 @@ def _build_attacked_pdf_latex(questions: List[Dict], output_path: Path, title: s
                 f.write(r"}")
                 f.write("\n")
                 
-                # Add instructions below the title
+                # Add comprehensive instructions below the title
                 f.write(r"\textbf{Instructions:} ")
-                f.write(r"Select the correct option(s) for each question. ")
-                f.write(r"Some questions may have multiple correct answers. ")
-                f.write(r"Provide a short explanation for all.")
+                f.write(r"Answer all questions as directed. ")
+                f.write(r"For True/False questions, select i) or ii). ")
+                f.write(r"For multiple choice questions, select the best answer(s). ")
+                f.write(r"Provide brief explanations for your answers where requested.")
                 f.write(r"\bigskip\par\noindent")
                 f.write("\n")
 
@@ -615,19 +648,49 @@ def _build_attacked_pdf_latex(questions: List[Dict], output_path: Path, title: s
 
                 visible_stem = q["attacked_stem"].replace(HIDDEN_INSTRUCTION_TEXT_PRIORITY_ALPHA, "").lstrip()
 
-                f.write(r"\textbf{Question ")
-                f.write(_escape_latex(str(q['q_number'])))
-                f.write(r")} ")
+                # Format question number properly - handle sub-questions like "1a", "1b", "1i", "1ii"
+                q_number = str(q['q_number'])
+                
+                # Check if it's a sub-question with letters (1a, 1b, 1i, 1ii, etc.)
+                if re.match(r'\d+[a-z]+', q_number, re.IGNORECASE):
+                    # Extract the main number and sub-question
+                    main_num = re.match(r'(\d+)', q_number).group(1)
+                    sub_part = q_number[len(main_num):]
+                    f.write(r"\textbf{Question ")
+                    f.write(_escape_latex(main_num))
+                    f.write(r"(")
+                    f.write(_escape_latex(sub_part))
+                    f.write(r")} ")
+                else:
+                    # Regular question format: "1", "2", etc.
+                    f.write(r"\textbf{Question ")
+                    f.write(_escape_latex(q_number))
+                    f.write(r")} ")
+                
                 f.write(_escape_latex(visible_stem))
-                f.write(r"\\")
+                f.write(r"\par")
                 f.write("\n")
 
-                for label, option in q["options"].items():
-                    # Remove stray numeric fragments that sometimes sneak onto their own line
-                    clean_opt = re.sub(r"\s+\d+\s*$", "", option.rstrip("(").strip())
-                    f.write(_escape_latex(f"{label}) {clean_opt}"))
-                    f.write(r"\\")
-                    f.write("\n")
+                # Handle different option formats based on question type
+                options_list = list(q["options"].items())
+                
+                # Check if this is a True/False question
+                if len(options_list) == 2 and all(label in ["True", "False"] for label, _ in options_list):
+                    # Format True/False questions with i) and ii)
+                    for i, (label, option) in enumerate(options_list):
+                        roman_numeral = "i" if i == 0 else "ii"
+                        clean_opt = re.sub(r"\s+\d+\s*$", "", option.rstrip("(").strip())
+                        f.write(_escape_latex(f"{roman_numeral}) {clean_opt}"))
+                        f.write(r"\par")
+                        f.write("\n")
+                else:
+                    # Format regular MCQ questions with A, B, C, D
+                    for label, option in options_list:
+                        # Remove stray numeric fragments that sometimes sneak onto their own line
+                        clean_opt = re.sub(r"\s+\d+\s*$", "", option.rstrip("(").strip())
+                        f.write(_escape_latex(f"{label}) {clean_opt}"))
+                        f.write(r"\par")
+                        f.write("\n")
 
                 # After the global instruction, add proper vertical space (without leaking commands as visible text)
                 f.write(r"\bigskip\par\noindent")
@@ -689,10 +752,10 @@ def extract_questions_from_pdf(pdf_path: Path) -> List[Dict]:
 # If parsing fails for a question, that entry is omitted.
 # ---------------------------------------------------------------------------
 
-def parse_pdf_answers(pdf_path: Path) -> Dict[int, Tuple[str, str]]:
+def parse_pdf_answers(pdf_path: Path) -> Dict[str, Tuple[str, str]]:
     """Extract answer key from *pdf_path*.
 
-    Returns a dict mapping question number *int* → tuple ``(correct_option_label, reason)``.
+    Returns a dict mapping question number *str* → tuple ``(correct_option_label, reason)``.
     This function now uses OCR with vision-capable LLMs when available to prevent
     information loss that can occur with traditional PDF parsing libraries.
     """
@@ -713,16 +776,16 @@ def parse_pdf_answers(pdf_path: Path) -> Dict[int, Tuple[str, str]]:
 
     text_blob = "\n".join(p.extract_text() or "" for p in PdfReader(str(pdf_path)).pages)
 
-    answers: Dict[int, Tuple[str, str]] = {}
+    answers: Dict[str, Tuple[str, str]] = {}
 
-    # Regex: 1. Answer: A  — explanation
+    # Updated regex to handle sub-questions: 1a. Answer: A  — explanation
     pattern = re.compile(
-        r"(?P<num>\d+)\s*[.).]?(?:\s*Answer\s*[:\-])?\s*(?P<label>[A-D])\b[)\.\s-]*(?P<reason>[^\n]*)",
+        r"(?P<num>\d+[a-z]?)\s*[.).]?(?:\s*Answer\s*[:\-])?\s*(?P<label>[A-D])\b[)\.\s-]*(?P<reason>[^\n]*)",
         re.I,
     )
 
     for m in pattern.finditer(text_blob):
-        q_num = int(m.group("num"))
+        q_num = m.group("num")
         label = m.group("label").upper()
         reason = m.group("reason").strip()
         answers[q_num] = (label, reason)
