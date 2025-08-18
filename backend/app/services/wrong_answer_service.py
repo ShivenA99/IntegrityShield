@@ -146,17 +146,42 @@ Example output: C|Shares the same molecular structure described in the stem.
 
     content = _call_openai(prompt)
     if content:
-        # Expect "C|Because …" format
-        if "|" in content:
-            label, reason = content.split("|", 1)
-            label = label.strip().upper().rstrip(")").lstrip("(")  # clean formats like "C)"
-            # Collapse to one line, remove excess whitespace
+        # Normalize to single line for easier parsing
+        one_line = re.sub(r"\s+", " ", content.strip())
+
+        # Expect strict "C|Because …" format first
+        if "|" in one_line:
+            label, reason = one_line.split("|", 1)
+            label = label.strip().upper().rstrip(")").lstrip("(")
             reason = re.sub(r"\s+", " ", reason.strip())
             if label in options:
                 return label, reason
-            # fallthrough to heuristic if LLM picked invalid label
-        else:
-            logger.debug("[wrong_answer_service] Unexpected LLM output format: %s", content)
+            # If model returned something like "B)" or "Answer: B", try to clean again below
+
+        # Heuristic parsing for common variants:
+        # - "Answer: B) ..." -> B
+        # - "B) Because ..." -> B
+        # - "True" / "False" when options are T/F
+        # - Any token that matches an existing option key (case-insensitive)
+        # Try letter options first
+        letter_match = re.search(r"\b([A-D])\)?\b", one_line, flags=re.IGNORECASE)
+        if letter_match:
+            candidate = letter_match.group(1).upper()
+            if candidate in options:
+                return candidate, "Clearly aligns with how the concept is described in the question."
+
+        # Try to match any of the provided option keys directly (for T/F or custom labels)
+        for opt_key in options.keys():
+            # Case-insensitive exact word match
+            if re.search(rf"\b{re.escape(str(opt_key))}\b", one_line, flags=re.IGNORECASE):
+                return str(opt_key), "Clearly aligns with how the concept is described in the question."
+
+        # If we reach here, we could not parse a usable label from LLM output
+        logger.info(
+            "[wrong_answer_service] Unexpected LLM output format; falling back. content=%r options=%s",
+            content,
+            list(options.keys()),
+        )
 
     # ------------------------------------------------------------------
     # 2. Fallback heuristic – randomly choose a wrong option (not the correct one)
