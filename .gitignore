@@ -9372,3 +9372,27 @@ backend/data/prebuilt_fonts/DejaVuSans/v4/map_U+200B_to_U+0076.ttf
 backend/data/prebuilt_fonts/DejaVuSans/v4/map_U+200B_to_U+0077.ttf
 backend/data/prebuilt_fonts/DejaVuSans/v4/map_U+200B_to_U+0078.ttf
 backend/data/prebuilt_fonts/DejaVuSans/v4/map_U+200B_to_U+0079.ttf
+
+# macOS
+.DS_Store
+
+# Python venv / caches
+.venv/
+**/__pycache__/
+
+# Frontend (Vite/Node)
+frontend/node_modules/
+frontend/dist/
+
+# App runtime artifacts
+backend/data/assessments/
+backend/output/
+
+# LaTeX temp
+*.aux
+*.log
+*.out
+*.toc
+
+# Local OAuth backups
+backend/.local/*.bak
