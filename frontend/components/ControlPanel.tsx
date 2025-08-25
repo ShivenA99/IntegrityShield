@@ -4,17 +4,15 @@ interface ControlPanelProps {
   onSubmit: () => void;
   onClear: () => void;
   isLoading: boolean;
+  noCopy?: boolean;
+  noScreenshot?: boolean;
+  onToggleNoCopy?: (v: boolean) => void;
+  onToggleNoScreenshot?: (v: boolean) => void;
 }
 
-export const ControlPanel: React.FC<ControlPanelProps> = ({
-  onSubmit,
-  onClear,
-  isLoading,
-}: ControlPanelProps) => {
+export const ControlPanel: React.FC<ControlPanelProps> = ({ onSubmit, onClear, isLoading, noCopy = false, noScreenshot = false, onToggleNoCopy, onToggleNoScreenshot }) => {
   return (
     <div className="space-y-6">
-      {/* Additional controls can be added here in the future */}
-
       <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
         <button
           onClick={onSubmit}
@@ -30,6 +28,17 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         >
           Clear All
         </button>
+      </div>
+
+      <div className="flex items-center gap-6 text-sm">
+        <label className="inline-flex items-center gap-2 opacity-70" title="Coming soon">
+          <input type="checkbox" checked={noCopy} onChange={(e) => onToggleNoCopy?.(e.target.checked)} disabled className="accent-sky-600" />
+          <span>No-copy</span>
+        </label>
+        <label className="inline-flex items-center gap-2 opacity-70" title="Coming soon">
+          <input type="checkbox" checked={noScreenshot} onChange={(e) => onToggleNoScreenshot?.(e.target.checked)} disabled className="accent-sky-600" />
+          <span>No-screenshot</span>
+        </label>
       </div>
     </div>
   );

@@ -314,12 +314,12 @@ def generate_wrong_answer_entities(
         "Stem: What loss is used for multi-class classification?\n"
         "Options: (none)\n"
         "JSON: {\n  \"input_entity\": \"cross-entropy\",\n  \"output_entity\": \"mean squared error\",\n  \"wrong_label\": \"\",\n  \"rationale\": \"Plausible alternative within topic.\",\n  \"entity_type\": \"text\",\n  \"entity_source\": \"stem\",\n  \"question_type\": \"short_answer\",\n  \"transformation\": \"topic_preserving_substitution\",\n  \"inferred_correct_label\": \"\",\n  \"inferred_correct_text\": \"cross-entropy\",\n  \"input_start\": 0,\n  \"input_end\": 0\n}"
-    )
+        )
 
     prompt = f"""
 You will produce a glyph-mapping plan that makes a specific WRONG option appear correct by minimally altering the QUESTION text only.
-
-Return STRICT JSON only with keys:
+ 
+ Return STRICT JSON only with keys:
 - input_entity (string)
 - output_entity (string)
 - wrong_label (string)
@@ -332,7 +332,7 @@ Return STRICT JSON only with keys:
 - inferred_correct_text (string)
 - input_start (integer)
 - input_end (integer)
-
+ 
 Rules (ALL must hold):
 1) Solve the question FIRST. Set inferred_correct_label/text.
 2) Choose exactly one wrong_label from Options (when present) that you will make appear correct.
@@ -345,13 +345,13 @@ Rules (ALL must hold):
 8) Validate before returning: wrong_label ∈ labels (if any); wrong_label ≠ inferred_correct_label; input_entity length 3–30 and differs from output_entity; input_start/input_end slice input_entity from the stem.
 
 Return ONLY the JSON object. No explanations or code fences.
-
+ 
 Question (stem):
 {stem_text}
-
+ 
 Options (verbatim; may be empty):
-{joined_opts}
-
+ {joined_opts}
+ 
 {few_shots}
 """
 

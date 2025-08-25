@@ -417,6 +417,125 @@ def download_report(assessment_id):
     return response
 
 
+@assessments_bp.route("/<uuid:assessment_id>/original", methods=["GET"])
+def download_original(assessment_id):
+    assessment: Assessment | None = Assessment.query.get(assessment_id)
+    if not assessment or not assessment.original_pdf:
+        return jsonify({"error": "Assessment not found"}), 404
+
+    response = send_file(assessment.original_pdf.path, as_attachment=True)
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+
+@assessments_bp.route("/", methods=["GET"])
+def list_assessments():
+    """Paginated list of assessments with basic filtering/sorting.
+    Query params:
+      - q: substring search on original filename
+      - attack_type: exact match
+      - status: exact match
+      - start: ISO date/time (inclusive)
+      - end: ISO date/time (inclusive)
+      - sort: one of created_at|attack_type|status|original_filename
+      - order: asc|desc
+      - page: 1-based page number
+      - page_size: items per page (max 100)
+    """
+    import datetime as dt
+    from sqlalchemy import func
+    
+    q = request.args.get("q", type=str)
+    attack_type = request.args.get("attack_type", type=str)
+    status = request.args.get("status", type=str)
+    start = request.args.get("start", type=str)
+    end = request.args.get("end", type=str)
+    sort = request.args.get("sort", default="created_at", type=str)
+    order = request.args.get("order", default="desc", type=str)
+    page = request.args.get("page", default=1, type=int)
+    page_size = max(1, min(100, request.args.get("page_size", default=20, type=int)))
+
+    query = Assessment.query
+
+    # Filters
+    if attack_type:
+        query = query.filter(Assessment.attack_type == attack_type)
+    if status:
+        query = query.filter(Assessment.status == status)
+    # Date range
+    try:
+        if start:
+            start_dt = dt.datetime.fromisoformat(start)
+            query = query.filter(Assessment.created_at >= start_dt)
+        if end:
+            end_dt = dt.datetime.fromisoformat(end)
+            query = query.filter(Assessment.created_at <= end_dt)
+    except Exception:
+        return jsonify({"error": "Invalid start/end datetime format. Use ISO 8601."}), 400
+
+    # Filename search (substring on basename of original)
+    if q:
+        # Join to original file for filtering by basename
+        query = query.join(Assessment.original_pdf)
+        # Use case-insensitive search on the tail of path
+        query = query.filter(func.lower(func.split_part(StoredFile.path, '/', -1)).like(f"%{q.lower()}%"))
+
+    # Sorting
+    sort_map = {
+        "created_at": Assessment.created_at,
+        "attack_type": Assessment.attack_type,
+        "status": Assessment.status,
+        # For original_filename we need to join stored_files
+        "original_filename": func.split_part(StoredFile.path, '/', -1),
+    }
+
+    # Ensure necessary joins for sorting columns
+    if sort == "original_filename":
+        query = query.join(Assessment.original_pdf)
+
+    sort_col = sort_map.get(sort, Assessment.created_at)
+
+    if order.lower() == "asc":
+        query = query.order_by(sort_col.asc())
+    else:
+        query = query.order_by(sort_col.desc())
+
+    # Pagination
+    total = query.count()
+    items = query.offset((page - 1) * page_size).limit(page_size).all()
+
+    # Build response items
+    def to_item(a: Assessment):
+        import os
+        return {
+            "id": str(a.id),
+            "created_at": a.created_at.isoformat(),
+            "attack_type": a.attack_type,
+            "status": a.status,
+            "original_filename": os.path.basename(a.original_pdf.path) if a.original_pdf else None,
+            "answers_filename": os.path.basename(a.answers_pdf.path) if a.answers_pdf else None,
+            "attacked_filename": os.path.basename(a.attacked_pdf.path) if a.attacked_pdf else None,
+            "report_filename": os.path.basename(a.report_pdf.path) if a.report_pdf else None,
+            "downloads": {
+                "original": f"/api/assessments/{a.id}/original",
+                "attacked": f"/api/assessments/{a.id}/attacked",
+                "report": f"/api/assessments/{a.id}/report",
+            },
+        }
+
+    return jsonify({
+        "items": [to_item(a) for a in items],
+        "pagination": {
+            "page": page,
+            "page_size": page_size,
+            "total": total,
+            "total_pages": (total + page_size - 1) // page_size,
+        },
+    })
+
+
 @assessments_bp.route("/<uuid:assessment_id>/evaluate", methods=["POST"])
 def evaluate_assessment(assessment_id):
     """Manually trigger evaluation of an existing assessment with OpenAI."""

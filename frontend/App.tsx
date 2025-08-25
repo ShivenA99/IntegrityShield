@@ -1,6 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { Header } from './components/Header';
-import { Footer } from './components/Footer';
 import { ControlPanel } from './components/ControlPanel';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { PdfUpload } from './components/PdfUpload';
@@ -27,6 +25,10 @@ const App: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // UI toggles (future backend integration)
+  const [noCopy, setNoCopy] = useState(false);
+  const [noScreenshot, setNoScreenshot] = useState(false);
 
   console.log('[App] Component mounted');
 
@@ -65,62 +67,62 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-900 text-slate-100 font-sans">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Column: Controls and Input */}
-          <div className="flex flex-col space-y-6 p-6 bg-slate-850 rounded-xl shadow-2xl">
-            <ControlPanel
-              onSubmit={handleSubmit}
-              onClear={handleClear}
-              isLoading={isLoading}
-            />
-            {/* Attack Type Dropdown */}
-            <div>
-              <label className="block text-sm font-medium text-sky-300 mb-1">Attack Type</label>
-              <select
-                value={attack}
-                onChange={(e) => setAttack(e.target.value as AttackType)}
-                disabled={isLoading}
-                className="block w-full bg-slate-800 text-slate-100 text-sm rounded-md border border-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-600"
-              >
-                {allowedAttacks.map((a) => (
-                  <option key={a} value={a}>{a}</option>
-                ))}
-              </select>
-            </div>
-            <PdfUpload
-              originalFile={originalPdf}
-              answersFile={answersPdf}
-              onOriginalChange={setOriginalPdf}
-              onAnswersChange={setAnswersPdf}
+    <main className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Left Column: Controls and Input */}
+        <div className="flex flex-col space-y-6 p-6 bg-slate-850 rounded-xl shadow-2xl">
+          <ControlPanel
+            onSubmit={handleSubmit}
+            onClear={handleClear}
+            isLoading={isLoading}
+            noCopy={noCopy}
+            noScreenshot={noScreenshot}
+            onToggleNoCopy={setNoCopy}
+            onToggleNoScreenshot={setNoScreenshot}
+          />
+          {/* Attack Type Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-sky-300 mb-1">Attack Type</label>
+            <select
+              value={attack}
+              onChange={(e) => setAttack(e.target.value as AttackType)}
               disabled={isLoading}
-            />
+              className="block w-full bg-slate-800 text-slate-100 text-sm rounded-md border border-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-600"
+            >
+              {allowedAttacks.map((a) => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
           </div>
-
-          {/* Right Column: Results */}
-          <div className="flex flex-col space-y-6 p-6 bg-slate-850 rounded-xl shadow-2xl">
-            {isLoading && <LoadingSpinner />}
-            {error && (
-              <div className="p-4 bg-red-700 text-white rounded-md shadow-lg" role="alert">
-                <h3 className="font-bold text-lg mb-1">Error</h3>
-                <p className="text-sm">{error}</p>
-              </div>
-            )}
-            {assessmentId && !isLoading && !error && (
-              <DownloadLinks assessmentId={assessmentId} />
-            )}
-            {!assessmentId && !isLoading && !error && (
-              <div className="text-center text-slate-400 py-10">
-                <p className="text-lg">Upload PDFs and run the attack simulation to see download links.</p>
-              </div>
-            )}
-          </div>
+          <PdfUpload
+            originalFile={originalPdf}
+            answersFile={answersPdf}
+            onOriginalChange={setOriginalPdf}
+            onAnswersChange={setAnswersPdf}
+            disabled={isLoading}
+          />
         </div>
-      </main>
-      <Footer />
-    </div>
+
+        {/* Right Column: Results */}
+        <div className="flex flex-col space-y-6 p-6 bg-slate-850 rounded-xl shadow-2xl">
+          {isLoading && <LoadingSpinner />}
+          {error && (
+            <div className="p-4 bg-red-700 text-white rounded-md shadow-lg" role="alert">
+              <h3 className="font-bold text-lg mb-1">Error</h3>
+              <p className="text-sm">{error}</p>
+            </div>
+          )}
+          {assessmentId && !isLoading && !error && (
+            <DownloadLinks assessmentId={assessmentId} />
+          )}
+          {!assessmentId && !isLoading && !error && (
+            <div className="text-center text-slate-400 py-10">
+              <p className="text-lg">Upload PDFs and run the attack simulation to see download links.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
   );
 };
 

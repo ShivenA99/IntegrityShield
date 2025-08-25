@@ -23,6 +23,32 @@ interface EvaluationResponse {
   };
 }
 
+export interface AssessmentListItem {
+  id: string;
+  created_at: string;
+  attack_type: string;
+  status: string;
+  original_filename: string | null;
+  answers_filename: string | null;
+  attacked_filename: string | null;
+  report_filename: string | null;
+  downloads: {
+    original: string;
+    attacked: string;
+    report: string;
+  };
+}
+
+export interface AssessmentListResponse {
+  items: AssessmentListItem[];
+  pagination: {
+    page: number;
+    page_size: number;
+    total: number;
+    total_pages: number;
+  };
+}
+
 export async function uploadAssessment(
   originalPdf: File,
   answersPdf: File | null | undefined,
@@ -57,4 +83,18 @@ export async function evaluateAssessment(assessmentId: string): Promise<Evaluati
     throw new Error(`Evaluation failed (${resp.status}): ${txt}`);
   }
   return (await resp.json()) as EvaluationResponse;
+}
+
+export async function listAssessments(params: Record<string, string | number | undefined> = {}): Promise<AssessmentListResponse> {
+  const usp = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) usp.set(k, String(v));
+  });
+  const url = `/api/assessments/?${usp.toString()}`;
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    const txt = await resp.text();
+    throw new Error(`List failed (${resp.status}): ${txt}`);
+  }
+  return (await resp.json()) as AssessmentListResponse;
 } 

@@ -179,7 +179,7 @@ export const PdfUpload: React.FC<PdfUploadProps> = ({
       />
 
       <DropZone
-        label="Answer Key (PDF)"
+        label="Answer Key (PDF) (Optional)"
         file={answersFile}
         thumbs={answersThumbs}
         onDropSet={makeDropHandlers(onAnswersChange, setAnswersThumbs)}
