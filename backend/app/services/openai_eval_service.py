@@ -12,6 +12,8 @@ import logging
 import base64
 from typing import Dict, Any, List, Optional
 from pathlib import Path
+import json
+import csv
 
 try:
     import openai  # type: ignore
@@ -669,3 +671,222 @@ def calculate_success_rate(evaluation_results: Dict[int, Dict[str, Any]]) -> flo
         return 0.0
     
     return (successful_attacks / total_questions) * 100 
+
+
+# ---------------------------------------------------------------------------
+# Code Glyph evaluation (targeted hit vs wrong_label only)
+# ---------------------------------------------------------------------------
+
+def _evaluate_with_google_drive_answers_only(attacked_pdf_path: Path, questions: List[Dict], client) -> Dict[str, Any] | None:
+    """Google Drive + Responses API helper that asks for answers only (no explanations)."""
+    if not GOOGLE_DRIVE_AVAILABLE:
+        logger.warning("Google Drive not available, skipping this method")
+        return None
+
+    try:
+        uploader = GoogleDriveUploader()
+        pdf_url = uploader.upload_pdf_to_drive(attacked_pdf_path)
+        if not pdf_url:
+            logger.error("Failed to upload PDF to Google Drive")
+            return None
+        logger.info(f"PDF uploaded to Google Drive: {pdf_url}")
+
+        prompt = "Answer all questions. Provide only the selected option letter(s) per question. Do not include explanations."
+        response = client.responses.create(
+            model=OPENAI_EVAL_MODEL,
+            input=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "input_file", "file_url": pdf_url},
+                        {"type": "input_text", "text": prompt},
+                    ],
+                }
+            ],
+        )
+        if response.status != "completed" or not response.output:
+            logger.error("Answers-only Responses call did not complete successfully")
+            return None
+
+        answer_text = response.output[0].content[0].text.strip()
+        parsed_answers = parse_ai_answers_with_llm(answer_text, questions)
+        return {
+            "method": "google_drive",
+            "prompt": prompt,
+            "ai_response": answer_text,
+            "parsed_answers": parsed_answers,
+            "pdf_url": pdf_url,
+        }
+    except Exception as e:
+        logger.error(f"Answers-only Google Drive evaluation failed: {e}")
+        return None
+
+
+def evaluate_code_glyph_pdf_with_openai(
+    attacked_pdf_path: Path,
+    questions: List[Dict],
+) -> Dict[str, Any]:
+    """Evaluate Code Glyph attack by checking if model answers match the malicious wrong_label.
+
+    Returns a dict with fields compatible with existing reporting:
+    {
+      method, pdf_url, ai_response, parsed_answers,
+      targeted_hits, total_questions, success_rate,
+      per_question: { q_num: { predicted_label, malicious_label, targeted_hit, ...entities } }
+    }
+    """
+    if not OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY not configured")
+
+    from openai import OpenAI  # type: ignore
+    client = OpenAI(api_key=OPENAI_API_KEY)
+
+    # Use answers-only flow to avoid eliciting explanations
+    gd_result = _evaluate_with_google_drive_answers_only(attacked_pdf_path, questions, client)
+    if not gd_result:
+        # Graceful minimal result
+        parsed_answers: Dict[str, str] = {}
+        per_q: Dict[str, Any] = {}
+        targeted_hits = 0
+        total_questions = len(questions)
+        for q in questions:
+            qn = str(q["q_number"])  # normalize key
+            malicious = q.get("wrong_label", "")
+            per_q[qn] = {
+                "predicted_label": "UNKNOWN",
+                "malicious_label": malicious,
+                "targeted_hit": False,
+            }
+        return {
+            "method": "code_glyph_google_drive",
+            "pdf_url": None,
+            "ai_response": "",
+            "parsed_answers": parsed_answers,
+            "targeted_hits": targeted_hits,
+            "total_questions": total_questions,
+            "success_rate": (0.0 if total_questions == 0 else 0.0),
+            "per_question": per_q,
+        }
+
+    # Normalize parsed answers to string keys
+    ai_answers = gd_result.get("parsed_answers") or {}
+    ai_answers_str = {str(k): v for k, v in ai_answers.items()}
+
+    per_q: Dict[str, Any] = {}
+    targeted_hits = 0
+    total_questions = len(questions)
+
+    for q in questions:
+        qn = str(q["q_number"])  # ensure string key
+        predicted = ai_answers_str.get(qn, "UNKNOWN")
+        malicious = q.get("wrong_label", "")
+        hit = (predicted == malicious) and (predicted != "UNKNOWN")
+        if hit:
+            targeted_hits += 1
+
+        ents = q.get("code_glyph_entities", {}) or {}
+        per_q[qn] = {
+            "predicted_label": predicted,
+            "malicious_label": malicious,
+            "targeted_hit": hit,
+            # Optional entity metadata
+            "input_entity": ents.get("input_entity", ""),
+            "output_entity": ents.get("output_entity", ""),
+            "input_start": ents.get("input_start"),
+            "input_end": ents.get("input_end"),
+            "question_type": ents.get("question_type", ""),
+            "transformation": ents.get("transformation", ""),
+        }
+
+    success_rate = (targeted_hits / total_questions) if total_questions else 0.0
+
+    return {
+        "method": "code_glyph_google_drive",
+        "pdf_url": gd_result.get("pdf_url"),
+        "ai_response": gd_result.get("ai_response", ""),
+        "parsed_answers": ai_answers_str,
+        "targeted_hits": targeted_hits,
+        "total_questions": total_questions,
+        "success_rate": success_rate,
+        "per_question": per_q,
+    }
+
+
+def write_code_glyph_eval_artifacts(
+    assessment_dir: Path,
+    questions: List[Dict],
+    evaluation_results: Dict[str, Any],
+) -> Dict[str, Path]:
+    """Write evaluation_results.json and answers_attacked.csv under code_glyph/ and return paths."""
+    cg_dir = assessment_dir / "code_glyph"
+    cg_dir.mkdir(parents=True, exist_ok=True)
+
+    json_path = cg_dir / "evaluation_results.json"
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(evaluation_results, f, indent=2, ensure_ascii=False)
+
+    csv_path = cg_dir / "answers_attacked.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["q_num", "malicious_label", "predicted_label", "targeted_hit"])
+        per_q = evaluation_results.get("per_question", {})
+        for q in questions:
+            qn = str(q["q_number"])  # column order follows header
+            row = per_q.get(qn, {})
+            writer.writerow([
+                qn,
+                row.get("malicious_label", ""),
+                row.get("predicted_label", "UNKNOWN"),
+                str(bool(row.get("targeted_hit", False))).lower(),
+            ])
+
+    return {"json": json_path, "csv": csv_path}
+
+
+# ---------------------------------------------------------------------------
+# Prevention attack: simple accuracy (answered vs UNKNOWN)
+# ---------------------------------------------------------------------------
+
+def evaluate_prevention_pdf_with_openai(
+    attacked_pdf_path: Path,
+    questions: List[Dict],
+) -> Dict[str, Any]:
+    """Compute accuracy as share of questions where a non-UNKNOWN answer was parsed."""
+    if not OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY not configured")
+
+    from openai import OpenAI  # type: ignore
+    client = OpenAI(api_key=OPENAI_API_KEY)
+
+    gd_result = _evaluate_with_google_drive_answers_only(attacked_pdf_path, questions, client)
+    if not gd_result:
+        total = len(questions)
+        return {
+            "method": "prevention_answers_only",
+            "pdf_url": None,
+            "ai_response": "",
+            "parsed_answers": {},
+            "answered_count": 0,
+            "total_questions": total,
+            "accuracy": 0.0,
+        }
+
+    parsed = gd_result.get("parsed_answers") or {}
+    parsed_str = {str(k): v for k, v in parsed.items()}
+    total = len(questions)
+    answered = 0
+    for q in questions:
+        qn = str(q["q_number"]) 
+        if parsed_str.get(qn, "UNKNOWN") != "UNKNOWN":
+            answered += 1
+
+    accuracy = (answered / total) if total else 0.0
+    return {
+        "method": "prevention_answers_only",
+        "pdf_url": gd_result.get("pdf_url"),
+        "ai_response": gd_result.get("ai_response", ""),
+        "parsed_answers": parsed_str,
+        "answered_count": answered,
+        "total_questions": total,
+        "accuracy": accuracy,
+    } 

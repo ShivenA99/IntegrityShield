@@ -1,0 +1,120 @@
+{
+  "font_mode": "prebuilt",
+  "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+  "pairs": [
+    [
+      "variance",
+      "accuracy"
+    ],
+    [
+      "policy-based",
+      "randomized"
+    ],
+    [
+      "follow",
+      "following"
+    ],
+    [
+      "methods",
+      "approaches"
+    ],
+    [
+      "maximization bias",
+      "exploration-exploitation tradeoff"
+    ]
+  ],
+  "font_configs": [
+    {
+      "input": "variance",
+      "output": "accuracy",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "policy-based",
+      "output": "randomized",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "follow",
+      "output": "following",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "methods",
+      "output": "approaches",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "maximization bias",
+      "output": "exploration-exploitation tradeoff",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    }
+  ],
+  "entities_by_qnum": {
+    "1i": {
+      "input_entity": "variance",
+      "output_entity": "accuracy",
+      "wrong_label": "True",
+      "rationale": "Swapping 'variance' implies improving accuracy, fitting True.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "true_false",
+      "transformation": "substitution",
+      "inferred_correct_label": "False",
+      "inferred_correct_text": "False"
+    },
+    "1ii": {
+      "input_entity": "policy-based",
+      "output_entity": "randomized",
+      "wrong_label": "True",
+      "rationale": "Changing the method to a different type could lead to randomized behavior.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "true_false",
+      "transformation": "substitution",
+      "inferred_correct_label": "False",
+      "inferred_correct_text": "False"
+    },
+    "2i": {
+      "input_entity": "follow",
+      "output_entity": "following",
+      "wrong_label": "C",
+      "rationale": "Changes to plural match option C.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "A",
+      "inferred_correct_text": "Sarsa"
+    },
+    "2ii": {
+      "input_entity": "methods",
+      "output_entity": "approaches",
+      "wrong_label": "B",
+      "rationale": "Changes terminology to match option B.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "A",
+      "inferred_correct_text": "differentiable"
+    },
+    "3i": {
+      "input_entity": "maximization bias",
+      "output_entity": "exploration-exploitation tradeoff",
+      "wrong_label": "",
+      "rationale": "Maintains focus on Q-learning concepts while shifting terminology.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "short_answer",
+      "transformation": "topic_preserving_substitution",
+      "inferred_correct_label": "",
+      "inferred_correct_text": "Balancing between trying new options and exploiting known ones"
+    }
+  }
+}

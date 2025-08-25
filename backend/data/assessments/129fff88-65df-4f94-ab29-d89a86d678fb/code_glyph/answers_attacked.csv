@@ -1,0 +1,9 @@
+q_num,malicious_label,predicted_label,targeted_hit
+1,A,UNKNOWN,false
+2,A,UNKNOWN,false
+3,A,UNKNOWN,false
+4,A,UNKNOWN,false
+5,A,UNKNOWN,false
+6,A,UNKNOWN,false
+7,A,UNKNOWN,false
+8,A,UNKNOWN,false

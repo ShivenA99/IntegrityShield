@@ -1,0 +1,176 @@
+{
+  "font_mode": "prebuilt",
+  "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+  "pairs": [
+    [
+      "contextual understanding",
+      "computational efficiency"
+    ],
+    [
+      "exclusively utilized",
+      "primarily utilized"
+    ],
+    [
+      "bidirectional context",
+      "unidirectional context"
+    ],
+    [
+      "inter-sentence semantics",
+      "image features"
+    ],
+    [
+      "drawbacks",
+      "benefits"
+    ],
+    [
+      "primary challenge",
+      "secondary challenge"
+    ],
+    [
+      "unidirectional",
+      "bidirectional"
+    ]
+  ],
+  "font_configs": [
+    {
+      "input": "contextual understanding",
+      "output": "computational efficiency",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "exclusively utilized",
+      "output": "primarily utilized",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "bidirectional context",
+      "output": "unidirectional context",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "inter-sentence semantics",
+      "output": "image features",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "drawbacks",
+      "output": "benefits",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "primary challenge",
+      "output": "secondary challenge",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    },
+    {
+      "input": "unidirectional",
+      "output": "bidirectional",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v3",
+      "font_path": ""
+    }
+  ],
+  "entities_by_qnum": {
+    "1": {
+      "input_entity": "contextual understanding",
+      "output_entity": "computational efficiency",
+      "wrong_label": "C",
+      "rationale": "Changes focus from understanding to efficiency.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "D",
+      "inferred_correct_text": "By enabling different heads to attend to diverse relational patterns across positions"
+    },
+    "2": {
+      "input_entity": "exclusively utilized",
+      "output_entity": "primarily utilized",
+      "wrong_label": "B",
+      "rationale": "Changes exclusivity to imply shared use, supporting Encoder layers.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "A",
+      "inferred_correct_text": "Decoder layers with masked self-attention"
+    },
+    "3": {
+      "input_entity": "bidirectional context",
+      "output_entity": "unidirectional context",
+      "wrong_label": "B",
+      "rationale": "Changes context type to match wrong option.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "A",
+      "inferred_correct_text": "Encoder-based design"
+    },
+    "4": {
+      "input_entity": "inter-sentence semantics",
+      "output_entity": "image features",
+      "wrong_label": "D",
+      "rationale": "Replaces semantics with image features, aligning with option D.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "C",
+      "inferred_correct_text": "Jointly optimizing masked token reconstruction and inter-sentence coherence discrimination"
+    },
+    "5": {
+      "input_entity": "drawbacks",
+      "output_entity": "benefits",
+      "wrong_label": "B",
+      "rationale": "Changes focus from negative to positive aspects.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "",
+      "inferred_correct_text": "drawbacks"
+    },
+    "6": {
+      "input_entity": "drawbacks",
+      "output_entity": "benefits",
+      "wrong_label": "B",
+      "rationale": "Changes focus from negative to positive aspects.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "",
+      "inferred_correct_text": "drawbacks"
+    },
+    "7": {
+      "input_entity": "primary challenge",
+      "output_entity": "secondary challenge",
+      "wrong_label": "B",
+      "rationale": "Changes challenge type to support wrong label.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "short_answer",
+      "transformation": "topic_preserving_substitution",
+      "inferred_correct_label": "",
+      "inferred_correct_text": "primary challenge"
+    },
+    "8": {
+      "input_entity": "unidirectional",
+      "output_entity": "bidirectional",
+      "wrong_label": "B",
+      "rationale": "Changes processing type, supporting wrong option.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "",
+      "inferred_correct_text": "unidirectional"
+    }
+  }
+}

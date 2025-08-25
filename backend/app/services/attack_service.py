@@ -9,10 +9,9 @@ from enum import Enum
 # ----------------------------------------------------------------------------
 class AttackType(str, Enum):
     NONE = "No Attack (Baseline)"
-    ZERO_WIDTH_SPACES_OBFUSCATION = "Zero-Width Spaces (Obfuscation)"
-    HIDDEN_MALICIOUS_INSTRUCTION_TOP = "Hidden Malicious Instruction (Prepended)"
-    HIDDEN_MALICIOUS_INSTRUCTION_BOTTOM = "Hidden Malicious Instruction (Appended)"
-    RANDOM_INVISIBLE_CHARS = "Random Invisible Characters"
+    HIDDEN_MALICIOUS_INSTRUCTION_TOP = "Hidden Malicious Instruction (Detection)"
+    HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION = "Hidden Malicious Instruction (Prevention)"
+    CODE_GLYPH = "Code Glyph (Detection)"
 
 
 # Invisible Unicode characters
@@ -35,24 +34,8 @@ def apply_attack(text: str, attack_type: AttackType) -> str:
     if attack_type == AttackType.NONE:
         return text
 
-    if attack_type == AttackType.ZERO_WIDTH_SPACES_OBFUSCATION:
-        return "".join(
-            f" {ZWSP} " if char == " " else char + ZWSP for char in text
-        )
-
-    if attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP:
+    if attack_type in {AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP, AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION}:
         return f"{HIDDEN_INSTRUCTION_TEXT_PRIORITY_ALPHA}\n\n{text}"
-
-    if attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_BOTTOM:
-        return f"{text}\n\n{HIDDEN_INSTRUCTION_TEXT_PRIORITY_ALPHA}"
-
-    if attack_type == AttackType.RANDOM_INVISIBLE_CHARS:
-        result_chars: list[str] = []
-        for char in text:
-            result_chars.append(char)
-            if random.random() < 0.2:
-                result_chars.append(random.choice(INVISIBLE_CHARS))
-        return "".join(result_chars)
 
     # Fallback – shouldn't reach here.
     return text 

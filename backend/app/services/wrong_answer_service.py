@@ -23,11 +23,17 @@ except ImportError:  # pragma: no cover – avoid hard dependency at import time
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 if OPENAI_API_KEY and openai and hasattr(openai, "api_key"):
     # Legacy client (<1.0) still uses a global api_key attribute.
     openai.api_key = OPENAI_API_KEY
+
+# Tokens to avoid choosing as input entities (too low-signal for reliable mapping)
+_FORBIDDEN_INPUT_TOKENS = {
+    "the", "a", "an", "is", "are", "was", "were", "to", "of", "in",
+    "and", "or", "for", "with", "on", "by", "which", "what"
+}
 
 
 def _call_openai(prompt: str) -> str | None:
@@ -53,11 +59,11 @@ def _call_openai(prompt: str) -> str | None:
             resp = client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=[
-                    {"role": "system", "content": "You are an expert test designer generating plausible but incorrect answer choices."},
+                    {"role": "system", "content": "You are an expert assessment designer. You must first solve questions correctly, then design minimal glyph-mapping edits that make a specific wrong option appear correct."},
                     {"role": "user", "content": prompt},
                 ],
-                temperature=0.9,
-                max_tokens=150,
+                temperature=0.2,
+                max_tokens=500,
             )
 
             content: str | None = resp.choices[0].message.content  # type: ignore[attr-defined]
@@ -73,11 +79,11 @@ def _call_openai(prompt: str) -> str | None:
             resp = openai.ChatCompletion.create(
                 model=OPENAI_MODEL,
                 messages=[
-                    {"role": "system", "content": "You are an expert test designer generating plausible but incorrect answer choices."},
+                    {"role": "system", "content": "You are an expert assessment designer. You must first solve questions correctly, then design minimal glyph-mapping edits that make a specific wrong option appear correct."},
                     {"role": "user", "content": prompt},
                 ],
-                temperature=0.9,
-                max_tokens=150,
+                temperature=0.2,
+                max_tokens=500,
             )
 
             content = (
@@ -97,6 +103,33 @@ def _call_openai(prompt: str) -> str | None:
         return None
 
 
+def _extract_json_block(raw: str) -> dict | None:
+    """Extract a JSON object from raw LLM content (tolerates code fences)."""
+    text = (raw or "").strip()
+    if text.startswith("```"):
+        try:
+            first_nl = text.find("\n")
+            if first_nl != -1:
+                text = text[first_nl + 1 :]
+            if text.endswith("````"):
+                text = text[:-4]
+            elif text.endswith("```"):
+                text = text[:-3]
+        except Exception:
+            pass
+    try:
+        return json.loads(text)
+    except Exception:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            try:
+                return json.loads(text[start : end + 1])
+            except Exception:
+                return None
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -105,6 +138,7 @@ def _call_openai(prompt: str) -> str | None:
 # (when an answer-key PDF was supplied).  This helps the LLM avoid accidentally
 # choosing the right option.  The parameter is *optional* so existing callers
 # remain compatible.
+
 
 def generate_wrong_answer(
     stem_text: str,
@@ -199,6 +233,271 @@ Example output: C|Shares the same molecular structure described in the stem.
     fallback_reason = "Clearly aligns with how the concept is described in the question."
     logger.info("[wrong_answer_service] Using fallback wrong answer %s", fallback_label)
     return fallback_label, fallback_reason
+
+
+
+# ---------------------------------------------------------------------------
+# CODE_GLYPH: Entities + wrong answer JSON
+# ---------------------------------------------------------------------------
+
+def _detect_question_type(options: Dict[str, str], stem_text: str) -> str:
+    """Heuristic detection: 'true_false' | 'mcq' | 'short_answer'."""
+    opt_values = " ".join(v.lower() for v in options.values())
+    has_tf = ("true" in opt_values and "false" in opt_values) or ("i) true" in opt_values or "ii) false" in opt_values)
+    if has_tf:
+        return "true_false"
+    if options:
+        return "mcq"
+    return "short_answer"
+
+
+def _true_false_value_to_label(options: Dict[str, str], value: str) -> str | None:
+    """Return the option label whose text is (True|False). Case-insensitive."""
+    want = value.strip().lower()
+    for lbl, txt in options.items():
+        if txt.strip().lower() in {want, f"{want}.", f"{want}!", f"{want}?"}:
+            return lbl
+    return None
+
+
+def generate_wrong_answer_entities(
+    stem_text: str,
+    options: Dict[str, str],
+    correct_answer: str | None = None,
+) -> Dict[str, str]:
+    """Return a JSON-like dict suitable for CODE_GLYPH mapping.
+
+    Keys:
+      - input_entity: semantic token to encode in glyphs
+      - output_entity: visual token to display
+      - wrong_label: chosen wrong option label for MCQ/TF/etc.
+      - rationale: short sentence defending the wrong choice
+      - entity_type: "label" | "text" (how to interpret entities)
+      - entity_source: "options" | "stem" (where entities came from)
+      - question_type: "mcq" | "true_false" | "short_answer"
+      - transformation: "negation" | "substitution" | "topic_preserving_substitution"
+    """
+    # Build a prompt aligned with our earlier flow
+    joined_opts = "\n".join(f"{lbl}) {txt}" for lbl, txt in options.items())
+    qtype = _detect_question_type(options, stem_text)
+
+    # We deliberately avoid relying on external correct answers.
+    # If a correct answer is provided, the model may use it, but it MUST still infer and return its own view.
+    extra_note = ""
+
+    # Type-aware inline guidance
+    specifics = ""
+    if qtype == "true_false":
+        specifics = (
+            "- True/False: transformation=\"negation\". Flip truth minimally (negator, quantifier, comparator) so truth switches to the wrong value.\n"
+        )
+    elif qtype == "short_answer":
+        specifics = (
+            "- Short Answer: transformation=\"topic_preserving_substitution\". Replace a central term while keeping the topic.\n"
+        )
+    else:
+        specifics = (
+            "- MCQ: transformation=\"substitution\". Align output_entity with a distinctive term from the chosen wrong option.\n"
+        )
+
+    # Few-shot exemplars (one per type, concise)
+    few_shots = (
+        "Example MCQ:\n"
+        "Stem: Which component handles input sequence encoding?\n"
+        "Options:\nA) Encoder\nB) Decoder\nC) Optimizer\nD) Loss\n"
+        "JSON: {\n  \"input_entity\": \"encoding\",\n  \"output_entity\": \"decoding\",\n  \"wrong_label\": \"B\",\n  \"rationale\": \"Swaps role to match Decoder.\",\n  \"entity_type\": \"text\",\n  \"entity_source\": \"stem\",\n  \"question_type\": \"mcq\",\n  \"transformation\": \"substitution\",\n  \"inferred_correct_label\": \"A\",\n  \"inferred_correct_text\": \"Encoder\",\n  \"input_start\": 41,\n  \"input_end\": 49\n}\n\n"
+        "Example True/False:\n"
+        "Stem: The softmax outputs are probabilities that sum to 1.\n"
+        "Options:\nA) True\nB) False\n"
+        "JSON: {\n  \"input_entity\": \"sum to 1\",\n  \"output_entity\": \"do not sum to 1\",\n  \"wrong_label\": \"B\",\n  \"rationale\": \"Negates the property, flipping truth.\",\n  \"entity_type\": \"text\",\n  \"entity_source\": \"stem\",\n  \"question_type\": \"true_false\",\n  \"transformation\": \"negation\",\n  \"inferred_correct_label\": \"A\",\n  \"inferred_correct_text\": \"True\",\n  \"input_start\": 40,\n  \"input_end\": 48\n}\n\n"
+        "Example Short Answer:\n"
+        "Stem: What loss is used for multi-class classification?\n"
+        "Options: (none)\n"
+        "JSON: {\n  \"input_entity\": \"cross-entropy\",\n  \"output_entity\": \"mean squared error\",\n  \"wrong_label\": \"\",\n  \"rationale\": \"Plausible alternative within topic.\",\n  \"entity_type\": \"text\",\n  \"entity_source\": \"stem\",\n  \"question_type\": \"short_answer\",\n  \"transformation\": \"topic_preserving_substitution\",\n  \"inferred_correct_label\": \"\",\n  \"inferred_correct_text\": \"cross-entropy\",\n  \"input_start\": 0,\n  \"input_end\": 0\n}"
+    )
+
+    prompt = f"""
+You will produce a glyph-mapping plan that makes a specific WRONG option appear correct by minimally altering the QUESTION text only.
+
+Return STRICT JSON only with keys:
+- input_entity (string)
+- output_entity (string)
+- wrong_label (string)
+- rationale (string <= 25 words)
+- entity_type ("text")
+- entity_source ("stem")
+- question_type ("mcq"|"true_false"|"short_answer")
+- transformation ("negation"|"substitution"|"topic_preserving_substitution")
+- inferred_correct_label (string)
+- inferred_correct_text (string)
+- input_start (integer)
+- input_end (integer)
+
+Rules (ALL must hold):
+1) Solve the question FIRST. Set inferred_correct_label/text.
+2) Choose exactly one wrong_label from Options (when present) that you will make appear correct.
+3) You may only alter the Question text: replace input_entity → output_entity in the stem. Do NOT change options.
+4) input_entity MUST be a literal, contiguous substring of the stem (not from options).
+5) Avoid function words. NEVER use any of: {sorted(_FORBIDDEN_INPUT_TOKENS)}.
+   Prefer domain terms, numbers, units, named entities, or key adjectives/verbs.
+6) Keep the change minimal but decisive: after replacement, the stem must support wrong_label and contradict inferred_correct_label.
+7) {specifics}
+8) Validate before returning: wrong_label ∈ labels (if any); wrong_label ≠ inferred_correct_label; input_entity length 3–30 and differs from output_entity; input_start/input_end slice input_entity from the stem.
+
+Return ONLY the JSON object. No explanations or code fences.
+
+Question (stem):
+{stem_text}
+
+Options (verbatim; may be empty):
+{joined_opts}
+
+{few_shots}
+"""
+
+    content = _call_openai(prompt)
+    if content:
+        obj = _extract_json_block(content)
+        if isinstance(obj, dict):
+            # Basic validation
+            inp = str(obj.get("input_entity", "")).strip()
+            out = str(obj.get("output_entity", "")).strip()
+            wlbl = str(obj.get("wrong_label", "")).strip().upper().rstrip(")").lstrip("(")
+            rationale = str(obj.get("rationale", "")).strip()
+            entity_type = (obj.get("entity_type") or "text").strip()
+            entity_source = (obj.get("entity_source") or "stem").strip()
+            question_type = (obj.get("question_type") or qtype).strip()
+            transformation = (obj.get("transformation") or ("negation" if qtype == "true_false" else ("topic_preserving_substitution" if qtype == "short_answer" else "substitution"))).strip()
+            inferred_label_raw = str(obj.get("inferred_correct_label", "")).strip()
+            inferred_text = str(obj.get("inferred_correct_text", "")).strip()
+
+            # Optional spans
+            def _to_int(val):
+                try:
+                    return int(val)
+                except Exception:
+                    return None
+            input_start = _to_int(obj.get("input_start"))
+            input_end = _to_int(obj.get("input_end"))
+            output_start = _to_int(obj.get("output_start"))
+            output_end = _to_int(obj.get("output_end"))
+
+            # Enforce/salvage wrong_label validity if options are present
+            if options:
+                if wlbl not in options:
+                    # 1) try mapping by option text equality (case-insensitive)
+                    low = wlbl.lower()
+                    for lbl, txt in options.items():
+                        if txt.strip().lower() == low:
+                            wlbl = lbl
+                            break
+                    # 2) if still not found, try T/F mapping
+                    if wlbl not in options:
+                        tf_lbl = _true_false_value_to_label(options, wlbl)
+                        if tf_lbl:
+                            wlbl = tf_lbl
+                    # 3) last resort: extract a single-letter label from content
+                    if wlbl not in options:
+                        m = re.search(r"\b([A-Z])\b", (out or "") + "\n" + (content or ""))
+                        if m and m.group(1) in options:
+                            wlbl = m.group(1)
+                # Map inferred correct label to an option label if present
+                inferred_label = inferred_label_raw
+                if inferred_label and inferred_label not in options:
+                    low_inf = inferred_label.lower()
+                    # by text equality
+                    for lbl, txt in options.items():
+                        if txt.strip().lower() == low_inf:
+                            inferred_label = lbl
+                            break
+                    if inferred_label not in options:
+                        tf_inf = _true_false_value_to_label(options, inferred_label)
+                        if tf_inf:
+                            inferred_label = tf_inf
+                    if inferred_label not in options and len(inferred_label) == 1 and inferred_label.upper() in options:
+                        inferred_label = inferred_label.upper()
+                else:
+                    inferred_label = inferred_label_raw
+                if correct_answer and wlbl == correct_answer:
+                    # pick an alternative
+                    alts = [k for k in options.keys() if k != correct_answer]
+                    wlbl = alts[0] if alts else (wlbl or "A")
+                # Ensure wrong_label != inferred correct when we have an inference
+                if options and inferred_label and wlbl == inferred_label:
+                    alts = [k for k in options.keys() if k != inferred_label]
+                    if alts:
+                        wlbl = alts[0]
+
+            # Additional semantic validation of input_entity
+            inp_lc = inp.lower()
+            if inp_lc in _FORBIDDEN_INPUT_TOKENS or len(inp) < 3 or len(inp) > 30:
+                logger.info("[wrong_answer_service] Rejecting low-signal input_entity from LLM: %r", inp)
+                inp = ""
+
+            # Validate required fields: input_entity must be a stem substring; wrong_label required when options exist
+            if inp and out and ((not options) or wlbl) and (inp in stem_text):
+                # If indices provided, verify they slice the same substring
+                if input_start is not None and input_end is not None:
+                    try:
+                        if stem_text[input_start:input_end] != inp:
+                            logger.info("[wrong_answer_service] Provided indices do not match input_entity; dropping indices.")
+                            input_start = None
+                            input_end = None
+                    except Exception:
+                        input_start = None
+                        input_end = None
+                result = {
+                    "input_entity": inp,
+                    "output_entity": out,
+                    "wrong_label": wlbl,
+                    "rationale": rationale or "Clearly aligns with phrasing in the question.",
+                    "entity_type": entity_type,
+                    "entity_source": entity_source,
+                    "question_type": question_type,
+                    "transformation": transformation,
+                    "inferred_correct_label": inferred_label if options else "",
+                    "inferred_correct_text": inferred_text,
+                }
+                if input_start is not None and input_end is not None:
+                    result["input_start"] = input_start
+                    result["input_end"] = input_end
+                logger.info("[wrong_answer_service] CODE_GLYPH entities: %s", result)
+                return result
+        logger.info("[wrong_answer_service] Unexpected JSON for CODE_GLYPH; content=%r", content)
+
+    # Fallback heuristic (substring-based from question stem)
+    # Pick two distinct alphanumeric tokens from the question text as input/output entities
+    tokens = re.findall(r"[A-Za-z0-9]{3,}", stem_text)
+    # Filter out forbidden tokens
+    tokens = [t for t in tokens if t.lower() not in _FORBIDDEN_INPUT_TOKENS]
+    if not tokens:
+        tokens = [stem_text[:3]] if len(stem_text) >= 3 else [stem_text]
+    input_entity = tokens[0]
+    output_entity = tokens[1] if len(tokens) > 1 else tokens[0]
+    if output_entity == input_entity and len(tokens[0]) >= 4:
+        output_entity = tokens[0][: len(tokens[0]) - 1]
+
+    # Choose an available wrong label not equal to correct_answer
+    candidates = [k for k in options.keys() if k != correct_answer] or list(options.keys()) or ["C"]
+    wrong_label = candidates[0]
+
+    question_type = _detect_question_type(options, stem_text)
+    transformation = "negation" if question_type == "true_false" else ("topic_preserving_substitution" if question_type == "short_answer" else "substitution")
+
+    result = {
+        "input_entity": str(input_entity),
+        "output_entity": str(output_entity),
+        "wrong_label": str(wrong_label),
+        "rationale": "Appears consistent with the question phrasing without revealing it is incorrect.",
+        "entity_type": "text",
+        "entity_source": "stem",
+        "question_type": question_type,
+        "transformation": transformation,
+        "inferred_correct_label": (correct_answer or (next((k for k in options.keys() if k != wrong_label), "")) if options else ""),
+        "inferred_correct_text": (options.get(correct_answer) if (options and correct_answer in options) else (options.get(next((k for k in options.keys() if k != wrong_label), ""), "") if options else "")),
+    }
+    logger.warning("[wrong_answer_service] Using fallback CODE_GLYPH entities: %s", result)
+    return result 
 
 
  

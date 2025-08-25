@@ -5,10 +5,10 @@ interface DownloadLinksProps {
 }
 
 export const DownloadLinks: React.FC<DownloadLinksProps> = ({ assessmentId }) => {
-  // Add timestamp to force fresh downloads and bypass cache
   const timestamp = Date.now();
   const attackedUrl = `/api/assessments/${assessmentId}/attacked?t=${timestamp}`;
   const reportUrl = `/api/assessments/${assessmentId}/report?t=${timestamp}`;
+
   return (
     <div className="space-y-4">
       <a

@@ -6,10 +6,9 @@ export enum AssessmentType {
 
 export enum AttackType {
   NONE = 'No Attack (Baseline)',
-  ZERO_WIDTH_SPACES_OBFUSCATION = 'Zero-Width Spaces (Obfuscation)',
-  HIDDEN_MALICIOUS_INSTRUCTION_TOP = 'Hidden Malicious Instruction (Prepended)',
-  HIDDEN_MALICIOUS_INSTRUCTION_BOTTOM = 'Hidden Malicious Instruction (Appended)',
-  RANDOM_INVISIBLE_CHARS = 'Random Invisible Characters',
+  HIDDEN_MALICIOUS_INSTRUCTION_TOP = 'Hidden Malicious Instruction (Detection)',
+  HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION = 'Hidden Malicious Instruction (Prevention)',
+  CODE_GLYPH = 'Code Glyph (Detection)',
 }
 
 // This interface might be useful if you plan to parse structured grounding metadata

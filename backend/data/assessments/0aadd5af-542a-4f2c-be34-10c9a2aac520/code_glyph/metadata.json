@@ -1,0 +1,115 @@
+{
+  "font_mode": "prebuilt",
+  "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v4",
+  "pairs": [
+    [
+      "Temporal",
+      "Spatial"
+    ],
+    [
+      "episodic environment",
+      "stable environment"
+    ],
+    [
+      "follow",
+      "following"
+    ],
+    [
+      "RL",
+      "ML"
+    ],
+    [
+      "maximization bias",
+      "minimization bias"
+    ]
+  ],
+  "font_configs": [
+    {
+      "input": "Temporal",
+      "output": "Spatial",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v4"
+    },
+    {
+      "input": "episodic environment",
+      "output": "stable environment",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v4"
+    },
+    {
+      "input": "follow",
+      "output": "following",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v4"
+    },
+    {
+      "input": "RL",
+      "output": "ML",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v4"
+    },
+    {
+      "input": "maximization bias",
+      "output": "minimization bias",
+      "prebuilt_dir": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v4"
+    }
+  ],
+  "entities_by_qnum": {
+    "1i": {
+      "input_entity": "Temporal",
+      "output_entity": "Spatial",
+      "wrong_label": "True",
+      "rationale": "Opposes original method type, aligns with True.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "true_false",
+      "transformation": "substitution",
+      "inferred_correct_label": "False",
+      "inferred_correct_text": ""
+    },
+    "1ii": {
+      "input_entity": "episodic environment",
+      "output_entity": "stable environment",
+      "wrong_label": "True",
+      "rationale": "Changing environment type mistakenly validates true statement.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "true_false",
+      "transformation": "substitution",
+      "inferred_correct_label": "False",
+      "inferred_correct_text": "False"
+    },
+    "2i": {
+      "input_entity": "follow",
+      "output_entity": "following",
+      "wrong_label": "C",
+      "rationale": "Transforms grammar to match option C.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "A",
+      "inferred_correct_text": "Sarsa"
+    },
+    "2ii": {
+      "input_entity": "RL",
+      "output_entity": "ML",
+      "wrong_label": "A",
+      "rationale": "Changes 'policy-based RL' to 'policy-based ML' matching option A.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "mcq",
+      "transformation": "substitution",
+      "inferred_correct_label": "C",
+      "inferred_correct_text": "easy to sample from"
+    },
+    "3i": {
+      "input_entity": "maximization bias",
+      "output_entity": "minimization bias",
+      "wrong_label": "",
+      "rationale": "Opposite term maintains focus on bias impact.",
+      "entity_type": "text",
+      "entity_source": "stem",
+      "question_type": "short_answer",
+      "transformation": "topic_preserving_substitution",
+      "inferred_correct_label": "",
+      "inferred_correct_text": "By adjusting rewards or using techniques like double Q-learning."
+    }
+  }
+}

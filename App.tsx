@@ -9,8 +9,14 @@ import { AttackType } from './types';
 import { uploadAssessment } from './services/assessmentService';
 
 const App: React.FC = () => {
-  // Front-end no longer exposes attack selection – choose a fixed default that matches backend implementation
-  const DEFAULT_ATTACK: AttackType = AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP;
+  // Attack selection
+  const [attack, setAttack] = useState<AttackType>(AttackType.CODE_GLYPH);
+  const allowedAttacks: AttackType[] = [
+    AttackType.CODE_GLYPH,
+    AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP,
+    AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION,
+    AttackType.NONE,
+  ];
 
   // File states
   const [originalPdf, setOriginalPdf] = useState<File | null>(null);
@@ -36,7 +42,7 @@ const App: React.FC = () => {
     setAssessmentId(null);
 
     try {
-      const { assessment_id } = await uploadAssessment(originalPdf, answersPdf, DEFAULT_ATTACK);
+      const { assessment_id } = await uploadAssessment(originalPdf, answersPdf, attack);
       setAssessmentId(assessment_id);
     } catch (err) {
       console.error('[handleSubmit] uploadAssessment threw', err);
@@ -48,7 +54,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [originalPdf, answersPdf]);
+  }, [originalPdf, answersPdf, attack]);
 
   const handleClear = () => {
     setOriginalPdf(null);
@@ -70,6 +76,20 @@ const App: React.FC = () => {
               onClear={handleClear}
               isLoading={isLoading}
             />
+            {/* Attack Type Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-sky-300 mb-1">Attack Type</label>
+              <select
+                value={attack}
+                onChange={(e) => setAttack(e.target.value as AttackType)}
+                disabled={isLoading}
+                className="block w-full bg-slate-800 text-slate-100 text-sm rounded-md border border-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-600"
+              >
+                {allowedAttacks.map((a) => (
+                  <option key={a} value={a}>{a}</option>
+                ))}
+              </select>
+            </div>
             <PdfUpload
               originalFile={originalPdf}
               answersFile={answersPdf}

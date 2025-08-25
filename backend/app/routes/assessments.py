@@ -20,9 +20,14 @@ from ..services.pdf_utils import (
     build_attacked_pdf,
     build_reference_report,
     parse_pdf_answers,
+    build_code_glyph_report,
 )
 from ..services.wrong_answer_service import generate_wrong_answer
-from ..services.openai_eval_service import evaluate_pdf_with_openai
+from ..services.openai_eval_service import (
+    evaluate_pdf_with_openai,
+    evaluate_code_glyph_pdf_with_openai,
+    write_code_glyph_eval_artifacts,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -116,12 +121,46 @@ def upload_assessment():
 
     for q in questions:
         correct_label, correct_reason = answer_key.get(q["q_number"], (None, "")) if answer_key else (None, "")
-
-        wrong_label, wrong_reason = generate_wrong_answer(
-            stem_text=q["stem_text"],
-            options=q["options"],
-            correct_answer=correct_label,
-        )
+        if attack_type == AttackType.CODE_GLYPH:
+            try:
+                from ..services.attacks import get_attack_handler
+                handler = get_attack_handler("CODE_GLYPH")
+                # Generate input/output entities via LLM for CODE_GLYPH
+                try:
+                    from ..services.wrong_answer_service import generate_wrong_answer_entities
+                    entities = generate_wrong_answer_entities(q["stem_text"], q["options"], correct_label)
+                    q["code_glyph_entities"] = entities  # {input_entity, output_entity, wrong_label, rationale, ...}
+                    logger.info("[upload_assessment] CODE_GLYPH entities for Q%s: %s", q["q_number"], entities)
+                except Exception as exc_ent:
+                    logger.error("[upload_assessment] CODE_GLYPH entity generation failed: %s", exc_ent)
+                if handler:
+                    wrong_label, wrong_reason = handler.generate_wrong_answer(
+                        stem_text=q["stem_text"],
+                        options=q["options"],
+                        correct_answer=correct_label,
+                    )
+                else:
+                    wrong_label, wrong_reason = generate_wrong_answer(
+                        stem_text=q["stem_text"],
+                        options=q["options"],
+                        correct_answer=correct_label,
+                    )
+            except Exception as exc:
+                logger.error("[upload_assessment] CODE_GLYPH wrong-answer generation failed; fallback to default: %s", exc)
+                wrong_label, wrong_reason = generate_wrong_answer(
+                    stem_text=q["stem_text"],
+                    options=q["options"],
+                    correct_answer=correct_label,
+                )
+        elif attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION:
+            # Prevention mode: No wrong-answer generation; keep placeholders empty
+            wrong_label, wrong_reason = "", ""
+        else:
+            wrong_label, wrong_reason = generate_wrong_answer(
+                stem_text=q["stem_text"],
+                options=q["options"],
+                correct_answer=correct_label,
+            )
 
         q["wrong_label"] = wrong_label
         q["wrong_reason"] = wrong_reason
@@ -135,7 +174,26 @@ def upload_assessment():
 
     # Create attacked PDF
     attacked_pdf_path = assessment_dir / "attacked.pdf"
-    build_attacked_pdf(questions, attacked_pdf_path, title=title_text)
+    if attack_type == AttackType.CODE_GLYPH:
+        try:
+            from ..services.attacks import get_attack_handler
+            handler = get_attack_handler("CODE_GLYPH")
+            if handler:
+                generated_path, _ = handler.build_artifacts(questions, assessment_dir, title_text)
+                # Copy or point attacked.pdf to the generated file location for consistency
+                if generated_path != attacked_pdf_path:
+                    try:
+                        import shutil
+                        shutil.copyfile(generated_path, attacked_pdf_path)
+                    except Exception:
+                        attacked_pdf_path = generated_path
+            else:
+                build_attacked_pdf(questions, attacked_pdf_path, title=title_text)
+        except Exception as exc:
+            logger.error("[upload_assessment] CODE_GLYPH build failed, falling back: %s", exc)
+            build_attacked_pdf(questions, attacked_pdf_path, title=title_text)
+    else:
+        build_attacked_pdf(questions, attacked_pdf_path, title=title_text)
 
     # ------------------------------------------------------------------
     # Evaluate attacked PDF with OpenAI
@@ -163,19 +221,56 @@ def upload_assessment():
             logger.debug(f"[upload_assessment] Found {len(reference_answers)} reference answers and {len(malicious_answers)} malicious answers")
             
             if questions:
-                # If no reference answers are available, we can still evaluate the attack
-                # by checking if the AI follows the hidden instructions
+                # If no reference answers are available, we can still evaluate
                 if not reference_answers:
                     logger.info("[upload_assessment] No reference answers available, evaluating attack effectiveness only")
-                    # Create dummy reference answers for evaluation (we'll ignore them in the analysis)
                     reference_answers = {q["q_number"]: "UNKNOWN" for q in questions}
                 
-                logger.info("[upload_assessment] Starting OpenAI PDF evaluation")
-                evaluation_results = evaluate_pdf_with_openai(
-                    attacked_pdf_path=attacked_pdf_path,
-                    questions=questions,
-                    reference_answers=reference_answers
-                )
+                if attack_type == AttackType.CODE_GLYPH:
+                    try:
+                        from ..services.attacks import get_attack_handler
+                        handler = get_attack_handler("CODE_GLYPH")
+                        if handler:
+                            logger.info("[upload_assessment] Starting CODE_GLYPH evaluation")
+                            from ..services.openai_eval_service import evaluate_code_glyph_pdf_with_openai, write_code_glyph_eval_artifacts
+                            evaluation_results = evaluate_code_glyph_pdf_with_openai(
+                                attacked_pdf_path=attacked_pdf_path,
+                                questions=questions,
+                            )
+                            try:
+                                write_code_glyph_eval_artifacts(assessment_dir, questions, evaluation_results)
+                            except Exception:
+                                pass
+                        else:
+                            logger.warning("[upload_assessment] CODE_GLYPH handler missing; falling back to OpenAI evaluation")
+                            logger.info("[upload_assessment] Starting OpenAI PDF evaluation")
+                            evaluation_results = evaluate_pdf_with_openai(
+                                attacked_pdf_path=attacked_pdf_path,
+                                questions=questions,
+                                reference_answers=reference_answers
+                            )
+                    except Exception as exc:
+                        logger.error("[upload_assessment] CODE_GLYPH evaluation failed; fallback to OpenAI evaluation: %s", exc)
+                        logger.info("[upload_assessment] Starting OpenAI PDF evaluation")
+                        evaluation_results = evaluate_pdf_with_openai(
+                            attacked_pdf_path=attacked_pdf_path,
+                            questions=questions,
+                            reference_answers=reference_answers
+                        )
+                elif attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION:
+                    logger.info("[upload_assessment] Starting PREVENTION evaluation (answers-only accuracy)")
+                    from ..services.openai_eval_service import evaluate_prevention_pdf_with_openai
+                    evaluation_results = evaluate_prevention_pdf_with_openai(
+                        attacked_pdf_path=attacked_pdf_path,
+                        questions=questions,
+                    )
+                else:
+                    logger.info("[upload_assessment] Starting OpenAI PDF evaluation")
+                    evaluation_results = evaluate_pdf_with_openai(
+                        attacked_pdf_path=attacked_pdf_path,
+                        questions=questions,
+                        reference_answers=reference_answers
+                    )
                 logger.info(f"[upload_assessment] OpenAI evaluation completed")
             else:
                 logger.warning("[upload_assessment] Skipping OpenAI evaluation - no questions found")

@@ -252,6 +252,15 @@ For the OpenAI PDF evaluation path that uploads the attacked PDF to Google Drive
 Notes
 - If you don’t want evaluation during testing, set `ENABLE_LLM=0` in the backend environment.
 - If OCR produces noisy parsing and you want simpler heuristics, set `USE_OCR=0`.
+- For CODE_GLYPH fonts (prebuilt), set in `backend/.env`:
+  - `CODE_GLYPH_FONT_MODE=prebuilt`
+  - `CODE_GLYPH_PREBUILT_DIR=/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/prebuilt_fonts/DejaVuSans/v4`
+  - Optional base font embedding (improves rendering):
+    - `CODE_GLYPH_BASE_FONT=/absolute/path/DejaVuSans.ttf`
+
+Logging tags to trace Code Glyph:
+- `[code_glyph.pipeline]` – mappings, font resolution, render, metadata
+- `[code_glyph.pdfgen]` – base font embedding and render progress
 
 ---
 
