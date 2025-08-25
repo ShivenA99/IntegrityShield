@@ -1,14 +1,25 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ControlPanel } from './components/ControlPanel';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { PdfUpload } from './components/PdfUpload';
 import { DownloadLinks } from './components/DownloadLinks';
 import { AttackType } from './types';
-import { uploadAssessment } from './services/assessmentService';
+import { uploadAssessment, fetchOriginalFile } from './services/assessmentService';
+import { ExplorerModal } from './components/ExplorerModal';
+import { useLocation } from 'react-router-dom';
+
+const STORAGE_KEYS = {
+  attack: 'fta_attack',
+  lastAssessmentId: 'fta_last_assessment_id',
+  runStatus: 'fta_run_status', // idle|running|completed
+};
 
 const App: React.FC = () => {
-  // Attack selection
-  const [attack, setAttack] = useState<AttackType>(AttackType.CODE_GLYPH);
+  const location = useLocation() as { state?: { assessmentId?: string; attack_type?: string } };
+  const [attack, setAttack] = useState<AttackType>(() => {
+    const saved = sessionStorage.getItem(STORAGE_KEYS.attack) as AttackType | null;
+    return saved && Object.values(AttackType).includes(saved) ? saved : AttackType.CODE_GLYPH;
+  });
   const allowedAttacks: AttackType[] = [
     AttackType.CODE_GLYPH,
     AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP,
@@ -16,112 +27,109 @@ const App: React.FC = () => {
     AttackType.NONE,
   ];
 
-  // File states
   const [originalPdf, setOriginalPdf] = useState<File | null>(null);
   const [answersPdf, setAnswersPdf] = useState<File | null>(null);
-
-  // Backend response
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [explorerOpen, setExplorerOpen] = useState(false);
 
-  // UI toggles (future backend integration)
-  const [noCopy, setNoCopy] = useState(false);
-  const [noScreenshot, setNoScreenshot] = useState(false);
+  useEffect(() => { sessionStorage.setItem(STORAGE_KEYS.attack, attack); }, [attack]);
 
-  console.log('[App] Component mounted');
+  useEffect(() => {
+    const st = location.state;
+    const run = async () => {
+      try {
+        const desiredAttack = st?.attack_type || sessionStorage.getItem(STORAGE_KEYS.attack);
+        if (desiredAttack && Object.values(AttackType).includes(desiredAttack as AttackType)) setAttack(desiredAttack as AttackType);
+        const persistedId = st?.assessmentId || sessionStorage.getItem(STORAGE_KEYS.lastAssessmentId);
+        const runStatus = sessionStorage.getItem(STORAGE_KEYS.runStatus) || 'idle';
+        if (persistedId) {
+          setAssessmentId(persistedId);
+          try {
+            const file = await fetchOriginalFile(persistedId);
+            setOriginalPdf(file);
+          } catch {}
+        }
+        setIsLoading(runStatus === 'running');
+      } catch (e: any) {
+        setError(String(e.message || e));
+      }
+    };
+    void run();
+  }, [location.state]);
 
   const handleSubmit = useCallback(async () => {
-    console.debug('[handleSubmit] Called');
-    if (!originalPdf) {
-      setError('Please upload the question paper PDF. The answer key is optional.');
-      return;
-    }
-
+    if (isLoading) return;
+    if (!originalPdf) { setError('Please upload the question paper PDF. The answer key is optional.'); return; }
     setIsLoading(true);
     setError(null);
     setAssessmentId(null);
-
+    sessionStorage.setItem(STORAGE_KEYS.runStatus, 'running');
     try {
-      const { assessment_id } = await uploadAssessment(originalPdf, answersPdf, attack);
-      setAssessmentId(assessment_id);
+      const clientId = sessionStorage.getItem(STORAGE_KEYS.lastAssessmentId) || crypto.randomUUID();
+      const formData = new FormData();
+      formData.append('original_pdf', originalPdf);
+      if (answersPdf) formData.append('answers_pdf', answersPdf);
+      formData.append('attack_type', attack);
+      formData.append('client_id', clientId);
+      const resp = await fetch('/api/assessments/upload', { method: 'POST', body: formData });
+      if (!resp.ok) throw new Error(await resp.text());
+      const data = await resp.json();
+      setAssessmentId(data.assessment_id);
+      sessionStorage.setItem(STORAGE_KEYS.lastAssessmentId, data.assessment_id);
+      sessionStorage.setItem(STORAGE_KEYS.runStatus, 'completed');
     } catch (err) {
-      console.error('[handleSubmit] uploadAssessment threw', err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unexpected error occurred while uploading.');
-      }
+      if (err instanceof Error) setError(err.message); else setError('An unexpected error occurred while uploading.');
+      sessionStorage.setItem(STORAGE_KEYS.runStatus, 'idle');
     } finally {
       setIsLoading(false);
     }
-  }, [originalPdf, answersPdf, attack]);
+  }, [originalPdf, answersPdf, attack, isLoading]);
 
   const handleClear = () => {
+    if (isLoading) return;
     setOriginalPdf(null);
     setAnswersPdf(null);
     setAssessmentId(null);
     setError(null);
-    console.info('[handleClear] Cleared all state');
+    sessionStorage.removeItem(STORAGE_KEYS.lastAssessmentId);
+    sessionStorage.removeItem(STORAGE_KEYS.runStatus);
   };
 
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Column: Controls and Input */}
         <div className="flex flex-col space-y-6 p-6 bg-slate-850 rounded-xl shadow-2xl">
-          <ControlPanel
-            onSubmit={handleSubmit}
-            onClear={handleClear}
-            isLoading={isLoading}
-            noCopy={noCopy}
-            noScreenshot={noScreenshot}
-            onToggleNoCopy={setNoCopy}
-            onToggleNoScreenshot={setNoScreenshot}
-          />
-          {/* Attack Type Dropdown */}
+          <ControlPanel onSubmit={handleSubmit} onClear={handleClear} isLoading={isLoading} />
           <div>
             <label className="block text-sm font-medium text-sky-300 mb-1">Attack Type</label>
-            <select
-              value={attack}
-              onChange={(e) => setAttack(e.target.value as AttackType)}
-              disabled={isLoading}
-              className="block w-full bg-slate-800 text-slate-100 text-sm rounded-md border border-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-600"
-            >
-              {allowedAttacks.map((a) => (
-                <option key={a} value={a}>{a}</option>
-              ))}
+            <select value={attack} onChange={(e) => setAttack(e.target.value as AttackType)} disabled={isLoading} className="block w-full bg-slate-800 text-slate-100 text-sm rounded-md border border-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-600">
+              {allowedAttacks.map((a) => (<option key={a} value={a}>{a}</option>))}
             </select>
           </div>
-          <PdfUpload
-            originalFile={originalPdf}
-            answersFile={answersPdf}
-            onOriginalChange={setOriginalPdf}
-            onAnswersChange={setAnswersPdf}
-            disabled={isLoading}
-          />
+          <PdfUpload originalFile={originalPdf} answersFile={answersPdf} onOriginalChange={(f) => { if (!isLoading) setOriginalPdf(f); }} onAnswersChange={(f) => { if (!isLoading) setAnswersPdf(f); }} disabled={isLoading} onOpenExplorer={() => setExplorerOpen(true)} />
         </div>
 
-        {/* Right Column: Results */}
-        <div className="flex flex-col space-y-6 p-6 bg-slate-850 rounded-xl shadow-2xl">
-          {isLoading && <LoadingSpinner />}
+        <div className="flex flex-col space-y-6 p-6 bg-slate-850 rounded-xl shadow-2xl min-h-[360px]">
           {error && (
             <div className="p-4 bg-red-700 text-white rounded-md shadow-lg" role="alert">
               <h3 className="font-bold text-lg mb-1">Error</h3>
               <p className="text-sm">{error}</p>
             </div>
           )}
+          {isLoading && (
+            <div className="flex justify-center"><LoadingSpinner /></div>
+          )}
           {assessmentId && !isLoading && !error && (
             <DownloadLinks assessmentId={assessmentId} />
           )}
           {!assessmentId && !isLoading && !error && (
-            <div className="text-center text-slate-400 py-10">
-              <p className="text-lg">Upload PDFs and run the attack simulation to see download links.</p>
-            </div>
+            <div className="text-center text-slate-400 py-10"><p className="text-lg">Upload or pick a PDF and run the attack simulation.</p></div>
           )}
         </div>
       </div>
+      <ExplorerModal open={explorerOpen} onClose={() => setExplorerOpen(false)} onSelectFile={(file) => { if (!isLoading) setOriginalPdf(file); }} />
     </main>
   );
 };

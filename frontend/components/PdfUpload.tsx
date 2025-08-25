@@ -10,6 +10,7 @@ interface PdfUploadProps {
   onOriginalChange: (file: File | null) => void;
   onAnswersChange: (file: File | null) => void;
   disabled?: boolean;
+  onOpenExplorer?: () => void;
 }
 
 export const PdfUpload: React.FC<PdfUploadProps> = ({
@@ -18,6 +19,7 @@ export const PdfUpload: React.FC<PdfUploadProps> = ({
   onOriginalChange,
   onAnswersChange,
   disabled = false,
+  onOpenExplorer,
 }: PdfUploadProps) => {
   type Thumb = { page: number; url: string };
   const [originalThumbs, setOriginalThumbs] = useState<Thumb[]>([]);
@@ -100,6 +102,23 @@ export const PdfUpload: React.FC<PdfUploadProps> = ({
     setOverlayOpen(true);
   }, [renderPage]);
 
+  // Sync thumbnails when files are set programmatically (e.g., via Explorer)
+  useEffect(() => {
+    if (originalFile && originalFile.type === 'application/pdf') {
+      void renderAllPages(originalFile, setOriginalThumbs);
+    } else if (!originalFile) {
+      setOriginalThumbs([]);
+    }
+  }, [originalFile, renderAllPages]);
+
+  useEffect(() => {
+    if (answersFile && answersFile.type === 'application/pdf') {
+      void renderAllPages(answersFile, setAnswersThumbs);
+    } else if (!answersFile) {
+      setAnswersThumbs([]);
+    }
+  }, [answersFile, renderAllPages]);
+
   // Clear thumbnails when parent clears files
   useEffect(() => {
     if (!originalFile) setOriginalThumbs([]);
@@ -115,7 +134,8 @@ export const PdfUpload: React.FC<PdfUploadProps> = ({
     onDropSet: ReturnType<typeof makeDropHandlers>;
     onChoose: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onThumbClick: (page: number) => void;
-  }> = ({ label, file, thumbs, onDropSet, onChoose, onThumbClick }) => (
+    showExplorer?: boolean;
+  }> = ({ label, file, thumbs, onDropSet, onChoose, onThumbClick, showExplorer }) => (
     <div>
       <label className="block text-sm font-medium text-sky-300 mb-1">{label}</label>
       <div
@@ -150,7 +170,18 @@ export const PdfUpload: React.FC<PdfUploadProps> = ({
               <p className="text-xs text-slate-400">Drag & drop a PDF here, or choose a file</p>
             )}
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            {showExplorer && (
+              <button
+                type="button"
+                className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded-md"
+                title="Pick from uploaded"
+                onClick={onOpenExplorer}
+                aria-label="Open file explorer"
+              >
+                📁
+              </button>
+            )}
             <label className="inline-block cursor-pointer px-2 py-1 text-xs bg-sky-700 hover:bg-sky-600 rounded-md text-white">
               Choose file
               <input
@@ -176,6 +207,7 @@ export const PdfUpload: React.FC<PdfUploadProps> = ({
         onDropSet={makeDropHandlers(onOriginalChange, setOriginalThumbs)}
         onChoose={(e) => handleFileSelect(e, onOriginalChange, setOriginalThumbs)}
         onThumbClick={(page) => openOverlay(originalFile, page)}
+        showExplorer
       />
 
       <DropZone

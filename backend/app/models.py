@@ -34,8 +34,11 @@ class Assessment(db.Model):
     __tablename__ = "assessments"
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     attack_type = db.Column(db.Text, nullable=False)
     status = db.Column(db.Text, default="processed", nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
+    deleted_at = db.Column(db.DateTime, nullable=True)
 
     # Foreign keys to files
     original_pdf_id = db.Column(UUID(as_uuid=True), db.ForeignKey("stored_files.id"))
@@ -85,4 +88,21 @@ class LLMResponse(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint("question_id", "model_name", name="uq_llmresponses_question_model"),
-    ) 
+    )
+
+
+class Job(db.Model):
+    __tablename__ = "jobs"
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    assessment_id = db.Column(UUID(as_uuid=True), db.ForeignKey("assessments.id"), nullable=False)
+    new_assessment_id = db.Column(UUID(as_uuid=True), db.ForeignKey("assessments.id"), nullable=True)
+    action = db.Column(db.Text, nullable=False)  # 'rerun'
+    params = db.Column(JSONB, nullable=True)
+    status = db.Column(db.Text, default="queued", nullable=False)  # queued|running|succeeded|failed|canceled
+    progress = db.Column(db.Integer, default=0, nullable=False)
+    message = db.Column(db.Text, nullable=True)
+    order_index = db.Column(db.Integer, default=0, nullable=False)
+    queued_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    started_at = db.Column(db.DateTime, nullable=True)
+    finished_at = db.Column(db.DateTime, nullable=True)
+    error_text = db.Column(db.Text, nullable=True) 

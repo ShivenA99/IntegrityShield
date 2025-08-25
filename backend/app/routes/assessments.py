@@ -6,12 +6,13 @@ import uuid
 from pathlib import Path
 from typing import List
 import logging
+import datetime as dt
 
 from flask import Blueprint, request, jsonify, send_file, current_app
 from werkzeug.utils import secure_filename
 
 from .. import db
-from ..models import Assessment, StoredFile, Question, LLMResponse
+from ..models import Assessment, StoredFile, Question, LLMResponse, Job
 from ..services import attack_service
 from ..services.attack_service import AttackType
 from ..services.pdf_utils import (
@@ -38,6 +39,21 @@ UPLOAD_DIR = Path(os.getenv("DATA_DIR", str(_default_data_dir))).resolve()
 
 ALLOWED_EXTENSIONS = {"pdf"}
 
+def allowed_file(filename: str) -> bool:
+    try:
+        return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+    except Exception:
+        return False
+
+def get_or_create_stored_file(file_path: Path, mime_type: str) -> StoredFile:
+    existing: StoredFile | None = StoredFile.query.filter_by(path=str(file_path)).first()
+    if existing:
+        return existing
+    sf = StoredFile(path=str(file_path), mime_type=mime_type)
+    db.session.add(sf)
+    db.session.flush()
+    return sf
+
 # Debug artefacts directory (repo root ./output)
 DEBUG_OUTPUT_DIR = Path(__file__).resolve().parents[2] / "output"
 DEBUG_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -45,348 +61,306 @@ DEBUG_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # Set via env: ENABLE_LLM=0 to disable all LLM calls during testing
 ENABLE_LLM = os.getenv("ENABLE_LLM", "1") not in {"0", "false", "False"}
 
-def allowed_file(filename: str) -> bool:
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+from sqlalchemy import func
 
 
 @assessments_bp.route("/upload", methods=["POST"])
 def upload_assessment():
     """Handle upload of original Q-paper and answers paper, create attacked versions, call LLM, save report."""
-
-    # ------------------------------------------------------------------
-    # Input validation
-    # ------------------------------------------------------------------
-    attack_type_str = request.form.get("attack_type", AttackType.NONE.value)
-    logger.info("[upload_assessment] Received upload request with attack_type=%s", attack_type_str)
+    job = None
     try:
-        attack_type = AttackType(attack_type_str)
-        logger.info("[upload_assessment] Parsed attack_type=%s", attack_type)
-    except ValueError:
-        logger.error("[upload_assessment] Invalid attack_type: %s", attack_type_str)
-        return jsonify({"error": "Invalid attack_type"}), 400
-
-    if "original_pdf" not in request.files:
-        return jsonify({"error": "original_pdf file is required."}), 400
-
-    orig_file = request.files["original_pdf"]
-    ans_file = request.files.get("answers_pdf")
-
-    if not (orig_file and allowed_file(orig_file.filename)):
-        return jsonify({"error": "original_pdf must be a PDF."}), 400
-    if ans_file and not allowed_file(ans_file.filename):
-        return jsonify({"error": "answers_pdf must be a PDF if provided."}), 400
-
-    # ------------------------------------------------------------------
-    # Create directory for this assessment
-    # ------------------------------------------------------------------
-    assessment_uuid = uuid.uuid4()
-    assessment_dir = UPLOAD_DIR / "assessments" / str(assessment_uuid)
-    assessment_dir.mkdir(parents=True, exist_ok=True)
-    logger.debug("[upload_assessment] Created assessment directory %s", assessment_dir)
-
-    # Save uploaded PDFs
-    orig_path = assessment_dir / secure_filename(orig_file.filename)
-    orig_file.save(orig_path)
-    ans_path: Path | None = None
-    if ans_file and ans_file.filename:
-        ans_path = assessment_dir / secure_filename(ans_file.filename)
-        ans_file.save(ans_path)
-
-    # Record StoredFile entries
-    orig_sf = StoredFile(path=str(orig_path), mime_type="application/pdf")
-    db.session.add(orig_sf)
-    ans_sf: StoredFile | None = None
-    if ans_path:
-        ans_sf = StoredFile(path=str(ans_path), mime_type="application/pdf")
-        db.session.add(ans_sf)
-    db.session.flush()  # obtain IDs
-
-    # ------------------------------------------------------------------
-    # Parse original PDF – get title and question list
-    # ------------------------------------------------------------------
-    title_text, questions = parse_pdf_questions(orig_path)
-    logger.info("[upload_assessment] Parsing PDF and injecting attacks (%s)", attack_type.value)
-    inject_attacks_into_questions(questions, attack_type)
-
-    # ------------------------------------------------------------------
-    # Generate wrong answers & rationales – leverage answer key when present
-    # ------------------------------------------------------------------
-    answer_key: dict[int, tuple[str, str]] = {}
-    if ans_path:
+        # Input validation
+        attack_type_str = request.form.get("attack_type", AttackType.NONE.value)
+        client_id_str = request.form.get("client_id")
+        logger.info("[upload_assessment] Received upload request with attack_type=%s client_id=%s", attack_type_str, client_id_str)
         try:
-            answer_key = parse_pdf_answers(ans_path)
-            logger.debug("[upload_assessment] Parsed %d answers from key PDF", len(answer_key))
-        except Exception as exc:
-            logger.warning("[upload_assessment] Failed to parse answers_pdf: %s", exc)
+            attack_type = AttackType(attack_type_str)
+            logger.info("[upload_assessment] Parsed attack_type=%s", attack_type)
+        except ValueError:
+            logger.error("[upload_assessment] Invalid attack_type: %s", attack_type_str)
+            return jsonify({"error": "Invalid attack_type"}), 400
 
-    for q in questions:
-        correct_label, correct_reason = answer_key.get(q["q_number"], (None, "")) if answer_key else (None, "")
-        if attack_type == AttackType.CODE_GLYPH:
+        if "original_pdf" not in request.files:
+            return jsonify({"error": "original_pdf file is required."}), 400
+
+        orig_file = request.files["original_pdf"]
+        ans_file = request.files.get("answers_pdf")
+
+        if not (orig_file and allowed_file(orig_file.filename)):
+            return jsonify({"error": "original_pdf must be a PDF."}), 400
+        if ans_file and not allowed_file(ans_file.filename):
+            return jsonify({"error": "answers_pdf must be a PDF if provided."}), 400
+
+        # Always create a new Assessment directory and ID (do not reuse)
+        assessment_uuid = uuid.uuid4()
+        assessment_dir = UPLOAD_DIR / "assessments" / str(assessment_uuid)
+        assessment_dir.mkdir(parents=True, exist_ok=True)
+        logger.debug("[upload_assessment] Created assessment directory %s", assessment_dir)
+
+        # Save uploaded PDFs
+        orig_path = assessment_dir / secure_filename(orig_file.filename)
+        orig_file.save(orig_path)
+        ans_path: Path | None = None
+        if ans_file and ans_file.filename:
+            ans_path = assessment_dir / secure_filename(ans_file.filename)
+            ans_file.save(ans_path)
+
+        # Create StoredFile entries (new rows)
+        orig_sf = StoredFile(path=str(orig_path), mime_type="application/pdf")
+        db.session.add(orig_sf)
+        ans_sf: StoredFile | None = None
+        if ans_path:
+            ans_sf = StoredFile(path=str(ans_path), mime_type="application/pdf")
+            db.session.add(ans_sf)
+        db.session.flush()
+
+        # Create Assessment
+        assessment = Assessment(
+            id=assessment_uuid,
+            attack_type=attack_type.value,
+            original_pdf_id=orig_sf.id,
+            answers_pdf_id=ans_sf.id if ans_sf else None,
+        )
+        db.session.add(assessment)
+        db.session.flush()
+
+        # Create running job (progress will be updated below)
+        job = Job(
+            assessment_id=assessment.id,
+            action="upload",
+            params={"attack_type": attack_type.value},
+            status="running",
+            progress=10,
+            message="Saving files",
+            queued_at=dt.datetime.utcnow(),
+            started_at=dt.datetime.utcnow(),
+        )
+        db.session.add(job)
+        db.session.flush()
+
+        # Parse original PDF – get title and question list
+        job.progress = 20
+        job.message = "Parsing & injecting"
+        db.session.flush()
+
+        title_text, questions = parse_pdf_questions(orig_path)
+        logger.info("[upload_assessment] Parsing PDF and injecting attacks (%s)", attack_type.value)
+        inject_attacks_into_questions(questions, attack_type)
+
+        # Generate wrong answers & rationales – leverage answer key when present
+        answer_key: dict[int, tuple[str, str]] = {}
+        if ans_path:
             try:
-                from ..services.attacks import get_attack_handler
-                handler = get_attack_handler("CODE_GLYPH")
-                # Generate input/output entities via LLM for CODE_GLYPH
+                answer_key = parse_pdf_answers(ans_path)
+                logger.debug("[upload_assessment] Parsed %d answers from key PDF", len(answer_key))
+            except Exception as exc:
+                logger.warning("[upload_assessment] Failed to parse answers_pdf: %s", exc)
+
+        for q in questions:
+            correct_label, correct_reason = answer_key.get(q["q_number"], (None, "")) if answer_key else (None, "")
+            if attack_type == AttackType.CODE_GLYPH:
                 try:
-                    from ..services.wrong_answer_service import generate_wrong_answer_entities
-                    entities = generate_wrong_answer_entities(q["stem_text"], q["options"], correct_label)
-                    q["code_glyph_entities"] = entities  # {input_entity, output_entity, wrong_label, rationale, ...}
-                    logger.info("[upload_assessment] CODE_GLYPH entities for Q%s: %s", q["q_number"], entities)
-                except Exception as exc_ent:
-                    logger.error("[upload_assessment] CODE_GLYPH entity generation failed: %s", exc_ent)
-                if handler:
-                    wrong_label, wrong_reason = handler.generate_wrong_answer(
-                        stem_text=q["stem_text"],
-                        options=q["options"],
-                        correct_answer=correct_label,
-                    )
-                else:
+                    from ..services.attacks import get_attack_handler
+                    handler = get_attack_handler("CODE_GLYPH")
+                    try:
+                        from ..services.wrong_answer_service import generate_wrong_answer_entities
+                        entities = generate_wrong_answer_entities(q["stem_text"], q["options"], correct_label)
+                        q["code_glyph_entities"] = entities
+                        logger.info("[upload_assessment] CODE_GLYPH entities for Q%s: %s", q["q_number"], entities)
+                    except Exception as exc_ent:
+                        logger.error("[upload_assessment] CODE_GLYPH entity generation failed: %s", exc_ent)
+                    if handler:
+                        wrong_label, wrong_reason = handler.generate_wrong_answer(
+                            stem_text=q["stem_text"],
+                            options=q["options"],
+                            correct_answer=correct_label,
+                        )
+                    else:
+                        wrong_label, wrong_reason = generate_wrong_answer(
+                            stem_text=q["stem_text"],
+                            options=q["options"],
+                            correct_answer=correct_label,
+                        )
+                except Exception as exc:
+                    logger.error("[upload_assessment] CODE_GLYPH wrong-answer generation failed; fallback to default: %s", exc)
                     wrong_label, wrong_reason = generate_wrong_answer(
                         stem_text=q["stem_text"],
                         options=q["options"],
                         correct_answer=correct_label,
                     )
-            except Exception as exc:
-                logger.error("[upload_assessment] CODE_GLYPH wrong-answer generation failed; fallback to default: %s", exc)
+            elif attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION:
+                wrong_label, wrong_reason = "", ""
+            else:
                 wrong_label, wrong_reason = generate_wrong_answer(
                     stem_text=q["stem_text"],
                     options=q["options"],
                     correct_answer=correct_label,
                 )
-        elif attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION:
-            # Prevention mode: No wrong-answer generation; keep placeholders empty
-            wrong_label, wrong_reason = "", ""
-        else:
-            wrong_label, wrong_reason = generate_wrong_answer(
-                stem_text=q["stem_text"],
-                options=q["options"],
-                correct_answer=correct_label,
-            )
 
-        q["wrong_label"] = wrong_label
-        q["wrong_reason"] = wrong_reason
+            q["wrong_label"] = wrong_label
+            q["wrong_reason"] = wrong_reason
+            if correct_label:
+                q["gold_answer"] = correct_label
+                q["gold_reason"] = correct_reason
 
-        logger.debug(f"[upload_assessment] Q{q['q_number']}: Generated wrong answer = {wrong_label}, reason = {wrong_reason}")
+        job.progress = 50
+        job.message = "Building attacked PDF"
+        db.session.flush()
 
-        if correct_label:
-            q["gold_answer"] = correct_label
-            q["gold_reason"] = correct_reason
-            logger.debug(f"[upload_assessment] Q{q['q_number']}: Found correct answer = {correct_label}")
-
-    # Create attacked PDF
-    attacked_pdf_path = assessment_dir / "attacked.pdf"
-    if attack_type == AttackType.CODE_GLYPH:
-        try:
-            from ..services.attacks import get_attack_handler
-            handler = get_attack_handler("CODE_GLYPH")
-            if handler:
-                generated_path, _ = handler.build_artifacts(questions, assessment_dir, title_text)
-                # Copy or point attacked.pdf to the generated file location for consistency
-                if generated_path != attacked_pdf_path:
-                    try:
-                        import shutil
-                        shutil.copyfile(generated_path, attacked_pdf_path)
-                    except Exception:
-                        attacked_pdf_path = generated_path
-            else:
+        # Create attacked PDF
+        attacked_pdf_path = assessment_dir / "attacked.pdf"
+        if attack_type == AttackType.CODE_GLYPH:
+            try:
+                from ..services.attacks import get_attack_handler
+                handler = get_attack_handler("CODE_GLYPH")
+                if handler:
+                    generated_path, _ = handler.build_artifacts(questions, assessment_dir, title_text)
+                    if generated_path != attacked_pdf_path:
+                        try:
+                            import shutil
+                            shutil.copyfile(generated_path, attacked_pdf_path)
+                        except Exception:
+                            attacked_pdf_path = generated_path
+                else:
+                    build_attacked_pdf(questions, attacked_pdf_path, title=title_text)
+            except Exception as exc:
+                logger.error("[upload_assessment] CODE_GLYPH build failed, falling back: %s", exc)
                 build_attacked_pdf(questions, attacked_pdf_path, title=title_text)
-        except Exception as exc:
-            logger.error("[upload_assessment] CODE_GLYPH build failed, falling back: %s", exc)
+        else:
             build_attacked_pdf(questions, attacked_pdf_path, title=title_text)
-    else:
-        build_attacked_pdf(questions, attacked_pdf_path, title=title_text)
 
-    # ------------------------------------------------------------------
-    # Evaluate attacked PDF with OpenAI
-    # ------------------------------------------------------------------
-    evaluation_results = None
-    logger.info(f"[upload_assessment] ENABLE_LLM={ENABLE_LLM}, attack_type={attack_type}, attack_type!=NONE={attack_type != AttackType.NONE}")
-    if ENABLE_LLM and attack_type != AttackType.NONE:
-        try:
-            # Prepare reference and malicious answers
-            reference_answers = {}
-            malicious_answers = {}
-            
-            for q in questions:
-                q_num = q["q_number"]
-                # Reference answer (correct answer)
-                if "gold_answer" in q and q["gold_answer"]:
-                    reference_answers[q_num] = q["gold_answer"]
-                    logger.debug(f"[upload_assessment] Q{q_num}: Reference answer = {q['gold_answer']}")
-                
-                # Malicious answer (wrong answer that was generated)
-                if "wrong_label" in q and q["wrong_label"]:
-                    malicious_answers[q_num] = q["wrong_label"]
-                    logger.debug(f"[upload_assessment] Q{q_num}: Malicious answer = {q['wrong_label']}")
-            
-            logger.debug(f"[upload_assessment] Found {len(reference_answers)} reference answers and {len(malicious_answers)} malicious answers")
-            
-            if questions:
-                # If no reference answers are available, we can still evaluate
-                if not reference_answers:
-                    logger.info("[upload_assessment] No reference answers available, evaluating attack effectiveness only")
-                    reference_answers = {q["q_number"]: "UNKNOWN" for q in questions}
-                
-                if attack_type == AttackType.CODE_GLYPH:
-                    try:
-                        from ..services.attacks import get_attack_handler
-                        handler = get_attack_handler("CODE_GLYPH")
-                        if handler:
-                            logger.info("[upload_assessment] Starting CODE_GLYPH evaluation")
-                            from ..services.openai_eval_service import evaluate_code_glyph_pdf_with_openai, write_code_glyph_eval_artifacts
-                            evaluation_results = evaluate_code_glyph_pdf_with_openai(
-                                attacked_pdf_path=attacked_pdf_path,
-                                questions=questions,
-                            )
-                            try:
-                                write_code_glyph_eval_artifacts(assessment_dir, questions, evaluation_results)
-                            except Exception:
-                                pass
-                        else:
-                            logger.warning("[upload_assessment] CODE_GLYPH handler missing; falling back to OpenAI evaluation")
-                            logger.info("[upload_assessment] Starting OpenAI PDF evaluation")
+        job.progress = 70
+        job.message = "Evaluating"
+        db.session.flush()
+
+        # Evaluate attacked PDF with OpenAI
+        evaluation_results = None
+        logger.info(f"[upload_assessment] ENABLE_LLM={ENABLE_LLM}, attack_type={attack_type}, attack_type!=NONE={attack_type != AttackType.NONE}")
+        if ENABLE_LLM and attack_type != AttackType.NONE:
+            try:
+                reference_answers = {}
+                malicious_answers = {}
+                for q in questions:
+                    q_num = q["q_number"]
+                    if "gold_answer" in q and q["gold_answer"]:
+                        reference_answers[q_num] = q["gold_answer"]
+                    if "wrong_label" in q and q["wrong_label"]:
+                        malicious_answers[q_num] = q["wrong_label"]
+                if questions:
+                    if not reference_answers:
+                        reference_answers = {q["q_number"]: "UNKNOWN" for q in questions}
+                    if attack_type == AttackType.CODE_GLYPH:
+                        try:
+                            from ..services.attacks import get_attack_handler
+                            handler = get_attack_handler("CODE_GLYPH")
+                            if handler:
+                                from ..services.openai_eval_service import evaluate_code_glyph_pdf_with_openai, write_code_glyph_eval_artifacts
+                                evaluation_results = evaluate_code_glyph_pdf_with_openai(
+                                    attacked_pdf_path=attacked_pdf_path,
+                                    questions=questions,
+                                )
+                                try:
+                                    write_code_glyph_eval_artifacts(assessment_dir, questions, evaluation_results)
+                                except Exception:
+                                    pass
+                            else:
+                                evaluation_results = evaluate_pdf_with_openai(
+                                    attacked_pdf_path=attacked_pdf_path,
+                                    questions=questions,
+                                    reference_answers=reference_answers
+                                )
+                        except Exception as exc:
+                            logger.error("[upload_assessment] CODE_GLYPH evaluation failed; fallback to OpenAI evaluation: %s", exc)
                             evaluation_results = evaluate_pdf_with_openai(
                                 attacked_pdf_path=attacked_pdf_path,
                                 questions=questions,
                                 reference_answers=reference_answers
                             )
-                    except Exception as exc:
-                        logger.error("[upload_assessment] CODE_GLYPH evaluation failed; fallback to OpenAI evaluation: %s", exc)
-                        logger.info("[upload_assessment] Starting OpenAI PDF evaluation")
+                    elif attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION:
+                        from ..services.openai_eval_service import evaluate_prevention_pdf_with_openai
+                        evaluation_results = evaluate_prevention_pdf_with_openai(
+                            attacked_pdf_path=attacked_pdf_path,
+                            questions=questions,
+                        )
+                    else:
                         evaluation_results = evaluate_pdf_with_openai(
                             attacked_pdf_path=attacked_pdf_path,
                             questions=questions,
                             reference_answers=reference_answers
                         )
-                elif attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION:
-                    logger.info("[upload_assessment] Starting PREVENTION evaluation (answers-only accuracy)")
-                    from ..services.openai_eval_service import evaluate_prevention_pdf_with_openai
-                    evaluation_results = evaluate_prevention_pdf_with_openai(
-                        attacked_pdf_path=attacked_pdf_path,
-                        questions=questions,
-                    )
-                else:
-                    logger.info("[upload_assessment] Starting OpenAI PDF evaluation")
-                    evaluation_results = evaluate_pdf_with_openai(
-                        attacked_pdf_path=attacked_pdf_path,
-                        questions=questions,
-                        reference_answers=reference_answers
-                    )
-                logger.info(f"[upload_assessment] OpenAI evaluation completed")
-            else:
-                logger.warning("[upload_assessment] Skipping OpenAI evaluation - no questions found")
-                
-        except Exception as exc:
-            logger.error(f"[upload_assessment] OpenAI evaluation failed: {exc}")
-            evaluation_results = None
+            except Exception as exc:
+                logger.error(f"[upload_assessment] OpenAI evaluation failed: {exc}")
+                evaluation_results = None
 
-    # ------------------------------------------------------------------
-    # Always generate reference report (with evaluation results if available)
-    # ------------------------------------------------------------------
-    report_path = assessment_dir / "reference_report.pdf"
-    build_reference_report(questions, report_path, evaluation_results)
+        job.progress = 85
+        job.message = "Building report"
+        db.session.flush()
 
-    attacked_sf = StoredFile(path=str(attacked_pdf_path), mime_type="application/pdf")
-    report_sf = StoredFile(path=str(report_path), mime_type="application/pdf")
+        # Always generate reference report
+        report_path = assessment_dir / "reference_report.pdf"
+        build_reference_report(questions, report_path, evaluation_results)
 
-    db.session.add_all([attacked_sf, report_sf])
-    db.session.flush()
+        attacked_sf = StoredFile(path=str(attacked_pdf_path), mime_type="application/pdf")
+        report_sf = StoredFile(path=str(report_path), mime_type="application/pdf")
+        db.session.add_all([attacked_sf, report_sf])
+        db.session.flush()
 
-    # ------------------------------------------------------------------
-    # Persist Assessment + Question + LLMResponse rows
-    # ------------------------------------------------------------------
-    assessment = Assessment(
-        id=assessment_uuid,
-        attack_type=attack_type.value,
-        original_pdf_id=orig_sf.id,
-        answers_pdf_id=ans_sf.id if ans_sf else None,
-        attacked_pdf_id=attacked_sf.id,
-        report_pdf_id=report_sf.id,
-    )
-    db.session.add(assessment)
-    db.session.flush()
+        # Update assessment outputs
+        assessment.attacked_pdf_id = attacked_sf.id
+        assessment.report_pdf_id = report_sf.id
+        db.session.flush()
 
-    question_rows = []
-    llm_rows = []
-    
-    # Check if questions already exist for this assessment to prevent duplicates
-    existing_questions = Question.query.filter_by(assessment_id=assessment.id).all()
-    if existing_questions:
-        logger.warning(f"[upload_assessment] Questions already exist for assessment {assessment_uuid}, cleaning up existing questions")
-        # Delete existing questions to allow re-insertion
-        for existing_q in existing_questions:
+        # Replace Questions (fresh per run)
+        for existing_q in Question.query.filter_by(assessment_id=assessment.id).all():
             db.session.delete(existing_q)
         db.session.flush()
-    
-    for q in questions:
-        q_row = Question(
-            assessment_id=assessment.id,
-            q_number=q["q_number"],
-            stem_text=q["stem_text"],
-            options_json=q["options"],
-            gold_answer=q.get("gold_answer", ""),
-            gold_reason=q.get("gold_reason", ""),
-            wrong_answer=q.get("wrong_label", ""),
-            wrong_reason=q.get("wrong_reason", ""),
-            attacked_stem=q["attacked_stem"],
-        )
-        question_rows.append(q_row)
-        db.session.add(q_row)
-        db.session.flush()
-
-        if "llm_response" in q:
-            llm_rows.append(
-                LLMResponse(
-                    question_id=q_row.id,
-                    model_name="perplexity",
-                    llm_answer=q["llm_response"].get("answer_text", ""),
-                    raw_json=q["llm_response"].get("raw"),
-                )
+        for q in questions:
+            q_row = Question(
+                assessment_id=assessment.id,
+                q_number=q["q_number"],
+                stem_text=q["stem_text"],
+                options_json=q["options"],
+                gold_answer=q.get("gold_answer", ""),
+                gold_reason=q.get("gold_reason", ""),
+                wrong_answer=q.get("wrong_label", ""),
+                wrong_reason=q.get("wrong_reason", ""),
+                attacked_stem=q["attacked_stem"],
             )
-
-    if llm_rows:
-        db.session.add_all(llm_rows)
-
-    try:
+            db.session.add(q_row)
         db.session.commit()
-        logger.info("[upload_assessment] Assessment %s processed successfully", assessment_uuid)
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"[upload_assessment] Failed to commit assessment {assessment_uuid}: {e}")
-        
-        # Check if it's a unique constraint violation
-        if "UniqueViolation" in str(e) and "uq_questions_assessment_qnum" in str(e):
-            logger.error(f"[upload_assessment] Duplicate question numbers detected for assessment {assessment_uuid}")
-            # Clean up the assessment directory and files
-            try:
-                import shutil
-                if assessment_dir.exists():
-                    shutil.rmtree(assessment_dir)
-                logger.info(f"[upload_assessment] Cleaned up assessment directory {assessment_dir}")
-            except Exception as cleanup_error:
-                logger.error(f"[upload_assessment] Failed to cleanup assessment directory: {cleanup_error}")
-            
-            return jsonify({"error": "Duplicate question numbers detected. Please try uploading again."}), 400
-        
-        raise
 
-    # ------------------------------------------------------------------
-    # Copy artefacts to ./output for quick manual inspection
-    # ------------------------------------------------------------------
-    try:
-        shutil.copy(attacked_pdf_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_attacked.pdf")
-        shutil.copy(report_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_reference_report.pdf")
-        # Also export the LaTeX source so developers can quickly inspect
-        # rendering issues in the generated PDF.
+        # Finalize job
+        job.status = "succeeded"
+        job.progress = 100
+        job.message = "Completed"
+        job.finished_at = dt.datetime.utcnow()
+        db.session.commit()
+
+        # Copy artefacts
         try:
-            tex_src = attacked_pdf_path.with_suffix(".tex")
-            if tex_src.exists():
-                shutil.copy(tex_src, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_attacked.tex")
-        except Exception:
-            pass
-    except Exception as exc:
-        logger.debug("[upload_assessment] Could not copy PDFs to output dir: %s", exc)
+            shutil.copy(attacked_pdf_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_attacked.pdf")
+            shutil.copy(report_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_reference_report.pdf")
+            try:
+                tex_src = attacked_pdf_path.with_suffix(".tex")
+                if tex_src.exists():
+                    shutil.copy(tex_src, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_attacked.tex")
+            except Exception:
+                pass
+        except Exception as exc:
+            logger.debug("[upload_assessment] Could not copy PDFs to output dir: %s", exc)
 
-    return jsonify({"assessment_id": str(assessment.id)}), 201
+        return jsonify({"assessment_id": str(assessment.id)}), 201
+    except Exception as e:
+        logger.exception("[upload_assessment] Failed: %s", e)
+        if job:
+            try:
+                job.status = "failed"
+                job.message = "Failed"
+                job.finished_at = dt.datetime.utcnow()
+                db.session.commit()
+            except Exception:
+                pass
+        return jsonify({"error": "Upload failed"}), 500
 
 
 @assessments_bp.route("/<uuid:assessment_id>/attacked", methods=["GET"])
@@ -432,24 +406,10 @@ def download_original(assessment_id):
 
 @assessments_bp.route("/", methods=["GET"])
 def list_assessments():
-    """Paginated list of assessments with basic filtering/sorting.
-    Query params:
-      - q: substring search on original filename
-      - attack_type: exact match
-      - status: exact match
-      - start: ISO date/time (inclusive)
-      - end: ISO date/time (inclusive)
-      - sort: one of created_at|attack_type|status|original_filename
-      - order: asc|desc
-      - page: 1-based page number
-      - page_size: items per page (max 100)
+    """Paginated list of assessments with filtering/sorting.
     """
-    import datetime as dt
-    from sqlalchemy import func
-    
     q = request.args.get("q", type=str)
     attack_type = request.args.get("attack_type", type=str)
-    status = request.args.get("status", type=str)
     start = request.args.get("start", type=str)
     end = request.args.get("end", type=str)
     sort = request.args.get("sort", default="created_at", type=str)
@@ -457,13 +417,11 @@ def list_assessments():
     page = request.args.get("page", default=1, type=int)
     page_size = max(1, min(100, request.args.get("page_size", default=20, type=int)))
 
-    query = Assessment.query
+    query = Assessment.query.filter(Assessment.is_deleted == False)  # noqa: E712
 
     # Filters
     if attack_type:
         query = query.filter(Assessment.attack_type == attack_type)
-    if status:
-        query = query.filter(Assessment.status == status)
     # Date range
     try:
         if start:
@@ -475,11 +433,9 @@ def list_assessments():
     except Exception:
         return jsonify({"error": "Invalid start/end datetime format. Use ISO 8601."}), 400
 
-    # Filename search (substring on basename of original)
+    # Filename search on original
     if q:
-        # Join to original file for filtering by basename
         query = query.join(Assessment.original_pdf)
-        # Use case-insensitive search on the tail of path
         query = query.filter(func.lower(func.split_part(StoredFile.path, '/', -1)).like(f"%{q.lower()}%"))
 
     # Sorting
@@ -487,11 +443,9 @@ def list_assessments():
         "created_at": Assessment.created_at,
         "attack_type": Assessment.attack_type,
         "status": Assessment.status,
-        # For original_filename we need to join stored_files
         "original_filename": func.split_part(StoredFile.path, '/', -1),
     }
 
-    # Ensure necessary joins for sorting columns
     if sort == "original_filename":
         query = query.join(Assessment.original_pdf)
 
@@ -506,7 +460,6 @@ def list_assessments():
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
 
-    # Build response items
     def to_item(a: Assessment):
         import os
         return {
@@ -534,6 +487,75 @@ def list_assessments():
             "total_pages": (total + page_size - 1) // page_size,
         },
     })
+
+
+@assessments_bp.route("/bulk-delete", methods=["POST"])
+def bulk_delete():
+    data = request.get_json(silent=True) or {}
+    ids = data.get("ids") or []
+    if not isinstance(ids, list) or not ids:
+        return jsonify({"error": "ids must be a non-empty array"}), 400
+    updated = 0
+    for id_str in ids:
+        try:
+            aid = uuid.UUID(id_str)
+        except Exception:
+            continue
+        a: Assessment | None = Assessment.query.get(aid)
+        if a and not a.is_deleted:
+            a.is_deleted = True
+            a.deleted_at = dt.datetime.utcnow()
+            updated += 1
+    db.session.commit()
+    return jsonify({"deleted": updated}), 200
+
+
+@assessments_bp.route("/<uuid:assessment_id>/rerun", methods=["POST"])
+def rerun_assessment(assessment_id):
+    a: Assessment | None = Assessment.query.get(assessment_id)
+    if not a or a.is_deleted:
+        return jsonify({"error": "Assessment not found"}), 404
+    body = request.get_json(silent=True) or {}
+    params = {
+        "attack_type": body.get("attack_type", a.attack_type),
+        "flags": body.get("flags", {}),
+    }
+    # Create job in queued state
+    job = Job(
+        assessment_id=a.id,
+        action="rerun",
+        params=params,
+        status="queued",
+        progress=0,
+        message="Queued",
+        order_index=0,
+    )
+    db.session.add(job)
+    db.session.commit()
+    return jsonify({"job_id": str(job.id)}), 202
+
+
+
+
+
+
+@assessments_bp.route("/files/tree", methods=["GET"])
+def files_tree():
+    path = request.args.get("path", "/")
+    root = UPLOAD_DIR / "assessments"
+    target = root if path == "/" else (root / path.strip("/"))
+    if not target.exists() or not target.is_dir():
+        return jsonify({"error": "Not found"}), 404
+    items = []
+    for p in sorted(target.iterdir(), key=lambda x: (not x.is_dir(), x.name.lower())):
+        items.append({
+            "name": p.name,
+            "type": "folder" if p.is_dir() else "file",
+            "modified_at": dt.datetime.fromtimestamp(p.stat().st_mtime).isoformat(),
+            "size": p.stat().st_size,
+            "path": str((target / p.name).relative_to(root)).replace("\\", "/"),
+        })
+    return jsonify({"path": path, "items": items})
 
 
 @assessments_bp.route("/<uuid:assessment_id>/evaluate", methods=["POST"])
