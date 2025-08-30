@@ -434,3 +434,144 @@ Return only the JSON object, no additional text."""
     except Exception as e:
         logger.error(f"OCR-based answer extraction failed: {e}")
         raise RuntimeError(f"Failed to extract answers using OCR: {e}") 
+
+
+def extract_structured_document_with_ocr(pdf_path: Path, layout_doc: Dict[str, Any]) -> Dict[str, Any]:
+    """Produce a structured document JSON by classifying layout blocks and extracting questions.
+
+    Inputs:
+        pdf_path: Path to the original PDF (used for OCR fallback context)
+        layout_doc: Dict produced by layout_extractor.extract_layout_and_assets
+
+    Returns:
+        Dict matching the structured.json shape with added fields:
+            document.title
+            document.questions: list of structured questions per schema
+    """
+    logger.info(f"Starting OCR structuring for: {pdf_path}")
+
+    # Collect block summaries and asset summaries from layout_doc
+    try:
+        pages = layout_doc.get("document", {}).get("pages", [])
+        block_summaries = []
+        asset_summaries = []
+        for page in pages:
+            pidx = page.get("page_index")
+            for item in page.get("items", []):
+                itype = item.get("type")
+                if itype == "text_block":
+                    text = item.get("text", "")
+                    excerpt = (text[:800] + "…") if len(text) > 800 else text
+                    block_summaries.append({
+                        "id": item.get("id"),
+                        "page_index": pidx,
+                        "bbox": item.get("bbox"),
+                        "text_excerpt": excerpt,
+                    })
+                elif itype in {"image", "table", "figure"}:
+                    asset_summaries.append({
+                        "id": item.get("id"),
+                        "asset_id": item.get("asset_id", ""),
+                        "type_guess": itype,
+                        "page_index": pidx,
+                        "bbox": item.get("bbox"),
+                    })
+    except Exception as e:
+        logger.error(f"Failed to prepare layout summaries: {e}")
+        raise
+
+    # Optional OCR raw text context
+    raw_text_context = ""
+    try:
+        raw_text_context = extract_text_from_pdf_with_ocr(pdf_path)
+    except Exception as e:
+        logger.warning(f"OCR raw text fallback failed (continuing with layout text only): {e}")
+
+    # Build structuring prompt
+    import json as _json
+    blocks_json = _json.dumps(block_summaries, ensure_ascii=False)
+    assets_json = _json.dumps(asset_summaries, ensure_ascii=False)
+
+    parsing_prompt = f"""
+You are given a set of page-ordered text blocks (with IDs, page indices, and bounding boxes) and a set of assets (images/tables/figures) extracted from a PDF. Your task is to classify the content and extract questions in a structured, machine-readable JSON format.
+
+Inputs:
+- blocks: JSON array of objects {{id, page_index, bbox, text_excerpt}}
+{blocks_json}
+
+- assets: JSON array of objects {{id, asset_id, type_guess, page_index, bbox}}
+{assets_json}
+
+- optional_raw_text_context: Text extracted from the full PDF via OCR. Use only as a hint to disambiguate content when block text is incomplete or missing. Do not copy it verbatim unless it clearly matches a block.
+{raw_text_context[:4000]}
+
+Output JSON (return ONLY valid JSON, no markdown fences, no extra text):
+{{
+  "title": "<document title if present>",
+  "questions": [
+    {{
+      "q_number": "1",  
+      "q_type": "mcq_single|mcq_multi|true_false|match|fill_blank|short_answer|long_answer|comprehension_qa",
+      "stem_text": "...",
+      "options": {{"A":"...","B":"..."}},       
+      "matches": [{{"left":"...","right":"..."}}],
+      "blanks": [{{"placeholder":"..."}}],
+      "context_ids": ["<block_or_asset_ids used as context>"]
+    }}
+  ]
+}}
+
+Guidelines:
+1) Use block text excerpts to determine titles/instructions and question boundaries.
+2) Preserve question numbering including sub-questions (e.g., "1a", "1i").
+3) Return only fields applicable to the q_type.
+4) Link any supporting comprehension blocks/images/tables via "context_ids".
+5) Return strictly valid JSON, nothing else.
+"""
+
+    # Call LLM to structure
+    try:
+        if hasattr(openai, 'OpenAI'):
+            client = openai.OpenAI(api_key=OPENAI_API_KEY)
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": parsing_prompt}],
+                max_tokens=4000,
+                temperature=0.1,
+            )
+            content = response.choices[0].message.content.strip()
+        else:
+            response = openai.ChatCompletion.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": parsing_prompt}],
+                max_tokens=4000,
+                temperature=0.1,
+            )
+            content = response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.error(f"LLM structuring failed: {e}")
+        raise RuntimeError(f"Failed to structure OCR document: {e}")
+
+    # Parse JSON
+    import json
+    try:
+        # Strip code fences if present
+        if content.startswith("```"):
+            fence = "```json" if content.startswith("```json") else "```"
+            start = content.find(fence)
+            end = content.find("```", start + len(fence))
+            if start != -1 and end != -1:
+                content = content[start + len(fence):end].strip()
+        parsed = json.loads(content)
+    except Exception as e:
+        logger.error(f"Failed to parse structured JSON: {e}\nRAW: {content[:1000]}")
+        raise RuntimeError(f"Failed to parse structured JSON: {e}")
+
+    # Merge into layout_doc
+    doc = layout_doc.get("document", {})
+    doc["title"] = parsed.get("title")
+    doc["questions"] = parsed.get("questions", [])
+    layout_doc["document"] = doc
+
+    logger.info(f"OCR structuring complete: title present={bool(doc.get('title'))}, questions={len(doc.get('questions', []))}")
+    return layout_doc 

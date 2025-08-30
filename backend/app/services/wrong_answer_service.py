@@ -13,6 +13,12 @@ import logging
 import random
 import re
 from typing import Dict, Tuple, List
+from typing import Any
+from .attack_service import AttackType
+from .code_glyph_entity_service import (
+    generate_entities_for_question as cg_generate_entities,
+    generate_entities_for_structured_question as cg_generate_structured_entities,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -498,6 +504,103 @@ Options (verbatim; may be empty):
     }
     logger.warning("[wrong_answer_service] Using fallback CODE_GLYPH entities: %s", result)
     return result 
+
+
+def generate_wrong_answer_for_question(question: Dict[str, Any], attack_type: AttackType, ocr_doc: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    """Generate wrong answer data per (attack_type, q_type) using full structured question payload.
+
+    Returns a dict that may include keys depending on q_type and attack_type, e.g.:
+      - wrong_label, wrong_labels, wrong_answer, wrong_reason
+      - target_wrong_mapping (for match)
+      - code_glyph_entities (for CODE_GLYPH)
+    """
+    q_type = (question.get("q_type") or "").strip()
+    stem_text = question.get("stem_text") or ""
+    options: Dict[str, str] = question.get("options") or {}
+    matches: List[Dict[str, str]] = question.get("matches") or []
+    blanks: List[Dict[str, str]] = question.get("blanks") or []
+
+    # Prevention: nothing to generate
+    if attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION:
+        return {}
+
+    # Hidden malicious (detection): create a wrong answer + reason
+    if attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP:
+        # Use LLM to infer right and then derive wrong according to q_type
+        payload = {
+            "q_type": q_type,
+            "stem_text": stem_text,
+            "options": options,
+            "matches": matches,
+            "blanks": blanks,
+        }
+        prompt = (
+            "You are generating WRONG answers for adversarial exam testing. First infer the RIGHT answer, "
+            "then output a WRONG answer with a concise wrong_reason. Return JSON only.\n\n"
+            f"Question JSON:\n{json.dumps(payload, ensure_ascii=False)}\n\n"
+            "Output schemas by q_type:\n"
+            "- mcq_single: {\"right\": \"B\", \"wrong\": \"D\", \"wrong_reason\": \"...\"}\n"
+            "- mcq_multi: {\"right\": [\"A\",\"C\"], \"wrong\": [\"A\",\"B\"], \"wrong_reason\": \"...\"}\n"
+            "- true_false: {\"right\": \"True\", \"wrong\": \"False\", \"wrong_reason\": \"...\"}\n"
+            "- match: {\"right\": [{\"L\":\"A\",\"R\":\"3\"},...], \"wrong\": [{\"L\":\"A\",\"R\":\"2\"},...], \"wrong_reason\": \"...\"}\n"
+            "- fill_blank: {\"right\": \"token\", \"wrong\": \"token\", \"wrong_reason\": \"...\"}\n"
+            "- short_answer/long_answer/comprehension_qa: {\"right\": \"text\", \"wrong\": \"text\", \"wrong_reason\": \"...\"}\n"
+        )
+        content = _call_openai(prompt)
+        data: Dict[str, Any] = {}
+        if content:
+            obj = _extract_json_block(content) or {}
+            # Normalize fields
+            if q_type in {"mcq_single", "mcq_multi"}:
+                right = obj.get("right")
+                wrong = obj.get("wrong")
+                # Coerce to lists for mcq_multi
+                if q_type == "mcq_single":
+                    if isinstance(wrong, str):
+                        data["wrong_label"] = wrong.strip().upper().rstrip(")").lstrip("(")
+                    data["wrong_reason"] = (obj.get("wrong_reason") or "Plausible but incorrect.").strip()
+                else:
+                    if isinstance(wrong, list):
+                        data["wrong_labels"] = [str(x).strip().upper().rstrip(")").lstrip("(") for x in wrong]
+                    data["wrong_reason"] = (obj.get("wrong_reason") or "Plausible but incorrect.").strip()
+            elif q_type == "true_false":
+                wrong = obj.get("wrong")
+                data["wrong_answer"] = "True" if str(wrong).strip().lower().startswith("t") else "False"
+                data["wrong_reason"] = (obj.get("wrong_reason") or "Plausible but incorrect.").strip()
+            elif q_type == "match":
+                wrong = obj.get("wrong") or []
+                # Expect list of {L,R}
+                if isinstance(wrong, list):
+                    data["target_wrong_mapping"] = [{"L": str(p.get("L", "")), "R": str(p.get("R", ""))} for p in wrong]
+                data["wrong_reason"] = (obj.get("wrong_reason") or "Plausible but incorrect.").strip()
+            else:
+                # fill_blank / short_answer / long_answer / comprehension_qa
+                data["wrong_answer"] = obj.get("wrong") or ""
+                data["wrong_reason"] = (obj.get("wrong_reason") or "Plausible but incorrect.").strip()
+        # If parsing failed, provide a minimal fallback
+        if not data:
+            if q_type in {"mcq_single", "mcq_multi"} and options:
+                labels = list(options.keys())
+                data = {"wrong_label": (labels[1] if len(labels) > 1 else labels[0]), "wrong_reason": "Plausible but incorrect."}
+            elif q_type == "true_false":
+                data = {"wrong_answer": "False", "wrong_reason": "Plausible but incorrect."}
+            elif q_type == "match" and matches:
+                # Simple rotate of rights
+                right_rs = [m.get("right", "") for m in matches]
+                rotated = right_rs[1:] + right_rs[:1]
+                data = {"target_wrong_mapping": [{"L": m.get("left", ""), "R": rotated[i]} for i, m in enumerate(matches)], "wrong_reason": "Plausible but incorrect."}
+            else:
+                data = {"wrong_answer": "", "wrong_reason": "Plausible but incorrect."}
+        return data
+
+    # CODE_GLYPH: build entities with per-type strategy
+    if attack_type == AttackType.CODE_GLYPH:
+        # Unified structured-entity generator handles all q_types and returns target_wrong or target_wrong_mapping
+        ent_struct = cg_generate_structured_entities(question)
+        return {"code_glyph_entities": ent_struct}
+
+    # Default no-op
+    return {} 
 
 
  

@@ -60,6 +60,10 @@ DEBUG_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Set via env: ENABLE_LLM=0 to disable all LLM calls during testing
 ENABLE_LLM = os.getenv("ENABLE_LLM", "1") not in {"0", "false", "False"}
+STOP_AFTER_OCR = os.getenv("STOP_AFTER_OCR", "0") in {"1", "true", "True"}
+STOP_AFTER_STRUCTURING = os.getenv("STOP_AFTER_STRUCTURING", "0") in {"1", "true", "True"}
+STOP_AFTER_WA = os.getenv("STOP_AFTER_WA", "0") in {"1", "true", "True"}
+STOP_AFTER_RENDER = os.getenv("STOP_AFTER_RENDER", "0") in {"1", "true", "True"}
 
 from sqlalchemy import func
 
@@ -142,6 +146,250 @@ def upload_assessment():
         job.progress = 20
         job.message = "Parsing & injecting"
         db.session.flush()
+
+        # If STOP_AFTER_OCR is enabled, run only layout + asset extraction and return early for UI testing
+        if STOP_AFTER_OCR:
+            try:
+                from ..services.layout_extractor import extract_layout_and_assets
+                assets_dir = assessment_dir / "assets"
+                logger.info("[upload_assessment] STOP_AFTER_OCR=1; extracting layout and assets only")
+                ocr_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                # Persist structured.json
+                import json
+                structured_path = assessment_dir / "structured.json"
+                with open(structured_path, "w", encoding="utf-8") as f:
+                    json.dump(ocr_doc, f, ensure_ascii=False, indent=2)
+
+                # Mirror to debug output
+                try:
+                    shutil.copy(structured_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_structured.json")
+                except Exception:
+                    pass
+
+                # Finalize job and return early
+                job.status = "succeeded"
+                job.progress = 100
+                job.message = "OCR extraction complete"
+                job.finished_at = dt.datetime.utcnow()
+                db.session.commit()
+
+                return jsonify({
+                    "assessment_id": str(assessment.id),
+                    "structured_json": str(structured_path),
+                    "assets_dir": str(assets_dir),
+                    "note": "STOP_AFTER_OCR enabled; skipped attack/build/eval."
+                }), 201
+            except Exception as exc_ocr:
+                logger.exception("[upload_assessment] STOP_AFTER_OCR extraction failed: %s", exc_ocr)
+                return jsonify({"error": "OCR extraction failed"}), 500
+
+        # If STOP_AFTER_STRUCTURING is enabled, run layout + LLM structuring and return early
+        if STOP_AFTER_STRUCTURING:
+            try:
+                from ..services.layout_extractor import extract_layout_and_assets
+                from ..services.ocr_service import extract_structured_document_with_ocr
+                from ..services.ocr_postprocess import postprocess_document
+                assets_dir = assessment_dir / "assets"
+                logger.info("[upload_assessment] STOP_AFTER_STRUCTURING=1; extracting layout + structuring only")
+                layout_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                structured_doc = extract_structured_document_with_ocr(orig_path, layout_doc)
+                # Post-process: dedup assets and prefer images for non-question text
+                structured_doc = postprocess_document(orig_path, structured_doc, assets_dir, questions=structured_doc.get("document", {}).get("questions", []), dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                # Persist structured.json
+                import json
+                structured_path = assessment_dir / "structured.json"
+                with open(structured_path, "w", encoding="utf-8") as f:
+                    json.dump(structured_doc, f, ensure_ascii=False, indent=2)
+
+                # Mirror to debug output
+                try:
+                    shutil.copy(structured_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_structured.json")
+                except Exception:
+                    pass
+
+                # Finalize job and return early
+                job.status = "succeeded"
+                job.progress = 100
+                job.message = "OCR structuring complete"
+                job.finished_at = dt.datetime.utcnow()
+                db.session.commit()
+
+                return jsonify({
+                    "assessment_id": str(assessment.id),
+                    "structured_json": str(structured_path),
+                    "assets_dir": str(assets_dir),
+                    "note": "STOP_AFTER_STRUCTURING enabled; skipped attack/build/eval."
+                }), 201
+            except Exception as exc_ocr2:
+                logger.exception("[upload_assessment] STOP_AFTER_STRUCTURING failed: %s", exc_ocr2)
+                return jsonify({"error": "OCR structuring failed"}), 500
+
+        # STOP_AFTER_WA: generate wrong answers/entities by attack & q_type, persist, and return early
+        if STOP_AFTER_WA:
+            try:
+                from ..services.layout_extractor import extract_layout_and_assets
+                from ..services.ocr_service import extract_structured_document_with_ocr
+                from ..services.ocr_postprocess import postprocess_document
+                from ..services.wrong_answer_service import generate_wrong_answer_for_question
+
+                assets_dir = assessment_dir / "assets"
+                logger.info("[upload_assessment] STOP_AFTER_WA=1; layout + structuring + wrong-answer generation only")
+                layout_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                structured_doc = extract_structured_document_with_ocr(orig_path, layout_doc)
+                structured_doc = postprocess_document(orig_path, structured_doc, assets_dir, questions=structured_doc.get("document", {}).get("questions", []), dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+
+                # Per-question WA/entities
+                doc = structured_doc.get("document", {})
+                qs = doc.get("questions", [])
+                for q in qs:
+                    try:
+                        wa = generate_wrong_answer_for_question(q, attack_type)
+                        if wa:
+                            q.update(wa)
+                    except Exception as e:
+                        logger.warning("[upload_assessment] WA generation failed for Q%s: %s", q.get("q_number"), e)
+
+                # Persist structured.json with WA fields
+                import json
+                structured_path = assessment_dir / "structured.json"
+                with open(structured_path, "w", encoding="utf-8") as f:
+                    json.dump(structured_doc, f, ensure_ascii=False, indent=2)
+
+                try:
+                    shutil.copy(structured_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_structured.json")
+                except Exception:
+                    pass
+
+                job.status = "succeeded"
+                job.progress = 100
+                job.message = "Wrong-answer generation complete"
+                job.finished_at = dt.datetime.utcnow()
+                db.session.commit()
+
+                return jsonify({
+                    "assessment_id": str(assessment.id),
+                    "structured_json": str(structured_path),
+                    "assets_dir": str(assets_dir),
+                    "note": "STOP_AFTER_WA enabled; skipped build/eval."
+                }), 201
+            except Exception as exc_wa:
+                logger.exception("[upload_assessment] STOP_AFTER_WA failed: %s", exc_wa)
+                return jsonify({"error": "Wrong-answer generation failed"}), 500
+
+        # STOP_AFTER_RENDER: run layout -> structuring -> postprocess -> (WA if detection/code_glyph) -> render attacked PDF via MuPDF
+        if STOP_AFTER_RENDER:
+            try:
+                from ..services.layout_extractor import extract_layout_and_assets
+                from ..services.ocr_service import extract_structured_document_with_ocr
+                from ..services.ocr_postprocess import postprocess_document
+                from ..services.wrong_answer_service import generate_wrong_answer_for_question
+                from ..services.pdf_renderer_mupdf import build_attacked_pdf_mupdf
+                from ..services.reference_report_builder import build_reference_report_pdf
+
+                assets_dir = assessment_dir / "assets"
+                logger.info("[upload_assessment] STOP_AFTER_RENDER=1; rendering attacked PDF via MuPDF")
+                layout_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                structured_doc = extract_structured_document_with_ocr(orig_path, layout_doc)
+                structured_doc = postprocess_document(orig_path, structured_doc, assets_dir, questions=structured_doc.get("document", {}).get("questions", []), dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+
+                # Ensure source path is recorded for background import
+                try:
+                    if isinstance(structured_doc.get("document"), dict):
+                        structured_doc["document"]["source_path"] = str(orig_path)
+                except Exception:
+                    pass
+
+                # For detection or code glyph, generate WA/entities before rendering
+                if attack_type in {AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP, AttackType.CODE_GLYPH}:
+                    doc = structured_doc.get("document", {})
+                    qs = doc.get("questions", [])
+                    for q in qs:
+                        try:
+                            wa = generate_wrong_answer_for_question(q, attack_type)
+                            if wa:
+                                q.update(wa)
+                        except Exception as e:
+                            logger.warning("[upload_assessment] WA generation failed for Q%s: %s", q.get("q_number"), e)
+
+                attacked_pdf_path = assessment_dir / "attacked.pdf"
+                if attack_type == AttackType.CODE_GLYPH:
+                    from ..services.pdf_renderer_mupdf import build_attacked_pdf_code_glyph
+                    prebuilt_dir = Path(os.getenv("CODE_GLYPH_PREBUILT_DIR", ""))
+                    if not prebuilt_dir or not prebuilt_dir.exists():
+                        raise RuntimeError("CODE_GLYPH_PREBUILT_DIR not configured or not found.")
+                    build_attacked_pdf_code_glyph(structured_doc, attacked_pdf_path, prebuilt_dir)
+                else:
+                    build_attacked_pdf_mupdf(orig_path, structured_doc, attacked_pdf_path, attack_type)
+
+                # Persist structured.json too
+                import json
+                structured_path = assessment_dir / "structured.json"
+                with open(structured_path, "w", encoding="utf-8") as f:
+                    json.dump(structured_doc, f, ensure_ascii=False, indent=2)
+
+                # Build and persist reference report in fast path
+                report_path = assessment_dir / "reference_report.pdf"
+                try:
+                    # Infer attack type for report builder
+                    from ..services.attack_service import AttackType as _AT
+                    doc = structured_doc.get("document", {})
+                    qs = doc.get("questions", [])
+                    # Title for report
+                    title_text = doc.get("title") or ""
+                    # Build report PDF (no evaluations in fast path)
+                    build_reference_report_pdf(
+                        questions=qs,
+                        attacked_pdf_path=attacked_pdf_path,
+                        structured_json_path=structured_path,
+                        output_path=report_path,
+                        attack_type=attack_type,
+                        title=title_text,
+                        reference_answers=None,
+                        evaluations=None,
+                    )
+                except Exception:
+                    # If report build fails, continue with attacked only
+                    report_path = None
+
+                # Save debug copies
+                try:
+                    shutil.copy(attacked_pdf_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_attacked.pdf")
+                    shutil.copy(structured_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_structured.json")
+                    if report_path and Path(report_path).exists():
+                        shutil.copy(report_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_report.pdf")
+                except Exception:
+                    pass
+
+                # Create StoredFile entries and attach to assessment for downloads
+                attacked_sf = get_or_create_stored_file(attacked_pdf_path, "application/pdf")
+                report_sf = get_or_create_stored_file(report_path, "application/pdf") if report_path and Path(report_path).exists() else None
+                assessment.attacked_pdf = attacked_sf
+                if report_sf:
+                    assessment.report_pdf = report_sf
+                db.session.flush()
+
+                job.status = "succeeded"
+                job.progress = 100
+                job.message = "Rendered attacked PDF (fast path)"
+                job.finished_at = dt.datetime.utcnow()
+                db.session.commit()
+
+                return jsonify({
+                    "assessment_id": str(assessment.id),
+                    "structured_json": str(structured_path),
+                    "assets_dir": str(assets_dir),
+                    "attacked_pdf": str(attacked_pdf_path),
+                    "report_pdf": (str(report_path) if report_path and Path(report_path).exists() else None),
+                    "downloads": {
+                        "original": f"/api/assessments/{assessment.id}/original",
+                        "attacked": f"/api/assessments/{assessment.id}/attacked",
+                        "report": f"/api/assessments/{assessment.id}/report",
+                    },
+                    "note": "STOP_AFTER_RENDER enabled; skipped evaluation."
+                }), 201
+            except Exception as exc_render:
+                logger.exception("[upload_assessment] STOP_AFTER_RENDER failed: %s", exc_render)
+                return jsonify({"error": "Render failed"}), 500
 
         title_text, questions = parse_pdf_questions(orig_path)
         logger.info("[upload_assessment] Parsing PDF and injecting attacks (%s)", attack_type.value)

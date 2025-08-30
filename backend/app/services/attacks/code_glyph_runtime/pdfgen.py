@@ -12,6 +12,33 @@ from .metrics import ensure_metrics, get_advance_px
 logger = logging.getLogger(__name__)
 
 
+def _draw_text_chunk(page, x: float, y: float, text: str, font: str, fontsize: float, margin_left: float, right_edge: float, leading: float, *, metrics: Optional[Dict] = None, base_font_path: Optional[Path] = None) -> Tuple[float, float]:
+	# width-aware wrapping (breaks long words); returns updated (x, y)
+	if not text:
+		return x, y
+	for ch in text:
+		if ch == "\n":
+			x = margin_left
+			y += leading
+			continue
+		# measure char advance
+		if metrics and base_font_path:
+			try:
+				from .metrics import get_advance_px
+				cp = ord(ch)
+				adv = get_advance_px(metrics, base_font_path, cp, fontsize)
+			except Exception:
+				adv = fontsize * 0.6
+		else:
+			adv = fontsize * 0.6
+		if x + adv > right_edge:
+			x = margin_left
+			y += leading
+		page.insert_text((x, y), ch, fontname=font, fontsize=fontsize, color=(0, 0, 0))
+		x += adv
+	return x, y
+
+
 def _add_wrapped_text(page, text: str, top_left: tuple[float, float], width: float, fontname: str = "helv", fontsize: float = 11, color=(0, 0, 0)) -> float:
 	x, y = top_left
 	max_chars = max(10, int(width // (fontsize * 0.5)))
@@ -151,6 +178,195 @@ def _draw_mapped_sequence(page, x: float, y: float, fontsize: float, base_font: 
 	return x, y
 
 
+def _render_text_with_mappings(page, text: str, y: float, base_font: str, fontsize: float, prebuilt_dir: Path,
+								 mappings: List[Dict[str, str]], *, metrics: Optional[Dict] = None, base_font_path: Optional[Path] = None,
+								 margin_left: float, right_edge: float, leading: float) -> float:
+	# Render a line-oriented text block applying multiple inline mappings.
+	if not text:
+		return y
+	for raw_line in (text.splitlines() or [text]):
+		x = margin_left
+		line = raw_line
+		start = 0
+		while True:
+			# Find earliest next match among all mappings
+			earliest_idx = -1
+			chosen = None
+			for m in mappings:
+				inp = m.get("input_entity") or ""
+				out = m.get("output_entity") or ""
+				if not inp:
+					continue
+				idx = line.find(inp, start)
+				if idx != -1 and (earliest_idx == -1 or idx < earliest_idx):
+					earliest_idx = idx
+					chosen = (inp, out)
+			if earliest_idx == -1 or chosen is None:
+				# draw remainder and break line
+				rem = line[start:]
+				x, y = _draw_text_chunk(page, x, y, rem, base_font, fontsize, margin_left, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
+				break
+			# draw text before match
+			before = line[start:earliest_idx]
+			x, y = _draw_text_chunk(page, x, y, before, base_font, fontsize, margin_left, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
+			# draw mapped segment
+			in_ent, out_ent = chosen
+			logger.info("[code_glyph.pdfgen] Inline multi-map at col=%d in='%s' out='%s'", earliest_idx, in_ent, out_ent)
+			x, y = _draw_mapped_sequence(
+				page, x, y, fontsize=fontsize, base_font=base_font, prebuilt_dir=prebuilt_dir,
+				input_entity=in_ent, output_entity=out_ent, reverse=True,
+				metrics=metrics, base_font_path=base_font_path,
+				margin_left=margin_left, right_edge=right_edge, leading=leading,
+			)
+			start = earliest_idx + len(in_ent)
+		y += leading
+	return y
+
+
+def _render_text_with_mappings_clipped(page, text: str, y: float, base_font: str, fontsize: float, prebuilt_dir: Path,
+										 mappings: List[Dict[str, str]], *, metrics: Optional[Dict] = None, base_font_path: Optional[Path] = None,
+										 margin_left: float, right_edge: float, leading: float, y_max: float) -> float:
+	# Same as _render_text_with_mappings but will not draw beyond y_max.
+	if not text:
+		return y
+	for raw_line in (text.splitlines() or [text]):
+		if y > y_max:
+			break
+		x = margin_left
+		line = raw_line
+		start = 0
+		while True:
+			if y > y_max:
+				break
+			# Find earliest next match among all mappings
+			earliest_idx = -1
+			chosen = None
+			for m in mappings:
+				inp = m.get("input_entity") or ""
+				out = m.get("output_entity") or ""
+				if not inp:
+					continue
+				idx = line.find(inp, start)
+				if idx != -1 and (earliest_idx == -1 or idx < earliest_idx):
+					earliest_idx = idx
+					chosen = (inp, out)
+			if earliest_idx == -1 or chosen is None:
+				# draw remainder and break line
+				rem = line[start:]
+				x, y = _draw_text_chunk(page, x, y, rem, base_font, fontsize, margin_left, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
+				break
+			# draw text before match
+			before = line[start:earliest_idx]
+			x, y = _draw_text_chunk(page, x, y, before, base_font, fontsize, margin_left, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
+			# draw mapped segment
+			in_ent, out_ent = chosen
+			logger.info("[code_glyph.pdfgen] Inline multi-map at col=%d in='%s' out='%s'", earliest_idx, in_ent, out_ent)
+			x, y = _draw_mapped_sequence(
+				page, x, y, fontsize=fontsize, base_font=base_font, prebuilt_dir=prebuilt_dir,
+				input_entity=in_ent, output_entity=out_ent, reverse=True,
+				metrics=metrics, base_font_path=base_font_path,
+				margin_left=margin_left, right_edge=right_edge, leading=leading,
+			)
+			start = earliest_idx + len(in_ent)
+		y_next = y + leading
+		if y_next > y_max:
+			return y
+		y = y_next
+	return y
+
+
+def measure_text_with_mappings(text: str, fontsize: float, prebuilt_dir: Path, mappings: List[Dict[str, str]], *, metrics: Optional[Dict] = None, base_font_path: Optional[Path] = None, width: float) -> Tuple[float, int]:
+	"""Return (height_px, line_count) for rendering text with mappings within the given width.
+
+	Uses the same wrapping decisions as _render_text_with_mappings/_draw_text_chunk.
+	"""
+	margin_left = 0.0
+	right_edge = width
+	leading = fontsize + 4
+	line_count = 0
+	y = 0.0
+	if not text:
+		return 0.0, 0
+	for raw_line in (text.splitlines() or [text]):
+		x = margin_left
+		line = raw_line
+		start = 0
+		while True:
+			# Find earliest next match among all mappings
+			earliest_idx = -1
+			chosen = None
+			for m in mappings:
+				inp = m.get("input_entity") or ""
+				if not inp:
+					continue
+				idx = line.find(inp, start)
+				if idx != -1 and (earliest_idx == -1 or idx < earliest_idx):
+					earliest_idx = idx
+					chosen = m
+			if earliest_idx == -1 or chosen is None:
+				# draw/measure remainder and break line
+				rem = line[start:]
+				# measure base text chunk
+				for ch in rem:
+					if ch == "\n":
+						x = margin_left
+						y += leading
+						line_count += 1
+						continue
+					if metrics and base_font_path:
+						try:
+							adv = get_advance_px(metrics, base_font_path, ord(ch), fontsize)
+						except Exception:
+							adv = fontsize * 0.6
+					else:
+						adv = fontsize * 0.6
+					if x + adv > right_edge:
+						x = margin_left
+						y += leading
+						line_count += 1
+					x += adv
+				break
+			# measure before chunk
+			before = line[start:earliest_idx]
+			for ch in before:
+				if ch == "\n":
+					x = margin_left
+					y += leading
+					line_count += 1
+					continue
+				if metrics and base_font_path:
+					try:
+						adv = get_advance_px(metrics, base_font_path, ord(ch), fontsize)
+					except Exception:
+						adv = fontsize * 0.6
+				else:
+					adv = fontsize * 0.6
+				if x + adv > right_edge:
+					x = margin_left
+					y += leading
+					line_count += 1
+				x += adv
+			# measure mapped segment (approximate using base font advances for output chars)
+			out_ent = (chosen.get("output_entity") or "")
+			for ch in out_ent:
+				if metrics and base_font_path:
+					try:
+						adv = get_advance_px(metrics, base_font_path, ord(ch), fontsize)
+					except Exception:
+						adv = fontsize * 0.6
+				else:
+					adv = fontsize * 0.6
+				if x + adv > right_edge:
+					x = margin_left
+					y += leading
+					line_count += 1
+				x += adv
+			start = earliest_idx + len(chosen.get("input_entity") or "")
+		y += leading
+		line_count += 1
+	return max(0.0, y), line_count
+
+
 def render_attacked_pdf(title: str, questions: List[Dict], entities_by_qnum: Dict[str, Dict[str, str]], output_path: Path, prebuilt_dir: Path) -> Path:
 	logger.info("[code_glyph.pdfgen] Starting render; output=%s", output_path)
 	output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -174,28 +390,7 @@ def render_attacked_pdf(title: str, questions: List[Dict], entities_by_qnum: Dic
 	# Load or build metrics once
 	metrics = ensure_metrics(prebuilt_dir, base_font_path)
 
-	def _draw_text_chunk(page, x: float, y: float, text: str, font: str, fontsize: float, margin_left: float, right_edge: float, leading: float) -> Tuple[float, float]:
-		# width-aware wrapping (breaks long words); returns updated (x, y)
-		if not text:
-			return x, y
-		for ch in text:
-			if ch == "\n":
-				x = margin_left
-				y += leading
-				continue
-			# measure char advance
-			if base_font_path and metrics:
-				cp = ord(ch)
-				adv = get_advance_px(metrics, base_font_path, cp, fontsize)
-			else:
-				adv = fontsize * 0.6
-			if x + adv > right_edge:
-				x = margin_left
-				y += leading
-			page.insert_text((x, y), ch, fontname=font, fontsize=fontsize, color=(0, 0, 0))
-			x += adv
-		return x, y
-
+	# use module-level _draw_text_chunk
 	def _render_stem_with_inline_mapping(page, stem: str, y: float, base_font: str, fontsize: float, in_ent: str, out_ent: str) -> float:
 		margin_left = margin
 		usable_width = width - 2 * margin
@@ -211,11 +406,11 @@ def render_attacked_pdf(title: str, questions: List[Dict], entities_by_qnum: Dic
 					if idx == -1:
 						# draw remainder
 						rem = line[start:]
-						x, y = _draw_text_chunk(page, x, y, rem, base_font, fontsize, margin_left, right_edge, leading)
+						x, y = _draw_text_chunk(page, x, y, rem, base_font, fontsize, margin_left, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
 						break
 					# draw text before match
 					before = line[start:idx]
-					x, y = _draw_text_chunk(page, x, y, before, base_font, fontsize, margin_left, right_edge, leading)
+					x, y = _draw_text_chunk(page, x, y, before, base_font, fontsize, margin_left, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
 					# draw mapped segment inline (width-aware)
 					logger.info("[code_glyph.pdfgen] Inline map at col=%d in_entity='%s' out_entity='%s'", idx, in_ent, out_ent)
 					x, y = _draw_mapped_sequence(
@@ -228,7 +423,7 @@ def render_attacked_pdf(title: str, questions: List[Dict], entities_by_qnum: Dic
 				y += leading
 			else:
 				# no mapping entity; draw normally
-				x, y = _draw_text_chunk(page, x, y, line, base_font, fontsize, margin_left, right_edge, leading)
+				x, y = _draw_text_chunk(page, x, y, line, base_font, fontsize, margin_left, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
 				y += leading
 		return y
 
@@ -248,7 +443,15 @@ def render_attacked_pdf(title: str, questions: List[Dict], entities_by_qnum: Dic
 		# Stem with inline mapping
 		in_entity = ents.get("input_entity", "")
 		out_entity = ents.get("output_entity", "")
-		y = _render_stem_with_inline_mapping(page, stem, y, base_font, 11, in_entity, out_entity)
+		mappings = ents.get("mappings") if isinstance(ents.get("mappings"), list) else None
+		if mappings:
+			margin_left = margin
+			usable_width = width - 2 * margin
+			right_edge = margin_left + usable_width
+			leading = 11 + 4
+			y = _render_text_with_mappings(page, stem, y, base_font, 11, prebuilt_dir, mappings, metrics=metrics, base_font_path=base_font_path, margin_left=margin_left, right_edge=right_edge, leading=leading)
+		else:
+			y = _render_stem_with_inline_mapping(page, stem, y, base_font, 11, in_entity, out_entity)
 		y += 2
 
 		# Options if present
@@ -264,7 +467,10 @@ def render_attacked_pdf(title: str, questions: List[Dict], entities_by_qnum: Dic
 				x_opt = margin + 16
 				right_edge = width - margin
 				option_text = f"{label}) {text}"
-				x_opt, y = _draw_text_chunk(page, x_opt, y, option_text, base_font, opt_fontsize, x_opt, right_edge, leading)
+				if mappings:
+					y = _render_text_with_mappings(page, option_text, y, base_font, opt_fontsize, prebuilt_dir, mappings, metrics=metrics, base_font_path=base_font_path, margin_left=x_opt, right_edge=right_edge, leading=leading)
+				else:
+					x_opt, y = _draw_text_chunk(page, x_opt, y, option_text, base_font, opt_fontsize, x_opt, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
 				y += leading
 			y += 4
 
