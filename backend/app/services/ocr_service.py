@@ -437,7 +437,7 @@ Return only the JSON object, no additional text."""
 
 
 def extract_structured_document_with_ocr(pdf_path: Path, layout_doc: Dict[str, Any]) -> Dict[str, Any]:
-    """Produce a structured document JSON by classifying layout blocks and extracting questions.
+    """Add title and questions to layout_doc via OCR + LLM analysis.
 
     Inputs:
         pdf_path: Path to the original PDF (used for OCR fallback context)
@@ -480,6 +480,34 @@ def extract_structured_document_with_ocr(pdf_path: Path, layout_doc: Dict[str, A
         logger.error(f"Failed to prepare layout summaries: {e}")
         raise
 
+    # Check if LLM is enabled for question extraction
+    from ..routes.assessments import ENABLE_LLM
+    
+    if not ENABLE_LLM:
+        logger.info("LLM disabled - using fallback question extraction from layout blocks")
+        # Use fallback method to extract questions from layout blocks
+        questions = _extract_questions_from_blocks_fallback(block_summaries)
+        
+        # Extract title from first page blocks (simple heuristic)
+        title = ""
+        if pages and pages[0].get("items"):
+            for item in pages[0]["items"][:3]:  # Check first 3 items for title
+                if item.get("type") == "text_block":
+                    text = item.get("text", "").strip()
+                    if text and len(text) < 100:  # Likely a title if short
+                        title = text
+                        break
+        
+        # Merge into layout_doc
+        doc = layout_doc.get("document", {})
+        doc["title"] = title
+        doc["questions"] = questions
+        layout_doc["document"] = doc
+        
+        logger.info(f"Fallback extraction complete: title='{title}', questions={len(questions)}")
+        return layout_doc
+
+    # Original LLM-based extraction follows...
     # Optional OCR raw text context
     raw_text_context = ""
     try:
@@ -521,12 +549,26 @@ Output JSON (return ONLY valid JSON, no markdown fences, no extra text):
   ]
 }}
 
-Guidelines:
-1) Use block text excerpts to determine titles/instructions and question boundaries.
-2) Preserve question numbering including sub-questions (e.g., "1a", "1i").
-3) Return only fields applicable to the q_type.
-4) Link any supporting comprehension blocks/images/tables via "context_ids".
-5) Return strictly valid JSON, nothing else.
+Guidelines for Question Type Classification:
+1) mcq_single: Multiple choice with one correct answer (has options A, B, C, D, etc.)
+2) mcq_multi: Multiple choice with multiple correct answers (contains "select all", "choose all", etc.)
+3) true_false: Only True/False options
+4) short_answer: Brief response questions (define, list, name, identify)
+5) long_answer: Extended response questions (explain, describe, analyze, discuss, write essay)
+6) match: Matching questions with left and right columns
+7) fill_blank: Fill-in-the-blank questions
+8) comprehension_qa: Questions based on reading passages
+
+Important Classification Rules:
+- If a question asks to "write", "explain", "describe", "discuss", "analyze", "draw", "illustrate", "provide examples", it's likely long_answer
+- If a question asks to "define", "list", "name", "identify", "state" briefly, it's likely short_answer
+- Only include "options" field for mcq_single, mcq_multi, or true_false questions
+- For essay questions (short_answer, long_answer), leave options empty: {{"options": {{}}}}
+- Use block text excerpts to determine titles/instructions and question boundaries
+- Preserve question numbering including sub-questions (e.g., "1a", "1i")
+- Return only fields applicable to the q_type
+- Link any supporting comprehension blocks/images/tables via "context_ids"
+- Return strictly valid JSON, nothing else
 """
 
     # Call LLM to structure
@@ -574,4 +616,108 @@ Guidelines:
     layout_doc["document"] = doc
 
     logger.info(f"OCR structuring complete: title present={bool(doc.get('title'))}, questions={len(doc.get('questions', []))}")
-    return layout_doc 
+    return layout_doc
+
+
+def _extract_questions_from_blocks_fallback(block_summaries: List[Dict]) -> List[Dict]:
+    """Extract basic questions from text blocks using simple heuristics when LLM is disabled."""
+    import re
+    
+    questions = []
+    current_question = None
+    question_counter = 1
+    
+    for block in block_summaries:
+        text = block.get("text_excerpt", "").strip()
+        if not text:
+            continue
+            
+        # Look for question patterns (Q1, 1., Question 1, etc.)
+        question_match = re.match(r'^(?:Q\.?\s*|Question\s*)?(\d+(?:[a-z]|[ivx]+)?)[:\.]?\s*(.+)', text, re.IGNORECASE)
+        
+        if question_match:
+            # Save previous question if exists
+            if current_question:
+                # Determine question type based on content
+                current_question = _classify_question_type(current_question)
+                questions.append(current_question)
+            
+            # Start new question
+            q_number = question_match.group(1)
+            stem_start = question_match.group(2)
+            
+            current_question = {
+                "q_number": q_number,
+                "q_type": "mcq_single",  # Default assumption, will be updated
+                "stem_text": stem_start,
+                "options": {},
+                "context_ids": [block.get("id", "")]
+            }
+            continue
+        
+        # Look for option patterns (A), B), A., etc.
+        option_match = re.match(r'^([A-E])\)\s*(.+)', text, re.IGNORECASE)
+        if not option_match:
+            option_match = re.match(r'^([A-E])\.\s*(.+)', text, re.IGNORECASE)
+        
+        if option_match and current_question:
+            option_label = option_match.group(1).upper()
+            option_text = option_match.group(2)
+            current_question["options"][option_label] = option_text
+            current_question["context_ids"].append(block.get("id", ""))
+            continue
+        
+        # If we have a current question and this looks like continuation text
+        if current_question and text and not re.match(r'^[A-E]\)', text):
+            # Check if it's True/False pattern
+            if re.search(r'\b(?:true|false)\b', text, re.IGNORECASE):
+                current_question["q_type"] = "true_false"
+                current_question["options"] = {"True": "True", "False": "False"}
+            else:
+                # Append to stem text for essay questions
+                current_question["stem_text"] += " " + text
+            current_question["context_ids"].append(block.get("id", ""))
+    
+    # Handle last question
+    if current_question:
+        current_question = _classify_question_type(current_question)
+        questions.append(current_question)
+    
+    return questions
+
+
+def _classify_question_type(question: Dict) -> Dict:
+    """Classify question type based on content and options."""
+    stem_text = question.get("stem_text", "").lower()
+    options = question.get("options", {})
+    
+    # If no options were found, likely an essay question
+    if not options:
+        # Check for essay indicators
+        essay_keywords = [
+            "write", "explain", "describe", "discuss", "analyze", "compare", 
+            "contrast", "evaluate", "define", "justify", "draw", "illustrate",
+            "provide", "give", "list", "show"
+        ]
+        if any(keyword in stem_text for keyword in essay_keywords):
+            # Determine if short or long answer based on text length and keywords
+            if len(stem_text) > 100 or any(word in stem_text for word in ["essay", "detailed", "comprehensive", "thoroughly"]):
+                question["q_type"] = "long_answer"
+            else:
+                question["q_type"] = "short_answer"
+        else:
+            question["q_type"] = "short_answer"  # Default for no options
+    
+    # True/False detection
+    elif len(options) == 2 and set(options.keys()) == {"True", "False"}:
+        question["q_type"] = "true_false"
+    
+    # Multiple choice with multiple correct answers
+    elif "select all" in stem_text or "multiple" in stem_text:
+        question["q_type"] = "mcq_multi"
+    
+    # Standard multiple choice
+    elif options:
+        question["q_type"] = "mcq_single"
+    
+    return question 

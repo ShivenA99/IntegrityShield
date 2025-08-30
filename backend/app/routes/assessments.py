@@ -59,11 +59,11 @@ DEBUG_OUTPUT_DIR = Path(__file__).resolve().parents[2] / "output"
 DEBUG_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Set via env: ENABLE_LLM=0 to disable all LLM calls during testing
-ENABLE_LLM = os.getenv("ENABLE_LLM", "1") not in {"0", "false", "False"}
+ENABLE_LLM = os.getenv("ENABLE_LLM", "0") not in {"0", "false", "False"}
 STOP_AFTER_OCR = os.getenv("STOP_AFTER_OCR", "0") in {"1", "true", "True"}
 STOP_AFTER_STRUCTURING = os.getenv("STOP_AFTER_STRUCTURING", "0") in {"1", "true", "True"}
 STOP_AFTER_WA = os.getenv("STOP_AFTER_WA", "0") in {"1", "true", "True"}
-STOP_AFTER_RENDER = os.getenv("STOP_AFTER_RENDER", "0") in {"1", "true", "True"}
+STOP_AFTER_RENDER = os.getenv("STOP_AFTER_RENDER", "1") in {"1", "true", "True"}
 
 from sqlalchemy import func
 
@@ -336,20 +336,32 @@ def upload_assessment():
                     qs = doc.get("questions", [])
                     # Title for report
                     title_text = doc.get("title") or ""
+                    
+                    logger.info(f"Building reference report with {len(qs)} questions, title='{title_text}'")
+                    
                     # Build report PDF (no evaluations in fast path)
                     build_reference_report_pdf(
                         questions=qs,
                         attacked_pdf_path=attacked_pdf_path,
                         structured_json_path=structured_path,
+                        assets_dir=assessment_dir / "assets",
                         output_path=report_path,
                         attack_type=attack_type,
-                        title=title_text,
                         reference_answers=None,
-                        evaluations=None,
+                        evaluations=None
                     )
-                except Exception:
+                    logger.info(f"Reference report successfully created at {report_path}")
+                except Exception as e:
                     # If report build fails, continue with attacked only
-                    report_path = None
+                    logger.error(f"Reference report building failed: {e}")
+                    logger.info("Falling back to simple report generation")
+                    try:
+                        from ..services.pdf_utils import build_reference_report
+                        build_reference_report(qs, report_path, None)
+                        logger.info(f"Fallback report created at {report_path}")
+                    except Exception as e2:
+                        logger.error(f"Fallback report also failed: {e2}")
+                        report_path = None
 
                 # Save debug copies
                 try:
@@ -546,7 +558,92 @@ def upload_assessment():
 
         # Always generate reference report
         report_path = assessment_dir / "reference_report.pdf"
-        build_reference_report(questions, report_path, evaluation_results)
+        
+        # Try to use questions from structured.json if available (has context_ids for visuals)
+        # but merge with database evaluation data
+        structured_path = assessment_dir / "structured.json"
+        questions_for_report = questions  # Default fallback
+        logger.info(f"DEBUG: Looking for structured.json at {structured_path}")
+        logger.info(f"DEBUG: structured.json exists: {structured_path.exists()}")
+        if structured_path.exists():
+            try:
+                import json
+                with open(structured_path, 'r', encoding='utf-8') as f:
+                    structured_doc = json.load(f)
+                structured_questions = structured_doc.get("document", {}).get("questions", [])
+                if structured_questions:
+                    logger.info(f"Using {len(structured_questions)} questions from structured.json for report")
+                    
+                    # Get database questions for evaluation data
+                    db_questions = Question.query.filter_by(assessment_id=assessment.id).all()
+                    db_question_map = {q.q_number: q for q in db_questions}
+                    
+                    logger.info(f"DEBUG: Found {len(db_questions)} database questions")
+                    for db_q in db_questions:
+                        logger.info(f"DEBUG: DB Q{db_q.q_number}: gold='{db_q.gold_answer}', wrong='{db_q.wrong_answer}'")
+                    
+                    # Merge structured questions with database evaluation data
+                    for structured_q in structured_questions:
+                        q_num = structured_q.get("q_number")
+                        logger.info(f"DEBUG: Structured Q{q_num} looking for match in DB")
+                        if q_num in db_question_map:
+                            db_q = db_question_map[q_num]
+                            # Add database evaluation data to structured question
+                            structured_q["gold_answer"] = db_q.gold_answer
+                            structured_q["gold_reason"] = db_q.gold_reason
+                            structured_q["wrong_answer"] = db_q.wrong_answer
+                            structured_q["wrong_reason"] = db_q.wrong_reason
+                            logger.info(f"DEBUG: Merged Q{q_num}: gold='{db_q.gold_answer}', wrong='{db_q.wrong_answer}'")
+                            # Also add code_glyph_entities if it exists in original questions
+                            for orig_q in questions:
+                                if orig_q.get("q_number") == q_num and "code_glyph_entities" in orig_q:
+                                    structured_q["code_glyph_entities"] = orig_q["code_glyph_entities"]
+                                    break
+                        else:
+                            logger.warning(f"DEBUG: No DB match for structured Q{q_num}")
+                            logger.info(f"DEBUG: Available DB question numbers: {list(db_question_map.keys())}")
+                    
+                    questions_for_report = structured_questions
+            except Exception as e:
+                logger.warning(f"Failed to load questions from structured.json: {e}")
+        else:
+            logger.info("DEBUG: structured.json doesn't exist, using original questions")
+            # Add evaluation data directly to original questions
+            db_questions = Question.query.filter_by(assessment_id=assessment.id).all()
+            db_question_map = {q.q_number: q for q in db_questions}
+            
+            logger.info(f"DEBUG: Found {len(db_questions)} database questions")
+            for db_q in db_questions:
+                logger.info(f"DEBUG: DB Q{db_q.q_number}: gold='{db_q.gold_answer}', wrong='{db_q.wrong_answer}'")
+            
+            # Merge database data into original questions
+            for orig_q in questions_for_report:
+                q_num = orig_q.get("q_number")
+                if q_num in db_question_map:
+                    db_q = db_question_map[q_num]
+                    orig_q["gold_answer"] = db_q.gold_answer
+                    orig_q["gold_reason"] = db_q.gold_reason  
+                    orig_q["wrong_answer"] = db_q.wrong_answer
+                    orig_q["wrong_reason"] = db_q.wrong_reason
+                    logger.info(f"DEBUG: Merged Q{q_num}: gold='{db_q.gold_answer}', wrong='{db_q.wrong_answer}'")
+        
+        # Generate reference report using the new professional builder
+        try:
+            build_reference_report_pdf(
+                questions=questions_for_report,
+                attacked_pdf_path=attacked_pdf_path,
+                structured_json_path=structured_path,
+                assets_dir=assessment_dir / "assets",
+                output_path=report_path,
+                attack_type=attack_type,
+                reference_answers=None,
+                evaluations=evaluation_results
+            )
+            logger.info(f"Professional reference report created at {report_path}")
+        except Exception as e:
+            logger.error(f"Professional report failed: {e}, falling back to simple report")
+            # Fallback to old report if new one fails
+            build_reference_report(questions_for_report, report_path, evaluation_results)
 
         attacked_sf = StoredFile(path=str(attacked_pdf_path), mime_type="application/pdf")
         report_sf = StoredFile(path=str(report_path), mime_type="application/pdf")
