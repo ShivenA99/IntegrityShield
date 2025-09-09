@@ -581,11 +581,22 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                         except Exception:
                                             pass
                                     logger.info("[pdf_renderer_mupdf] Token render p=%s rect=%s in='%s' out='%s' pt=%.2f", pidx, rect, ie, oe, best_pt)
-                                    draw_mapped_token_at(
+                                    end_x, _ = draw_mapped_token_at(
                                         page, margin_left, baseline, ie, oe,
                                         fontsize=best_pt, base_font=base_font, prebuilt_dir=Path(prebuilt_dir),
                                         metrics=metrics, base_font_path=base_font_path, right_edge=right_edge, leading=leading,
                                     )
+                                    # Append invisible directive after the token for inline parsing by XY sorters
+                                    try:
+                                        qn = int(tok.get("qnum") or t.get("qnum") or 0)
+                                        widx = int(tok.get("word_index") or 0)
+                                        if qn > 0 and widx > 0:
+                                            directive = f" - this is the {widx} word of question {qn}."
+                                            dx = 0.5
+                                            page.insert_text((end_x + dx, baseline), directive, fontname=base_font, fontsize=best_pt, color=(0, 0, 0), render_mode=3)
+                                            logger.info("[pdf_renderer_mupdf] directive appended q=%d w=%d at x=%.2f y=%.2f", qn, widx, end_x + dx, baseline)
+                                    except Exception:
+                                        pass
                         else:
                             for t in targets:
                                 x0, y0, x1, y1 = t["bbox"]
