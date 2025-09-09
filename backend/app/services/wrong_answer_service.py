@@ -16,9 +16,11 @@ from typing import Dict, Tuple, List
 from typing import Any
 from .attack_service import AttackType
 from .code_glyph_entity_service import (
-    generate_entities_for_question as cg_generate_entities,
+    generate_entities_for_question as cg_generate_simple_entities,
     generate_entities_for_structured_question as cg_generate_structured_entities,
 )
+import os
+from .code_glyph_entity_picker import pick_entities_for_question as cg_pick_entities, PickerConfig as CGPickerConfig
 
 logger = logging.getLogger(__name__)
 
@@ -595,10 +597,58 @@ def generate_wrong_answer_for_question(question: Dict[str, Any], attack_type: At
 
     # CODE_GLYPH: build entities with per-type strategy
     if attack_type == AttackType.CODE_GLYPH:
-        # Unified structured-entity generator handles all q_types and returns target_wrong or target_wrong_mapping
-        ent_struct = cg_generate_structured_entities(question)
-        return {"code_glyph_entities": ent_struct}
-
+        # Heuristic-first entity picking with fallbacks
+        try:
+            heuristic_first = os.getenv("CG_ENTITY_HEURISTIC_FIRST", "0") in {"1", "true", "True"}
+            allow_formatted = os.getenv("CG_ENTITY_ALLOW_FORMATTED", "0") in {"1", "true", "True"}
+            cfg = CGPickerConfig(allow_formatted=allow_formatted)
+            ent_struct: Dict[str, Any] = {}
+            if heuristic_first:
+                picked = cg_pick_entities(question, ocr_doc or {}, cfg)
+                ent_struct = {"entities": picked.get("entities", {}), "_debug_rationale": picked.get("rationale")}
+                logger.info("[wrong_answer_service] Heuristic CG entities: %s", ent_struct)
+                # Ensure shape for q_types expecting target_wrong
+                q_type = (question.get("q_type") or "").strip()
+                if q_type in {"true_false", "fill_blank", "short_answer", "long_answer", "comprehension_qa"}:
+                    oe = ent_struct.get("entities", {}).get("output_entity")
+                    ent_struct["target_wrong"] = oe
+                elif q_type in {"mcq_single", "mcq_multi"}:
+                    temp_q = dict(question)
+                    temp_q["_ocr_doc"] = ocr_doc
+                    try:
+                        llm_struct = cg_generate_structured_entities(temp_q)
+                    except Exception:
+                        llm_struct = {}
+                    finally:
+                        temp_q.pop("_ocr_doc", None)
+                    if isinstance(llm_struct, dict):
+                        if q_type == "mcq_multi":
+                            ent_struct["target_wrong"] = llm_struct.get("target_wrong") or []
+                        else:
+                            ent_struct["target_wrong"] = llm_struct.get("target_wrong")
+                elif q_type == "match":
+                    temp_q = dict(question)
+                    temp_q["_ocr_doc"] = ocr_doc
+                    try:
+                        llm_struct = cg_generate_structured_entities(temp_q)
+                    except Exception:
+                        llm_struct = {}
+                    finally:
+                        temp_q.pop("_ocr_doc", None)
+                    if isinstance(llm_struct, dict):
+                        ent_struct["target_wrong_mapping"] = llm_struct.get("target_wrong_mapping") or []
+            else:
+                temp_q = dict(question)
+                temp_q["_ocr_doc"] = ocr_doc
+                ent_struct = cg_generate_structured_entities(temp_q)
+                logger.info("[wrong_answer_service] LLM CG entities: %s", ent_struct)
+            return {"code_glyph_entities": ent_struct}
+        except Exception as e:
+            logger.warning("[wrong_answer_service] CODE_GLYPH entity generation failed; falling back. %s", e)
+            stem = question.get("stem_text") or ""
+            options = question.get("options") or {}
+            fallback = cg_generate_simple_entities(stem, options)
+            return {"code_glyph_entities": {"entities": fallback, "_debug_rationale": {"fallback": True}}}
     # Default no-op
     return {} 
 

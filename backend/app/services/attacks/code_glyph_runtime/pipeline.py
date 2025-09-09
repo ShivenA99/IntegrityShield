@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 from .mapper import build_unified_mappings
-from .fontgen import prepare_font_configs
+from .fontgen import prepare_font_configs, ensure_pad_fonts_ascii
 from .pdfgen import render_attacked_pdf
 import logging
 
@@ -33,6 +33,19 @@ def run_code_glyph_pipeline(
     pairs: List[Tuple[str, str]] = build_unified_mappings(entities_by_qnum)
     logger.info("[code_glyph.pipeline] Mappings (%d): %s", len(pairs), pairs)
 
+    # 1.5) Ensure pad fonts (U+2009→ASCII letters/digits) exist
+    try:
+        from ..config import get_base_font_path  # correct parent package
+        base_font_path = get_base_font_path()
+    except Exception:
+        base_font_path = None
+    try:
+        n_created = ensure_pad_fonts_ascii(prebuilt_dir, base_font_path)
+        if n_created:
+            logger.info("[code_glyph.pipeline] Generated %d pad fonts (U+2009→ASCII)", n_created)
+    except Exception as e:
+        logger.warning("[code_glyph.pipeline] Could not ensure pad fonts: %s", e)
+
     # 2) Prepare font configs (prebuilt references)
     logger.info("[code_glyph.pipeline] Preparing font configs; prebuilt_dir=%s", prebuilt_dir)
     font_configs = prepare_font_configs(pairs, prebuilt_dir)
@@ -51,16 +64,13 @@ def run_code_glyph_pipeline(
 
     # 4) Save metadata
     logger.info("[code_glyph.pipeline] Writing metadata.json")
-    metadata = {
-        "font_mode": font_mode,
+    meta = {
+        "mappings": pairs,
         "prebuilt_dir": str(prebuilt_dir),
-        "pairs": pairs,
-        "font_configs": font_configs,
-        "entities_by_qnum": entities_by_qnum,
+        "attacked_pdf_path": str(attacked_pdf_path),
+        "metadata_path": str(cg_dir / "metadata.json"),
     }
-    meta_path = cg_dir / "metadata.json"
-    with open(meta_path, "w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2, ensure_ascii=False)
-    logger.info("[code_glyph.pipeline] Done; attacked_pdf=%s, metadata=%s", attacked_pdf_path, meta_path)
-
-    return {"attacked_pdf_path": str(attacked_pdf_path), "metadata_path": str(meta_path)} 
+    with open(cg_dir / "metadata.json", "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+    logger.info("[code_glyph.pipeline] Done; attacked_pdf=%s, metadata=%s", attacked_pdf_path, cg_dir / "metadata.json")
+    return meta

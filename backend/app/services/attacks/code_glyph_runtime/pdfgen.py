@@ -11,6 +11,48 @@ from .metrics import ensure_metrics, get_advance_px
 
 logger = logging.getLogger(__name__)
 
+# Cache for fitz.Font objects by absolute font path
+_font_obj_cache: Dict[str, "fitz.Font"] = {}
+
+
+def _match_case_pattern(source: str, target: str) -> str:
+    """Return target adjusted to match the casing pattern of source.
+
+    - All upper -> upper
+    - All lower -> lower
+    - Titlecase -> Titlecase
+    - Mixed -> per-character mapping when possible, else leave as-is for extra chars
+    """
+    if not source or not target:
+        return target
+    if source.isupper():
+        return target.upper()
+    if source.islower():
+        return target.lower()
+    if source.istitle():
+        return target[:1].upper() + target[1:].lower()
+    # Mixed case: apply char-wise
+    out_chars: List[str] = []
+    for i, ch in enumerate(target):
+        if i < len(source) and source[i].isalpha():
+            out_chars.append(ch.upper() if source[i].isupper() else ch.lower())
+        else:
+            out_chars.append(ch)
+    return "".join(out_chars)
+
+
+def _get_font_obj(font_path: Path | None) -> "fitz.Font":
+	import fitz  # lazy
+	if font_path and font_path.exists():
+		key = str(font_path.resolve())
+		fo = _font_obj_cache.get(key)
+		if fo is None:
+			fo = fitz.Font(fontfile=str(font_path))
+			_font_obj_cache[key] = fo
+		return fo
+	# Fallback to built-in Helvetica
+	return fitz.Font(fontname="helv")
+
 
 def _draw_text_chunk(page, x: float, y: float, text: str, font: str, fontsize: float, margin_left: float, right_edge: float, leading: float, *, metrics: Optional[Dict] = None, base_font_path: Optional[Path] = None) -> Tuple[float, float]:
 	# width-aware wrapping (breaks long words); returns updated (x, y)
@@ -125,6 +167,22 @@ def _draw_mapped_sequence(page, x: float, y: float, fontsize: float, base_font: 
 		else:
 			# Reversed: draw output codepoint with out->in font so extraction=output, visual=input
 			if out_code is not None and in_code is not None:
+				# If identity mapping, use base font directly
+				if out_code == in_code:
+					use_font = base_font
+					draw_char = out_char
+					if metrics and base_font_path:
+						adv = get_advance_px(metrics, base_font_path, out_code, fontsize, fallback_paths=[base_font_path])
+					else:
+						adv = fontsize * 0.6
+					if x + adv > right_edge:
+						x = margin_left
+						y += leading
+					page.insert_text((x, y), draw_char, fontname=use_font, fontsize=fontsize, color=(0, 0, 0))
+					logger.info("[code_glyph.pdfgen] reverse map pos=%d identity out=%s(U+%04X) using base=%s adv=%.2f",
+							i, repr(out_char), out_code, use_font, adv)
+					x += adv
+					continue
 				fontname = _ensure_pair_font(page, prebuilt_dir, out_code, in_code)
 				draw_char = out_char
 				use_font = fontname or base_font
@@ -141,41 +199,133 @@ def _draw_mapped_sequence(page, x: float, y: float, fontsize: float, base_font: 
 						i, repr(out_char), out_code, repr(in_char), in_code, use_font, adv)
 				x += adv
 			elif in_code is not None and out_code is None:
-				# extra input (pad visually) via 200B->in
-				zw = "\u200B"; zw_code = 0x200B
-				fontname = _ensure_pair_font(page, prebuilt_dir, zw_code, in_code)
-				draw_char = zw
+				# extra input (pad vis) via 2009->in (thin space with non-zero advance)
+				hs = "\u2009"; hs_code = 0x2009
+				fontname = _ensure_pair_font(page, prebuilt_dir, hs_code, in_code)
+				draw_char = hs
 				use_font = fontname or base_font
 				if metrics and base_font_path:
-					font_path = _pair_font_path(prebuilt_dir, zw_code, in_code) if fontname else base_font_path
-					adv = get_advance_px(metrics, font_path, zw_code, fontsize, fallback_paths=[base_font_path])
+					font_path = _pair_font_path(prebuilt_dir, hs_code, in_code) if fontname else base_font_path
+					adv = get_advance_px(metrics, font_path, hs_code, fontsize, fallback_paths=[base_font_path])
 				else:
-					adv = fontsize * 0.55
+					adv = fontsize * 0.4
 				if x + adv > right_edge:
 					x = margin_left
 					y += leading
 				page.insert_text((x, y), draw_char, fontname=use_font, fontsize=fontsize, color=(0, 0, 0))
-				logger.info("[code_glyph.pdfgen] reverse map pos=%d pad vis in=%s(U+%04X) via U+200B using=%s adv=%.2f",
+				logger.info("[code_glyph.pdfgen] reverse map pos=%d pad vis in=%s(U+%04X) via U+2009 using=%s adv=%.2f",
 						i, repr(input_entity[i]), in_code, use_font, adv)
 				x += adv
 			elif out_code is not None and in_code is None:
-				# extra output (hide visually) via out->200B
-				fontname = _ensure_pair_font(page, prebuilt_dir, out_code, 0x200B)
+				# extra output (thin visible spacer) via out->2009
+				fontname = _ensure_pair_font(page, prebuilt_dir, out_code, 0x2009)
 				draw_char = out_char
 				use_font = fontname or base_font
 				if metrics and base_font_path:
-					font_path = _pair_font_path(prebuilt_dir, out_code, 0x200B) if fontname else base_font_path
+					font_path = _pair_font_path(prebuilt_dir, out_code, 0x2009) if fontname else base_font_path
 					adv = get_advance_px(metrics, font_path, out_code, fontsize, fallback_paths=[base_font_path])
 				else:
-					adv = fontsize * 0.55
+					adv = fontsize * 0.4
 				if x + adv > right_edge:
 					x = margin_left
 					y += leading
 				page.insert_text((x, y), draw_char, fontname=use_font, fontsize=fontsize, color=(0, 0, 0))
-				logger.info("[code_glyph.pdfgen] reverse map pos=%d pad out=%s(U+%04X) → U+200B using=%s adv=%.2f",
+				logger.info("[code_glyph.pdfgen] reverse map pos=%d pad out=%s(U+%04X) → U+2009 using=%s adv=%.2f",
 						i, repr(out_char), out_code, use_font, adv)
 				x += adv
 	return x, y
+
+
+def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str, *, fontsize: float, base_font: str, prebuilt_dir: Path, metrics: Optional[Dict] = None, base_font_path: Optional[Path] = None, right_edge: float = 1e9, leading: float = 14.0) -> Tuple[float, float]:
+	"""Render a single token as ONE text object using a TextWriter so extractors keep inline order.
+
+	Extraction should yield token_out. Visual should look like token_in.
+	"""
+	import fitz  # PyMuPDF
+	logger.info("[code_glyph.pdfgen] Drawing mapped token (writer) at (%.2f,%.2f) in='%s' out='%s' pt=%.2f", x, y, token_in, token_out, fontsize)
+	# Prepare writer
+	tw = fitz.TextWriter(page.rect)
+	# Prepare base font object
+	base_font_obj = _get_font_obj(base_font_path if base_font_path and base_font_path.exists() else None)
+	# Case-align the output to the input token's casing
+	if token_in:
+		token_out = _match_case_pattern(token_in, token_out)
+	# Walk the longer of the two strings and build mapping per char in reverse mode
+	x_pos = x
+	max_len = max(len(token_in or ""), len(token_out or ""))
+	for i in range(max_len):
+		in_char = token_in[i] if i < len(token_in) else ""
+		out_char = token_out[i] if i < len(token_out) else ""
+		in_code = ord(in_char) if in_char else None
+		out_code = ord(out_char) if out_char else None
+
+		# Reverse mapping logic (visual=input, extracted=output)
+		if out_code is not None and in_code is not None:
+			# Identity mapping: use base font directly, draw output char
+			if out_code == in_code:
+				font_obj = base_font_obj
+				draw_char = out_char
+				try:
+					adv = font_obj.text_length(draw_char, fontsize)
+				except Exception:
+					adv = get_advance_px(metrics, base_font_path, out_code, fontsize, fallback_paths=[base_font_path]) if (metrics and base_font_path) else fontsize * 0.6
+				# Append to writer
+				tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize)
+				logger.info("[code_glyph.pdfgen] reverse map pos=%d identity out=%s(U+%04X) using base adv=%.2f", i, repr(out_char), out_code, adv)
+				x_pos += adv
+				continue
+			# Non-identity: need pair font for out->in; draw output char with that font
+			pair_path = _pair_font_path(prebuilt_dir, out_code, in_code)
+			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
+			draw_char = out_char
+			try:
+				adv = font_obj.text_length(draw_char, fontsize)
+			except Exception:
+				adv = get_advance_px(metrics, pair_path, out_code, fontsize, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize * 0.6
+			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize)
+			logger.info("[code_glyph.pdfgen] reverse map pos=%d out=%s(U+%04X) → in=%s(U+%04X) using=%s adv=%.2f",
+					i, repr(out_char), out_code, repr(in_char), in_code, ("pair" if pair_path.exists() else "base"), adv)
+			x_pos += adv
+			continue
+
+		# Extra input (pad visually): U+2009 thin space → in
+		if in_code is not None and out_code is None:
+			hs_code = 0x2009
+			pair_path = _pair_font_path(prebuilt_dir, hs_code, in_code)
+			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
+			draw_char = "\u2009"
+			try:
+				adv = font_obj.text_length(draw_char, fontsize)
+			except Exception:
+				adv = get_advance_px(metrics, pair_path, hs_code, fontsize, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize * 0.4
+			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize)
+			logger.info("[code_glyph.pdfgen] reverse map pos=%d pad vis in=%s(U+%04X) via U+2009 adv=%.2f",
+					i, repr(in_char), in_code, adv)
+			x_pos += adv
+			continue
+
+		# Extra output (thin visible spacer): out → U+2009
+		if out_code is not None and in_code is None:
+			pair_path = _pair_font_path(prebuilt_dir, out_code, 0x2009)
+			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
+			draw_char = out_char
+			try:
+				adv = font_obj.text_length(draw_char, fontsize)
+			except Exception:
+				adv = get_advance_px(metrics, pair_path, out_code, fontsize, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize * 0.4
+			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize)
+			logger.info("[code_glyph.pdfgen] reverse map pos=%d pad out=%s(U+%04X) → U+2009 adv=%.2f",
+					i, repr(out_char), out_code, adv)
+			x_pos += adv
+			continue
+
+	# Emit as one text object
+	write_fn = getattr(tw, "write_text", None) or getattr(tw, "writeText", None)
+	if write_fn:
+		write_fn(page)
+	else:
+		pass
+	return x_pos, y
 
 
 def _render_text_with_mappings(page, text: str, y: float, base_font: str, fontsize: float, prebuilt_dir: Path,
@@ -211,6 +361,9 @@ def _render_text_with_mappings(page, text: str, y: float, base_font: str, fontsi
 			x, y = _draw_text_chunk(page, x, y, before, base_font, fontsize, margin_left, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
 			# draw mapped segment
 			in_ent, out_ent = chosen
+			# Case-align output to the actual matched input segment
+			seg_in = line[earliest_idx:earliest_idx + len(in_ent)]
+			out_ent = _match_case_pattern(seg_in, out_ent)
 			logger.info("[code_glyph.pdfgen] Inline multi-map at col=%d in='%s' out='%s'", earliest_idx, in_ent, out_ent)
 			x, y = _draw_mapped_sequence(
 				page, x, y, fontsize=fontsize, base_font=base_font, prebuilt_dir=prebuilt_dir,
@@ -260,6 +413,8 @@ def _render_text_with_mappings_clipped(page, text: str, y: float, base_font: str
 			x, y = _draw_text_chunk(page, x, y, before, base_font, fontsize, margin_left, right_edge, leading, metrics=metrics, base_font_path=base_font_path)
 			# draw mapped segment
 			in_ent, out_ent = chosen
+			seg_in = line[earliest_idx:earliest_idx + len(in_ent)]
+			out_ent = _match_case_pattern(seg_in, out_ent)
 			logger.info("[code_glyph.pdfgen] Inline multi-map at col=%d in='%s' out='%s'", earliest_idx, in_ent, out_ent)
 			x, y = _draw_mapped_sequence(
 				page, x, y, fontsize=fontsize, base_font=base_font, prebuilt_dir=prebuilt_dir,
@@ -451,7 +606,9 @@ def render_attacked_pdf(title: str, questions: List[Dict], entities_by_qnum: Dic
 			leading = 11 + 4
 			y = _render_text_with_mappings(page, stem, y, base_font, 11, prebuilt_dir, mappings, metrics=metrics, base_font_path=base_font_path, margin_left=margin_left, right_edge=right_edge, leading=leading)
 		else:
-			y = _render_stem_with_inline_mapping(page, stem, y, base_font, 11, in_entity, out_entity)
+			# Case-align mapping when rendering stems
+			out_entity_ca = _match_case_pattern(in_entity, out_entity) if in_entity and out_entity else out_entity
+			y = _render_stem_with_inline_mapping(page, stem, y, base_font, 11, in_entity, out_entity_ca)
 		y += 2
 
 		# Options if present

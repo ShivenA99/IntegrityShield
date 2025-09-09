@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from typing import Dict, List, Tuple
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def build_unified_mappings(entities_by_qnum: Dict[str, Dict[str, str]]) -> List[Tuple[str, str]]:
@@ -16,10 +19,13 @@ def build_unified_mappings(entities_by_qnum: Dict[str, Dict[str, str]]) -> List[
         inp = (ent.get("input_entity") or "").strip()
         out = (ent.get("output_entity") or "").strip()
         if not inp:
+            logger.debug("[code_glyph.mapper] Skipping empty input entity for Q%s", qnum)
             continue
         key = (inp, out)
         if key in seen:
+            logger.debug("[code_glyph.mapper] Duplicate pair %s→%s ignored (Q%s)", inp, out, qnum)
             continue
         seen.add(key)
         pairs.append(key)
+    logger.info("[code_glyph.mapper] Unified mappings built: %s", pairs)
     return pairs 

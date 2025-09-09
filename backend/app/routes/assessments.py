@@ -101,6 +101,17 @@ def upload_assessment():
         assessment_dir.mkdir(parents=True, exist_ok=True)
         logger.debug("[upload_assessment] Created assessment directory %s", assessment_dir)
 
+        # Setup per-run logging to a file inside assessment_dir/code_glyph/run.log
+        try:
+            from ..services.logging_utils import activate_run_context, create_run_file_handler, attach_run_file_handler
+            run_log_path = assessment_dir / "code_glyph" / "run.log"
+            activate_run_context(str(assessment_uuid))
+            _run_file_handler = create_run_file_handler(run_log_path)
+            attach_run_file_handler(_run_file_handler)
+            logger.info("[upload_assessment] Run-scoped logging initialized at %s", run_log_path)
+        except Exception as _e_setup_log:
+            logger.warning("[upload_assessment] Failed to initialize run-scoped logging: %s", _e_setup_log)
+
         # Save uploaded PDFs
         orig_path = assessment_dir / secure_filename(orig_file.filename)
         orig_file.save(orig_path)
@@ -243,7 +254,7 @@ def upload_assessment():
                 qs = doc.get("questions", [])
                 for q in qs:
                     try:
-                        wa = generate_wrong_answer_for_question(q, attack_type)
+                        wa = generate_wrong_answer_for_question(q, attack_type, structured_doc)
                         if wa:
                             q.update(wa)
                     except Exception as e:
@@ -305,7 +316,7 @@ def upload_assessment():
                     qs = doc.get("questions", [])
                     for q in qs:
                         try:
-                            wa = generate_wrong_answer_for_question(q, attack_type)
+                            wa = generate_wrong_answer_for_question(q, attack_type, structured_doc)
                             if wa:
                                 q.update(wa)
                         except Exception as e:
@@ -706,6 +717,13 @@ def upload_assessment():
             except Exception:
                 pass
         return jsonify({"error": "Upload failed"}), 500
+    finally:
+        try:
+            from ..services.logging_utils import detach_run_file_handler
+            if '_run_file_handler' in locals():
+                detach_run_file_handler(_run_file_handler)
+        except Exception:
+            pass
 
 
 @assessments_bp.route("/<uuid:assessment_id>/attacked", methods=["GET"])
