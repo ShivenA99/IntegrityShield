@@ -242,100 +242,15 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	Extraction should yield token_out. Visual should look like token_in.
 	"""
 	import fitz  # PyMuPDF
-	import os
 	logger.info("[code_glyph.pdfgen] Drawing mapped token (writer) at (%.2f,%.2f) in='%s' out='%s' pt=%.2f", x, y, token_in, token_out, fontsize)
 	# Prepare writer
 	tw = fitz.TextWriter(page.rect)
 	# Prepare base font object
 	base_font_obj = _get_font_obj(base_font_path if base_font_path and base_font_path.exists() else None)
-	in_fontsize = fontsize
 	# Case-align the output to the input token's casing
 	if token_in:
 		token_out = _match_case_pattern(token_in, token_out)
-
-	# Small vertical proportion alignment via font size (no baseline shift)
-	try:
-		align_mode = (os.getenv("CG_ALIGN_MODE", "xheight") or "xheight").lower()
-		if metrics and base_font_path and token_in and token_out:
-			m_all = metrics
-			base_key = str(base_font_path.resolve())
-			binfo = m_all.get("fonts", {}).get(base_key, {})
-			b_upm = float(max(1, int(binfo.get("unitsPerEm", 1000))))
-			b_x = float(binfo.get("xHeight", 0)) or 0.0
-			b_cap = float(binfo.get("capHeight", 0)) or 0.0
-			ref_h_base = (b_x if align_mode.startswith("x") else (b_cap if b_cap > 0 else b_x))
-			# choose first non-identity char's pair font
-			ref_h_pair = 0.0
-			max_len = max(len(token_in), len(token_out))
-			for i in range(max_len):
-				cin = token_in[i] if i < len(token_in) else ""
-				cout = token_out[i] if i < len(token_out) else ""
-				if not cin or not cout or cin == cout:
-					continue
-				pair_path = _pair_font_path(prebuilt_dir, ord(cout), ord(cin))
-				if pair_path.exists():
-					pinfo = m_all.get("fonts", {}).get(str(pair_path.resolve()), {})
-					p_x = float(pinfo.get("xHeight", 0)) or 0.0
-					p_cap = float(pinfo.get("capHeight", 0)) or 0.0
-					ref_h_pair = (p_x if align_mode.startswith("x") else (p_cap if p_cap > 0 else p_x))
-					break
-			if ref_h_base > 0 and ref_h_pair > 0:
-				ratio = (ref_h_base / b_upm) / (ref_h_pair / b_upm)
-				# clamp tiny tweak: within ±3%
-				ratio = min(1.03, max(0.97, ratio))
-				fontsize = min(in_fontsize, fontsize * ratio)
-	except Exception:
-		pass
-
-	# Optional width fitting (shrink-only, narrow clamp)
-	fit_width = (os.getenv("CG_FIT_WIDTH", "1").lower() in {"1", "true", "yes", "on", "y", "t"})
-	if fit_width and metrics and base_font_path:
-		try:
-			# Measure with current fontsize
-			tmp_x = 0.0
-			max_len = max(len(token_in or ""), len(token_out or ""))
-			for i in range(max_len):
-				in_char = token_in[i] if i < len(token_in) else ""
-				out_char = token_out[i] if i < len(token_out) else ""
-				in_code = ord(in_char) if in_char else None
-				out_code = ord(out_char) if out_char else None
-				if out_code is not None and in_code is not None:
-					if out_code == in_code:
-						adv = base_font_obj.text_length(out_char, fontsize)
-					else:
-						pair_path = _pair_font_path(prebuilt_dir, out_code, in_code)
-						font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
-						try:
-							adv = font_obj.text_length(out_char, fontsize)
-						except Exception:
-							adv = get_advance_px(metrics, pair_path, out_code, fontsize, fallback_paths=[base_font_path])
-						tmp_x += adv
-				elif in_code is not None and out_code is None:
-					# pad visual via U+2009
-					pair_path = _pair_font_path(prebuilt_dir, 0x2009, in_code)
-					font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
-					try:
-						adv = font_obj.text_length("\u2009", fontsize)
-					except Exception:
-						adv = get_advance_px(metrics, pair_path, 0x2009, fontsize, fallback_paths=[base_font_path])
-					tmp_x += adv
-				elif out_code is not None and in_code is None:
-					# extra output visible
-					pair_path = _pair_font_path(prebuilt_dir, out_code, 0x2009)
-					font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
-					try:
-						adv = font_obj.text_length(out_char, fontsize)
-					except Exception:
-						adv = get_advance_px(metrics, pair_path, out_code, fontsize, fallback_paths=[base_font_path])
-					tmp_x += adv
-			width_px = max(1.0, right_edge - x)
-			if tmp_x > width_px:
-				scale = max(0.95, min(1.0, width_px / max(1.0, tmp_x)))
-				fontsize = min(in_fontsize, fontsize * scale)
-		except Exception:
-			pass
-
-	# Build the text writer object with mapped glyphs at (x, y)
+	# Walk the longer of the two strings and build mapping per char in reverse mode
 	x_pos = x
 	max_len = max(len(token_in or ""), len(token_out or ""))
 	for i in range(max_len):
@@ -408,17 +323,7 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	write_fn = getattr(tw, "write_text", None) or getattr(tw, "writeText", None)
 	if write_fn:
 		write_fn(page)
-
-	# Optional ActualText embedding for ordered parsing (disabled by default; may cause duplicate extraction)
-	try:
-		use_actual = (os.getenv("CG_USE_ACTUALTEXT", "0").lower() in {"1", "true", "yes", "on", "y", "t"})
-		if use_actual and token_out:
-			invis = fitz.TextWriter(page.rect)
-			invis.append((x, y), token_out, font=base_font_obj, fontsize=fontsize)
-			write_fn2 = getattr(invis, "write_text", None) or getattr(invis, "writeText", None)
-			if write_fn2:
-				write_fn2(page, opacity=0.0)
-	except Exception:
+	else:
 		pass
 	return x_pos, y
 
