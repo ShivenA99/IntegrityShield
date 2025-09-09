@@ -355,7 +355,11 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                                                 sbbox = sp.get("bbox") or [orig_rect.x0, orig_rect.y0, orig_rect.x1, orig_rect.y1]
                                                                 r = fitz.Rect(*sbbox)
                                                                 if r.width > 0 and r.height > 0:
-                                                                    span_baseline = r.y1
+                                                                    try:
+                                                                        _o = sp.get("origin") or [r.x0, r.y1]
+                                                                        span_baseline = float(_o[1] if isinstance(_o, (list, tuple)) and len(_o) >= 2 else r.y1)
+                                                                    except Exception:
+                                                                        span_baseline = r.y1
                                                                     span_size = sp.get("size") or float(os.getenv("CG_TOKEN_FONT_PT", "11"))
                                                                     break
                                                             if span_baseline is not None:
@@ -507,7 +511,7 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                 baseline_nudge = float(os.getenv("CG_BASELINE_NUDGE_PX", "0.0"))
                                 overlap_thresh = float(os.getenv("CG_SPAN_OVERLAP_THRESH", "0.30"))
                                 vtol = float(os.getenv("CG_BASELINE_VTOL_PX", "2.0"))
-                                baseline_source = (os.getenv("CG_BASELINE_SOURCE", "auto") or "auto").lower()
+                                baseline_source = (os.getenv("CG_BASELINE_SOURCE", "stored") or "stored").lower()
                                 debug_baseline = (os.getenv("CG_DEBUG_BASELINE", "").lower() in {"1", "true", "yes", "on", "y", "t"})
                                 for tok in token_rects:
                                     rect = tok.get("rect")
@@ -526,8 +530,8 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                     stored_baseline = float(tok.get("baseline") or (rect.y1 - (rect.height * 0.2)))
                                     chosen_from = "stored"
                                     baseline = stored_baseline
-                                    # If we have spans, pick baseline using vertical overlap + tie-breakers
-                                    if spans_info:
+                                    # If we have spans and re-selection is allowed, pick baseline using overlap + tie-breakers
+                                    if spans_info and baseline_source != "stored":
                                         # Build candidate list with overlap and distances
                                         rect_h = max(1e-3, rect.y1 - rect.y0)
                                         rect_center_y = (rect.y0 + rect.y1) / 2.0
