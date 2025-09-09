@@ -489,14 +489,19 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                 try:
                                     clip_rect = fitz.Rect(*t["bbox"])  # type: ignore[name-defined]
                                     raw = page.get_text("rawdict", clip=clip_rect)
-                                    spans_info: List[Tuple[fitz.Rect, float]] = []  # (span_bbox, size)
+                                    spans_info: List[Tuple[fitz.Rect, float, float]] = []  # (span_bbox, size, origin_y)
                                     for blk in raw.get("blocks", []) or []:
                                         for ln in blk.get("lines", []) or []:
                                             for sp in ln.get("spans", []) or []:
                                                 bbox = sp.get("bbox") or [clip_rect.x0, clip_rect.y0, clip_rect.x1, clip_rect.y1]
                                                 r = fitz.Rect(*bbox)
                                                 if r.width > 0 and r.height > 0:
-                                                    spans_info.append((r, float(sp.get("size") or 11.0)))
+                                                    try:
+                                                        origin = sp.get("origin") or [r.x0, r.y1]
+                                                        origin_y = float(origin[1] if isinstance(origin, (list, tuple)) and len(origin) >= 2 else r.y1)
+                                                    except Exception:
+                                                        origin_y = float(r.y1)
+                                                    spans_info.append((r, float(sp.get("size") or 11.0), origin_y))
                                 except Exception:
                                     spans_info = []
                                 baseline_nudge = float(os.getenv("CG_BASELINE_NUDGE_PX", "0.0"))
@@ -505,26 +510,25 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                     m = tok.get("m") or {}
                                     ie = m.get("input_entity") or ""
                                     oe = m.get("output_entity") or ""
-                                    if not ie or not oe:
+                                    if not rect or not ie:
                                         continue
-                                    key = f"{ie}:{rect.x0:.2f},{rect.y0:.2f},{rect.x1:.2f},{rect.y1:.2f}"
+                                    # Skip duplicates
+                                    key = f"{rect.x0:.2f},{rect.y0:.2f},{ie}"
                                     if key in drawn_keys:
                                         continue
                                     drawn_keys.add(key)
-                                    width = max(1.0, rect.x1 - rect.x0)
-                                    # Choose nearest span baseline within this bbox; default to recorded baseline/size
+                                    # Prefer previously captured span metrics when available
                                     best_pt = float(tok.get("font_pt") or os.getenv("CG_TOKEN_FONT_PT", "11"))
-                                    baseline = float(tok.get("baseline") or (rect.y1 - (rect.height * 0.2)))
+                                    # If we have spans, pick the nearest baseline (origin.y) and size by horizontal overlap and distance
                                     if spans_info:
-                                        # Try to find spans overlapping token horizontally; then pick the nearest baseline (y1)
-                                        candidates: List[Tuple[float, float]] = []  # (baseline, size)
-                                        for sb, sz in spans_info:
+                                        candidates: List[Tuple[float, float]] = []  # (baseline_origin_y, size)
+                                        for sb, sz, oy in spans_info:
                                             # horizontal overlap check
                                             if not (sb.x1 < rect.x0 or sb.x0 > rect.x1):
-                                                candidates.append((sb.y1, sz))
+                                                candidates.append((oy, sz))
                                         if not candidates:
                                             # fallback: use all spans
-                                            candidates = [(sb.y1, sz) for sb, sz in spans_info]
+                                            candidates = [(oy, sz) for _sb, sz, oy in spans_info]
                                         if candidates:
                                             # nearest by absolute distance to rect baseline guess
                                             target_y = rect.y1 - (rect.height * 0.2)
