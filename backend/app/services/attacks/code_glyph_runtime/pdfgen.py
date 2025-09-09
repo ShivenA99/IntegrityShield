@@ -279,86 +279,97 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	# Case-align the output to the input token's casing
 	if token_in:
 		token_out = _match_case_pattern(token_in, token_out)
-	# Walk the longer of the two strings and build mapping per char in reverse mode
-	x_pos = x
-	max_len = max(len(token_in or ""), len(token_out or ""))
-	for i in range(max_len):
-		in_char = token_in[i] if i < len(token_in) else ""
-		out_char = token_out[i] if i < len(token_out) else ""
-		in_code = ord(in_char) if in_char else None
-		out_code = ord(out_char) if out_char else None
 
-		# Reverse mapping logic (visual=input, extracted=output)
-		if out_code is not None and in_code is not None:
-			# Identity mapping: use base font directly, draw output char
-			if out_code == in_code:
-				font_obj = base_font_obj
-				draw_char = out_char
-				fontsize_char = fontsize
-				try:
-					adv = font_obj.text_length(draw_char, fontsize_char)
-				except Exception:
-					adv = get_advance_px(metrics, base_font_path, out_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and base_font_path) else fontsize_char * 0.6
-				# Append to writer
-				tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize_char)
-				logger.info("[code_glyph.pdfgen] reverse map pos=%d identity out=%s(U+%04X) using base adv=%.2f", i, repr(out_char), out_code, adv)
-				x_pos += adv
-				continue
-			# Non-identity: need pair font for out->in; draw output char with that font
-			pair_path = _pair_font_path(prebuilt_dir, out_code, in_code)
+	# Build glyph runs for ONLY output characters (no pad characters)
+	glyphs: list[tuple[fitz.Font, str, float, float]] = []  # (font_obj, char, fontsize_char, advance_px)
+	advances: list[float] = []
+	cumul: list[float] = []
+	n_in = len(token_in or "")
+	n_out = len(token_out or "")
+	for i in range(n_out):
+		out_char = token_out[i]
+		out_code = ord(out_char)
+		# Select an input code for mapping if available; else reuse last input code to choose pair font
+		in_code: Optional[int] = None
+		if i < n_in and n_in > 0:
+			in_char = token_in[i]
+			in_code = ord(in_char)
+		elif n_in > 0:
+			in_code = ord(token_in[-1])
+		# Determine font and per-glyph size
+		use_pair = (in_code is not None) and (out_code is not None) and (out_code != in_code)
+		if not use_pair:
+			font_obj = base_font_obj
+			fontsize_char = fontsize
+			font_path_for_width = base_font_path
+		else:
+			pair_path = _pair_font_path(prebuilt_dir, out_code, in_code)  # type: ignore[arg-type]
 			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
-			draw_char = out_char
 			fontsize_char = fontsize * (_size_factor_for_pair(pair_path if pair_path.exists() else None))
-			try:
-				adv = font_obj.text_length(draw_char, fontsize_char)
-			except Exception:
-				adv = get_advance_px(metrics, pair_path, out_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize_char * 0.6
-			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize_char)
-			logger.info("[code_glyph.pdfgen] reverse map pos=%d out=%s(U+%04X) → in=%s(U+%04X) using=%s adv=%.2f",
-					i, repr(out_char), out_code, repr(in_char), in_code, ("pair" if pair_path.exists() else "base"), adv)
-			x_pos += adv
-			continue
+			font_path_for_width = pair_path if pair_path.exists() else base_font_path
+		# Measure advance
+		try:
+			adv = font_obj.text_length(out_char, fontsize_char)
+		except Exception:
+			adv = get_advance_px(metrics, font_path_for_width, out_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and font_path_for_width) else max(0.4, fontsize_char * 0.6)
+		glyphs.append((font_obj, out_char, fontsize_char, adv))
+		advances.append(adv)
+		cumul.append((cumul[-1] if cumul else 0.0) + adv)
 
-		# Extra input (pad visually): U+2009 thin space → in
-		if in_code is not None and out_code is None:
-			hs_code = 0x2009
-			pair_path = _pair_font_path(prebuilt_dir, hs_code, in_code)
-			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
-			draw_char = "\u2009"
-			fontsize_char = fontsize  # keep base size for pad
-			try:
-				adv = font_obj.text_length(draw_char, fontsize_char)
-			except Exception:
-				adv = get_advance_px(metrics, pair_path, hs_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize_char * 0.4
-			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize_char)
-			logger.info("[code_glyph.pdfgen] reverse map pos=%d pad vis in=%s(U+%04X) via U+2009 adv=%.2f",
-					i, repr(in_char), in_code, adv)
-			x_pos += adv
-			continue
+	if not glyphs:
+		return x, y
 
-		# Extra output (thin visible spacer): out → U+2009
-		if out_code is not None and in_code is None:
-			pair_path = _pair_font_path(prebuilt_dir, out_code, 0x2009)
-			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
-			draw_char = out_char
-			fontsize_char = fontsize * (_size_factor_for_pair(pair_path if pair_path.exists() else None))
-			try:
-				adv = font_obj.text_length(draw_char, fontsize_char)
-			except Exception:
-				adv = get_advance_px(metrics, pair_path, out_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize_char * 0.4
-			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize_char)
-			logger.info("[code_glyph.pdfgen] reverse map pos=%d pad out=%s(U+%04X) → U+2009 adv=%.2f",
-					i, repr(out_char), out_code, adv)
-			x_pos += adv
-			continue
-
-	# Emit as one text object
-	write_fn = getattr(tw, "write_text", None) or getattr(tw, "writeText", None)
-	if write_fn:
-		write_fn(page)
+	desired_width = max(0.0, (right_edge - x))
+	total_out = cumul[-1]
+	# Compute x positions: compress if wider, distribute gaps if narrower, center single glyph
+	x_positions: list[float] = []
+	if total_out > desired_width and desired_width > 0:
+		scale_x = max(0.0, desired_width / total_out)
+		for i in range(len(glyphs)):
+			nat_x = (0.0 if i == 0 else cumul[i - 1])
+			x_positions.append(x + scale_x * nat_x)
+	elif total_out <= desired_width and desired_width > 0:
+		n_gaps = max(0, len(glyphs) - 1)
+		if n_gaps > 0:
+			gap_extra = (desired_width - total_out) / n_gaps
+			for i in range(len(glyphs)):
+				nat_x = (0.0 if i == 0 else cumul[i - 1])
+				x_positions.append(x + nat_x + gap_extra * i)
+		else:
+			# single glyph: center within box
+			x_positions.append(x + (desired_width - total_out) / 2.0)
 	else:
+		# No right_edge bound; use natural positions
+		for i in range(len(glyphs)):
+			nat_x = (0.0 if i == 0 else cumul[i - 1])
+			x_positions.append(x + nat_x)
+
+	# Ensure last glyph fits within right_edge by tiny correction if needed
+	try:
+		last_x = x_positions[-1]
+		last_adv = advances[-1]
+		if last_x + last_adv > right_edge:
+			overflow = (last_x + last_adv) - right_edge
+			shift = overflow
+			for i in range(len(x_positions)):
+				x_positions[i] = x_positions[i] - shift * (i / max(1, len(x_positions) - 1))
+	except Exception:
 		pass
-	return x_pos, y
+
+	# Append all glyphs to the writer as a single run
+	for i, (font_obj, ch, fsz, _adv) in enumerate(glyphs):
+		tw.append((x_positions[i], y), ch, font=font_obj, fontsize=fsz)
+
+	# Emit the text
+	tw.write_text(page)
+
+	# Diagnostics
+	try:
+		logger.info("[code_glyph.pdfgen] positioned token width fit: desired=%.2f total=%.2f pos_first=%.2f pos_last=%.2f", desired_width, total_out, x_positions[0], x_positions[-1])
+	except Exception:
+		pass
+
+	return x_positions[-1] + advances[-1], y
 
 
 def _render_text_with_mappings(page, text: str, y: float, base_font: str, fontsize: float, prebuilt_dir: Path,
