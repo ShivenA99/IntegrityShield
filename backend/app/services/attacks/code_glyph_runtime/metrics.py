@@ -23,10 +23,15 @@ def _compute_font_metrics_for_file(font_path: Path) -> Optional[Dict[str, Any]]:
 		hhea = tt.get("hhea")
 		hmtx = tt.get("hmtx")
 		cmap_tbl = tt.get("cmap")
+		os2 = tt.get("OS/2")
 		if not (head and hhea and hmtx and cmap_tbl):
 			logger.warning("[code_glyph.metrics] Missing tables in %s; skipping", font_path)
 			return None
 		units_per_em = int(getattr(head, "unitsPerEm", 1000))
+		ascender = int(getattr(hhea, "ascent", 0))
+		descender = int(getattr(hhea, "descent", 0))
+		x_height = int(getattr(os2, "sxHeight", 0)) if os2 is not None else 0
+		cap_height = int(getattr(os2, "sCapHeight", 0)) if os2 is not None else 0
 
 		# Merge cmaps
 		codepoint_to_glyph: Dict[int, str] = {}
@@ -46,7 +51,14 @@ def _compute_font_metrics_for_file(font_path: Path) -> Optional[Dict[str, Any]]:
 				continue
 
 		logger.info("[code_glyph.metrics] Computed metrics: %s (UPM=%d, glyphs=%d)", font_path, units_per_em, len(advances))
-		return {"unitsPerEm": units_per_em, "advances": advances}
+		return {
+			"unitsPerEm": units_per_em,
+			"ascender": ascender,
+			"descender": descender,
+			"xHeight": x_height,
+			"capHeight": cap_height,
+			"advances": advances,
+		}
 	except Exception as e:
 		logger.warning("[code_glyph.metrics] Failed to compute metrics for %s: %s", font_path, e)
 		return None

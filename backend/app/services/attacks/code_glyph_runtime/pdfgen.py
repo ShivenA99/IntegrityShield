@@ -242,6 +242,7 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	Extraction should yield token_out. Visual should look like token_in.
 	"""
 	import fitz  # PyMuPDF
+	import os
 	logger.info("[code_glyph.pdfgen] Drawing mapped token (writer) at (%.2f,%.2f) in='%s' out='%s' pt=%.2f", x, y, token_in, token_out, fontsize)
 	# Prepare writer
 	tw = fitz.TextWriter(page.rect)
@@ -250,7 +251,85 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	# Case-align the output to the input token's casing
 	if token_in:
 		token_out = _match_case_pattern(token_in, token_out)
-	# Walk the longer of the two strings and build mapping per char in reverse mode
+
+	# Optional width fitting: measure mapped token width then scale to fit within [x, right_edge]
+	fit_width = (os.getenv("CG_FIT_WIDTH", "1").lower() in {"1", "true", "yes", "on", "y", "t"})
+	if fit_width and metrics and base_font_path:
+		try:
+			# Measure with current fontsize
+			tmp_x = 0.0
+			max_len = max(len(token_in or ""), len(token_out or ""))
+			for i in range(max_len):
+				in_char = token_in[i] if i < len(token_in) else ""
+				out_char = token_out[i] if i < len(token_out) else ""
+				in_code = ord(in_char) if in_char else None
+				out_code = ord(out_char) if out_char else None
+				if out_code is not None and in_code is not None:
+					if out_code == in_code:
+						adv = base_font_obj.text_length(out_char, fontsize)
+					else:
+						pair_path = _pair_font_path(prebuilt_dir, out_code, in_code)
+						font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
+						try:
+							adv = font_obj.text_length(out_char, fontsize)
+						except Exception:
+							adv = get_advance_px(metrics, pair_path, out_code, fontsize, fallback_paths=[base_font_path])
+						tmp_x += adv
+				elif in_code is not None and out_code is None:
+					# pad visual via U+2009
+					pair_path = _pair_font_path(prebuilt_dir, 0x2009, in_code)
+					font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
+					try:
+						adv = font_obj.text_length("\u2009", fontsize)
+					except Exception:
+						adv = get_advance_px(metrics, pair_path, 0x2009, fontsize, fallback_paths=[base_font_path])
+					tmp_x += adv
+				elif out_code is not None and in_code is None:
+					# extra output visible
+					pair_path = _pair_font_path(prebuilt_dir, out_code, 0x2009)
+					font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
+					try:
+						adv = font_obj.text_length(out_char, fontsize)
+					except Exception:
+						adv = get_advance_px(metrics, pair_path, out_code, fontsize, fallback_paths=[base_font_path])
+					tmp_x += adv
+			width_px = max(1.0, right_edge - x)
+			if tmp_x > 1.0:
+				scale = min(1.15, max(0.75, width_px / tmp_x))
+				fontsize = max(float(os.getenv("CG_MIN_FONT_PT", "8")), min(float(os.getenv("CG_TOKEN_FONT_PT", "12")), fontsize * scale))
+		except Exception:
+			pass
+
+	# Baseline ascender adjustment (align visual baseline to original base font metrics)
+	try:
+		if metrics and base_font_path:
+			from .metrics import load_metrics
+			m_all = metrics
+			base_key = str(base_font_path.resolve())
+			base_info = m_all.get("fonts", {}).get(base_key, {})
+			base_upm = float(max(1, int(base_info.get("unitsPerEm", 1000))))
+			base_asc = float(base_info.get("ascender", 0))
+			# Estimate average ascender used for sequence from first mapped non-identity char
+			pair_asc = base_asc
+			max_len = max(len(token_in or ""), len(token_out or ""))
+			for i in range(max_len):
+				in_char = token_in[i] if i < len(token_in) else ""
+				out_char = token_out[i] if i < len(token_out) else ""
+				if not in_char or not out_char or in_char == out_char:
+					continue
+				pair_path = _pair_font_path(prebuilt_dir, ord(out_char), ord(in_char))
+				if pair_path.exists():
+					info = m_all.get("fonts", {}).get(str(pair_path.resolve()), {})
+					pa = float(info.get("ascender", base_asc))
+					pair_asc = pa
+					break
+			# dy in pixels to align ascenders
+			dy = ((pair_asc - base_asc) / base_upm) * fontsize
+			y = y + dy
+	except Exception:
+		pass
+
+	# Build the text writer object with mapped glyphs at (x, y)
 	x_pos = x
 	max_len = max(len(token_in or ""), len(token_out or ""))
 	for i in range(max_len):
@@ -323,7 +402,19 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	write_fn = getattr(tw, "write_text", None) or getattr(tw, "writeText", None)
 	if write_fn:
 		write_fn(page)
-	else:
+
+	# Optional ActualText embedding for ordered parsing
+	try:
+		use_actual = (os.getenv("CG_USE_ACTUALTEXT", "0").lower() in {"1", "true", "yes", "on", "y", "t"})
+		if use_actual and token_out:
+			# Draw invisible text object carrying token_out immediately at same position
+			invis = fitz.TextWriter(page.rect)
+			invis.append((x, y), token_out, font=base_font_obj, fontsize=fontsize)
+			# Many extractors honor ActualText via marked content; PyMuPDF lacks direct API, but invisible text helps ordering
+			write_fn2 = getattr(invis, "write_text", None) or getattr(invis, "writeText", None)
+			if write_fn2:
+				write_fn2(page, opacity=0.0)
+	except Exception:
 		pass
 	return x_pos, y
 
