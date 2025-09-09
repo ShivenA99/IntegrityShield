@@ -505,6 +505,10 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                 except Exception:
                                     spans_info = []
                                 baseline_nudge = float(os.getenv("CG_BASELINE_NUDGE_PX", "0.0"))
+                                overlap_thresh = float(os.getenv("CG_SPAN_OVERLAP_THRESH", "0.30"))
+                                vtol = float(os.getenv("CG_BASELINE_VTOL_PX", "2.0"))
+                                baseline_source = (os.getenv("CG_BASELINE_SOURCE", "auto") or "auto").lower()
+                                debug_baseline = (os.getenv("CG_DEBUG_BASELINE", "").lower() in {"1", "true", "yes", "on", "y", "t"})
                                 for tok in token_rects:
                                     rect = tok.get("rect")
                                     m = tok.get("m") or {}
@@ -519,22 +523,46 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                     drawn_keys.add(key)
                                     # Prefer previously captured span metrics when available
                                     best_pt = float(tok.get("font_pt") or os.getenv("CG_TOKEN_FONT_PT", "11"))
-                                    # If we have spans, pick the nearest baseline (origin.y) and size by horizontal overlap and distance
+                                    stored_baseline = float(tok.get("baseline") or (rect.y1 - (rect.height * 0.2)))
+                                    chosen_from = "stored"
+                                    baseline = stored_baseline
+                                    # If we have spans, pick baseline using vertical overlap + tie-breakers
                                     if spans_info:
-                                        candidates: List[Tuple[float, float]] = []  # (baseline_origin_y, size)
+                                        # Build candidate list with overlap and distances
+                                        rect_h = max(1e-3, rect.y1 - rect.y0)
+                                        rect_center_y = (rect.y0 + rect.y1) / 2.0
+                                        cand: List[Tuple[float, float, float, fitz.Rect]] = []  # (origin_y, size, overlap_ratio, sb)
                                         for sb, sz, oy in spans_info:
                                             # horizontal overlap check
-                                            if not (sb.x1 < rect.x0 or sb.x0 > rect.x1):
-                                                candidates.append((oy, sz))
-                                        if not candidates:
-                                            # fallback: use all spans
-                                            candidates = [(oy, sz) for _sb, sz, oy in spans_info]
-                                        if candidates:
-                                            # nearest by absolute distance to rect baseline guess
-                                            target_y = rect.y1 - (rect.height * 0.2)
-                                            base, size_match = min(candidates, key=lambda bs: abs(target_y - bs[0]))
-                                            baseline = float(base)
-                                            best_pt = float(size_match)
+                                            if sb.x1 < rect.x0 or sb.x0 > rect.x1:
+                                                continue
+                                            # vertical overlap ratio relative to token rect
+                                            ov_h = max(0.0, min(rect.y1, sb.y1) - max(rect.y0, sb.y0))
+                                            ov_ratio = ov_h / rect_h
+                                            cand.append((oy, sz, ov_ratio, sb))
+                                        # Prefer those meeting overlap threshold; else consider all
+                                        if cand:
+                                            primary = [c for c in cand if c[2] >= overlap_thresh]
+                                            consider = primary if primary else cand
+                                            # Rank by (distance to rect_center_y, distance to stored_baseline)
+                                            def key_fn(c: Tuple[float, float, float, fitz.Rect]):
+                                                oy, sz, _ov, _sb = c
+                                                return (abs(oy - rect_center_y), abs(oy - stored_baseline))
+                                            oy, sz, _ovr, sb = min(consider, key=key_fn)
+                                            baseline = float(oy)
+                                            best_pt = float(sz)
+                                            chosen_from = "span"
+                                            # If baseline_source is forced to stored and within tolerance, snap to stored
+                                            if baseline_source == "stored" and abs(baseline - stored_baseline) <= vtol:
+                                                baseline = stored_baseline
+                                                chosen_from = "stored(snap)"
+                                        else:
+                                            # no candidates, keep stored
+                                            pass
+                                    # If source is forced
+                                    if baseline_source == "stored" and chosen_from != "stored(snap)":
+                                        baseline = stored_baseline
+                                        chosen_from = "stored(force)"
                                     baseline += baseline_nudge
                                     margin_left = rect.x0
                                     right_edge = rect.x1
@@ -542,6 +570,12 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                     from .attacks.code_glyph_runtime.pdfgen import draw_mapped_token_at, _match_case_pattern
                                     # Case-align output
                                     oe = _match_case_pattern(ie, oe)
+                                    if debug_baseline:
+                                        try:
+                                            logger.info("[pdf_renderer_mupdf] baseline_dbg p=%s rect=%s stored=%.2f chosen=%.2f src=%s pt=%.2f nudge=%.2f vtol=%.2f ov_thresh=%.2f",
+                                                pidx, rect, stored_baseline, baseline, chosen_from, best_pt, baseline_nudge, vtol, overlap_thresh)
+                                        except Exception:
+                                            pass
                                     logger.info("[pdf_renderer_mupdf] Token render p=%s rect=%s in='%s' out='%s' pt=%.2f", pidx, rect, ie, oe, best_pt)
                                     draw_mapped_token_at(
                                         page, margin_left, baseline, ie, oe,
