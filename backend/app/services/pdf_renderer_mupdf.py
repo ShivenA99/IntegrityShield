@@ -485,6 +485,21 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                             for t in targets:
                                 token_rects: List[Dict[str, Any]] = t.get("_token_rects") or []
                                 drawn_keys: set[str] = set()
+                                # Build span baselines and sizes once for this context bbox
+                                try:
+                                    clip_rect = fitz.Rect(*t["bbox"])  # type: ignore[name-defined]
+                                    raw = page.get_text("rawdict", clip=clip_rect)
+                                    spans_info: List[Tuple[fitz.Rect, float]] = []  # (span_bbox, size)
+                                    for blk in raw.get("blocks", []) or []:
+                                        for ln in blk.get("lines", []) or []:
+                                            for sp in ln.get("spans", []) or []:
+                                                bbox = sp.get("bbox") or [clip_rect.x0, clip_rect.y0, clip_rect.x1, clip_rect.y1]
+                                                r = fitz.Rect(*bbox)
+                                                if r.width > 0 and r.height > 0:
+                                                    spans_info.append((r, float(sp.get("size") or 11.0)))
+                                except Exception:
+                                    spans_info = []
+                                baseline_nudge = float(os.getenv("CG_BASELINE_NUDGE_PX", "0.0"))
                                 for tok in token_rects:
                                     rect = tok.get("rect")
                                     m = tok.get("m") or {}
@@ -497,8 +512,26 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                         continue
                                     drawn_keys.add(key)
                                     width = max(1.0, rect.x1 - rect.x0)
+                                    # Choose nearest span baseline within this bbox; default to recorded baseline/size
                                     best_pt = float(tok.get("font_pt") or os.getenv("CG_TOKEN_FONT_PT", "11"))
                                     baseline = float(tok.get("baseline") or (rect.y1 - (rect.height * 0.2)))
+                                    if spans_info:
+                                        # Try to find spans overlapping token horizontally; then pick the nearest baseline (y1)
+                                        candidates: List[Tuple[float, float]] = []  # (baseline, size)
+                                        for sb, sz in spans_info:
+                                            # horizontal overlap check
+                                            if not (sb.x1 < rect.x0 or sb.x0 > rect.x1):
+                                                candidates.append((sb.y1, sz))
+                                        if not candidates:
+                                            # fallback: use all spans
+                                            candidates = [(sb.y1, sz) for sb, sz in spans_info]
+                                        if candidates:
+                                            # nearest by absolute distance to rect baseline guess
+                                            target_y = rect.y1 - (rect.height * 0.2)
+                                            base, size_match = min(candidates, key=lambda bs: abs(target_y - bs[0]))
+                                            baseline = float(base)
+                                            best_pt = float(size_match)
+                                    baseline += baseline_nudge
                                     margin_left = rect.x0
                                     right_edge = rect.x1
                                     leading = best_pt + 2
