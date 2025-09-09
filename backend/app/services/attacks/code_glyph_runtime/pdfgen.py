@@ -247,6 +247,35 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	tw = fitz.TextWriter(page.rect)
 	# Prepare base font object
 	base_font_obj = _get_font_obj(base_font_path if base_font_path and base_font_path.exists() else None)
+
+	def _get_metric(field: str, font_path: Optional[Path]) -> Optional[float]:
+		try:
+			if not metrics or not font_path:
+				return None
+			fi = metrics.get("fonts", {}).get(str(font_path.resolve()))
+			if not isinstance(fi, dict):
+				return None
+			val = fi.get(field)
+			return float(val) if isinstance(val, (int, float)) and float(val) > 0 else None
+		except Exception:
+			return None
+
+	def _size_factor_for_pair(pair_path: Optional[Path]) -> float:
+		# Compute base_xH/pair_xH (fallback to capHeight) and clamp to ±2%
+		bx = _get_metric("xHeight", base_font_path)
+		px = _get_metric("xHeight", pair_path)
+		if not bx or not px:
+			bx = bx or _get_metric("capHeight", base_font_path)
+			px = px or _get_metric("capHeight", pair_path)
+		if not bx or not px or px <= 0:
+			return 1.0
+		factor = bx / px
+		lo, hi = 0.98, 1.02
+		if factor < lo:
+			return lo
+		if factor > hi:
+			return hi
+		return factor
 	# Case-align the output to the input token's casing
 	if token_in:
 		token_out = _match_case_pattern(token_in, token_out)
@@ -265,12 +294,13 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 			if out_code == in_code:
 				font_obj = base_font_obj
 				draw_char = out_char
+				fontsize_char = fontsize
 				try:
-					adv = font_obj.text_length(draw_char, fontsize)
+					adv = font_obj.text_length(draw_char, fontsize_char)
 				except Exception:
-					adv = get_advance_px(metrics, base_font_path, out_code, fontsize, fallback_paths=[base_font_path]) if (metrics and base_font_path) else fontsize * 0.6
+					adv = get_advance_px(metrics, base_font_path, out_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and base_font_path) else fontsize_char * 0.6
 				# Append to writer
-				tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize)
+				tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize_char)
 				logger.info("[code_glyph.pdfgen] reverse map pos=%d identity out=%s(U+%04X) using base adv=%.2f", i, repr(out_char), out_code, adv)
 				x_pos += adv
 				continue
@@ -278,11 +308,12 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 			pair_path = _pair_font_path(prebuilt_dir, out_code, in_code)
 			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
 			draw_char = out_char
+			fontsize_char = fontsize * (_size_factor_for_pair(pair_path if pair_path.exists() else None))
 			try:
-				adv = font_obj.text_length(draw_char, fontsize)
+				adv = font_obj.text_length(draw_char, fontsize_char)
 			except Exception:
-				adv = get_advance_px(metrics, pair_path, out_code, fontsize, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize * 0.6
-			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize)
+				adv = get_advance_px(metrics, pair_path, out_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize_char * 0.6
+			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize_char)
 			logger.info("[code_glyph.pdfgen] reverse map pos=%d out=%s(U+%04X) → in=%s(U+%04X) using=%s adv=%.2f",
 					i, repr(out_char), out_code, repr(in_char), in_code, ("pair" if pair_path.exists() else "base"), adv)
 			x_pos += adv
@@ -294,11 +325,12 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 			pair_path = _pair_font_path(prebuilt_dir, hs_code, in_code)
 			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
 			draw_char = "\u2009"
+			fontsize_char = fontsize  # keep base size for pad
 			try:
-				adv = font_obj.text_length(draw_char, fontsize)
+				adv = font_obj.text_length(draw_char, fontsize_char)
 			except Exception:
-				adv = get_advance_px(metrics, pair_path, hs_code, fontsize, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize * 0.4
-			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize)
+				adv = get_advance_px(metrics, pair_path, hs_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize_char * 0.4
+			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize_char)
 			logger.info("[code_glyph.pdfgen] reverse map pos=%d pad vis in=%s(U+%04X) via U+2009 adv=%.2f",
 					i, repr(in_char), in_code, adv)
 			x_pos += adv
@@ -309,11 +341,12 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 			pair_path = _pair_font_path(prebuilt_dir, out_code, 0x2009)
 			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
 			draw_char = out_char
+			fontsize_char = fontsize * (_size_factor_for_pair(pair_path if pair_path.exists() else None))
 			try:
-				adv = font_obj.text_length(draw_char, fontsize)
+				adv = font_obj.text_length(draw_char, fontsize_char)
 			except Exception:
-				adv = get_advance_px(metrics, pair_path, out_code, fontsize, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize * 0.4
-			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize)
+				adv = get_advance_px(metrics, pair_path, out_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and (pair_path.exists() if pair_path else False)) else fontsize_char * 0.4
+			tw.append((x_pos, y), draw_char, font=font_obj, fontsize=fontsize_char)
 			logger.info("[code_glyph.pdfgen] reverse map pos=%d pad out=%s(U+%04X) → U+2009 adv=%.2f",
 					i, repr(out_char), out_code, adv)
 			x_pos += adv
