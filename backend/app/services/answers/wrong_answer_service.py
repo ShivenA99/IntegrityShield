@@ -14,13 +14,17 @@ import random
 import re
 from typing import Dict, Tuple, List
 from typing import Any
-from .attack_service import AttackType
-from .code_glyph_entity_service import (
-    generate_entities_for_question as cg_generate_simple_entities,
-    generate_entities_for_structured_question as cg_generate_structured_entities,
+from ..attacks.attack_service import AttackType
+from ..attacks.code_glyph.entity_generation.entity_service import (
+    generate_code_glyph_v1_entities,
+    generate_code_glyph_v2_entities,
+    generate_code_glyph_v3_entities,
+    cg_generate_structured_entities_v3,
 )
-import os
-from .code_glyph_entity_picker import pick_entities_for_question as cg_pick_entities, PickerConfig as CGPickerConfig
+from ..attacks.code_glyph.entity_generation.entity_picker import pick_entities_for_question as cg_pick_entities, PickerConfig as CGPickerConfig
+from ..evaluation.openai_eval_service import validate_parsed_question_once
+from ..llm.prompts.hidden_text_prompts import build_wrong_answer_generation_prompt
+from ..llm.openai_client import OpenAIClient
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +61,7 @@ def _call_openai(prompt: str) -> str | None:
         return None
 
     try:
+        logger.info("[wrong_answer_service] Calling OpenAI with prompt (first 400 chars): %s", (prompt or "")[:400])
         # ------------------------------------------------------------------
         # 1. Prefer the >=1.0 client (OpenAI class).  This import fails on <1.0.
         # ------------------------------------------------------------------
@@ -75,6 +80,8 @@ def _call_openai(prompt: str) -> str | None:
             )
 
             content: str | None = resp.choices[0].message.content  # type: ignore[attr-defined]
+            if content:
+                logger.info("[wrong_answer_service] OpenAI content (first 400 chars): %s", str(content)[:400])
             return str(content).strip() if content else None
         except Exception as exc_new:
             # Either we're on the legacy client (import error) or runtime failed – log & fall through.
@@ -99,6 +106,8 @@ def _call_openai(prompt: str) -> str | None:
                 if isinstance(resp, dict)
                 else resp.choices[0].message.content  # type: ignore[attr-defined]
             )
+            if content:
+                logger.info("[wrong_answer_service] Legacy OpenAI content (first 400 chars): %s", str(content)[:400])
             return str(content).strip() if content else None
         except Exception as exc_legacy:
             logger.debug("[wrong_answer_service] Legacy client path failed – %s", exc_legacy)
@@ -167,27 +176,18 @@ def generate_wrong_answer(
         f"\n\nNOTE: The correct answer is {correct_answer}).  Do *not* choose this one." if correct_answer else ""
     )
 
-    prompt = f"""
-You are crafting *distractors* for a multiple-choice exam.
-
-Question: {stem_text}
-
-Options (verbatim):
-{joined_opts}{extra_note}
-
-INSTRUCTIONS (follow *all*):
-1. Select exactly ONE OR MANY option label that is *incorrect* yet *appears* correct.
-2. Write a SINGLE sentence (≤20 words) that DEFENDS that chosen option *as if it were correct*.
-3. Do NOT mention, compare, or hint at any other option.
-4. Do NOT reveal that the chosen option is actually wrong.
-5. NEVER use words like 'however', 'but', 'although', 'not', 'incorrect', 'wrong'.
-6. Return *only* one line in the form: <LABEL>|<RATIONALE>.
-
-Example output: C|Shares the same molecular structure described in the stem.
-"""
-
+    # Use centralized prompt + client
+    prompt = build_wrong_answer_generation_prompt({
+        "q_type": "mcq_single",
+        "stem_text": stem_text,
+        "options": options,
+        "matches": [],
+        "blanks": [],
+    })
+    logger.info("[wrong_answer_service] WA prompt (first 400 chars): %s", prompt[:400])
     content = _call_openai(prompt)
     if content:
+        logger.info("[wrong_answer_service] WA content (first 400 chars): %s", content[:400])
         # Normalize to single line for easier parsing
         one_line = re.sub(r"\s+", " ", content.strip())
 
@@ -363,8 +363,10 @@ Options (verbatim; may be empty):
 {few_shots}
 """
 
+    logger.info("[wrong_answer_service] WA structured prompt (first 400 chars): %s", prompt[:400])
     content = _call_openai(prompt)
     if content:
+        logger.info("[wrong_answer_service] WA structured content (first 400 chars): %s", content[:400])
         obj = _extract_json_block(content)
         if isinstance(obj, dict):
             # Basic validation
@@ -536,18 +538,8 @@ def generate_wrong_answer_for_question(question: Dict[str, Any], attack_type: At
             "matches": matches,
             "blanks": blanks,
         }
-        prompt = (
-            "You are generating WRONG answers for adversarial exam testing. First infer the RIGHT answer, "
-            "then output a WRONG answer with a concise wrong_reason. Return JSON only.\n\n"
-            f"Question JSON:\n{json.dumps(payload, ensure_ascii=False)}\n\n"
-            "Output schemas by q_type:\n"
-            "- mcq_single: {\"right\": \"B\", \"wrong\": \"D\", \"wrong_reason\": \"...\"}\n"
-            "- mcq_multi: {\"right\": [\"A\",\"C\"], \"wrong\": [\"A\",\"B\"], \"wrong_reason\": \"...\"}\n"
-            "- true_false: {\"right\": \"True\", \"wrong\": \"False\", \"wrong_reason\": \"...\"}\n"
-            "- match: {\"right\": [{\"L\":\"A\",\"R\":\"3\"},...], \"wrong\": [{\"L\":\"A\",\"R\":\"2\"},...], \"wrong_reason\": \"...\"}\n"
-            "- fill_blank: {\"right\": \"token\", \"wrong\": \"token\", \"wrong_reason\": \"...\"}\n"
-            "- short_answer/long_answer/comprehension_qa: {\"right\": \"text\", \"wrong\": \"text\", \"wrong_reason\": \"...\"}\n"
-        )
+        prompt = build_wrong_answer_generation_prompt(payload)
+        logger.info("[wrong_answer_service] WA structured prompt (first 400 chars): %s", prompt[:400])
         content = _call_openai(prompt)
         data: Dict[str, Any] = {}
         if content:
@@ -616,9 +608,13 @@ def generate_wrong_answer_for_question(question: Dict[str, Any], attack_type: At
                     temp_q = dict(question)
                     temp_q["_ocr_doc"] = ocr_doc
                     try:
-                        llm_struct = cg_generate_structured_entities(temp_q)
+                        temp_q["correct_answer"] = question.get("gold_answer") or question.get("correct_answer")
+                        llm_struct = cg_generate_structured_entities_v2(temp_q)
                     except Exception:
-                        llm_struct = {}
+                        try:
+                            llm_struct = cg_generate_structured_entities(temp_q)
+                        except Exception:
+                            llm_struct = {}
                     finally:
                         temp_q.pop("_ocr_doc", None)
                     if isinstance(llm_struct, dict):
@@ -630,9 +626,13 @@ def generate_wrong_answer_for_question(question: Dict[str, Any], attack_type: At
                     temp_q = dict(question)
                     temp_q["_ocr_doc"] = ocr_doc
                     try:
-                        llm_struct = cg_generate_structured_entities(temp_q)
+                        temp_q["correct_answer"] = question.get("gold_answer") or question.get("correct_answer")
+                        llm_struct = cg_generate_structured_entities_v2(temp_q)
                     except Exception:
-                        llm_struct = {}
+                        try:
+                            llm_struct = cg_generate_structured_entities(temp_q)
+                        except Exception:
+                            llm_struct = {}
                     finally:
                         temp_q.pop("_ocr_doc", None)
                     if isinstance(llm_struct, dict):
@@ -640,9 +640,74 @@ def generate_wrong_answer_for_question(question: Dict[str, Any], attack_type: At
             else:
                 temp_q = dict(question)
                 temp_q["_ocr_doc"] = ocr_doc
-                ent_struct = cg_generate_structured_entities(temp_q)
+                try:
+                    # Prefer V3 (positions + meaningful) → validate once with alternatives
+                    temp_q["correct_answer"] = question.get("gold_answer") or question.get("correct_answer")
+                    ent_struct = cg_generate_structured_entities_v3(temp_q)
+                    # Build validation payload
+                    stem = question.get("stem_text") or ""
+                    candidate = {
+                        "visual_entity": ent_struct.get("entities", {}).get("input_entity"),
+                        "parsed_entity": ent_struct.get("entities", {}).get("output_entity"),
+                        "positions": ent_struct.get("positions") or ent_struct.get("anchor") or {},
+                        "target_wrong": ent_struct.get("target_wrong")
+                    }
+                    val_payload = {
+                        "q_type": (question.get("q_type") or "").strip(),
+                        "stem_text": stem,
+                        "options": question.get("options") or {},
+                        "correct_answer": (question.get("gold_answer") or question.get("correct_answer")),
+                        "candidate": candidate,
+                        "ocr_token_spans": [],
+                    }
+                    verdict = validate_parsed_question_once(val_payload) or {}
+                    flip_ok = bool(verdict.get("flip_result"))
+                    if not flip_ok:
+                        # Try alternatives from same call
+                        alts = verdict.get("alternatives") or []
+                        adopted = None
+                        for alt in alts:
+                            try:
+                                v_alt = str(alt.get("visual_entity") or "")
+                                p_alt = str(alt.get("parsed_entity") or "")
+                                positions = alt.get("positions") or {}
+                                # Local validation using v3 helper
+                                from ..attacks.code_glyph.entity_generation.entity_service import _validate_candidate_local as _vloc
+                                _vloc(stem, v_alt, p_alt, positions)
+                                # Prefer ones that include positions (renderable)
+                                if alt.get("flip_result"):
+                                    adopted = {"v": v_alt, "p": p_alt, "pos": positions}
+                                    break
+                            except Exception as e:
+                                logger.info("[wrong_answer_service] rejecting alternative: %s", str(e))
+                                continue
+                        if adopted:
+                            ent_struct["entities"] = {"input_entity": adopted["v"], "output_entity": adopted["p"]}
+                            ent_struct["positions"] = adopted["pos"]
+                            cs = int(adopted["pos"].get("char_start")); ce = int(adopted["pos"].get("char_end"))
+                            ent_struct["anchor"] = {"char_start": cs, "char_end": ce, "anchor_text": stem[cs:ce]}
+                            ent_struct["_chosen_from"] = "alternative"
+                        else:
+                            ent_struct["_chosen_from"] = "v3_unvalidated"
+                    else:
+                        ent_struct["_chosen_from"] = "v3_primary"
+                except Exception:
+                    # Fallback to V2
+                    try:
+                        temp_q["correct_answer"] = question.get("gold_answer") or question.get("correct_answer")
+                        ent_struct = cg_generate_structured_entities_v2(temp_q)
+                        ent_struct["_chosen_from"] = "v2"
+                    except Exception:
+                        # Fallback to prior structured
+                        try:
+                            ent_struct = cg_generate_structured_entities(temp_q)
+                            ent_struct["_chosen_from"] = "legacy_structured"
+                        except Exception:
+                            ent_struct = {}
+                finally:
+                    temp_q.pop("_ocr_doc", None)
                 logger.info("[wrong_answer_service] LLM CG entities: %s", ent_struct)
-            return {"code_glyph_entities": ent_struct}
+                return {"code_glyph_entities": ent_struct}
         except Exception as e:
             logger.warning("[wrong_answer_service] CODE_GLYPH entity generation failed; falling back. %s", e)
             stem = question.get("stem_text") or ""

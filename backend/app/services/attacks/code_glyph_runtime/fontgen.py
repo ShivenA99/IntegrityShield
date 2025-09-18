@@ -38,7 +38,7 @@ def _find_pair_font(prebuilt_dir: Path, inp: str, out: str) -> Optional[Path]:
             logger.info("[code_glyph.fontgen] Found pair font for %s→%s: %s", inp, out, c)
             return c
 
-    logger.warning("[code_glyph.fontgen] Pair font not found for %s→%s under %s", inp, out, prebuilt_dir)
+    logger.info("[code_glyph.fontgen] Pair font not found for %s→%s under %s", inp, out, prebuilt_dir)
     return None
 
 
@@ -75,8 +75,8 @@ def ensure_pad_fonts_ascii(prebuilt_dir: Path, base_font_path: Optional[Path]) -
         if path.exists():
             continue
         try:
-            # Attempt on-the-fly generation via poc prebuilt factory if present
-            from ..poc_code_glyph.prebuilt_font_factory import generate_pair_font  # type: ignore
+            # Attempt on-the-fly generation via prebuilt factory if present
+            from ..code_glyph.tooling.prebuilt_font_factory import generate_pair_font  # type: ignore
             if base_font_path and base_font_path.exists():
                 ok = generate_pair_font(str(base_font_path), str(path), chr(in_code), chr(oc))
                 if ok:
@@ -103,7 +103,7 @@ def generate_full_ascii_pairs(prebuilt_dir: Path, base_font_path: Path, *, inclu
     prebuilt_dir.mkdir(parents=True, exist_ok=True)
     if not base_font_path or not base_font_path.exists():
         raise FileNotFoundError(f"Base font not found: {base_font_path}")
-    from ..poc_code_glyph.prebuilt_font_factory import generate_pair_font  # type: ignore
+    from ..code_glyph.tooling.prebuilt_font_factory import generate_pair_font  # type: ignore
     ascii_codes = list(range(0x0020, 0x007F))
     created = 0
     for ic in ascii_codes:
@@ -124,11 +124,72 @@ def generate_full_ascii_pairs(prebuilt_dir: Path, base_font_path: Path, *, inclu
     return created
 
 
+def _ascii_letter_digit_codes() -> List[int]:
+    # 0-9, A-Z, a-z, plus ASCII hyphen-minus
+    digits = list(range(0x30, 0x3A))
+    upper = list(range(0x41, 0x5B))
+    lower = list(range(0x61, 0x7B))
+    return digits + upper + lower + [0x002D]
+
+
+def ensure_out_to_in_pairs(prebuilt_dir: Path, base_font_path: Optional[Path], out_codes: List[int], in_codes: List[int]) -> int:
+    """Ensure pair fonts exist mapping each out_code → in_code under v3.
+
+    Returns number of new fonts created. Uses prebuilt font factory if available.
+    """
+    # Force v3 working set
+    if prebuilt_dir.name != "v3":
+        prebuilt_dir = prebuilt_dir / "v3"
+    prebuilt_dir.mkdir(parents=True, exist_ok=True)
+    created = 0
+    try:
+        from ..code_glyph.tooling.prebuilt_font_factory import generate_pair_font  # type: ignore
+    except Exception:
+        generate_pair_font = None  # type: ignore
+    if not base_font_path or not base_font_path.exists() or not generate_pair_font:
+        logger.warning("[code_glyph.fontgen] Cannot generate pair fonts (base or factory missing). base=%s", base_font_path)
+        return 0
+    for oc in out_codes:
+        for ic in in_codes:
+            out_path = _pair_font_path_for_codes(prebuilt_dir, oc, ic)
+            if out_path.exists():
+                continue
+            ok = False
+            try:
+                ok = generate_pair_font(str(base_font_path), str(out_path), chr(oc), chr(ic))  # type: ignore
+            except Exception as e:
+                logger.warning("[code_glyph.fontgen] Failed to generate pair font %s: %s", out_path, e)
+            if ok:
+                created += 1
+                if created % 100 == 0:
+                    logger.info("[code_glyph.fontgen] Generated %d out→in punctuation pair fonts so far...", created)
+    if created:
+        logger.info("[code_glyph.fontgen] Created %d punctuation pair fonts under %s", created, prebuilt_dir)
+    return created
+
+
+def ensure_common_punctuation_pairs(prebuilt_dir: Path, base_font_path: Optional[Path]) -> int:
+    """Ensure v3 has coverage for common punctuation targets used in mappings.
+
+    Targets include:
+      - Dashes/minus: U+2012, U+2013, U+2014, U+2212, U+2011
+      - Quotes: U+2018, U+2019, U+201C, U+201D
+      - Ellipsis: U+2026
+    """
+    punct_in_codes = [
+        0x2012, 0x2013, 0x2014, 0x2212, 0x2011,
+        0x2018, 0x2019, 0x201C, 0x201D,
+        0x2026,
+    ]
+    out_codes = _ascii_letter_digit_codes()
+    return ensure_out_to_in_pairs(prebuilt_dir, base_font_path, out_codes, punct_in_codes)
+
+
 if __name__ == "__main__":
     import os
     logging.basicConfig(level=logging.INFO)
     prebuilt_root = Path(os.getenv("PREBUILT_DIR", "backend/data/prebuilt_fonts/DejaVuSans/v3")).resolve()
-    base_font = Path(os.getenv("BASE_FONT_PATH", "backend/app/services/attacks/poc_code_glyph/DejaVuSans.ttf")).resolve()
+    base_font = Path(os.getenv("BASE_FONT_PATH", "backend/app/services/attacks/code_glyph/tooling/assets/DejaVuSans.ttf")).resolve()
     include_identity = os.getenv("INCLUDE_IDENTITY", "0").lower() in {"1", "true", "yes"}
     try:
         n = generate_full_ascii_pairs(prebuilt_root, base_font, include_identity=include_identity)

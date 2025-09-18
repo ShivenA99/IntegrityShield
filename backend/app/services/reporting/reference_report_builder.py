@@ -18,7 +18,7 @@ from reportlab.platypus import Paragraph, Table, TableStyle
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 from reportlab.lib.units import inch
 
-from .attack_service import AttackType
+from ..attacks.attack_service import AttackType
 
 logger = logging.getLogger(__name__)
 
@@ -308,8 +308,17 @@ class ProfessionalReportBuilder:
             crop.attack_entities = question_data.get('code_glyph_entities', {})
         
         # Extract evaluation data if available
-        if self.evaluations and str(q_number) in str(self.evaluations):
-            crop.evaluation_data = self.evaluations.get(str(q_number), {})
+        if self.evaluations:
+            # Support both flat per_question map and nested structures
+            try:
+                per_q = self.evaluations.get("per_question") if isinstance(self.evaluations, dict) else None
+                key = str(q_number)
+                if isinstance(per_q, dict) and key in per_q:
+                    crop.evaluation_data = per_q.get(key) or {}
+                elif isinstance(self.evaluations, dict) and key in self.evaluations:
+                    crop.evaluation_data = self.evaluations.get(key) or {}
+            except Exception:
+                pass
         
         logger.info(f"[DATA] Q{q_number}: gold_answer={crop.gold_answer}, wrong_answer={crop.wrong_answer}")
         logger.info(f"[DATA] Q{q_number}: attack_entities={crop.attack_entities}")
@@ -562,7 +571,7 @@ class ProfessionalReportBuilder:
         table_x = self.margin + self.panel_padding
         table_y = start_y - 15
         
-        logger.info(f"[TABLE] Q{crop.question_number}: Table dimensions: {table_width}x{row_height+data_row_height}")
+        logger.debug(f"[TABLE] Q{crop.question_number}: Table dimensions: {table_width}x{row_height+data_row_height}")
         
         # Header row with improved styling
         c.setFillColor(Color(0.85, 0.9, 0.95))  # Light blue header
@@ -575,7 +584,7 @@ class ProfessionalReportBuilder:
         # Header text
         c.setFillColor(Color(0.2, 0.2, 0.4))
         c.setFont("Helvetica-Bold", 10)
-        headers = ["Expected Answer", "Wrong Answer", "Attack Analysis"]
+        headers = ["Expected Answer (OpenAI Gold)", "Attacked AI Answer", "Attack Method & Details"]
         for i, header in enumerate(headers):
             c.drawString(table_x + i*col_width + 5, table_y - 15, header)
         
@@ -589,14 +598,22 @@ class ProfessionalReportBuilder:
         c.setFont("Helvetica", 9)
         c.setFillColor(Color(0.2, 0.2, 0.2))
         
-        # Expected answer column
+        # Expected answer column (OpenAI Gold)
         expected_text = crop.gold_answer or "Not specified"
         self._draw_wrapped_text(c, expected_text[:80] + ("..." if len(expected_text) > 80 else ""),
                                table_x + 5, table_y - row_height - 15, col_width - 10)
         
-        # Wrong answer column  
-        wrong_text = crop.wrong_answer or "Not specified"
-        self._draw_wrapped_text(c, wrong_text[:80] + ("..." if len(wrong_text) > 80 else ""),
+        # Attacked AI answer column
+        attacked_ai_answer = ""
+        if crop.evaluation_data and isinstance(crop.evaluation_data, dict):
+            # Mixed evaluation per_question payload or legacy map
+            attacked_ai_answer = (
+                crop.evaluation_data.get("ai_answer")
+                or crop.evaluation_data.get("predicted_label")
+                or ""
+            )
+        attacked_ai_answer = attacked_ai_answer or "Not available"
+        self._draw_wrapped_text(c, attacked_ai_answer[:80] + ("..." if len(attacked_ai_answer) > 80 else ""),
                                table_x + col_width + 5, table_y - row_height - 15, col_width - 10)
         
         # Attack analysis column (includes entity highlighting info)
@@ -605,7 +622,7 @@ class ProfessionalReportBuilder:
                                table_x + 2*col_width + 5, table_y - row_height - 15, col_width - 10)
         
         final_y = table_y - row_height - data_row_height
-        logger.info(f"[TABLE] Q{crop.question_number}: Improved table completed at y={final_y}")
+        logger.debug(f"[TABLE] Q{crop.question_number}: Improved table completed at y={final_y}")
         return final_y
 
     def _draw_attack_only_table(self, c: canvas.Canvas, crop: QuestionCrop, start_y: float) -> float:
@@ -631,7 +648,7 @@ class ProfessionalReportBuilder:
         
         c.setFillColor(Color(0.2, 0.2, 0.4))
         c.setFont("Helvetica-Bold", 11)
-        c.drawString(table_x + 10, table_y - 18, "Attack Analysis")
+        c.drawString(table_x + 10, table_y - 18, "Attack Method & Detection Guide")
         
         # Content
         c.setFillColor(Color(0.2, 0.2, 0.2))
@@ -667,31 +684,72 @@ class ProfessionalReportBuilder:
         return message_y
 
     def _get_attack_analysis(self, crop: QuestionCrop) -> str:
-        """Generate attack analysis text including entity highlighting info."""
-        if self.attack_type == AttackType.CODE_GLYPH:
-            # Get entity information from nested structure
+        """Generate detailed attack analysis text showing method and relevant fields."""
+        q_data = crop.question_data
+        # Prefer explicit fields set upstream by routes
+        attack_method = q_data.get('attack_method') or (q_data.get('attack_metadata') or {}).get('attack_method') or (q_data.get('attack_result', {}) or {}).get('attack_method', 'unknown')
+        
+        # Show which specific attack method was used for this question
+        method_text = f"METHOD: {attack_method.upper()}\n"
+        
+        if attack_method == 'code_glyph':
+            # Get detailed Code Glyph entity information
             entities = crop.attack_entities or {}
             input_entity = ''
             output_entity = ''
+            positions = {}
             
             if isinstance(entities, dict):
                 if 'entities' in entities:
                     entity_info = entities['entities']
                     input_entity = entity_info.get('input_entity', '')
                     output_entity = entity_info.get('output_entity', '')
+                    positions = entities.get('positions', {})
                 else:
                     input_entity = entities.get('input_entity', '')
                     output_entity = entities.get('output_entity', '')
+                    positions = entities.get('positions', {})
             
             if input_entity and output_entity:
-                return f"HUMAN READS:\n{input_entity[:40]}{'...' if len(input_entity) > 40 else ''}\n\nLLM READS:\n{output_entity[:40]}{'...' if len(output_entity) > 40 else ''}"
-            elif crop.attack_entities:
-                return "Visual attack detected. Check for glyph substitution in question text."
-            return "Look for visual inconsistencies • Check for responses that don't match what's visually displayed"
-        elif self.attack_type in [AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP, AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION]:
-            return "Check for off-topic responses • Look for factual inaccuracies • Monitor for templated language"
+                char_pos = f"[{positions.get('char_start', '?')}-{positions.get('char_end', '?')}]" if positions else ""
+                return f"{method_text}VISUAL: '{input_entity}'\nPARSED: '{output_entity}'\nPOSITION: {char_pos}\n\nLook for responses that differ from what's visually shown"
+            else:
+                return f"{method_text}Glyph substitution detected\nCheck for visual vs parsed differences"
+                
+        elif attack_method == 'hidden_text':
+            # Get Hidden Text attack details
+            wrong_answer = q_data.get('wrong_answer', q_data.get('wrong_label', ''))
+            wrong_reason = q_data.get('wrong_reason', '')
+            
+            analysis = f"{method_text}HIDDEN INSTRUCTION:\n"
+            if wrong_answer:
+                analysis += f"Answer: {wrong_answer}\n"
+            if wrong_reason:
+                analysis += f"Reason: {wrong_reason[:60]}{'...' if len(wrong_reason) > 60 else ''}\n"
+            analysis += "\nCheck for responses matching hidden instructions"
+            return analysis
+            
+        elif attack_method == 'mixed':
+            # Mixed attack - show both methods attempted
+            cg_entities = q_data.get('code_glyph_entities', {})
+            wrong_answer = q_data.get('wrong_answer', '')
+            
+            analysis = f"{method_text}ATTEMPTED: Code Glyph + Hidden Text\n"
+            if cg_entities:
+                analysis += "Primary: Glyph substitution\n"
+            if wrong_answer:
+                analysis += f"Fallback: Hidden instruction → {wrong_answer}\n"
+            analysis += "Check for either visual or instruction-based manipulation"
+            return analysis
+            
         else:
-            return "Review response quality • Check for consistency with question content"
+            # Fallback or unknown attack
+            if self.attack_type == AttackType.CODE_GLYPH:
+                return f"{method_text}Visual glyph substitution\nLook for visual inconsistencies"
+            elif self.attack_type in [AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP, AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION]:
+                return f"{method_text}Hidden malicious instructions\nCheck for off-topic or incorrect responses"
+            else:
+                return f"{method_text}Review response quality and consistency"
 
     def _draw_wrapped_text(self, c: canvas.Canvas, text: str, x: float, y: float, max_width: float, line_height: float = 12):
         """Draw text with word wrapping within specified width."""

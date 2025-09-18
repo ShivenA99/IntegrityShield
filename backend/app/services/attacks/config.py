@@ -35,13 +35,19 @@ def get_base_font_path() -> Path | None:
 
     Resolution order:
     1) CODE_GLYPH_BASE_FONT env if set
-    2) poc font at backend/app/services/attacks/poc_code_glyph/DejaVuSans.ttf if exists
-    3) None (renderer will fall back to built-in fonts)
+    2) tooling asset at backend/app/services/attacks/code_glyph/tooling/assets/DejaVuSans.ttf if exists
+    3) poc font at backend/app/services/attacks/poc_code_glyph/DejaVuSans.ttf if exists (legacy)
+    4) None (renderer will fall back to built-in fonts)
     """
     env_path = os.getenv("CODE_GLYPH_BASE_FONT")
     if env_path:
         p = Path(env_path).expanduser()
         return p if p.exists() else None
+    # New location
+    tool_font = Path(__file__).resolve().parents[1] / "code_glyph" / "tooling" / "assets" / "DejaVuSans.ttf"
+    if tool_font.exists():
+        return tool_font
+    # Legacy location
     poc_font = Path(__file__).resolve().parents[1] / "poc_code_glyph" / "DejaVuSans.ttf"
     if poc_font.exists():
         return poc_font

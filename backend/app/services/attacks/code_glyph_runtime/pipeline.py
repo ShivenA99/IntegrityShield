@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 from .mapper import build_unified_mappings
-from .fontgen import prepare_font_configs, ensure_pad_fonts_ascii
+from .fontgen import prepare_font_configs, ensure_pad_fonts_ascii, ensure_common_punctuation_pairs
 from .pdfgen import render_attacked_pdf
 import logging
 
@@ -45,6 +45,14 @@ def run_code_glyph_pipeline(
             logger.info("[code_glyph.pipeline] Generated %d pad fonts (U+2009→ASCII)", n_created)
     except Exception as e:
         logger.warning("[code_glyph.pipeline] Could not ensure pad fonts: %s", e)
+
+    # 1.6) Ensure common punctuation pairs (ASCII letters/digits/ '-') → en/em dashes, quotes, ellipsis
+    try:
+        n_punct = ensure_common_punctuation_pairs(prebuilt_dir, base_font_path)
+        if n_punct:
+            logger.info("[code_glyph.pipeline] Generated %d punctuation pair fonts", n_punct)
+    except Exception as e:
+        logger.warning("[code_glyph.pipeline] Could not ensure punctuation pairs: %s", e)
 
     # 2) Prepare font configs (prebuilt references)
     logger.info("[code_glyph.pipeline] Preparing font configs; prebuilt_dir=%s", prebuilt_dir)

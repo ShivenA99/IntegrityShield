@@ -13,9 +13,11 @@ type Thumb = { page: number; url: string };
 export const DownloadLinks: React.FC<DownloadLinksProps> = ({ assessmentId }) => {
   const timestamp = useMemo(() => Date.now(), [assessmentId]);
   const attackedUrl = `/api/assessments/${assessmentId}/attacked?t=${timestamp}`;
+  const evalReportUrl = `/api/assessments/${assessmentId}/evaluation_report?t=${timestamp}`;
   const reportUrl = `/api/assessments/${assessmentId}/report?t=${timestamp}`;
 
   const [attackedThumbs, setAttackedThumbs] = useState<Thumb[]>([]);
+  const [evalReportThumbs, setEvalReportThumbs] = useState<Thumb[]>([]);
   const [reportThumbs, setReportThumbs] = useState<Thumb[]>([]);
 
   const [overlayOpen, setOverlayOpen] = useState(false);
@@ -95,6 +97,17 @@ export const DownloadLinks: React.FC<DownloadLinksProps> = ({ assessmentId }) =>
     void renderAllPagesFromUrl(reportUrl, setReportThumbs);
   }, [assessmentId, attackedUrl, reportUrl, renderAllPagesFromUrl]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        // Reuse the existing helper to render thumbnails; it internally fetches and paginates
+        await renderAllPagesFromUrl(evalReportUrl, setEvalReportThumbs);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [evalReportUrl, fetchPdfArrayBuffer, renderAllPagesFromUrl]);
+
   const PreviewGrid: React.FC<{
     title: string;
     url: string;
@@ -145,6 +158,13 @@ export const DownloadLinks: React.FC<DownloadLinksProps> = ({ assessmentId }) =>
         url={attackedUrl}
         thumbs={attackedThumbs}
         emptyHint="No preview available yet."
+      />
+
+      <PreviewGrid
+        title="Evaluation Report"
+        url={evalReportUrl}
+        thumbs={evalReportThumbs}
+        emptyHint="No evaluation report yet."
       />
 
       <PreviewGrid

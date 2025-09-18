@@ -111,6 +111,7 @@ Please provide the extracted text in a clean, readable format."""
         if hasattr(openai, 'OpenAI'):
             # Use new OpenAI client (>=1.0)
             client = openai.OpenAI(api_key=OPENAI_API_KEY)
+            logger.info("[ocr_service] Vision prompt (first 300 chars): %s", (user_prompt or "")[:300])
             response = client.chat.completions.create(
                 model=OPENAI_VISION_MODEL,
                 messages=[
@@ -130,9 +131,12 @@ Please provide the extracted text in a clean, readable format."""
                 max_tokens=4000,
                 temperature=0.1
             )
-            return response.choices[0].message.content.strip()
+            text = response.choices[0].message.content.strip()
+            logger.info("[ocr_service] Vision response (first 400 chars): %s", text[:400])
+            return text
         else:
             # Fallback to legacy client
+            logger.info("[ocr_service] Vision prompt (first 300 chars): %s", (user_prompt or "")[:300])
             response = openai.ChatCompletion.create(
                 model=OPENAI_VISION_MODEL,
                 messages=[
@@ -152,7 +156,9 @@ Please provide the extracted text in a clean, readable format."""
                 max_tokens=4000,
                 temperature=0.1
             )
-            return response.choices[0].message.content.strip()
+            text = response.choices[0].message.content.strip()
+            logger.info("[ocr_service] Vision response (first 400 chars): %s", text[:400])
+            return text
             
     except Exception as e:
         logger.error(f"Error extracting text from image with LLM: {e}")
@@ -481,7 +487,7 @@ def extract_structured_document_with_ocr(pdf_path: Path, layout_doc: Dict[str, A
         raise
 
     # Check if LLM is enabled for question extraction
-    from ..routes.assessments import ENABLE_LLM
+    from ...routes.assessments import ENABLE_LLM
     
     if not ENABLE_LLM:
         logger.info("LLM disabled - using fallback question extraction from layout blocks")

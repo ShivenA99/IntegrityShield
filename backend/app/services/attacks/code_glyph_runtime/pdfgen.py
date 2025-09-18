@@ -244,7 +244,7 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	import fitz  # PyMuPDF
 	logger.info("[code_glyph.pdfgen] Drawing mapped token (writer) at (%.2f,%.2f) in='%s' out='%s' pt=%.2f", x, y, token_in, token_out, fontsize)
 	# Prepare writer
-	tw = fitz.TextWriter(page.rect)
+	w = fitz.TextWriter(page.rect)
 	# Prepare base font object
 	base_font_obj = _get_font_obj(base_font_path if base_font_path and base_font_path.exists() else None)
 
@@ -280,47 +280,76 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	if token_in:
 		token_out = _match_case_pattern(token_in, token_out)
 
-	# Build glyph runs for ONLY output characters (no pad characters)
+	# Build glyph runs across max length with padding for mismatches
 	glyphs: list[tuple[fitz.Font, str, float, float]] = []  # (font_obj, char, fontsize_char, advance_px)
 	advances: list[float] = []
 	cumul: list[float] = []
 	n_in = len(token_in or "")
 	n_out = len(token_out or "")
-	for i in range(n_out):
-		out_char = token_out[i]
-		out_code = ord(out_char)
-		# Select an input code for mapping if available; else reuse last input code to choose pair font
-		in_code: Optional[int] = None
-		if i < n_in and n_in > 0:
-			in_char = token_in[i]
-			in_code = ord(in_char)
-		elif n_in > 0:
-			in_code = ord(token_in[-1])
-		# Determine font and per-glyph size
-		use_pair = (in_code is not None) and (out_code is not None) and (out_code != in_code)
-		if not use_pair:
-			font_obj = base_font_obj
-			fontsize_char = fontsize
-			font_path_for_width = base_font_path
-		else:
-			pair_path = _pair_font_path(prebuilt_dir, out_code, in_code)  # type: ignore[arg-type]
+	max_len = max(n_in, n_out)
+	for i in range(max_len):
+		in_code: Optional[int] = ord(token_in[i]) if i < n_in else None
+		out_code: Optional[int] = ord(token_out[i]) if i < n_out else None
+
+		# Three cases:
+		# 1) Both chars present: draw out_code mapped to in_code (reverse) so extract=out, visual=in
+		# 2) Extra input (visual longer): draw U+2009 mapped to in_code (visible, space-like semantics)
+		# 3) Extra output (parsed longer): draw out_code mapped to U+200B (zero-width visual)
+		if in_code is not None and out_code is not None:
+			if out_code == in_code:
+				font_obj = base_font_obj
+				fontsize_char = fontsize
+				font_path_for_width = base_font_path
+			else:
+				pair_path = _pair_font_path(prebuilt_dir, out_code, in_code)  # type: ignore[arg-type]
+				font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
+				fontsize_char = fontsize * (_size_factor_for_pair(pair_path if pair_path.exists() else None))
+				font_path_for_width = pair_path if pair_path.exists() else base_font_path
+			ch = chr(out_code)
+			try:
+				adv = font_obj.text_length(ch, fontsize_char)
+			except Exception:
+				adv = get_advance_px(metrics, font_path_for_width, out_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and font_path_for_width) else max(0.4, fontsize_char * 0.6)
+			glyphs.append((font_obj, ch, fontsize_char, adv))
+			advances.append(adv)
+			cumul.append((cumul[-1] if cumul else 0.0) + adv)
+		elif in_code is not None and out_code is None:
+			# Extra input: pad with thin-space codepoint U+2009 mapped to the input glyph for visible width
+			pad_code = 0x2009
+			pair_path = _pair_font_path(prebuilt_dir, pad_code, in_code)
 			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
 			fontsize_char = fontsize * (_size_factor_for_pair(pair_path if pair_path.exists() else None))
 			font_path_for_width = pair_path if pair_path.exists() else base_font_path
-		# Measure advance
-		try:
-			adv = font_obj.text_length(out_char, fontsize_char)
-		except Exception:
-			adv = get_advance_px(metrics, font_path_for_width, out_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and font_path_for_width) else max(0.4, fontsize_char * 0.6)
-		glyphs.append((font_obj, out_char, fontsize_char, adv))
-		advances.append(adv)
-		cumul.append((cumul[-1] if cumul else 0.0) + adv)
+			ch = chr(pad_code)
+			try:
+				adv = font_obj.text_length(ch, fontsize_char)
+			except Exception:
+				adv = get_advance_px(metrics, font_path_for_width, pad_code, fontsize_char, fallback_paths=[base_font_path]) if (metrics and font_path_for_width) else max(0.3, fontsize_char * 0.4)
+			glyphs.append((font_obj, ch, fontsize_char, adv))
+			advances.append(adv)
+			cumul.append((cumul[-1] if cumul else 0.0) + adv)
+		elif out_code is not None and in_code is None:
+			# Extra output: map to zero-width space U+200B so parser sees the char but visual width is ~0
+			pad_zero_code = 0x200B
+			pair_path = _pair_font_path(prebuilt_dir, out_code, pad_zero_code)
+			font_obj = _get_font_obj(pair_path if pair_path.exists() else (base_font_path if base_font_path else None))
+			# Keep size aligned; but advance should be ~0 when pair exists; fallback to minimal
+			fontsize_char = fontsize * (_size_factor_for_pair(pair_path if pair_path.exists() else None))
+			ch = chr(out_code)
+			try:
+				adv = font_obj.text_length(ch, fontsize_char)
+			except Exception:
+				# If we cannot measure (or pair missing), force near-zero advance
+				adv = 0.0
+			glyphs.append((font_obj, ch, fontsize_char, adv))
+			advances.append(adv)
+			cumul.append((cumul[-1] if cumul else 0.0) + adv)
 
 	if not glyphs:
 		return x, y
 
 	desired_width = max(0.0, (right_edge - x))
-	total_out = cumul[-1]
+	total_out = cumul[-1] if cumul else 0.0
 	# Compute x positions: compress if wider, distribute gaps if narrower, center single glyph
 	x_positions: list[float] = []
 	if total_out > desired_width and desired_width > 0:
@@ -358,10 +387,10 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 
 	# Append all glyphs to the writer as a single run
 	for i, (font_obj, ch, fsz, _adv) in enumerate(glyphs):
-		tw.append((x_positions[i], y), ch, font=font_obj, fontsize=fsz)
+		w.append((x_positions[i], y), ch, font=font_obj, fontsize=fsz)
 
 	# Emit the text
-	tw.write_text(page)
+	w.write_text(page)
 
 	# Diagnostics
 	try:
@@ -369,7 +398,7 @@ def draw_mapped_token_at(page, x: float, y: float, token_in: str, token_out: str
 	except Exception:
 		pass
 
-	return x_positions[-1] + advances[-1], y
+	return x_positions[-1] + (advances[-1] if advances else 0.0), y
 
 
 def _render_text_with_mappings(page, text: str, y: float, base_font: str, fontsize: float, prebuilt_dir: Path,

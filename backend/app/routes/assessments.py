@@ -13,9 +13,9 @@ from werkzeug.utils import secure_filename
 
 from .. import db
 from ..models import Assessment, StoredFile, Question, LLMResponse, Job
-from ..services import attack_service
-from ..services.attack_service import AttackType
-from ..services.pdf_utils import (
+from ..services.attacks import attack_service
+from ..services.attacks.attack_service import AttackType
+from ..services.legacy.pdf_utils import (
     parse_pdf_questions,
     inject_attacks_into_questions,
     build_attacked_pdf,
@@ -23,8 +23,8 @@ from ..services.pdf_utils import (
     parse_pdf_answers,
     build_code_glyph_report,
 )
-from ..services.wrong_answer_service import generate_wrong_answer
-from ..services.openai_eval_service import (
+from ..services.answers.wrong_answer_service import generate_wrong_answer
+from ..services.evaluation.openai_eval_service import (
     evaluate_pdf_with_openai,
     evaluate_code_glyph_pdf_with_openai,
     write_code_glyph_eval_artifacts,
@@ -73,16 +73,60 @@ def upload_assessment():
     """Handle upload of original Q-paper and answers paper, create attacked versions, call LLM, save report."""
     job = None
     try:
-        # Input validation
+        # Input validation - support both old and new attack types
         attack_type_str = request.form.get("attack_type", AttackType.NONE.value)
+        attack_mode_str = request.form.get("attack_mode")  # New parameter
+        prevention_sub_type_str = request.form.get("prevention_sub_type")  # New parameter
         client_id_str = request.form.get("client_id")
-        logger.info("[upload_assessment] Received upload request with attack_type=%s client_id=%s", attack_type_str, client_id_str)
-        try:
-            attack_type = AttackType(attack_type_str)
-            logger.info("[upload_assessment] Parsed attack_type=%s", attack_type)
-        except ValueError:
-            logger.error("[upload_assessment] Invalid attack_type: %s", attack_type_str)
-            return jsonify({"error": "Invalid attack_type"}), 400
+        
+        logger.info(
+            "[REFACTOR][UPLOAD] Received upload request: attack_type=%s, attack_mode=%s, "
+            "prevention_sub_type=%s, client_id=%s",
+            attack_type_str, attack_mode_str, prevention_sub_type_str, client_id_str
+        )
+        
+        # Determine if using new or legacy attack system
+        use_new_system = attack_mode_str is not None
+        
+        if use_new_system:
+            # New refactored system
+            try:
+                from ..services.attacks.attack_service import AttackMode, PreventionSubType, AttackConfig
+                attack_mode = AttackMode(attack_mode_str)
+                
+                prevention_sub_type = None
+                if prevention_sub_type_str:
+                    prevention_sub_type = PreventionSubType(prevention_sub_type_str)
+                
+                attack_config = AttackConfig(
+                    mode=attack_mode,
+                    prevention_sub_type=prevention_sub_type
+                )
+                
+                # Map new attack modes to legacy attack types for database storage
+                if attack_mode == AttackMode.PREVENTION:
+                    attack_type = AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION
+                elif attack_mode == AttackMode.DETECTION:
+                    attack_type = AttackType.CODE_GLYPH
+                else:
+                    attack_type = AttackType.NONE
+                
+                logger.info(
+                    "[REFACTOR][UPLOAD] Using new attack system: mode=%s, sub_type=%s, mapped_legacy_type=%s",
+                    attack_mode.value, prevention_sub_type.value if prevention_sub_type else None, attack_type.value
+                )
+                
+            except ValueError as e:
+                logger.error("[REFACTOR][UPLOAD] Invalid attack configuration: %s", str(e))
+                return jsonify({"error": f"Invalid attack configuration: {str(e)}"}), 400
+        else:
+            # Legacy system for backward compatibility
+            try:
+                attack_type = AttackType(attack_type_str)
+                logger.info("[REFACTOR][UPLOAD] Using legacy attack system: %s", attack_type)
+            except ValueError:
+                logger.error("[REFACTOR][UPLOAD] Invalid attack_type: %s", attack_type_str)
+                return jsonify({"error": "Invalid attack_type"}), 400
 
         if "original_pdf" not in request.files:
             return jsonify({"error": "original_pdf file is required."}), 400
@@ -115,10 +159,20 @@ def upload_assessment():
         # Save uploaded PDFs
         orig_path = assessment_dir / secure_filename(orig_file.filename)
         orig_file.save(orig_path)
+        try:
+            orig_size = orig_path.stat().st_size
+            logger.info("[upload_assessment] Original PDF size: %d bytes", orig_size)
+        except Exception:
+            pass
         ans_path: Path | None = None
         if ans_file and ans_file.filename:
             ans_path = assessment_dir / secure_filename(ans_file.filename)
             ans_file.save(ans_path)
+            try:
+                ans_size = ans_path.stat().st_size
+                logger.info("[upload_assessment] Answers PDF size: %d bytes", ans_size)
+            except Exception:
+                pass
 
         # Create StoredFile entries (new rows)
         orig_sf = StoredFile(path=str(orig_path), mime_type="application/pdf")
@@ -198,8 +252,8 @@ def upload_assessment():
         if STOP_AFTER_STRUCTURING:
             try:
                 from ..services.layout_extractor import extract_layout_and_assets
-                from ..services.ocr_service import extract_structured_document_with_ocr
-                from ..services.ocr_postprocess import postprocess_document
+                from ..services.ocr.ocr_service import extract_structured_document_with_ocr
+                from ..services.ocr.ocr_postprocess import postprocess_document
                 assets_dir = assessment_dir / "assets"
                 logger.info("[upload_assessment] STOP_AFTER_STRUCTURING=1; extracting layout + structuring only")
                 layout_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
@@ -239,9 +293,9 @@ def upload_assessment():
         if STOP_AFTER_WA:
             try:
                 from ..services.layout_extractor import extract_layout_and_assets
-                from ..services.ocr_service import extract_structured_document_with_ocr
-                from ..services.ocr_postprocess import postprocess_document
-                from ..services.wrong_answer_service import generate_wrong_answer_for_question
+                from ..services.ocr.ocr_service import extract_structured_document_with_ocr
+                from ..services.ocr.ocr_postprocess import postprocess_document
+                from ..services.answers.wrong_answer_service import generate_wrong_answer_for_question
 
                 assets_dir = assessment_dir / "assets"
                 logger.info("[upload_assessment] STOP_AFTER_WA=1; layout + structuring + wrong-answer generation only")
@@ -290,12 +344,12 @@ def upload_assessment():
         # STOP_AFTER_RENDER: run layout -> structuring -> postprocess -> (WA if detection/code_glyph) -> render attacked PDF via MuPDF
         if STOP_AFTER_RENDER:
             try:
-                from ..services.layout_extractor import extract_layout_and_assets
-                from ..services.ocr_service import extract_structured_document_with_ocr
-                from ..services.ocr_postprocess import postprocess_document
-                from ..services.wrong_answer_service import generate_wrong_answer_for_question
-                from ..services.pdf_renderer_mupdf import build_attacked_pdf_mupdf
-                from ..services.reference_report_builder import build_reference_report_pdf
+                from ..services.ocr.layout_extractor import extract_layout_and_assets
+                from ..services.ocr.ocr_service import extract_structured_document_with_ocr
+                from ..services.ocr.ocr_postprocess import postprocess_document
+                from ..services.answers.wrong_answer_service import generate_wrong_answer_for_question
+                from ..services.rendering.pdf_renderer_mupdf import build_attacked_pdf_mupdf
+                from ..services.reporting.reference_report_builder import build_reference_report_pdf
 
                 assets_dir = assessment_dir / "assets"
                 logger.info("[upload_assessment] STOP_AFTER_RENDER=1; rendering attacked PDF via MuPDF")
@@ -310,27 +364,116 @@ def upload_assessment():
                 except Exception:
                     pass
 
-                # For detection or code glyph, generate WA/entities before rendering
-                if attack_type in {AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP, AttackType.CODE_GLYPH}:
-                    doc = structured_doc.get("document", {})
-                    qs = doc.get("questions", [])
-                    for q in qs:
-                        try:
-                            wa = generate_wrong_answer_for_question(q, attack_type, structured_doc)
-                            if wa:
-                                q.update(wa)
-                        except Exception as e:
-                            logger.warning("[upload_assessment] WA generation failed for Q%s: %s", q.get("q_number"), e)
-
                 attacked_pdf_path = assessment_dir / "attacked.pdf"
-                if attack_type == AttackType.CODE_GLYPH:
-                    from ..services.pdf_renderer_mupdf import build_attacked_pdf_code_glyph
-                    prebuilt_dir = Path(os.getenv("CODE_GLYPH_PREBUILT_DIR", ""))
-                    if not prebuilt_dir or not prebuilt_dir.exists():
-                        raise RuntimeError("CODE_GLYPH_PREBUILT_DIR not configured or not found.")
-                    build_attacked_pdf_code_glyph(structured_doc, attacked_pdf_path, prebuilt_dir)
-                else:
-                    build_attacked_pdf_mupdf(orig_path, structured_doc, attacked_pdf_path, attack_type)
+
+                # Use new attack orchestrator if using new system
+                if use_new_system:
+                    logger.info("[REFACTOR][UPLOAD] Using new Attack Orchestrator")
+                    
+                    # Extract questions from structured document
+                    doc = structured_doc.get("document", {})
+                    questions = doc.get("questions", [])
+                    
+                    # Generate gold answers first
+                    try:
+                        from ..services.answers.gold_answer_service import GoldAnswerService
+                        gold_service = GoldAnswerService()
+                        questions = gold_service.generate_gold_answers(questions)
+                        logger.info("[REFACTOR][UPLOAD] Gold answers generated for %d questions", len(questions))
+                    except Exception as e:
+                        logger.warning("[REFACTOR][UPLOAD] Gold answer generation failed: %s", str(e))
+                    
+                    # Execute attack using orchestrator
+                    try:
+                        from ..services.attacks.attack_orchestrator import AttackOrchestrator
+                        orchestrator = AttackOrchestrator()
+                        
+                        attack_result = orchestrator.execute_attack(
+                            questions=questions,
+                            config=attack_config,
+                            assessment_dir=assessment_dir,
+                            original_pdf_path=orig_path,
+                            ocr_doc=structured_doc
+                        )
+                        
+                        attacked_pdf_path = attack_result["attacked_pdf_path"]
+                        attack_metadata = attack_result["metadata"]
+                        
+                        logger.info(
+                            "[REFACTOR][UPLOAD] Attack orchestration completed: %s",
+                            attack_metadata
+                        )
+                        
+                        # Update structured doc with attack results for report generation
+                        for i, result in enumerate(attack_result["attack_results"]):
+                            if i < len(questions):
+                                questions[i]["attack_method"] = result.attack_method
+                                questions[i]["attack_success"] = result.success
+                                if result.entities:
+                                    questions[i]["code_glyph_entities"] = result.entities
+                                if result.wrong_answer:
+                                    questions[i]["wrong_answer"] = result.wrong_answer
+                                questions[i]["attack_metadata"] = result.metadata
+                        
+                        # New system: Mixed evaluation using orchestrator results
+                        try:
+                            from ..services.evaluation.mixed_eval_service import MixedEvalService
+                            mixed_evaluator = MixedEvalService()
+                            
+                            evaluation_results = mixed_evaluator.evaluate_mixed_attack_pdf(
+                                attacked_pdf_path=attacked_pdf_path,
+                                questions=questions,
+                                attack_results=attack_result["attack_results"],
+                                attack_mode=attack_config.mode.value.lower()
+                            )
+                            
+                            # Write evaluation artifacts
+                            mixed_evaluator.write_mixed_eval_artifacts(
+                                assessment_dir=assessment_dir,
+                                questions=questions,
+                                evaluation_results=evaluation_results,
+                                attack_mode=attack_config.mode.value.lower()
+                            )
+                            
+                            logger.info(
+                                "[REFACTOR][UPLOAD] Mixed evaluation completed: success_rate=%.1f%%",
+                                evaluation_results.get("success_rate", 0.0)
+                            )
+                            
+                        except Exception as eval_e:
+                            logger.error("[REFACTOR][UPLOAD] Mixed evaluation failed: %s", str(eval_e))
+                            evaluation_results = None
+                        
+                    except Exception as e:
+                        logger.error("[REFACTOR][UPLOAD] Attack orchestration failed: %s", str(e))
+                        # Fallback to legacy system
+                        logger.info("[REFACTOR][UPLOAD] Falling back to legacy attack system")
+                        use_new_system = False
+                
+                # Legacy attack system (for backward compatibility or fallback)
+                if not use_new_system:
+                    logger.info("[REFACTOR][UPLOAD] Using legacy attack system")
+                    
+                    # For detection or code glyph, generate WA/entities before rendering
+                    if attack_type in {AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP, AttackType.CODE_GLYPH}:
+                        doc = structured_doc.get("document", {})
+                        qs = doc.get("questions", [])
+                        for q in qs:
+                            try:
+                                wa = generate_wrong_answer_for_question(q, attack_type, structured_doc)
+                                if wa:
+                                    q.update(wa)
+                            except Exception as e:
+                                logger.warning("[upload_assessment] WA generation failed for Q%s: %s", q.get("q_number"), e)
+
+                    if attack_type == AttackType.CODE_GLYPH:
+                        from ..services.rendering.pdf_renderer_mupdf import build_attacked_pdf_code_glyph
+                        prebuilt_dir = Path(os.getenv("CODE_GLYPH_PREBUILT_DIR", ""))
+                        if not prebuilt_dir or not prebuilt_dir.exists():
+                            raise RuntimeError("CODE_GLYPH_PREBUILT_DIR not configured or not found.")
+                        build_attacked_pdf_code_glyph(structured_doc, attacked_pdf_path, prebuilt_dir)
+                    else:
+                        build_attacked_pdf_mupdf(orig_path, structured_doc, attacked_pdf_path, attack_type)
 
                 # Persist structured.json too
                 import json
@@ -342,7 +485,7 @@ def upload_assessment():
                 report_path = assessment_dir / "reference_report.pdf"
                 try:
                     # Infer attack type for report builder
-                    from ..services.attack_service import AttackType as _AT
+                    from ..services.attacks.attack_service import AttackType as _AT
                     doc = structured_doc.get("document", {})
                     qs = doc.get("questions", [])
                     # Title for report
@@ -359,7 +502,7 @@ def upload_assessment():
                         output_path=report_path,
                         attack_type=attack_type,
                         reference_answers=None,
-                        evaluations=None
+                        evaluations=(evaluation_results.get("per_question") if evaluation_results else None)
                     )
                     logger.info(f"Reference report successfully created at {report_path}")
                 except Exception as e:
@@ -367,7 +510,7 @@ def upload_assessment():
                     logger.error(f"Reference report building failed: {e}")
                     logger.info("Falling back to simple report generation")
                     try:
-                        from ..services.pdf_utils import build_reference_report
+                        from ..services.legacy.pdf_utils import build_reference_report
                         build_reference_report(qs, report_path, None)
                         logger.info(f"Fallback report created at {report_path}")
                     except Exception as e2:
@@ -434,7 +577,7 @@ def upload_assessment():
                     from ..services.attacks import get_attack_handler
                     handler = get_attack_handler("CODE_GLYPH")
                     try:
-                        from ..services.wrong_answer_service import generate_wrong_answer_entities
+                        from ..services.answers.wrong_answer_service import generate_wrong_answer_entities
                         entities = generate_wrong_answer_entities(q["stem_text"], q["options"], correct_label)
                         q["code_glyph_entities"] = entities
                         logger.info("[upload_assessment] CODE_GLYPH entities for Q%s: %s", q["q_number"], entities)
@@ -525,7 +668,7 @@ def upload_assessment():
                             from ..services.attacks import get_attack_handler
                             handler = get_attack_handler("CODE_GLYPH")
                             if handler:
-                                from ..services.openai_eval_service import evaluate_code_glyph_pdf_with_openai, write_code_glyph_eval_artifacts
+                                from ..services.evaluation.openai_eval_service import evaluate_code_glyph_pdf_with_openai, write_code_glyph_eval_artifacts
                                 evaluation_results = evaluate_code_glyph_pdf_with_openai(
                                     attacked_pdf_path=attacked_pdf_path,
                                     questions=questions,
@@ -548,7 +691,7 @@ def upload_assessment():
                                 reference_answers=reference_answers
                             )
                     elif attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION:
-                        from ..services.openai_eval_service import evaluate_prevention_pdf_with_openai
+                        from ..services.evaluation.openai_eval_service import evaluate_prevention_pdf_with_openai
                         evaluation_results = evaluate_prevention_pdf_with_openai(
                             attacked_pdf_path=attacked_pdf_path,
                             questions=questions,
@@ -569,7 +712,20 @@ def upload_assessment():
 
         # Always generate reference report
         report_path = assessment_dir / "reference_report.pdf"
+        eval_report_path = assessment_dir / "evaluation_report.pdf"
         
+        # Fallback: if evaluation_results missing or failed, try to load mixed_evaluation JSON written by MixedEvalService
+        try:
+            if not evaluation_results or evaluation_results.get("evaluation_failed"):
+                import json
+                mixed_eval_json = assessment_dir / "mixed_evaluation" / "evaluation_results.json"
+                if mixed_eval_json.exists():
+                    with open(mixed_eval_json, "r", encoding="utf-8") as f:
+                        evaluation_results = json.load(f)
+                    logger.info(f"Loaded fallback evaluation_results from {mixed_eval_json}")
+        except Exception as _e:
+            logger.debug(f"Could not load fallback evaluation results: {_e}")
+
         # Try to use questions from structured.json if available (has context_ids for visuals)
         # but merge with database evaluation data
         structured_path = assessment_dir / "structured.json"
@@ -656,14 +812,33 @@ def upload_assessment():
             # Fallback to old report if new one fails
             build_reference_report(questions_for_report, report_path, evaluation_results)
 
+        # Generate evaluation PDF if we have evaluation results
+        try:
+            if evaluation_results:
+                from ..services.reporting.evaluation_pdf_builder import EvaluationPdfBuilder
+                builder = EvaluationPdfBuilder(eval_report_path)
+                builder.build(
+                    attack_mode=attack_config.mode.value.lower(),
+                    questions=questions_for_report,
+                    evaluation=evaluation_results,
+                )
+                logger.info(f"Evaluation report created at {eval_report_path}")
+        except Exception as e:
+            logger.error(f"Evaluation PDF generation failed: {e}")
+
         attacked_sf = StoredFile(path=str(attacked_pdf_path), mime_type="application/pdf")
-        report_sf = StoredFile(path=str(report_path), mime_type="application/pdf")
+        report_sf = StoredFile(path=str(report_path), mime_type="application/pdf") if report_path and Path(report_path).exists() else None
+        eval_sf = StoredFile(path=str(eval_report_path), mime_type="application/pdf") if eval_report_path and Path(eval_report_path).exists() else None
         db.session.add_all([attacked_sf, report_sf])
+        if eval_sf:
+            db.session.add(eval_sf)
         db.session.flush()
 
         # Update assessment outputs
         assessment.attacked_pdf_id = attacked_sf.id
         assessment.report_pdf_id = report_sf.id
+        if eval_sf:
+            assessment.answers_pdf_id = eval_sf.id  # reuse answers_pdf field for evaluation report
         db.session.flush()
 
         # Replace Questions (fresh per run)
@@ -696,6 +871,11 @@ def upload_assessment():
         try:
             shutil.copy(attacked_pdf_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_attacked.pdf")
             shutil.copy(report_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_reference_report.pdf")
+            try:
+                if eval_report_path.exists():
+                    shutil.copy(eval_report_path, DEBUG_OUTPUT_DIR / f"{assessment_uuid}_evaluation_report.pdf")
+            except Exception:
+                pass
             try:
                 tex_src = attacked_pdf_path.with_suffix(".tex")
                 if tex_src.exists():
@@ -838,6 +1018,7 @@ def list_assessments():
                 "original": f"/api/assessments/{a.id}/original",
                 "attacked": f"/api/assessments/{a.id}/attacked",
                 "report": f"/api/assessments/{a.id}/report",
+                "evaluation": f"/api/assessments/{a.id}/evaluation_report" if a.answers_pdf else None,
             },
         }
 
@@ -972,3 +1153,15 @@ def evaluate_assessment(assessment_id):
     except Exception as exc:
         logger.error(f"[evaluate_assessment] Evaluation failed: {exc}")
         return jsonify({"error": f"Evaluation failed: {str(exc)}"}), 500 
+
+
+@assessments_bp.route("/<uuid:assessment_id>/evaluation_report", methods=["GET"])
+def download_evaluation_report(assessment_id):
+    assessment: Assessment | None = Assessment.query.get(assessment_id)
+    if not assessment or not assessment.answers_pdf:
+        return jsonify({"error": "Assessment not found"}), 404
+    response = send_file(assessment.answers_pdf.path, as_attachment=True)
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response 

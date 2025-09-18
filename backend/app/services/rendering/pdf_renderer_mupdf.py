@@ -7,7 +7,7 @@ from typing import Dict, Any, Tuple, List, Tuple
 import fitz  # PyMuPDF
 import os
 
-from .attack_service import AttackType
+from ..attacks.attack_service import AttackType
 
 logger = logging.getLogger(__name__)
 
@@ -177,12 +177,12 @@ def build_attacked_pdf_mupdf(original_pdf_path: Path, ocr_doc: Dict[str, Any], o
             if "wrong_label" in q and q.get("wrong_label"):
                 wl = q.get("wrong_label")
                 wtxt = opts.get(wl, "")
-                hidden_line = f"Answer shown as correct: {wl}) {wtxt} — Reason: {q.get('wrong_reason','')}"
+                hidden_line = f"Answer: {wl}) {wtxt} — Reason: {q.get('wrong_reason','')}"
             elif "wrong_labels" in q and q.get("wrong_labels"):
                 wls = q.get("wrong_labels")
-                hidden_line = f"Answer shown as correct: {', '.join(wls)} — Reason: {q.get('wrong_reason','')}"
+                hidden_line = f"Answer: {', '.join(wls)} — Reason: {q.get('wrong_reason','')}"
             elif "wrong_answer" in q and q.get("wrong_answer"):
-                hidden_line = f"Answer shown as correct: {q.get('wrong_answer')} — Reason: {q.get('wrong_reason','')}"
+                hidden_line = f"Answer: {q.get('wrong_answer')} — Reason: {q.get('wrong_reason','')}"
             if hidden_line:
                 _insert_hidden_text(page, hidden_line, x=anchor_x, y=anchor_y)
         elif attack_type == AttackType.CODE_GLYPH:
@@ -205,13 +205,13 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
     code glyph pipeline to generate `code_glyph/attacked.pdf` and `metadata.json`, then
     copies that attacked PDF to `output_path` for consistency with other attacks.
     """
-    from .attacks.code_glyph_runtime.pipeline import run_code_glyph_pipeline  # lazy import
-    from .attacks.code_glyph_runtime.pdfgen import _ensure_base_font, _render_text_with_mappings  # lazy import
+    from ..attacks.code_glyph_runtime.pipeline import run_code_glyph_pipeline  # lazy import
+    from ..attacks.code_glyph_runtime.pdfgen import _ensure_base_font, _render_text_with_mappings  # lazy import
     import shutil
 
-    from .attacks.code_glyph_runtime.pdfgen import measure_text_with_mappings  # lazy import
-    from .attacks.config import get_base_font_path  # lazy import
-    from .attacks.code_glyph_runtime.metrics import ensure_metrics  # lazy import
+    from ..attacks.code_glyph_runtime.pdfgen import measure_text_with_mappings  # lazy import
+    from ..attacks.config import get_base_font_path  # lazy import
+    from ..attacks.code_glyph_runtime.metrics import ensure_metrics  # lazy import
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -265,11 +265,34 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                     ents = cge.get("entities")
                     mappings = []
                     if isinstance(ents, list):
-                        mappings = [{"input_entity": str(e.get("input_entity", "")), "output_entity": str(e.get("output_entity", ""))} for e in ents if e.get("input_entity") and e.get("output_entity")]
+                        for e in ents:
+                            ie = str(e.get("input_entity", ""))
+                            oe = str(e.get("output_entity", ""))
+                            if ie and oe:
+                                a = e.get("anchor") or {}
+                                atxt = a.get("anchor_text") if isinstance(a, dict) else None
+                                m = {"input_entity": ie, "output_entity": oe}
+                                if atxt:
+                                    m["anchor_text"] = str(atxt)
+                                mappings.append(m)
                     elif isinstance(ents, dict) and ents.get("input_entity") and ents.get("output_entity"):
-                        mappings = [{"input_entity": str(ents.get("input_entity")), "output_entity": str(ents.get("output_entity"))}]
+                        ie = str(ents.get("input_entity"))
+                        oe = str(ents.get("output_entity"))
+                        a = cge.get("anchor") or {}
+                        atxt = a.get("anchor_text") if isinstance(a, dict) else None
+                        m = {"input_entity": ie, "output_entity": oe}
+                        if atxt:
+                            m["anchor_text"] = str(atxt)
+                        mappings = [m]
                     elif cge.get("input_entity") and cge.get("output_entity"):
-                        mappings = [{"input_entity": str(cge.get("input_entity")), "output_entity": str(cge.get("output_entity"))}]
+                        ie = str(cge.get("input_entity"))
+                        oe = str(cge.get("output_entity"))
+                        a = cge.get("anchor") or {}
+                        atxt = a.get("anchor_text") if isinstance(a, dict) else None
+                        m = {"input_entity": ie, "output_entity": oe}
+                        if atxt:
+                            m["anchor_text"] = str(atxt)
+                        mappings = [m]
                     if not mappings:
                         continue
 
@@ -330,6 +353,65 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                     if ie_lc in global_seen_entities:
                                         continue
                                     took_first = False
+                                    # NEW: try case-sensitive anchor_text placement if provided
+                                    try:
+                                        ent_struct = (q.get("code_glyph_entities") or {}) if isinstance(q, dict) else {}
+                                    except Exception:
+                                        ent_struct = {}
+                                    anchor_text = None
+                                    if isinstance(ent_struct, dict):
+                                        a = ent_struct.get("anchor") or {}
+                                        if isinstance(a, dict):
+                                            anchor_text = a.get("anchor_text") or None
+                                    if anchor_text and isinstance(t.get("text"), str):
+                                        context_text = t.get("text") or ""
+                                        anchor_idx = context_text.find(anchor_text)
+                                        if anchor_idx != -1:
+                                            # Stitch word boxes that overlap the anchor substring range
+                                            try:
+                                                words = page.get_text("words", clip=clip_rect) or []
+                                            except Exception:
+                                                words = []
+                                            # Build cumulative character index over words to approximate substring coverage
+                                            accum = 0
+                                            boxes: List[fitz.Rect] = []
+                                            for w in words:
+                                                try:
+                                                    wx0, wy0, wx1, wy1, wtxt = float(w[0]), float(w[1]), float(w[2]), float(w[3]), str(w[4] or "")
+                                                except Exception:
+                                                    continue
+                                                if not wtxt:
+                                                    continue
+                                                wlen = len(wtxt)
+                                                w_start = accum
+                                                w_end = accum + wlen
+                                                a_start = anchor_idx
+                                                a_end = anchor_idx + len(anchor_text)
+                                                if not (w_end <= a_start or w_start >= a_end):
+                                                    boxes.append(fitz.Rect(wx0, wy0, wx1, wy1))
+                                                accum += wlen + 1  # approximate a single space between words
+                                            if boxes:
+                                                # Union the boxes horizontally
+                                                ux0 = min(b.x0 for b in boxes)
+                                                uy0 = min(b.y0 for b in boxes)
+                                                ux1 = max(b.x1 for b in boxes)
+                                                uy1 = max(b.y1 for b in boxes)
+                                                orig_rect = fitz.Rect(ux0, uy0, ux1, uy1)
+                                                red_rect = fitz.Rect(orig_rect.x0 - pad, orig_rect.y0 - pad, orig_rect.x1 + pad, orig_rect.y1 + pad)
+                                                key = f"{ie_lc}:{orig_rect.x0:.2f},{orig_rect.y0:.2f},{orig_rect.x1:.2f},{orig_rect.y1:.2f}"
+                                                if key not in seen_keys:
+                                                    seen_keys.add(key)
+                                                    token_rects.append({
+                                                        "rect": orig_rect,
+                                                        "redact_rect": red_rect,
+                                                        "m": m,
+                                                        "baseline": float(orig_rect.y1 - (orig_rect.height * 0.2)),
+                                                        "font_pt": float(os.getenv("CG_TOKEN_FONT_PT", "11")),
+                                                    })
+                                                    took_first = True
+                                                    global_seen_entities.add(ie_lc)
+                                    if took_first:
+                                        continue
                                     # Word-box matching (case-insensitive)
                                     for w in words:
                                         try:
@@ -405,7 +487,7 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                                                 break
                                                             # Measure prefix and entity width using metrics to derive rects
                                                             try:
-                                                                from .attacks.code_glyph_runtime.metrics import get_advance_px as _gapx
+                                                                from ..attacks.code_glyph_runtime.metrics import get_advance_px as _gapx
                                                                 px_l = 0.0
                                                                 for ch in stext[:idx]:
                                                                     px_l += _gapx(metrics, base_font_path, ord(ch), sp.get("size") or 10.0)
@@ -446,6 +528,60 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                     page.add_redact_annot(fitz.Rect(rx0, ry0, rx1, ry1), fill=(1, 1, 1))
                                 t["_token_rects"] = token_rects
                                 logger.info("[pdf_renderer_mupdf] token_rects in bbox %s: %d", tb, len(token_rects))
+                                # Union-rect fallback if nothing found: attempt a broader search on the question's union rect
+                                if len(token_rects) == 0 and (t.get("union_bbox")):
+                                    try:
+                                        ubx0, uby0, ubx1, uby1 = t["union_bbox"]
+                                        uclip = fitz.Rect(ubx0, uby0, ubx1, uby1)
+                                        raw_u = page.get_text("rawdict", clip=uclip)
+                                        # Try numeric/letter stitching tolerant to segmentation
+                                        for m in t["mappings"]:
+                                            ie = (m.get("input_entity") or "").strip()
+                                            if not ie:
+                                                continue
+                                            # Find candidate spans whose text contains all digits/letters of ie
+                                            want_chars = [ch for ch in ie]
+                                            hits: List[fitz.Rect] = []
+                                            for blk in raw_u.get("blocks", []) or []:
+                                                for ln in blk.get("lines", []) or []:
+                                                    for sp in ln.get("spans", []) or []:
+                                                        stext = (sp.get("text") or "")
+                                                        if not stext:
+                                                            continue
+                                                        # Greedy subsequence match (tolerate punctuation in between)
+                                                        j = 0
+                                                        for ch in stext:
+                                                            if j < len(want_chars) and ch == want_chars[j]:
+                                                                j += 1
+                                                            if j == len(want_chars):
+                                                                break
+                                                        if j == len(want_chars):
+                                                            sb = sp.get("bbox") or [uclip.x0, uclip.y0, uclip.x1, uclip.y1]
+                                                            rspan = fitz.Rect(*sb)
+                                                            if rspan.width > 0 and rspan.height > 0:
+                                                                hits.append(rspan)
+                                            if hits:
+                                                # Stitch minimal covering rect over hits
+                                                hx0 = min(r.x0 for r in hits); hy0 = min(r.y0 for r in hits)
+                                                hx1 = max(r.x1 for r in hits); hy1 = max(r.y1 for r in hits)
+                                                stitched = fitz.Rect(hx0, hy0, hx1, hy1)
+                                                red = fitz.Rect(stitched.x0 - pad, stitched.y0 - pad, stitched.x1 + pad, stitched.y1 + pad)
+                                                token_rects.append({
+                                                    "rect": stitched,
+                                                    "redact_rect": red,
+                                                    "m": m,
+                                                    "baseline": float(stitched.y1),
+                                                    "font_pt": float(os.getenv("CG_TOKEN_FONT_PT", "11")),
+                                                })
+                                        if token_rects:
+                                            logger.info("[pdf_renderer_mupdf] union-fallback token_rects in bbox %s: %d", t.get("union_bbox"), len(token_rects))
+                                            # Re-apply redactions for added rects
+                                            for tok in token_rects:
+                                                r = tok.get("redact_rect") or tok.get("rect")
+                                                page.add_redact_annot(fitz.Rect(r.x0, r.y0, r.x1, r.y1), fill=(1, 1, 1))
+                                            page.apply_redactions(images=0)
+                                    except Exception:
+                                        pass
                             page.apply_redactions(images=0)
                             # Post-redaction verification: ensure originals are gone; expand and retry if needed
                             try:
@@ -571,7 +707,7 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                     margin_left = rect.x0
                                     right_edge = rect.x1
                                     leading = best_pt + 2
-                                    from .attacks.code_glyph_runtime.pdfgen import draw_mapped_token_at, _match_case_pattern
+                                    from ..attacks.code_glyph_runtime.pdfgen import draw_mapped_token_at, _match_case_pattern
                                     # Case-align output
                                     oe = _match_case_pattern(ie, oe)
                                     if debug_baseline:
@@ -611,7 +747,7 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                 lo, hi = font_pt_lo, font_pt_hi
                                 while hi - lo > 0.25:
                                     mid = (hi + lo) / 2.0
-                                    from .attacks.code_glyph_runtime.pdfgen import measure_text_with_mappings  # ensure exact advances
+                                    from ..attacks.code_glyph_runtime.pdfgen import measure_text_with_mappings  # ensure exact advances
                                     h_px, _ = measure_text_with_mappings(text, mid, Path(prebuilt_dir), mappings, metrics=metrics, base_font_path=base_font_path, width=width)
                                     if h_px <= height:
                                         best_pt = mid
@@ -621,7 +757,7 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                                 margin_left = x0
                                 right_edge = x1
                                 leading = best_pt + 4
-                                from .attacks.code_glyph_runtime.pdfgen import _render_text_with_mappings_clipped, _match_case_pattern
+                                from ..attacks.code_glyph_runtime.pdfgen import _render_text_with_mappings_clipped, _match_case_pattern
                                 # Case-align mappings per occurrence happens inside pdfgen now
                                 _render_text_with_mappings_clipped(
                                     page, text, y0, base_font, best_pt, Path(prebuilt_dir), mappings,
@@ -663,5 +799,21 @@ def build_attacked_pdf_code_glyph(ocr_doc: Dict[str, Any], output_path: Path, pr
                 logger.info("[pdf_renderer_mupdf] Copied pipeline attacked PDF to %s", output_path)
     except Exception as e:
         logger.warning("[pdf_renderer_mupdf] Could not write metadata.json via pipeline: %s", e)
+        # Fallback: write minimal metadata.json adjacent to attacked.pdf
+        try:
+            import json as _json
+            meta_dir = assessment_dir / "code_glyph"
+            meta_dir.mkdir(parents=True, exist_ok=True)
+            meta_path = meta_dir / "metadata.json"
+            doc_out = {
+                "title": title,
+                "mappings": entities_by_qnum_for_meta,
+                "overlay_mode": True,
+            }
+            with open(meta_path, "w", encoding="utf-8") as f:
+                _json.dump(doc_out, f, ensure_ascii=False, indent=2)
+            logger.info("[pdf_renderer_mupdf] Fallback metadata.json written: %s", meta_path)
+        except Exception as e2:
+            logger.warning("[pdf_renderer_mupdf] Fallback metadata write failed: %s", e2)
 
     return output_path 

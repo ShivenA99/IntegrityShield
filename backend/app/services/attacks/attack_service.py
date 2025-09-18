@@ -1,13 +1,49 @@
 """Utility functions to apply prompt-injection attacks to text."""
 from __future__ import annotations
 
+import logging
 import random
+from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 # ----------------------------------------------------------------------------
-# Attack Types
+# New Attack Architecture Types
+# ----------------------------------------------------------------------------
+class AttackMode(str, Enum):
+    """Simplified attack modes for refactored architecture."""
+    PREVENTION = "Prevention"
+    DETECTION = "Detection"
+
+class PreventionSubType(str, Enum):
+    """Sub-types for prevention attacks with different injection methods."""
+    INVISIBLE_UNICODE = "invisible_unicode"
+    TINY_TEXT = "tiny_text"
+    ACTUALTEXT_OVERRIDE = "actualtext_override"
+
+@dataclass
+class AttackConfig:
+    """Configuration for attack execution."""
+    mode: AttackMode
+    prevention_sub_type: Optional[PreventionSubType] = None
+
+@dataclass
+class QuestionAttackResult:
+    """Result of attacking a single question."""
+    question_id: str
+    attack_method: str  # "code_glyph" | "hidden_text"
+    success: bool
+    entities: Optional[Dict[str, str]] = None
+    wrong_answer: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+# ----------------------------------------------------------------------------
+# Backward Compatibility Types
 # ----------------------------------------------------------------------------
 class AttackType(str, Enum):
+    """Legacy attack types for backward compatibility."""
     NONE = "No Attack (Baseline)"
     HIDDEN_MALICIOUS_INSTRUCTION_TOP = "Hidden Malicious Instruction (Detection)"
     HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION = "Hidden Malicious Instruction (Prevention)"

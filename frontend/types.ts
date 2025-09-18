@@ -4,6 +4,26 @@ export enum AssessmentType {
   SHORT_ANSWER = 'Short Answer',
 }
 
+// New simplified attack modes for refactored architecture
+export enum AttackMode {
+  PREVENTION = 'Prevention',
+  DETECTION = 'Detection'
+}
+
+// Prevention sub-types for internal strategy selection
+export enum PreventionSubType {
+  INVISIBLE_UNICODE = 'invisible_unicode',
+  TINY_TEXT = 'tiny_text',
+  ACTUALTEXT_OVERRIDE = 'actualtext_override'
+}
+
+// Attack configuration for API calls
+export interface AttackConfig {
+  mode: AttackMode;
+  preventionSubType?: PreventionSubType;
+}
+
+// Backward compatibility - keep existing enum for migration
 export enum AttackType {
   CODE_GLYPH = 'Code Glyph (Detection)',
   HIDDEN_MALICIOUS_INSTRUCTION_TOP = 'Hidden Malicious Instruction (Detection)',
