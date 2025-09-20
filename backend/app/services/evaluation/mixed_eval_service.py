@@ -13,7 +13,7 @@ from typing import Dict, Any, List
 from ..attacks.attack_service import QuestionAttackResult
 from .openai_eval_service import (
 	_evaluate_with_openai_file_answers_only,
-	OPENAI_API_KEY
+	OPENAI_API_KEY,
 )
 
 logger = logging.getLogger(__name__)
@@ -64,6 +64,21 @@ class MixedEvalService:
 			from openai import OpenAI
 			client = OpenAI(api_key=OPENAI_API_KEY)
 			
+			# Prefer end-to-end strict JSON evaluation (lazy import to avoid import-time issues)
+			try:
+				import app.services.evaluation.openai_eval_service as _oes
+				_e2e_eval = getattr(_oes, "evaluate_end_to_end_mixed", None)
+				if callable(_e2e_eval):
+					end2end = _e2e_eval(attacked_pdf_path, questions, attack_results, attack_mode)
+					logger.info("[REFACTOR][MIXED_EVAL] End-to-end evaluation succeeded")
+					return end2end
+				else:
+					logger.warning("[REFACTOR][MIXED_EVAL] End-to-end function not found; using fallback")
+			except Exception as e2:
+				logger.error("[REFACTOR][MIXED_EVAL] End-to-end evaluation failed, falling back: %s", e2)
+				pass
+			
+			# Fallback: legacy two-step (answers + parser) then local scoring
 			# Get AI responses using direct OpenAI file method
 			eval_result = _evaluate_with_openai_file_answers_only(attacked_pdf_path, questions, client)
 			if not eval_result:
@@ -128,6 +143,7 @@ class MixedEvalService:
 			
 			per_question_results[q_num] = {
 				"ai_answer": ai_answer,
+				"expected_wrong": (attack_result.wrong_answer if attack_result and attack_result.wrong_answer else (question.get("wrong_label") or question.get("wrong_answer") or "")),
 				"attack_method": attack_result.attack_method if attack_result else "unknown",
 				"attack_success": attack_result.success if attack_result else False,
 				"prevention_success": is_refused,
@@ -222,21 +238,29 @@ class MixedEvalService:
 			if q_type in {"mcq_single", "mcq_multi", "true_false"}:
 				# label-based
 				if attack_result and attack_result.attack_method == "hidden_text":
-					expected_wrong = attack_result.wrong_answer
+					expected_wrong = attack_result.wrong_answer or question.get("wrong_label") or question.get("wrong_answer")
 				elif attack_result and attack_result.attack_method == "code_glyph":
 					expected_wrong = question.get("wrong_label", "")
 				if expected_wrong and ai_answer:
-					is_targeted_hit = ai_answer.strip().upper() == str(expected_wrong).strip().upper()
+					is_targeted_hit = str(ai_answer).strip().upper() == str(expected_wrong).strip().upper()
 				if is_targeted_hit:
 					targeted_hits += 1
 					if attack_method == "code_glyph": code_glyph_hits += 1
 					if attack_method == "hidden_text": hidden_text_hits += 1
 			else:
-				# Non-MCQ: semantic divergence from gold
+				# Non-MCQ: semantic divergence from gold for detection
 				diverged = False
-				if gold_answer and isinstance(ai_answer, str) and ai_answer != "UNKNOWN":
-					diverged = _judge_divergence(gold_answer, ai_answer)
-				if diverged:
+				# Prefer explicit wrong-answer template match for hidden_text when available
+				if attack_method == "hidden_text" and attack_result and getattr(attack_result, "wrong_answer", None):
+					wa = str(getattr(attack_result, "wrong_answer") or "").strip()
+					if isinstance(ai_answer, str) and ai_answer.strip():
+						is_targeted_hit = ai_answer.strip().lower() == wa.lower()
+				else:
+					# Fallback to divergence vs gold
+					if gold_answer and isinstance(ai_answer, str) and ai_answer != "UNKNOWN":
+						diverged = _judge_divergence(gold_answer, ai_answer)
+					is_targeted_hit = diverged
+				if is_targeted_hit:
 					targeted_hits += 1
 					if attack_method == "code_glyph": code_glyph_hits += 1
 					if attack_method == "hidden_text": hidden_text_hits += 1
@@ -244,10 +268,10 @@ class MixedEvalService:
 					"ai_answer": ai_answer,
 					"expected_wrong": expected_wrong,
 					"attack_method": attack_method,
-					"attack_success": attack_result.success if attack_result else False,
-					"targeted_hit": diverged,
-					"entities": attack_result.entities if attack_result else {},
-					"metadata": attack_result.metadata if attack_result else {}
+					"attack_success": (attack_result.success if attack_result else False),
+					"targeted_hit": is_targeted_hit,
+					"entities": (attack_result.entities if attack_result else {}),
+					"metadata": (attack_result.metadata if attack_result else {}),
 				}
 				continue
 			
@@ -255,10 +279,10 @@ class MixedEvalService:
 				"ai_answer": ai_answer,
 				"expected_wrong": expected_wrong,
 				"attack_method": attack_method,
-				"attack_success": attack_result.success if attack_result else False,
+				"attack_success": (attack_result.success if attack_result else False),
 				"targeted_hit": is_targeted_hit,
-				"entities": attack_result.entities if attack_result else {},
-				"metadata": attack_result.metadata if attack_result else {}
+				"entities": (attack_result.entities if attack_result else {}),
+				"metadata": (attack_result.metadata if attack_result else {}),
 			}
 		
 		success_rate = (targeted_hits / total_questions * 100) if total_questions > 0 else 0.0

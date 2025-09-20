@@ -9396,3 +9396,5 @@ backend/output/
 
 # Local OAuth backups
 backend/.local/*.bak
+backend/data/prebuilt_fonts.zip
+backend/data/prebuilt_fonts.zip

@@ -552,14 +552,24 @@ def generate_wrong_answer_for_question(question: Dict[str, Any], attack_type: At
                 if q_type == "mcq_single":
                     if isinstance(wrong, str):
                         data["wrong_label"] = wrong.strip().upper().rstrip(")").lstrip("(")
+                    # Populate gold answer label when provided by the model
+                    if isinstance(right, str) and right.strip():
+                        data["gold_answer"] = right.strip().upper().rstrip(")").lstrip("(")
                     data["wrong_reason"] = (obj.get("wrong_reason") or "Plausible but incorrect.").strip()
                 else:
                     if isinstance(wrong, list):
                         data["wrong_labels"] = [str(x).strip().upper().rstrip(")").lstrip("(") for x in wrong]
+                    # Populate gold answers for multi where possible
+                    if isinstance(right, list) and right:
+                        data["gold_answer"] = ", ".join([str(x).strip().upper().rstrip(")").lstrip("(") for x in right])
                     data["wrong_reason"] = (obj.get("wrong_reason") or "Plausible but incorrect.").strip()
             elif q_type == "true_false":
                 wrong = obj.get("wrong")
                 data["wrong_answer"] = "True" if str(wrong).strip().lower().startswith("t") else "False"
+                # Populate gold answer for T/F when provided
+                right_tf = obj.get("right")
+                if isinstance(right_tf, str) and right_tf.strip():
+                    data["gold_answer"] = "True" if right_tf.strip().lower().startswith("t") else "False"
                 data["wrong_reason"] = (obj.get("wrong_reason") or "Plausible but incorrect.").strip()
             elif q_type == "match":
                 wrong = obj.get("wrong") or []
@@ -570,6 +580,10 @@ def generate_wrong_answer_for_question(question: Dict[str, Any], attack_type: At
             else:
                 # fill_blank / short_answer / long_answer / comprehension_qa
                 data["wrong_answer"] = obj.get("wrong") or ""
+                # If the model provided an inferred correct text, surface it for reporting
+                inf = obj.get("inferred_correct_text") or obj.get("right")
+                if isinstance(inf, str) and inf.strip():
+                    data["gold_answer_full"] = inf.strip()
                 data["wrong_reason"] = (obj.get("wrong_reason") or "Plausible but incorrect.").strip()
         # If parsing failed, provide a minimal fallback
         if not data:

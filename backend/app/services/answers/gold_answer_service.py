@@ -111,6 +111,7 @@ class GoldAnswerService:
             # Return enhanced question
             enhanced_question = dict(question)
             enhanced_question["gold_answer"] = gold_answer
+            enhanced_question["gold_answer_full"] = answer_text.strip()
             enhanced_question["gold_generation_method"] = "openai_eval"
             
             return enhanced_question
@@ -164,5 +165,5 @@ class GoldAnswerService:
             if found_labels:
                 return ", ".join(sorted(found_labels))
         
-        # For other question types or if no option labels found, return cleaned text
-        return answer_text[:200]  # Limit length for database storage
+        # For other question types or if no option labels found, return full cleaned text
+        return answer_text

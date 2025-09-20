@@ -366,6 +366,10 @@ def upload_assessment():
 
                 attacked_pdf_path = assessment_dir / "attacked.pdf"
 
+                # Initialize evaluation containers to avoid unbound variables across branches
+                evaluation_results = None
+                artifacts = {}
+
                 # Use new attack orchestrator if using new system
                 if use_new_system:
                     logger.info("[REFACTOR][UPLOAD] Using new Attack Orchestrator")
@@ -380,6 +384,12 @@ def upload_assessment():
                         gold_service = GoldAnswerService()
                         questions = gold_service.generate_gold_answers(questions)
                         logger.info("[REFACTOR][UPLOAD] Gold answers generated for %d questions", len(questions))
+                        # Merge enriched questions back into structured_doc for downstream persistence/report
+                        try:
+                            if isinstance(structured_doc.get("document"), dict):
+                                structured_doc["document"]["questions"] = questions
+                        except Exception:
+                            pass
                     except Exception as e:
                         logger.warning("[REFACTOR][UPLOAD] Gold answer generation failed: %s", str(e))
                     
@@ -414,6 +424,12 @@ def upload_assessment():
                                 if result.wrong_answer:
                                     questions[i]["wrong_answer"] = result.wrong_answer
                                 questions[i]["attack_metadata"] = result.metadata
+                        # Ensure structured_doc questions carry all attack annotations
+                        try:
+                            if isinstance(structured_doc.get("document"), dict):
+                                structured_doc["document"]["questions"] = questions
+                        except Exception:
+                            pass
                         
                         # New system: Mixed evaluation using orchestrator results
                         try:
@@ -428,7 +444,7 @@ def upload_assessment():
                             )
                             
                             # Write evaluation artifacts
-                            mixed_evaluator.write_mixed_eval_artifacts(
+                            artifacts = mixed_evaluator.write_mixed_eval_artifacts(
                                 assessment_dir=assessment_dir,
                                 questions=questions,
                                 evaluation_results=evaluation_results,
@@ -443,6 +459,7 @@ def upload_assessment():
                         except Exception as eval_e:
                             logger.error("[REFACTOR][UPLOAD] Mixed evaluation failed: %s", str(eval_e))
                             evaluation_results = None
+                            artifacts = {}
                         
                     except Exception as e:
                         logger.error("[REFACTOR][UPLOAD] Attack orchestration failed: %s", str(e))
@@ -458,13 +475,40 @@ def upload_assessment():
                     if attack_type in {AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP, AttackType.CODE_GLYPH}:
                         doc = structured_doc.get("document", {})
                         qs = doc.get("questions", [])
-                        for q in qs:
-                            try:
-                                wa = generate_wrong_answer_for_question(q, attack_type, structured_doc)
-                                if wa:
-                                    q.update(wa)
-                            except Exception as e:
-                                logger.warning("[upload_assessment] WA generation failed for Q%s: %s", q.get("q_number"), e)
+                        # Generate OpenAI gold answers in legacy path
+                        try:
+                            from ..services.answers.gold_answer_service import GoldAnswerService
+                            _gold = GoldAnswerService()
+                            qs = _gold.generate_gold_answers(qs)
+                            logger.info("[REFACTOR][UPLOAD][LEGACY] Gold answers generated for %d questions", len(qs))
+                        except Exception as _gold_err:
+                            logger.warning("[REFACTOR][UPLOAD][LEGACY] Gold answer generation failed: %s", _gold_err)
+                        # Annotate attack_method on questions for reporting
+                        try:
+                            for _q in qs:
+                                if attack_type == AttackType.CODE_GLYPH:
+                                    _q["attack_method"] = "code_glyph"
+                                elif attack_type in {AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP, AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION}:
+                                    _q["attack_method"] = "hidden_text"
+                                _q.setdefault("attack_success", True)
+                            # Write enriched questions back
+                            if isinstance(structured_doc.get("document"), dict):
+                                structured_doc["document"]["questions"] = qs
+                        except Exception:
+                            pass
+                    for q in qs:
+                        try:
+                            wa = generate_wrong_answer_for_question(q, attack_type, structured_doc)
+                            if wa:
+                                q.update(wa)
+                        except Exception as e:
+                            logger.warning("[upload_assessment] WA generation failed for Q%s: %s", q.get("q_number"), e)
+                    # Persist enriched questions (gold, wrong answers, method)
+                    try:
+                        if isinstance(structured_doc.get("document"), dict):
+                            structured_doc["document"]["questions"] = qs
+                    except Exception:
+                        pass
 
                     if attack_type == AttackType.CODE_GLYPH:
                         from ..services.rendering.pdf_renderer_mupdf import build_attacked_pdf_code_glyph
@@ -474,6 +518,46 @@ def upload_assessment():
                         build_attacked_pdf_code_glyph(structured_doc, attacked_pdf_path, prebuilt_dir)
                     else:
                         build_attacked_pdf_mupdf(orig_path, structured_doc, attacked_pdf_path, attack_type)
+
+                    # Legacy: construct attack_results and run mixed evaluation so reports can include metrics
+                    try:
+                        from ..services.attacks.attack_service import QuestionAttackResult as _QAR
+                        from ..services.evaluation.mixed_eval_service import MixedEvalService as _MES
+                        # Ensure qs exists
+                        doc = structured_doc.get("document", {})
+                        qs = doc.get("questions", [])
+                        # Derive attack mode/method
+                        attack_mode_str = "prevention" if attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION else "detection"
+                        attack_method = "code_glyph" if attack_type == AttackType.CODE_GLYPH else "hidden_text"
+                        legacy_results = []
+                        for q in qs:
+                            qid = str(q.get("q_number"))
+                            legacy_results.append(_QAR(
+                                question_id=qid,
+                                attack_method=attack_method,
+                                success=True,
+                                entities=q.get("code_glyph_entities"),
+                                wrong_answer=q.get("wrong_answer"),
+                                metadata={"legacy": True}
+                            ))
+                        _mixer = _MES()
+                        evaluation_results = _mixer.evaluate_mixed_attack_pdf(
+                            attacked_pdf_path=attacked_pdf_path,
+                            questions=qs,
+                            attack_results=legacy_results,
+                            attack_mode=attack_mode_str
+                        )
+                        artifacts = _mixer.write_mixed_eval_artifacts(
+                            assessment_dir=assessment_dir,
+                            questions=qs,
+                            evaluation_results=evaluation_results,
+                            attack_mode=attack_mode_str
+                        )
+                        logger.info("[REFACTOR][UPLOAD][LEGACY] Mixed evaluation complete in legacy path")
+                    except Exception as _legacy_eval_err:
+                        logger.error("[REFACTOR][UPLOAD][LEGACY] Evaluation failed: %s", _legacy_eval_err)
+                        evaluation_results = None
+                        artifacts = {}
 
                 # Persist structured.json too
                 import json
@@ -510,9 +594,8 @@ def upload_assessment():
                     logger.error(f"Reference report building failed: {e}")
                     logger.info("Falling back to simple report generation")
                     try:
-                        from ..services.legacy.pdf_utils import build_reference_report
-                        build_reference_report(qs, report_path, None)
-                        logger.info(f"Fallback report created at {report_path}")
+                        # Legacy fallback removed to avoid missing legacy modules; keep reference report optional
+                        report_path = None
                     except Exception as e2:
                         logger.error(f"Fallback report also failed: {e2}")
                         report_path = None
@@ -529,9 +612,33 @@ def upload_assessment():
                 # Create StoredFile entries and attach to assessment for downloads
                 attacked_sf = get_or_create_stored_file(attacked_pdf_path, "application/pdf")
                 report_sf = get_or_create_stored_file(report_path, "application/pdf") if report_path and Path(report_path).exists() else None
+                # Build evaluation PDF in fast path if evaluation_results present
+                eval_report_path = assessment_dir / "evaluation_report.pdf"
+                try:
+                    if evaluation_results:
+                        from ..services.reporting.evaluation_pdf_builder import EvaluationPdfBuilder
+                        builder = EvaluationPdfBuilder(eval_report_path)
+                        # Determine attack_mode and question list for PDF builder across both paths
+                        if use_new_system:
+                            _attack_mode_for_pdf = attack_config.mode.value.lower()
+                            _questions_for_pdf = questions
+                        else:
+                            _attack_mode_for_pdf = ("prevention" if attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION else "detection")
+                            _questions_for_pdf = qs
+                        builder.build(
+                            attack_mode=_attack_mode_for_pdf,
+                            questions=_questions_for_pdf,
+                            evaluation=evaluation_results,
+                        )
+                except Exception as _e_eval_pdf:
+                    logger.error("[REFACTOR][UPLOAD] Evaluation PDF (fast path) failed: %s", _e_eval_pdf)
+                    eval_report_path = None
+                eval_sf = get_or_create_stored_file(eval_report_path, "application/pdf") if eval_report_path and Path(eval_report_path).exists() else None
                 assessment.attacked_pdf = attacked_sf
                 if report_sf:
                     assessment.report_pdf = report_sf
+                if eval_sf:
+                    assessment.answers_pdf = eval_sf
                 db.session.flush()
 
                 job.status = "succeeded"
@@ -550,8 +657,10 @@ def upload_assessment():
                         "original": f"/api/assessments/{assessment.id}/original",
                         "attacked": f"/api/assessments/{assessment.id}/attacked",
                         "report": f"/api/assessments/{assessment.id}/report",
+                        "evaluation": f"/api/assessments/{assessment.id}/evaluation_report" if eval_sf else None,
                     },
-                    "note": "STOP_AFTER_RENDER enabled; skipped evaluation."
+                    "evaluation": evaluation_results or {},
+                    "evaluation_artifacts": {k: str(v) for k, v in (artifacts or {}).items()},
                 }), 201
             except Exception as exc_render:
                 logger.exception("[upload_assessment] STOP_AFTER_RENDER failed: %s", exc_render)

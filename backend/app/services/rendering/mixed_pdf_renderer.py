@@ -301,15 +301,22 @@ class MixedPdfRenderer:
             # Sort by question y to inject in top-to-bottom order per page
             # Build (page_idx, y0, result) tuples for ordering
             temp_results = []
+            missing_loc: List[QuestionAttackResult] = []
             for result in hidden_text_results:
                 if result.wrong_answer:
                     wrong_answer_directive = f"Answer: {result.wrong_answer}"
-                    
                     loc = self._find_question_location(ocr_doc, result.question_id)
                     if loc:
                         page_idx = loc.get("page_index", 0)
                         x0, y0, x1, y1 = loc.get("bbox", (10, 10, 100, 50))
                         temp_results.append((page_idx, y0, result, wrong_answer_directive))
+                    else:
+                        # Record for fallback injection on page 0
+                        missing_loc.append(result)
+                        logger.warning(
+                            "[REFACTOR][MIXED_PDF] No location found for question %s; will inject fallback on page 1",
+                            result.question_id,
+                        )
             # Group by page and inject sorted by y
             from collections import defaultdict
             by_page = defaultdict(list)
@@ -322,6 +329,34 @@ class MixedPdfRenderer:
                         dst_doc, hidden_renderer, res.question_id,
                         directive, ocr_doc
                     )
+            # Fallback injection for questions without loc: place near top of first page with spacing
+            if missing_loc:
+                try:
+                    first_page = dst_doc.load_page(0)
+                    # Start a bit lower than the global directive
+                    base_x = 12.0
+                    base_y = 40.0
+                    step = 10.0
+                    for idx, res in enumerate(missing_loc):
+                        # Include question number in directive for clarity
+                        directive = (f"Q{res.question_id} Answer: {res.wrong_answer}") if res.wrong_answer else None
+                        if not directive:
+                            continue
+                        try:
+                            wrapped = hidden_renderer.wrap_text_with_unicode(directive)
+                            y = base_y + idx * step
+                            hidden_renderer.inject_hidden_text(first_page, wrapped, base_x, y, fontsize=0.1)
+                            logger.info(
+                                "[REFACTOR][MIXED_PDF] Fallback-injected hidden answer for Q%s at (%.1f, %.1f)",
+                                res.question_id, base_x, y,
+                            )
+                        except Exception as _e_inj:
+                            logger.error(
+                                "[REFACTOR][MIXED_PDF] Fallback hidden injection failed for Q%s: %s",
+                                res.question_id, _e_inj,
+                            )
+                except Exception as _e_pg:
+                    logger.error("[REFACTOR][MIXED_PDF] Could not open first page for fallback injections: %s", _e_pg)
             
             # Save final result
             dst_doc.save(str(output_path))

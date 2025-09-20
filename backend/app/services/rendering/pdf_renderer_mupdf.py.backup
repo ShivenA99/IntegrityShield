@@ -159,7 +159,7 @@ def build_attacked_pdf_mupdf(original_pdf_path: Path, ocr_doc: Dict[str, Any], o
         elif attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_PREVENTION:
             _insert_hidden_text(p0, PREVENTION_DIRECTIVE, x=12.0, y=12.0)
 
-    # For hidden malicious detection, implement minimal robust multi-layered injection
+    # For hidden malicious detection, add a dedicated first-page block with all directives in order (no extra page)
     if attack_type == AttackType.HIDDEN_MALICIOUS_INSTRUCTION_TOP:
         try:
             p0 = dst.load_page(0)
@@ -168,7 +168,6 @@ def build_attacked_pdf_mupdf(original_pdf_path: Path, ocr_doc: Dict[str, Any], o
         except Exception:
             p0 = dst.load_page(0)
             width, height = 612.0, 792.0
-        
         # Build ordered list of hidden answer lines
         try:
             def _q_key(q: Dict[str, Any]) -> tuple:
@@ -180,7 +179,6 @@ def build_attacked_pdf_mupdf(original_pdf_path: Path, ocr_doc: Dict[str, Any], o
             ordered = sorted(list(questions), key=_q_key)
         except Exception:
             ordered = list(questions)
-        
         lines: List[str] = []
         # Include the global instruction header
         lines.append(INSTRUCTION_TEXT)
@@ -201,43 +199,29 @@ def build_attacked_pdf_mupdf(original_pdf_path: Path, ocr_doc: Dict[str, Any], o
                 hidden_line = f"{prefix}Answer: {q.get('wrong_answer')} — Reason: {q.get('wrong_reason','')}"
             if hidden_line:
                 lines.append(hidden_line)
-        
-        # Build the complete hidden text block
-        block_text = "\n\n".join([s for s in lines if s is not None and s != ""])
-        
-        # MINIMAL ROBUST INJECTION STRATEGY
-        # Method 1: Light gray text at multiple positions (covers vision-heavy models)
-        light_gray_color = (0.95, 0.95, 0.95)  # Light gray instead of white
-        positions = [
-            (1.0, 1.0),                    # Top-left
-            (1.0, 10.0),                   # Slightly below
-            (width - 100, 1.0),            # Top-right
-        ]
-        
-        for x, y in positions:
+        # Prefix with invisible sentinels to help text detectors identify the start without changing semantics
+        sentinel_prefix = f"{ZWSP}{ZWNJ}{ZWSP}"
+        block_text = sentinel_prefix + "\n" + "\n\n".join([s for s in lines if s is not None and s != ""]) 
+        try:
+            # Write a single underlay content stream at top-left so extractors read it first
+            tw = fitz.TextWriter(fitz.Rect(0, 0, width, height))
             try:
-                p0.insert_text((x, y), block_text, fontsize=1.0, color=light_gray_color)
+                tw.append(fitz.Point(1.0, 1.0), block_text, fontname="helv", fontsize=1.0, color=(1, 1, 1))
             except Exception:
-                # Fallback if insert_text fails
-                try:
-                    rect = fitz.Rect(x, y, x + 200, y + 50)
-                    p0.insert_textbox(rect, block_text, fontsize=1.0, color=light_gray_color)
-                except Exception:
-                    pass
-        
-        # Method 2: PDF metadata injection (covers text-based extractors)
-        try:
-            dst.set_metadata({"HiddenInstructions": block_text})
+                tw.append((1.0, 1.0), block_text, fontsize=1.0, color=(1, 1, 1))
+            try:
+                tw.write_text(p0, overlay=False)
+            except Exception:
+                # Older PyMuPDF versions
+                tw.writeText(p0, overlay=False)
         except Exception:
-            pass
-        
-        # Method 3: Invisible Unicode prefix (minimal enhancement for text-focused models)
-        try:
-            invisible_prefix = "\u200B\u200C"  # ZWSP + ZWNJ
-            invisible_text = invisible_prefix + block_text
-            p0.insert_text((1.0, 1.0), invisible_text, fontsize=1.0, color=light_gray_color)
-        except Exception:
-            pass
+            # Fallback to textbox underlay
+            rect = fitz.Rect(1.0, 1.0, width - 4.0, height * 0.35)
+            try:
+                p0.insert_textbox(rect, block_text, fontsize=1.0, color=(1, 1, 1), align=fitz.TEXT_ALIGN_LEFT, overlay=False)
+            except TypeError:
+                # If overlay kw unsupported, last resort overlay True
+                p0.insert_textbox(rect, block_text, fontsize=1.0, color=(1, 1, 1), align=fitz.TEXT_ALIGN_LEFT)
 
     # Per-question overlays
     # Build anchors first so we can inject in page/y order
