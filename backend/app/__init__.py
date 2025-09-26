@@ -1,65 +1,53 @@
+from __future__ import annotations
+
 import os
-import logging
+from pathlib import Path
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from dotenv import load_dotenv
-from sqlalchemy import MetaData
-from flask_cors import CORS
+from flask import Flask, jsonify
 
-# Load env vars from a .env file if present (useful in local dev)
-load_dotenv()
+from .config import get_config
+from .extensions import db, init_extensions
+from .utils.json import ORJSONProvider
+from .utils.logging import configure_logging
 
-_convention = {
-    "ix": "ix_%(column_0_label)s",
-    "uq": "uq_%(table_name)s_%(column_0_name)s",
-    "ck": "ck_%(table_name)s_%(constraint_name)s",
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-    "pk": "pk_%(table_name)s",
-}
 
-metadata = MetaData(naming_convention=_convention)
+load_dotenv(Path.cwd() / ".env")
 
-# Pass the metadata with conventions to SQLAlchemy so Alembic picks it up
-db = SQLAlchemy(metadata=metadata)
-migrate = Migrate()
 
-def create_app() -> Flask:
-    """Application factory."""
-    # ------------------------------------------------------------------
-    # Logging – ensure we have at least basic configuration so Blueprints
-    # can emit useful diagnostics.
-    # ------------------------------------------------------------------
-    logging.basicConfig(
-        level=os.getenv("LOG_LEVEL", "INFO"),
-        format="%(asctime)s | %(levelname)8s | %(name)s:%(lineno)d - %(message)s",
-    )
-
+def create_app(config_name: str | None = None) -> Flask:
+    config_class = get_config(config_name)
     app = Flask(__name__)
+    app.config.from_object(config_class)
 
-    # ------------------------------------------------------------------
-    # Configuration
-    # ------------------------------------------------------------------
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-        "DATABASE_URL",
-        "postgresql+psycopg://localhost/ftai",
-    )
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.json = ORJSONProvider(app)
 
-    # ------------------------------------------------------------------
-    # Extensions
-    # ------------------------------------------------------------------
-    db.init_app(app)
-    migrate.init_app(app, db)
-    # Allow local Vite dev server (5173) to reach the API
-    CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"], supports_credentials=True)
+    configure_logging(app)
+    init_extensions(app)
 
-    # ------------------------------------------------------------------
-    # Blueprints
-    # ------------------------------------------------------------------
-    from .routes.assessments import assessments_bp
+    from .api import register_blueprints
+    register_blueprints(app)
 
-    app.register_blueprint(assessments_bp, url_prefix="/api/assessments")
+    register_error_handlers(app)
+    register_shellcontext(app)
 
-    return app 
+    return app
+
+
+def register_error_handlers(app: Flask) -> None:
+    @app.errorhandler(404)
+    def handle_not_found(error):
+        return jsonify({"error": "Not found"}), 404
+
+    @app.errorhandler(500)
+    def handle_server_error(error):
+        app.logger.exception("Unhandled server error")
+        return jsonify({"error": "Internal server error"}), 500
+
+
+def register_shellcontext(app: Flask) -> None:
+    @app.shell_context_processor
+    def shell_context():
+        from . import models  # noqa: F401
+
+        return {"db": db}

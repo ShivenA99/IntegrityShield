@@ -1,0 +1,226 @@
+:root {
+  color-scheme: dark;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+body, html, #root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #020617 100%);
+}
+
+button {
+  background-color: #1d4ed8;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pipeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pipeline-stage-panel, .panel {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  backdrop-filter: blur(12px);
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.control-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.progress-tracker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+
+.progress-tracker .stage {
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.8);
+  text-transform: capitalize;
+  text-align: center;
+  border: 1px solid transparent;
+  cursor: pointer;
+  color: inherit;
+}
+
+.progress-tracker .stage.selected {
+  border-color: rgba(37, 99, 235, 0.7);
+}
+
+.progress-tracker .stage.completed {
+  border: 1px solid #22c55e;
+}
+
+.progress-tracker .stage.running {
+  border: 1px solid #fbbf24;
+}
+
+.panel-card {
+  border-radius: 12px;
+  padding: 1rem;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.notification-system {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notification-system .toast {
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.notification-system .toast.success {
+  border-color: #22c55e;
+}
+
+.notification-system .toast.error {
+  border-color: #ef4444;
+}
+
+.app-header, .app-footer {
+  padding: 1rem 1.5rem;
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.app-sidebar {
+  min-width: 200px;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.app-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.app-sidebar a {
+  color: inherit;
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+}
+
+.app-sidebar a.active {
+  background: rgba(37, 99, 235, 0.35);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.developer-panel {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.live-log-viewer ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.live-log-viewer li {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.live-log-viewer .level.info {
+  color: #38bdf8;
+}
+
+.live-log-viewer .level.error {
+  color: #f87272;
+}
+
+.enhancement-preview, .method-comparison {
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.question-card {
+  display: grid;
+  gap: 1rem;
+  background: rgba(30, 41, 59, 0.55);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.question-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.character-mapping-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.character-mapping-table th,
+.character-mapping-table td {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.5rem;
+}
+
+.effectiveness-indicator.success {
+  color: #22c55e;
+}
+
+.effectiveness-indicator.warning {
+  color: #fbbf24;
+}
+
+.effectiveness-indicator.error {
+  color: #ef4444;
+}

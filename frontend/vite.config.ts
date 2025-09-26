@@ -1,26 +1,36 @@
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
-export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
-    return {
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@components": path.resolve(__dirname, "src/components"),
+      "@hooks": path.resolve(__dirname, "src/hooks"),
+      "@services": path.resolve(__dirname, "src/services"),
+      "@contexts": path.resolve(__dirname, "src/contexts"),
+      "@pages": path.resolve(__dirname, "src/pages"),
+      "@styles": path.resolve(__dirname, "src/styles")
+    }
+  },
+  server: {
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        ws: true,
       },
-      resolve: {
-        alias: {
-          '@': path.resolve(__dirname, '.'),
-        }
+      "/developer": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        ws: true,
       },
-      server: {
-        port: 5173,
-        proxy: {
-          '/api': {
-            target: 'http://127.0.0.1:5001',
-            changeOrigin: true,
-          },
-        },
-      },
-    };
+      "/ws": {
+        target: "ws://localhost:8000",
+        ws: true
+      }
+    }
+  }
 });
