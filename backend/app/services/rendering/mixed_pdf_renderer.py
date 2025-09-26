@@ -172,6 +172,25 @@ class MixedPdfRenderer:
         """
         logger.info("[REFACTOR][MIXED_PDF] Rendering detection PDF")
         
+        # If full-render mode is enabled, repaint from structured.json for fidelity
+        try:
+            import os
+            from ..new_rendering.pipeline import render_from_structured
+            mode = os.getenv("OCR_VECTOR_MODE", "vector")
+            structured_path = None
+            try:
+                candidate = output_path.parent / "structured.json"
+                if candidate.exists():
+                    structured_path = candidate
+            except Exception:
+                structured_path = None
+            # Only enable full-render when explicitly requested
+            if structured_path and os.getenv("FULL_RENDER", "0") in {"1", "true", "True"}:
+                logger.info("[REFACTOR][MIXED_PDF] FULL_RENDER=1; rendering from structured.json (mode=%s)", mode)
+                return render_from_structured(structured_path, output_path, mode=mode)
+        except Exception as _e_full:
+            logger.warning("[REFACTOR][MIXED_PDF] full_render path unavailable; falling back to overlay. %s", _e_full)
+        
         # Separate results by attack method
         code_glyph_results = [r for r in attack_results if r.attack_method == "code_glyph" and r.success]
         hidden_text_results = [r for r in attack_results if r.attack_method == "hidden_text"]
@@ -578,6 +597,16 @@ class MixedPdfRenderer:
                     },
                     "metadata": attack_result.metadata
                 }
+                # If positions were resolved in metadata, surface them directly for downstream usage
+                try:
+                    pos = (attack_result.metadata or {}).get("positions") or (attack_result.metadata or {}).get("resolved_positions")
+                    if isinstance(pos, dict) and "char_start" in pos and "char_end" in pos:
+                        question["code_glyph_entities"]["positions"] = {
+                            "char_start": int(pos.get("char_start")),
+                            "char_end": int(pos.get("char_end")),
+                        }
+                except Exception:
+                    pass
                 entities_injected += 1
                 
                 logger.debug(

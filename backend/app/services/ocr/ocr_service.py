@@ -15,9 +15,11 @@ from PIL import Image
 import io
 
 try:
-    import openai
-except ImportError as exc:
-    raise RuntimeError("The 'openai' package is required for OCR functionality.") from exc
+	import openai  # type: ignore
+	_OPENAI_AVAILABLE = True
+except ImportError:
+	openai = None  # type: ignore
+	_OPENAI_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -25,69 +27,69 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_VISION_MODEL = os.getenv("OPENAI_VISION_MODEL", "gpt-4o")
 
 if not OPENAI_API_KEY:
-    logger.warning("OPENAI_API_KEY not set – OCR functionality will be disabled.")
+	logger.warning("OPENAI_API_KEY not set – OCR functionality will be disabled.")
 
 
 def pdf_to_images(pdf_path: Path, dpi: int = 300) -> List[Image.Image]:
-    """Convert PDF pages to PIL Images for OCR processing.
-    
-    Args:
-        pdf_path: Path to the PDF file
-        dpi: Resolution for image conversion (higher = better quality but slower)
-    
-    Returns:
-        List of PIL Image objects, one per page
-    """
-    try:
-        # Open PDF with PyMuPDF
-        pdf_document = fitz.open(str(pdf_path))
-        images = []
-        
-        for page_num in range(len(pdf_document)):
-            page = pdf_document.load_page(page_num)
-            
-            # Create a transformation matrix for the desired DPI
-            mat = fitz.Matrix(dpi/72, dpi/72)  # 72 is the default DPI
-            
-            # Render page to image
-            pix = page.get_pixmap(matrix=mat)
-            
-            # Convert to PIL Image
-            img_data = pix.tobytes("png")
-            img = Image.open(io.BytesIO(img_data))
-            images.append(img)
-        
-        pdf_document.close()
-        return images
-        
-    except Exception as e:
-        logger.error(f"Error converting PDF to images: {e}")
-        raise RuntimeError(f"Failed to convert PDF to images: {e}")
+	"""Convert PDF pages to PIL Images for OCR processing.
+	
+	Args:
+		pdf_path: Path to the PDF file
+		dpi: Resolution for image conversion (higher = better quality but slower)
+	
+	Returns:
+		List of PIL Image objects, one per page
+	"""
+	try:
+		# Open PDF with PyMuPDF
+		pdf_document = fitz.open(str(pdf_path))
+		images = []
+		
+		for page_num in range(len(pdf_document)):
+			page = pdf_document.load_page(page_num)
+			
+			# Create a transformation matrix for the desired DPI
+			mat = fitz.Matrix(dpi/72, dpi/72)  # 72 is the default DPI
+			
+			# Render page to image
+			pix = page.get_pixmap(matrix=mat)
+			
+			# Convert to PIL Image
+			img_data = pix.tobytes("png")
+			img = Image.open(io.BytesIO(img_data))
+			images.append(img)
+		
+		pdf_document.close()
+		return images
+		
+	except Exception as e:
+		logger.error(f"Error converting PDF to images: {e}")
+		raise RuntimeError(f"Failed to convert PDF to images: {e}")
 
 
 def encode_image_to_base64(image: Image.Image) -> str:
-    """Convert PIL Image to base64 string for API transmission."""
-    buffer = io.BytesIO()
-    image.save(buffer, format="PNG")
-    img_str = base64.b64encode(buffer.getvalue()).decode()
-    return img_str
+	"""Convert PIL Image to base64 string for API transmission."""
+	buffer = io.BytesIO()
+	image.save(buffer, format="PNG")
+	img_str = base64.b64encode(buffer.getvalue()).decode()
+	return img_str
 
 
 def extract_text_from_image_with_llm(image: Image.Image, prompt: str = None) -> str:
-    """Extract text from a single image using OpenAI's vision model.
-    
-    Args:
-        image: PIL Image to process
-        prompt: Custom prompt for the LLM (optional)
-    
-    Returns:
-        Extracted text from the image
-    """
-    if not OPENAI_API_KEY:
-        raise RuntimeError("OPENAI_API_KEY not configured for OCR")
-    
-    # Default prompt optimized for academic document extraction
-    default_prompt = """Please extract all text from this image. This appears to be an academic document (quiz, test, or assessment). 
+	"""Extract text from a single image using OpenAI's vision model.
+	
+	Args:
+		image: PIL Image to process
+		prompt: Custom prompt for the LLM (optional)
+	
+	Returns:
+		Extracted text from the image
+	"""
+	if not (OPENAI_API_KEY and _OPENAI_AVAILABLE):
+		raise RuntimeError("OPENAI Vision not available (missing package or API key)")
+	
+	# Default prompt optimized for academic document extraction
+	default_prompt = """Please extract all text from this image. This appears to be an academic document (quiz, test, or assessment). 
 
 Important guidelines:
 1. Extract ALL visible text including questions, answer options, headers, footers, and any other text
@@ -101,68 +103,51 @@ Important guidelines:
 
 Please provide the extracted text in a clean, readable format."""
 
-    user_prompt = prompt or default_prompt
-    
-    try:
-        # Convert image to base64
-        base64_image = encode_image_to_base64(image)
-        
-        # Prepare the API call
-        if hasattr(openai, 'OpenAI'):
-            # Use new OpenAI client (>=1.0)
-            client = openai.OpenAI(api_key=OPENAI_API_KEY)
-            logger.info("[ocr_service] Vision prompt (first 300 chars): %s", (user_prompt or "")[:300])
-            response = client.chat.completions.create(
-                model=OPENAI_VISION_MODEL,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": user_prompt},
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": f"data:image/png;base64,{base64_image}"
-                                }
-                            }
-                        ]
-                    }
-                ],
-                max_tokens=4000,
-                temperature=0.1
-            )
-            text = response.choices[0].message.content.strip()
-            logger.info("[ocr_service] Vision response (first 400 chars): %s", text[:400])
-            return text
-        else:
-            # Fallback to legacy client
-            logger.info("[ocr_service] Vision prompt (first 300 chars): %s", (user_prompt or "")[:300])
-            response = openai.ChatCompletion.create(
-                model=OPENAI_VISION_MODEL,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": user_prompt},
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": f"data:image/png;base64,{base64_image}"
-                                }
-                            }
-                        ]
-                    }
-                ],
-                max_tokens=4000,
-                temperature=0.1
-            )
-            text = response.choices[0].message.content.strip()
-            logger.info("[ocr_service] Vision response (first 400 chars): %s", text[:400])
-            return text
-            
-    except Exception as e:
-        logger.error(f"Error extracting text from image with LLM: {e}")
-        raise RuntimeError(f"LLM OCR failed: {e}")
+	user_prompt = prompt or default_prompt
+	
+	try:
+		# Convert image to base64
+		base64_image = encode_image_to_base64(image)
+		
+		# Prepare the API call
+		if hasattr(openai, 'OpenAI'):
+			# Use new OpenAI client (>=1.0)
+			client = openai.OpenAI(api_key=OPENAI_API_KEY)
+			logger.info("[ocr_service] Vision prompt (first 300 chars): %s", (user_prompt or "")[:300])
+			response = client.chat.completions.create(
+				model=OPENAI_VISION_MODEL,
+				messages=[
+					{
+						"role": "user",
+						"content": [
+							{"type": "text", "text": user_prompt},
+							{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}},
+						]
+					}
+				],
+				max_tokens=2000,
+				temperature=0.0,
+			)
+			return (response.choices[0].message.content or "").strip()
+		else:
+			response = openai.ChatCompletion.create(  # type: ignore
+				model=OPENAI_VISION_MODEL,
+				messages=[
+					{
+						"role": "user",
+						"content": [
+							{"type": "text", "text": user_prompt},
+							{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}},
+						]
+					}
+				],
+				max_tokens=2000,
+				temperature=0.0,
+			)
+			return (response["choices"][0]["message"]["content"] if isinstance(response, dict) else response.choices[0].message.content or "").strip()
+	except Exception as e:
+		logger.error(f"OpenAI Vision OCR error: {e}")
+		raise RuntimeError(f"OpenAI Vision OCR failed: {e}")
 
 
 def extract_text_from_pdf_with_ocr(pdf_path: Path, prompt: str = None) -> str:

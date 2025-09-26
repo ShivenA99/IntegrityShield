@@ -147,11 +147,14 @@ def upload_assessment():
 
         # Setup per-run logging to a file inside assessment_dir/code_glyph/run.log
         try:
-            from ..services.logging_utils import activate_run_context, create_run_file_handler, attach_run_file_handler
+            from ..services.logging_utils import activate_run_context, create_run_file_handler, attach_run_file_handler, create_run_console_handler, attach_run_console_handler
             run_log_path = assessment_dir / "code_glyph" / "run.log"
             activate_run_context(str(assessment_uuid))
             _run_file_handler = create_run_file_handler(run_log_path)
             attach_run_file_handler(_run_file_handler)
+            # Mirror to console for easy tracking in UI/terminal
+            _try_console = create_run_console_handler()
+            attach_run_console_handler(_try_console)
             logger.info("[upload_assessment] Run-scoped logging initialized at %s", run_log_path)
         except Exception as _e_setup_log:
             logger.warning("[upload_assessment] Failed to initialize run-scoped logging: %s", _e_setup_log)
@@ -218,7 +221,16 @@ def upload_assessment():
                 from ..services.layout_extractor import extract_layout_and_assets
                 assets_dir = assessment_dir / "assets"
                 logger.info("[upload_assessment] STOP_AFTER_OCR=1; extracting layout and assets only")
-                ocr_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                # Prefer NEW_OCR AST for STOP_AFTER_OCR to keep the same file shape
+                try:
+                    from ..services.new_ocr.config import NewOCRConfig
+                    from ..services.new_ocr.ingestion.pdf_ast_extractor import extract_pdf_ast
+                    if NewOCRConfig().NEW_OCR:
+                        ocr_doc = extract_pdf_ast(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                    else:
+                        raise ImportError("NEW_OCR disabled")
+                except Exception:
+                    ocr_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
                 # Persist structured.json
                 import json
                 structured_path = assessment_dir / "structured.json"
@@ -256,10 +268,20 @@ def upload_assessment():
                 from ..services.ocr.ocr_postprocess import postprocess_document
                 assets_dir = assessment_dir / "assets"
                 logger.info("[upload_assessment] STOP_AFTER_STRUCTURING=1; extracting layout + structuring only")
-                layout_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
-                structured_doc = extract_structured_document_with_ocr(orig_path, layout_doc)
-                # Post-process: dedup assets and prefer images for non-question text
-                structured_doc = postprocess_document(orig_path, structured_doc, assets_dir, questions=structured_doc.get("document", {}).get("questions", []), dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                # NEW_OCR path (STOP_AFTER_STRUCTURING): build via new pipeline when enabled
+                try:
+                    from ..services.new_ocr.config import NewOCRConfig
+                    from ..services.new_ocr.controller.build_structured import build_structured as build_structured_new
+                    if NewOCRConfig().NEW_OCR:
+                        logger.info("[upload_assessment] NEW_OCR=1; using new OCR+fusion pipeline (STOP_AFTER_STRUCTURING)")
+                        structured_doc = build_structured_new(assessment_dir, orig_path)
+                    else:
+                        raise ImportError("NEW_OCR disabled")
+                except Exception:
+                    layout_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                    structured_doc = extract_structured_document_with_ocr(orig_path, layout_doc)
+                    # Post-process: dedup assets and prefer images for non-question text
+                    structured_doc = postprocess_document(orig_path, structured_doc, assets_dir, questions=structured_doc.get("document", {}).get("questions", []), dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
                 # Persist structured.json
                 import json
                 structured_path = assessment_dir / "structured.json"
@@ -353,9 +375,19 @@ def upload_assessment():
 
                 assets_dir = assessment_dir / "assets"
                 logger.info("[upload_assessment] STOP_AFTER_RENDER=1; rendering attacked PDF via MuPDF")
-                layout_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
-                structured_doc = extract_structured_document_with_ocr(orig_path, layout_doc)
-                structured_doc = postprocess_document(orig_path, structured_doc, assets_dir, questions=structured_doc.get("document", {}).get("questions", []), dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                # NEW_OCR path (STOP_AFTER_RENDER): build via new pipeline when enabled
+                try:
+                    from ..services.new_ocr.config import NewOCRConfig
+                    from ..services.new_ocr.controller.build_structured import build_structured as build_structured_new
+                    if NewOCRConfig().NEW_OCR:
+                        logger.info("[upload_assessment] NEW_OCR=1; using new OCR+fusion pipeline (STOP_AFTER_RENDER)")
+                        structured_doc = build_structured_new(assessment_dir, orig_path)
+                    else:
+                        raise ImportError("NEW_OCR disabled")
+                except Exception:
+                    layout_doc = extract_layout_and_assets(orig_path, assets_dir, dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
+                    structured_doc = extract_structured_document_with_ocr(orig_path, layout_doc)
+                    structured_doc = postprocess_document(orig_path, structured_doc, assets_dir, questions=structured_doc.get("document", {}).get("questions", []), dpi=int(os.getenv("STRUCTURE_OCR_DPI", "300")))
 
                 # Ensure source path is recorded for background import
                 try:
@@ -423,6 +455,14 @@ def upload_assessment():
                                     questions[i]["code_glyph_entities"] = result.entities
                                 if result.wrong_answer:
                                     questions[i]["wrong_answer"] = result.wrong_answer
+                                    # Normalize MCQ: if wrong_answer matches an option label, also set wrong_label
+                                    try:
+                                        opts = questions[i].get("options") or {}
+                                        wa = str(result.wrong_answer).strip()
+                                        if isinstance(opts, dict) and wa in opts.keys():
+                                            questions[i]["wrong_label"] = wa
+                                    except Exception:
+                                        pass
                                 questions[i]["attack_metadata"] = result.metadata
                         # Ensure structured_doc questions carry all attack annotations
                         try:
@@ -430,7 +470,16 @@ def upload_assessment():
                                 structured_doc["document"]["questions"] = questions
                         except Exception:
                             pass
-                        
+
+                        # Persist updated structured.json with attack annotations for downstream reporting
+                        try:
+                            import json as _json
+                            structured_path = assessment_dir / "structured.json"
+                            with open(structured_path, "w", encoding="utf-8") as _f:
+                                _json.dump(structured_doc, _f, ensure_ascii=False, indent=2)
+                        except Exception:
+                            logger.debug("[REFACTOR][UPLOAD] Could not persist updated structured.json after attack annotations")
+                         
                         # New system: Mixed evaluation using orchestrator results
                         try:
                             from ..services.evaluation.mixed_eval_service import MixedEvalService
@@ -870,10 +919,19 @@ def upload_assessment():
                             structured_q["wrong_answer"] = db_q.wrong_answer
                             structured_q["wrong_reason"] = db_q.wrong_reason
                             logger.info(f"DEBUG: Merged Q{q_num}: gold='{db_q.gold_answer}', wrong='{db_q.wrong_answer}'")
-                            # Also add code_glyph_entities if it exists in original questions
+                            # Also merge attack annotations from in-memory questions (not persisted to DB)
                             for orig_q in questions:
-                                if orig_q.get("q_number") == q_num and "code_glyph_entities" in orig_q:
-                                    structured_q["code_glyph_entities"] = orig_q["code_glyph_entities"]
+                                if orig_q.get("q_number") == q_num:
+                                    for _k in [
+                                        "code_glyph_entities",
+                                        "wrong_answer",
+                                        "wrong_label",
+                                        "attack_method",
+                                        "attack_success",
+                                        "attack_metadata",
+                                    ]:
+                                        if _k in orig_q and orig_q.get(_k) is not None:
+                                            structured_q[_k] = orig_q[_k]
                                     break
                         else:
                             logger.warning(f"DEBUG: No DB match for structured Q{q_num}")

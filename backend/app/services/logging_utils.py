@@ -38,10 +38,30 @@ def create_run_file_handler(log_path: Path, level: int = logging.DEBUG) -> loggi
     return handler
 
 
+def create_run_console_handler(level: int = logging.INFO) -> logging.Handler:
+    """Create a stream handler to mirror run-scoped logs to console with run_id prefix."""
+    h = logging.StreamHandler()
+    h.setLevel(level)
+    h.addFilter(RunContextFilter())
+    fmt = logging.Formatter(
+        fmt="%(asctime)s | %(levelname)5s | %(name)s:%(lineno)d | run=%(run_id)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    h.setFormatter(fmt)
+    return h
+
+
 def attach_run_file_handler(handler: logging.Handler, *, logger: Optional[logging.Logger] = None) -> None:
     """Attach the handler to the specified logger (or root logger by default)."""
     target_logger = logger or logging.getLogger()
     # Avoid duplicate attachment of the same handler
+    if handler not in target_logger.handlers:
+        target_logger.addHandler(handler)
+
+
+def attach_run_console_handler(handler: logging.Handler, *, logger: Optional[logging.Logger] = None) -> None:
+    """Attach console handler similarly, avoiding duplicates."""
+    target_logger = logger or logging.getLogger()
     if handler not in target_logger.handlers:
         target_logger.addHandler(handler)
 

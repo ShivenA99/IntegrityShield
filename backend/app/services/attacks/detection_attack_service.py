@@ -165,8 +165,72 @@ class DetectionAttackService:
                     entities_result.get("entities", {}).get("input_entity", ""),
                     entities_result.get("entities", {}).get("output_entity", "")
                 )
+                # Hard precheck: input_entity must be a contiguous substring of stem_text
+                try:
+                    stem_text = question.get("stem_text") or ""
+                    vin_pre = entities_result.get("entities", {}).get("input_entity", "")
+                    if not self._resolve_entity_span(stem_text, vin_pre):
+                        logger.debug(
+                            "[REFACTOR][DETECTION] Skipping option %d/%d for Q%s: input_entity not a contiguous substring",
+                            i+1, len(entity_options), q_number
+                        )
+                        continue
+                except Exception:
+                    # Be safe: if precheck fails unexpectedly, skip this option
+                    continue
                 
                 if self.use_validation:
+                    # Prefer latest validator when latest path was used
+                    try:
+                        import os
+                        use_latest = os.getenv("LATEST_ENTITIES", "0") in {"1", "true", "True"}
+                    except Exception:
+                        use_latest = False
+                    if use_latest:
+                        try:
+                            from ..entity_detection.entity_validation.llm_validator import validate_entities_latest as _validate_latest  # type: ignore
+                        except Exception:
+                            _validate_latest = None  # type: ignore
+                        if _validate_latest is not None:
+                            verdict = _validate_latest(question, entities_result) or {}
+                            if bool(verdict.get("ok")):
+                                # Persist latest attack annotations back into the question for reporting
+                                try:
+                                    entities = entities_result.get("entities", {})
+                                    question["attack_method"] = "code_glyph"
+                                    question["attack_success"] = True
+                                    question["code_glyph_entities"] = entities
+                                    if "target_wrong" in entities_result:
+                                        question["wrong_answer"] = entities_result.get("target_wrong")
+                                    # Resolve precise positions post-validation
+                                    stem_text = question.get("stem_text") or ""
+                                    vin = entities.get("input_entity") or ""
+                                    cs, ce = self._resolve_entity_span(stem_text, vin)
+                                    if cs is not None and ce is not None:
+                                        entities_result.setdefault("positions", {})
+                                        entities_result["positions"]["char_start"] = cs
+                                        entities_result["positions"]["char_end"] = ce
+                                        entities_result["anchor"] = {
+                                            "char_start": cs,
+                                            "char_end": ce,
+                                            "anchor_text": stem_text[cs:ce]
+                                        }
+                                        # also persist on question for downstream/reporting
+                                        question.setdefault("code_glyph_entities_positions", {"char_start": cs, "char_end": ce})
+                                    # Enrich entities_result metadata with validator outputs
+                                    entities_result.setdefault("validation", {})
+                                    entities_result["validation"]["edited_answer"] = verdict.get("edited_answer")
+                                    entities_result["validation"]["confidence"] = verdict.get("confidence")
+                                    entities_result["validation"]["notes"] = verdict.get("notes")
+                                except Exception:
+                                    pass
+                                return self._create_code_glyph_result(question, entities_result, f"latest_option_{i+1}_validated")
+                            logger.debug(
+                                "[REFACTOR][DETECTION][LATEST] Option %d/%d failed latest validation for question %s: %s",
+                                i+1, len(entity_options), q_number, verdict
+                            )
+                            continue
+                    # Legacy validator path
                     validated_result = self._validate_with_llm(question, entities_result)
                     if validated_result:
                         logger.info(
@@ -210,7 +274,19 @@ class DetectionAttackService:
         q_number = question.get("q_number", "unknown")
         
         try:
+            import os
+            use_latest = os.getenv("LATEST_ENTITIES", "0") in {"1", "true", "True"}
+            topk = int(os.getenv("LATEST_ENTITIES_TOPK", "3"))
             q_type = (question.get("q_type") or "").strip().lower()
+            if use_latest:
+                from .code_glyph.entity_generation.entity_latest import generate_topk_entities_latest as _gen_latest
+                logger.info("[REFACTOR][DETECTION][LATEST] Generating top-%d latest entities for Q%s", topk, q_number)
+                latest_opts = _gen_latest(question, top_k=topk) or []
+                if latest_opts:
+                    logger.info("[REFACTOR][DETECTION][LATEST] Generated %d options for Q%s", len(latest_opts), q_number)
+                    return latest_opts
+                logger.warning("[REFACTOR][DETECTION][LATEST] No options returned by latest generator; falling back to legacy v3 path for Q%s", q_number)
+            
             if q_type in {"long_answer", "short_answer", "comprehension_qa", "fill_blank"}:
                 # Use long-form V3 generator directly (one best entity)
                 from .code_glyph.entity_generation.entity_service import cg_generate_structured_entities_v3
@@ -513,7 +589,8 @@ class DetectionAttackService:
                 "positions": entities_result.get("positions", {}),
                 "anchor": entities_result.get("anchor", {}),
                 "transformation": entities_result.get("transformation", ""),
-                "evidence_tokens": entities_result.get("evidence_tokens", [])
+                "evidence_tokens": entities_result.get("evidence_tokens", []),
+                "rationale_steps": entities_result.get("rationale_steps", [])
             }
         )
         
@@ -538,7 +615,37 @@ class DetectionAttackService:
         
         # Generate wrong answer for hidden text detection
         wrong_answer = self._generate_wrong_answer_for_hidden_text(question)
+        # Normalize for MCQ: map wrong_label -> wrong_answer (single string label)
+        try:
+            q_type = (question.get("q_type") or "").strip()
+            if q_type in {"mcq_single", "mcq_multi"}:
+                # Prefer label(s) for MCQ; join multi with commas
+                wrong_label = None
+                if isinstance(wrong_answer, dict):
+                    # In case helper returns a dict in future; be defensive
+                    wrong_label = wrong_answer.get("wrong_label") or wrong_answer.get("wrong_labels")
+                if isinstance(wrong_label, list):
+                    wrong_label = ",".join([str(x).strip().upper() for x in wrong_label if x])
+                if not wrong_label:
+                    wrong_label = question.get("wrong_label") or ""
+                if not wrong_label and isinstance(wrong_answer, str) and len(wrong_answer) == 1:
+                    # Already a label like 'A'
+                    wrong_label = wrong_answer
+                # Persist on question for reporting
+                if wrong_label:
+                    question["wrong_label"] = wrong_label
+                    wrong_answer = wrong_label
+        except Exception:
+            pass
         
+        # Persist hidden-text annotations back into the question for reporting
+        try:
+            question["attack_method"] = "hidden_text"
+            question["attack_success"] = True
+            if wrong_answer is not None:
+                question["wrong_answer"] = wrong_answer
+        except Exception:
+            pass
         result = QuestionAttackResult(
             question_id=str(q_number),
             attack_method="hidden_text",
@@ -581,7 +688,15 @@ class DetectionAttackService:
                 ocr_doc=None  # Not needed for hidden text
             )
             
-            return wrong_answer_data.get("wrong_answer")
+            # Return best field depending on q_type
+            q_type = (question.get("q_type") or "").strip()
+            if q_type in {"mcq_single", "mcq_multi"}:
+                wl = wrong_answer_data.get("wrong_label")
+                if not wl and isinstance(wrong_answer_data.get("wrong_labels"), list):
+                    wl = ",".join([str(x).strip().upper() for x in wrong_answer_data.get("wrong_labels")])
+                return wl or wrong_answer_data.get("wrong_answer")
+            else:
+                return wrong_answer_data.get("wrong_answer")
             
         except Exception as e:
             logger.error(
@@ -998,5 +1113,34 @@ class DetectionAttackService:
             logger.debug(
                 "[REFACTOR][DETECTION] Error creating entity option for '%s' -> '%s': %s",
                 visual_entity, parsed_entity, str(e)
+            )
+            return None
+
+    def _resolve_entity_span(self, text: str, entity_text: str) -> tuple[int, int] | None:
+        """
+        Resolves the precise start and end positions of an entity within a text.
+        This is crucial for accurate rendering and validation.
+        
+        Args:
+            text: The full text.
+            entity_text: The text of the entity to find.
+            
+        Returns:
+            A tuple (start_char_index, end_char_index) if found, None otherwise.
+        """
+        try:
+            start_pos = text.find(entity_text)
+            if start_pos == -1:
+                # Try case-insensitive search
+                start_pos = text.lower().find(entity_text.lower())
+                if start_pos == -1:
+                    return None
+            
+            end_pos = start_pos + len(entity_text)
+            return (start_pos, end_pos)
+        except Exception as e:
+            logger.error(
+                "[REFACTOR][DETECTION] Error resolving entity span for text '%s' and entity '%s': %s",
+                text, entity_text, str(e)
             )
             return None
