@@ -1,0 +1,22 @@
+{
+  "pipeline_metadata": {
+    "run_id": "4e774f37-0bfb-4707-a6e6-81cd6a1f3732",
+    "current_stage": "smart_reading",
+    "stages_completed": [],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-26T14:23:33.148407+00:00",
+    "version": "2.0.0",
+    "config": {}
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/4e774f37-0bfb-4707-a6e6-81cd6a1f3732/demo_paper_1.pdf",
+    "filename": "demo_paper_1.pdf"
+  },
+  "questions": [],
+  "assets": {
+    "images": [],
+    "fonts": []
+  },
+  "manipulation_results": {},
+  "performance_metrics": {}
+}

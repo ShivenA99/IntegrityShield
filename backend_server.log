@@ -1,0 +1,33 @@
+ * Serving Flask app 'app'
+ * Debug mode: on
+{"asctime": "2025-09-26 00:23:32,561", "levelname": "INFO", "name": "werkzeug", "message": "\u001b[31m\u001b[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.\u001b[0m\n * Running on all addresses (0.0.0.0)\n * Running on http://127.0.0.1:8000\n * Running on http://192.168.0.11:8000"}
+{"asctime": "2025-09-26 00:23:32,561", "levelname": "INFO", "name": "werkzeug", "message": "\u001b[33mPress CTRL+C to quit\u001b[0m"}
+{"asctime": "2025-09-26 00:23:32,561", "levelname": "INFO", "name": "werkzeug", "message": " * Restarting with stat"}
+{"asctime": "2025-09-26 00:23:32,832", "levelname": "WARNING", "name": "werkzeug", "message": " * Debugger is active!"}
+{"asctime": "2025-09-26 00:23:32,839", "levelname": "INFO", "name": "werkzeug", "message": " * Debugger PIN: 359-257-930"}
+{"asctime": "2025-09-26 00:49:10,074", "levelname": "INFO", "name": "werkzeug", "message": " * Detected change in '/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/app/services/pipeline/enhancement_methods/image_overlay_renderer.py', reloading"}
+{"asctime": "2025-09-26 00:49:10,168", "levelname": "INFO", "name": "werkzeug", "message": " * Restarting with stat"}
+{"asctime": "2025-09-26 00:49:12,028", "levelname": "WARNING", "name": "werkzeug", "message": " * Debugger is active!"}
+{"asctime": "2025-09-26 00:49:12,035", "levelname": "INFO", "name": "werkzeug", "message": " * Debugger PIN: 359-257-930"}
+{"asctime": "2025-09-26 01:46:23,547", "levelname": "INFO", "name": "werkzeug", "message": " * Detected change in '/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/app/services/pipeline/smart_reading_service.py', reloading"}
+{"asctime": "2025-09-26 01:46:23,630", "levelname": "INFO", "name": "werkzeug", "message": " * Restarting with stat"}
+{"asctime": "2025-09-26 01:46:24,527", "levelname": "WARNING", "name": "werkzeug", "message": " * Debugger is active!"}
+{"asctime": "2025-09-26 01:46:24,532", "levelname": "INFO", "name": "werkzeug", "message": " * Debugger PIN: 359-257-930"}
+{"asctime": "2025-09-26 01:46:28,645", "levelname": "INFO", "name": "werkzeug", "message": " * Detected change in '/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/app/services/pipeline/smart_reading_service.py', reloading"}
+{"asctime": "2025-09-26 01:46:28,770", "levelname": "INFO", "name": "werkzeug", "message": " * Restarting with stat"}
+{"asctime": "2025-09-26 01:46:29,260", "levelname": "WARNING", "name": "werkzeug", "message": " * Debugger is active!"}
+{"asctime": "2025-09-26 01:46:29,269", "levelname": "INFO", "name": "werkzeug", "message": " * Debugger PIN: 359-257-930"}
+{"asctime": "2025-09-26 01:46:59,010", "levelname": "INFO", "name": "werkzeug", "message": " * Detected change in '/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/app/services/pipeline/smart_reading_service.py', reloading"}
+{"asctime": "2025-09-26 01:46:59,118", "levelname": "INFO", "name": "werkzeug", "message": " * Restarting with stat"}
+{"asctime": "2025-09-26 01:46:59,713", "levelname": "WARNING", "name": "werkzeug", "message": " * Debugger is active!"}
+{"asctime": "2025-09-26 01:46:59,719", "levelname": "INFO", "name": "werkzeug", "message": " * Debugger PIN: 359-257-930"}
+{"asctime": "2025-09-26 01:48:44,168", "levelname": "INFO", "name": "werkzeug", "message": " * Detected change in '/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/app/api/developer_routes.py', reloading"}
+{"asctime": "2025-09-26 01:48:44,271", "levelname": "INFO", "name": "werkzeug", "message": " * Restarting with stat"}
+{"asctime": "2025-09-26 01:48:44,775", "levelname": "WARNING", "name": "werkzeug", "message": " * Debugger is active!"}
+{"asctime": "2025-09-26 01:48:44,779", "levelname": "INFO", "name": "werkzeug", "message": " * Debugger PIN: 359-257-930"}
+{"asctime": "2025-09-26 01:49:00,115", "levelname": "INFO", "name": "werkzeug", "message": " * Detected change in '/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/app/api/developer_routes.py', reloading"}
+{"asctime": "2025-09-26 01:49:00,220", "levelname": "INFO", "name": "werkzeug", "message": " * Restarting with stat"}
+{"asctime": "2025-09-26 01:49:00,775", "levelname": "WARNING", "name": "werkzeug", "message": " * Debugger is active!"}
+{"asctime": "2025-09-26 01:49:00,781", "levelname": "INFO", "name": "werkzeug", "message": " * Debugger PIN: 359-257-930"}
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/multiprocessing/resource_tracker.py:216: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
