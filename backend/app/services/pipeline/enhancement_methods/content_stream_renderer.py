@@ -42,13 +42,43 @@ class ContentStreamRenderer(BaseRenderer):
                 "matches_found": 0,
             }
 
-        # Step 1: perform text rewrites with PyMuPDF so underlying content matches the mapping
-        renderer = PyMuPDFRenderer()
         mapping_context = self.build_mapping_context(run_id) if run_id else {}
-        doc = fitz.open(str(original_pdf))
-        replace_stats = renderer._replace_text(doc, clean_mapping, run_id, mapping_context)
-        rewritten_bytes = replace_stats.get("rewritten_bytes") or doc.tobytes()
-        doc.close()
+        original_bytes = original_pdf.read_bytes()
+
+        fallback_used = False
+        replace_stats: Dict[str, object]
+        try:
+            rewritten_bytes, rewrite_stats = self.rewrite_content_streams_structured(
+                original_bytes,
+                clean_mapping,
+                mapping_context,
+                run_id=run_id,
+            )
+            replace_stats = {
+                "replacements": rewrite_stats.get("replacements", 0),
+                "targets": rewrite_stats.get("matches_found", 0),
+                "textbox_adjustments": 0,
+                "rewritten_bytes": rewritten_bytes,
+                "tokens_scanned": rewrite_stats.get("tokens_scanned", 0),
+            }
+        except Exception as exc:
+            LOGGER.warning(
+                "structured stream rewrite failed; falling back to PyMuPDF",
+                extra={"run_id": run_id, "error": str(exc)},
+            )
+            fallback_used = True
+            renderer = PyMuPDFRenderer()
+            doc = fitz.open(stream=original_bytes, filetype="pdf")
+            replace_stats = renderer._replace_text(doc, clean_mapping, run_id, mapping_context)
+            rewritten_bytes = replace_stats.get("rewritten_bytes") or doc.tobytes()
+            doc.close()
+            rewrite_stats = {
+                "pages": len(replace_stats.get("targets") or []),
+                "tj_hits": 0,
+                "replacements": replace_stats.get("replacements", 0),
+                "matches_found": replace_stats.get("targets", 0),
+                "tokens_scanned": 0,
+            }
 
         artifacts: Dict[str, str] = {}
         try:
@@ -65,7 +95,6 @@ class ContentStreamRenderer(BaseRenderer):
 
         # Step 2: capture overlays from the original document to preserve appearance
         overlay = ImageOverlayRenderer()
-        original_bytes = original_pdf.read_bytes()
         snapshots = overlay._capture_original_snapshots(
             original_bytes,
             clean_mapping,
@@ -103,9 +132,20 @@ class ContentStreamRenderer(BaseRenderer):
         doc_overlay.close()
         artifacts["final"] = str(destination)
 
-        replacements = replace_stats["replacements"]
-        matches = replace_stats["targets"]
-        typography_scaled_segments = replace_stats["textbox_adjustments"]
+        try:
+            final_bytes = destination.read_bytes()
+            self.validate_output_with_context(final_bytes, mapping_context, run_id)
+        except Exception as exc:
+            LOGGER.error(
+                "validation failure after content stream render",
+                extra={"run_id": run_id, "error": str(exc)},
+            )
+            raise
+
+        replacements = int(replace_stats.get("replacements", 0))
+        matches = int(replace_stats.get("targets", 0))
+        typography_scaled_segments = int(replace_stats.get("textbox_adjustments", 0))
+        tokens_scanned = int(replace_stats.get("tokens_scanned", 0))
 
         effectiveness_score = (
             min(overlays_applied / max(total_targets, 1), 1.0)
@@ -113,6 +153,8 @@ class ContentStreamRenderer(BaseRenderer):
             else (1.0 if replacements else 0.0)
         )
         overlay_area_pct = overlay_area_sum / max(page_area_sum, 1.0) if page_area_sum else 0.0
+
+        rewrite_engine = "structured_stream" if not fallback_used else "pymupdf"
 
         live_logging_service.emit(
             run_id,
@@ -123,9 +165,9 @@ class ContentStreamRenderer(BaseRenderer):
             context={
                 "replacements": replacements,
                 "matches_found": matches,
-                "tokens_scanned": 0,
+                "tokens_scanned": tokens_scanned,
                 "typography_scaled_segments": typography_scaled_segments,
-                "fallback_pages": {"rewrite_engine": "pymupdf"},
+                "fallback_pages": {"rewrite_engine": rewrite_engine},
                 "overlay_applied": overlays_applied,
                 "overlay_targets": total_targets,
                 "overlay_area_pct": round(overlay_area_pct, 4),
@@ -139,12 +181,12 @@ class ContentStreamRenderer(BaseRenderer):
             "effectiveness_score": effectiveness_score,
             "replacements": replacements,
             "matches_found": matches,
-            "tokens_scanned": 0,
+            "tokens_scanned": tokens_scanned,
             "typography_scaled_segments": typography_scaled_segments,
             "overlay_applied": overlays_applied,
             "overlay_targets": total_targets,
             "overlay_area_pct": round(overlay_area_pct, 4),
-            "fallback_pages": {"rewrite_engine": "pymupdf"},
+            "fallback_pages": {"rewrite_engine": rewrite_engine},
             "font_gaps": {},
             "artifacts": artifacts,
         }
