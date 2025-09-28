@@ -1,0 +1,18 @@
+{
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/7f214ead-25ef-4777-ad63-d806a467bf11/enhanced_content_stream.pdf",
+        "method": "content_stream",
+        "effectiveness_score": null
+      }
+    }
+  },
+  "pipeline_metadata": {
+    "current_stage": "document_enhancement",
+    "stages_completed": [
+      "document_enhancement"
+    ],
+    "last_updated": "2025-09-27T02:08:58.125607+00:00"
+  }
+}

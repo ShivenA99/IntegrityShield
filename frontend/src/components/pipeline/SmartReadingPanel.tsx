@@ -6,10 +6,51 @@ import { useNotifications } from "@contexts/NotificationContext";
 import { validatePdfFile } from "@services/utils/validators";
 import type { PipelineStageName } from "@services/types/pipeline";
 
+type StageOption = {
+  id: PipelineStageName;
+  label: string;
+  description: string;
+  icon: string;
+  disabled?: boolean;
+};
+
+const STAGE_OPTIONS: StageOption[] = [
+  { id: "smart_reading", label: "Upload", description: "Submit your baseline PDF for processing.", icon: "📥" },
+  { id: "content_discovery", label: "Discovery", description: "Extract questions, choices, and structure.", icon: "🔎" },
+  { id: "smart_substitution", label: "Substitution", description: "Author and validate question-level manipulations.", icon: "🧠" },
+  { id: "pdf_creation", label: "PDF Creation", description: "Render enhanced PDFs with overlays and rewrites.", icon: "🖨️" },
+  { id: "results_generation", label: "Evaluation", description: "Compile metrics and reports.", icon: "📊", disabled: true },
+];
+
+const ENHANCEMENT_OPTIONS = [
+  {
+    key: "rewrite" as const,
+    label: "Stream Rewrite",
+    description: "Replace selectable text via PyMuPDF and reapply glyph overlays.",
+    method: "pymupdf_overlay",
+    icon: "✍️",
+  },
+  {
+    key: "overlay" as const,
+    label: "Stream Overlay",
+    description: "Rewrite streams with overlay snapshots for perfect fidelity.",
+    method: "content_stream_overlay",
+    icon: "🖼️",
+  },
+];
+
+type EnhancementKey = (typeof ENHANCEMENT_OPTIONS)[number]["key"];
+
 const SmartReadingPanel: React.FC = () => {
   const { startPipeline, isLoading, error, status } = usePipeline();
   const { push } = useNotifications();
   const [file, setFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [selectedStage, setSelectedStage] = useState<PipelineStageName>("pdf_creation");
+  const [selectedEnhancements, setSelectedEnhancements] = useState<Record<EnhancementKey, boolean>>({
+    rewrite: true,
+    overlay: true,
+  });
 
   const previewUrl = useMemo(() => {
     if (!file) return null;
@@ -23,22 +64,8 @@ const SmartReadingPanel: React.FC = () => {
     };
   }, [previewUrl]);
 
-  // UI slider stages (single-select). Only show visible panels.
-  const uiStageOrder = useMemo<PipelineStageName[]>(
-    () => [
-      "smart_reading",
-      "content_discovery",
-      "smart_substitution",
-      "pdf_creation",
-      "results_generation",
-    ],
-    []
-  );
-
-  const [selectedStage, setSelectedStage] = useState<PipelineStageName>(uiStageOrder[0]);
-
-  const handleFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const nextFile = event.target.files?.[0];
+  const handleFiles = (files: FileList | null) => {
+    const nextFile = files?.[0];
     if (!nextFile) return;
     const validationError = validatePdfFile(nextFile);
     if (validationError) {
@@ -48,11 +75,21 @@ const SmartReadingPanel: React.FC = () => {
     setFile(nextFile);
   };
 
+  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleFiles(event.target.files);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    handleFiles(event.dataTransfer.files);
+  };
+
   const computeTargetStages = (stopAt: PipelineStageName) => {
     const fullBackendOrder: PipelineStageName[] = [
       "smart_reading",
       "content_discovery",
-      "answer_detection", // backend-only
+      // removed unknown backend stage 'answer_detection'
       "smart_substitution",
       "document_enhancement", // backend-only
       "pdf_creation",
@@ -67,12 +104,19 @@ const SmartReadingPanel: React.FC = () => {
       push({ title: "No file selected", intent: "warning" });
       return;
     }
+
+    const enhancementMethods = ENHANCEMENT_OPTIONS.filter((option) => selectedEnhancements[option.key]).map((option) => option.method);
+    if (enhancementMethods.length === 0) {
+      push({ title: "Select an enhancement", description: "Choose at least one stream method before starting.", intent: "warning" });
+      return;
+    }
+
     const runId = await startPipeline({
       file,
       config: {
         targetStages: computeTargetStages(selectedStage),
         aiModels: [],
-        enhancementMethods: ["content_stream"],
+        enhancementMethods,
         skipIfExists: true,
         parallelProcessing: true,
       },
@@ -83,55 +127,108 @@ const SmartReadingPanel: React.FC = () => {
   };
 
   return (
-    <div className="panel smart-reading">
-      <h2>📄 Smart Reading</h2>
+    <div className="panel smart-reading" style={{ display: 'grid', gap: '1.5rem' }}>
+      <header style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', margin: 0 }}>
+          <span role="img" aria-hidden="true">📄</span>
+          Start a New Run
+        </h2>
+        <p style={{ margin: 0, color: 'var(--muted)' }}>
+          Upload a PDF, choose how far to process, and select the enhancement strategy.
+        </p>
+      </header>
 
-      <div className="panel-card">
-        <h4>Upload PDF</h4>
-        <input type="file" accept="application/pdf" onChange={handleFile} />
-        {previewUrl ? (
-          <div style={{ marginTop: 12 }}>
-            <iframe title="pdf-preview" src={previewUrl} style={{ width: "100%", height: 400, border: 0 }} />
+      <section className="panel-card" style={{ display: 'grid', gap: '1rem' }}>
+        <div>
+          <h4 style={{ marginBottom: '0.5rem' }}>Pipeline Scope</h4>
+          <div className="stage-island-row" role="radiogroup" aria-label="Pipeline stage">
+            {STAGE_OPTIONS.map((stage) => {
+              const isSelected = selectedStage === stage.id;
+              return (
+                <button
+                  key={stage.id}
+                  type="button"
+                  className={`stage-island ${isSelected ? 'selected' : ''}`}
+                  onClick={() => setSelectedStage(stage.id)}
+                  disabled={stage.disabled}
+                  title={stage.description}
+                >
+                  <span aria-hidden="true" style={{ fontSize: '1.25rem' }}>{stage.icon}</span>
+                  <span>{stage.label}</span>
+                </button>
+              );
+            })}
           </div>
+        </div>
+
+        <div>
+          <h4 style={{ marginBottom: '0.5rem' }}>Enhancement Methods</h4>
+          <div className="enhancement-toggle-row">
+            {ENHANCEMENT_OPTIONS.map((option) => {
+              const isActive = selectedEnhancements[option.key];
+              return (
+                <button
+                  key={option.key}
+                  type="button"
+                  className={`enhancement-toggle ${isActive ? 'active' : ''}`}
+                  onClick={() => setSelectedEnhancements((prev) => ({ ...prev, [option.key]: !prev[option.key] }))}
+                  title={option.description}
+                >
+                  <span aria-hidden="true">{option.icon}</span>
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+          <p style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--muted)' }}>
+            Stream Rewrite focuses on editable text layers; Stream Overlay preserves perfect visuals by reapplying captured snapshots.
+          </p>
+        </div>
+      </section>
+
+      <section className="panel-card" style={{ display: 'grid', gap: '1rem' }}>
+        <h4 style={{ margin: 0 }}>Upload PDF</h4>
+        <label
+          onDragOver={(event) => { event.preventDefault(); setIsDragging(true); }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          className={`upload-dropzone ${isDragging ? 'dragging' : ''}`}
+        >
+          <input type="file" accept="application/pdf" onChange={handleFileInput} hidden />
+          <div>
+            <span role="img" aria-hidden="true" style={{ fontSize: '2rem' }}>📁</span>
+            <p style={{ margin: '0.35rem 0 0', fontWeight: 600 }}>Drag & drop a PDF, or <span style={{ color: 'var(--accent)' }}>browse</span></p>
+            <p style={{ margin: '0.15rem 0 0', fontSize: '0.85rem', color: 'var(--muted)' }}>Maximum size 20 MB. Original remains unchanged.</p>
+          </div>
+        </label>
+
+        {file ? (
+          <div className="file-summary">
+            <div>
+              <strong>{file.name}</strong>
+              <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>{(file.size / (1024 * 1024)).toFixed(2)} MB</div>
+            </div>
+            <button type="button" className="pill-button" onClick={() => setFile(null)} title="Remove file">✖ Clear</button>
+          </div>
+        ) : null}
+
+        {previewUrl ? (
+          <div className="pdf-preview">
+            <iframe title="pdf-preview" src={previewUrl} style={{ width: '100%', height: 420, border: 0, borderRadius: '12px' }} />
+          </div>
+        ) : null}
+      </section>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <button onClick={handleStart} disabled={isLoading || !file} className="pill-button" title="Begin processing the uploaded PDF">
+          {isLoading ? "Starting…" : "Start Pipeline"}
+        </button>
+        {status?.run_id ? (
+          <span className="badge tag-muted">Last run: {status.run_id}</span>
         ) : null}
       </div>
 
-      <div className="controls-grid">
-        <div>
-          <h4>Pipeline Stages</h4>
-          <div className="control-list" role="radiogroup" aria-label="Pipeline stage">
-            {uiStageOrder.map((stage) => (
-              <label key={stage} style={{ opacity: stage === "results_generation" ? 0.5 : 1 }}>
-                <input
-                  type="radio"
-                  name="pipeline-stage"
-                  checked={selectedStage === stage}
-                  disabled={stage === "results_generation"}
-                  onChange={() => setSelectedStage(stage)}
-                />
-                {stage.replace("_", " ")}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h4>Enhancement Method</h4>
-          <div className="control-list">
-            {["content_stream"].map((method) => (
-              <label key={method}>
-                <input type="radio" name="enhancement" checked={method === "content_stream"} readOnly />
-                {method.replace("_", " ")}
-              </label>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <button onClick={handleStart} disabled={isLoading || !file} className="primary">
-        {isLoading ? "Starting…" : "Start Pipeline"}
-      </button>
-      {error ? <p className="error">{error}</p> : null}
+      {error ? <p className="error" style={{ color: 'var(--danger)' }}>{error}</p> : null}
     </div>
   );
 };

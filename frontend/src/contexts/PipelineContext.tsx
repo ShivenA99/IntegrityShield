@@ -1,8 +1,9 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import * as React from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import type { PipelineRunSummary, PipelineStageName } from "@services/types/pipeline";
 import { extractErrorMessage } from "@services/utils/errorHandling";
-import { saveRecentRun } from "@services/utils/storage";
+import { saveRecentRun, loadRecentRuns, removeRecentRun } from "@services/utils/storage";
 import * as pipelineApi from "@services/api/pipelineApi";
 
 interface PipelineContextValue {
@@ -15,6 +16,7 @@ interface PipelineContextValue {
   startPipeline: (payload: { file: File; config?: Partial<StartPipelineConfig> }) => Promise<string | null>;
   resumeFromStage: (runId: string, stage: PipelineStageName) => Promise<void>;
   deleteRun: (runId: string) => Promise<void>;
+  resetActiveRun: (options?: { softDelete?: boolean }) => Promise<void>;
 }
 
 interface StartPipelineConfig {
@@ -27,7 +29,8 @@ interface StartPipelineConfig {
 
 const PipelineContext = createContext<PipelineContextValue | undefined>(undefined);
 
-export const PipelineProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
+  const { children } = props;
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const [status, setStatus] = useState<PipelineRunSummary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,6 +49,7 @@ export const PipelineProvider: React.FC<React.PropsWithChildren> = ({ children }
         const data = await pipelineApi.getPipelineStatus(targetRunId);
         setStatus(data);
         setActiveRunId(targetRunId);
+        saveRecentRun(targetRunId);
       } catch (err) {
         setError(extractErrorMessage(err));
       } finally {
@@ -110,11 +114,39 @@ export const PipelineProvider: React.FC<React.PropsWithChildren> = ({ children }
       if (activeRunId === runId) {
         setActiveRunId(null);
         setStatus(null);
+        removeRecentRun(runId);
       }
     } catch (err) {
       setError(extractErrorMessage(err));
     }
   }, [activeRunId]);
+
+  const resetActiveRun = useCallback(async (options?: { softDelete?: boolean }) => {
+    if (!activeRunId) return;
+
+    try {
+      if (options?.softDelete) {
+        await pipelineApi.softDeleteRun(activeRunId).catch(() => undefined);
+      }
+    } catch (err) {
+      console.warn("Failed to soft delete run", err);
+    } finally {
+      removeRecentRun(activeRunId);
+      setActiveRunId(null);
+      setStatus(null);
+      setError(null);
+    }
+  }, [activeRunId]);
+
+  // Bootstrap last active run from localStorage if none is set
+  useEffect(() => {
+    if (activeRunId) return;
+    const recent = loadRecentRuns()[0];
+    if (recent) {
+      setActiveRunId(recent);
+      void refreshStatus(recent, { quiet: true });
+    }
+  }, [activeRunId, refreshStatus]);
 
   useEffect(() => {
     if (!activeRunId) return;
@@ -142,8 +174,19 @@ export const PipelineProvider: React.FC<React.PropsWithChildren> = ({ children }
       startPipeline,
       resumeFromStage,
       deleteRun,
+      resetActiveRun,
     }),
-    [activeRunId, status, isLoading, error, refreshStatus, startPipeline, resumeFromStage, deleteRun]
+    [
+      activeRunId,
+      status,
+      isLoading,
+      error,
+      refreshStatus,
+      startPipeline,
+      resumeFromStage,
+      deleteRun,
+      resetActiveRun,
+    ]
   );
 
   return <PipelineContext.Provider value={value}>{children}</PipelineContext.Provider>;

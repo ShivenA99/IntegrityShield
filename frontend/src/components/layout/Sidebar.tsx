@@ -1,13 +1,21 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
+const links = [
+  { to: '/dashboard', label: 'Active Run', icon: '🚀' },
+  { to: '/runs', label: 'Previous Runs', icon: '🗂️' },
+  { to: '/settings', label: 'Settings', icon: '⚙️' },
+];
+
 const Sidebar: React.FC = () => (
   <aside className="app-sidebar">
     <nav>
-      <NavLink to="/dashboard">Dashboard</NavLink>
-      <NavLink to="/runs">Active Run</NavLink>
-      <NavLink to="/settings">Settings</NavLink>
-      <NavLink to="/developer">Developer Console</NavLink>
+      {links.map((link) => (
+        <NavLink key={link.to} to={link.to} className={({ isActive }) => (isActive ? 'active' : undefined)}>
+          <span aria-hidden='true' style={{ marginRight: '0.5rem' }}>{link.icon}</span>
+          {link.label}
+        </NavLink>
+      ))}
     </nav>
   </aside>
 );

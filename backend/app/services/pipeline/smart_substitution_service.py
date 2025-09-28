@@ -57,13 +57,8 @@ class SmartSubstitutionService:
 		# Initialize manipulation metadata but do not prefill substring_mappings; UI will drive them
 		for question_model, question_dict in zip(questions_models, questions_data):
 			question_model.manipulation_method = question_model.manipulation_method or "smart_substitution"
-			# ensure JSON-safe list without replacing the attribute directly
-			if question_model.substring_mappings is None:
-				# set to an empty JSON-safe list via mutation path
-				question_model.substring_mappings = []  # create once; SQLA wraps as MutableList
-			else:
-				# keep existing content; no overwrite here
-				pass
+			# Leave substring_mappings as None if not set; avoid direct assignment which causes MutableList coercion issues
+			# The UI will initialize and manage the mappings through the API endpoints
 			question_dict["manipulation"] = {
 				"method": question_model.manipulation_method,
 				"substring_mappings": list(question_model.substring_mappings or []),
@@ -132,14 +127,13 @@ class SmartSubstitutionService:
 		if not question_model:
 			raise ValueError("Question manipulation entry missing")
 
-		# Ensure list exists and is JSON-safe
+		# Ensure list exists and is JSON-safe - use mutation-only approach
 		current_list: List[Dict[str, Any]] = list(question_model.substring_mappings or [])
 		json_safe = json.loads(json.dumps(current_list))
-		if question_model.substring_mappings is None:
-			question_model.substring_mappings = []
-		else:
+		# Only mutate existing MutableList, never assign new list directly
+		if question_model.substring_mappings is not None:
 			question_model.substring_mappings.clear()
-		question_model.substring_mappings.extend(json_safe)
+			question_model.substring_mappings.extend(json_safe)
 		question_model.effectiveness_score = aggregate_effectiveness(json_safe)
 		db.session.add(question_model)
 		db.session.commit()
@@ -158,6 +152,51 @@ class SmartSubstitutionService:
 			"substring_mappings": json_safe,
 			"effectiveness_score": question_model.effectiveness_score,
 		}
+
+	def sync_structured_mappings(self, run_id: str) -> None:
+		"""Ensure structured data reflects the latest substring mappings from the database."""
+		structured = self.structured_manager.load(run_id)
+		if not structured:
+			return
+
+		questions = structured.get("questions", []) or []
+		if not questions:
+			return
+
+		question_map = {
+			str(entry.get("q_number") or entry.get("question_number")): entry for entry in questions
+		}
+		if not question_map:
+			return
+
+		strategy = structured.get("global_mappings", {}).get("character_strategy", "unicode_steganography")
+
+		changed = False
+		for model in QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all():
+			q_label = str(model.question_number or model.id)
+			entry = question_map.get(q_label)
+			if not entry:
+				continue
+
+			current_list: List[Dict[str, Any]] = list(model.substring_mappings or [])
+			json_safe = json.loads(json.dumps(current_list))
+			manipulation = entry.get("manipulation") or {}
+			previous = manipulation.get("substring_mappings") or []
+			if previous != json_safe:
+				changed = True
+
+			manipulation.update(
+				{
+					"substring_mappings": json_safe,
+					"effectiveness_score": model.effectiveness_score,
+					"method": model.manipulation_method or "smart_substitution",
+					"character_strategy": strategy,
+				}
+			)
+			entry["manipulation"] = manipulation
+
+		if changed:
+			self.structured_manager.save(run_id, structured)
 
 	def _compute_true_gold(self, question: QuestionManipulation) -> tuple[str | None, float | None]:
 		options = question.options_data or {}

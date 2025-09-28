@@ -16,7 +16,8 @@
       "@services/*": ["services/*"],
       "@contexts/*": ["contexts/*"],
       "@pages/*": ["pages/*"],
-      "@styles/*": ["styles/*"]
+      "@styles/*": ["styles/*"],
+      "@constants/*": ["constants/*"]
     }
   },
   "include": ["src"],

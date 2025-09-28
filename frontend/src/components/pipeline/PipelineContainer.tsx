@@ -32,7 +32,9 @@ const PipelineContainer: React.FC = () => {
     setSelectedStage(activeStage as PipelineStageName);
   }, [activeStage]);
 
-  const ActiveStageComponent = useMemo(() => stageComponentMap[selectedStage], [selectedStage]);
+  const ActiveStageComponent = useMemo(() => {
+    return stageComponentMap[selectedStage] ?? SmartReadingPanel;
+  }, [selectedStage]);
 
   return (
     <div className="pipeline-container">

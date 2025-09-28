@@ -43,11 +43,11 @@ const DeveloperPanel: React.FC = () => {
 
   return (
     <div className="developer-panel">
-      <LiveLogViewer logs={logs} isStreaming={isStreaming} />
-      <PerformanceMetrics metrics={metrics} />
-      <PipelineDebugger status={status} />
-      <StructuredDataViewer data={structured ?? (status?.structured_data as Record<string, unknown>)} />
-      <DatabaseInspector />
+      <div className="panel-card"><LiveLogViewer logs={logs} isStreaming={isStreaming} /></div>
+      <div className="panel-card"><PerformanceMetrics metrics={metrics} /></div>
+      <div className="panel-card"><PipelineDebugger status={status} /></div>
+      <div className="panel-card"><StructuredDataViewer data={structured ?? (status?.structured_data as Record<string, unknown>)} /></div>
+      <div className="panel-card"><DatabaseInspector /></div>
     </div>
   );
 };

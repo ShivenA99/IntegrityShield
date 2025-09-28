@@ -1,13 +1,14 @@
 {
   "pipeline_metadata": {
     "run_id": "79f22fad-d108-4eef-8252-498511dceb8c",
-    "current_stage": "content_discovery",
+    "current_stage": "smart_substitution",
     "stages_completed": [
-      "content_discovery",
-      "smart_reading"
+      "smart_substitution",
+      "smart_reading",
+      "content_discovery"
     ],
     "total_processing_time_ms": 0,
-    "last_updated": "2025-09-26T21:05:15.488898+00:00",
+    "last_updated": "2025-09-26T21:58:01.323096+00:00",
     "version": "2.0.0",
     "config": {},
     "ai_extraction_enabled": true,
@@ -88,7 +89,15 @@
       "confidence": 0.95,
       "q_number": "1",
       "stem_text": "Question 1",
-      "options": {}
+      "options": {},
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
     },
     {
       "question_id": "q2",
@@ -142,7 +151,15 @@
       "confidence": 0.95,
       "q_number": "2",
       "stem_text": "Question 2",
-      "options": {}
+      "options": {},
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
     },
     {
       "question_id": "q3",
@@ -194,7 +211,15 @@
       "confidence": 0.95,
       "q_number": "3",
       "stem_text": "Question 3",
-      "options": {}
+      "options": {},
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
     },
     {
       "question_id": "q4",
@@ -247,7 +272,15 @@
       "confidence": 0.95,
       "q_number": "4",
       "stem_text": "Question 4",
-      "options": {}
+      "options": {},
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
     },
     {
       "question_id": "q5",
@@ -299,7 +332,15 @@
       "confidence": 0.95,
       "q_number": "5",
       "stem_text": "Question 5",
-      "options": {}
+      "options": {},
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
     },
     {
       "question_id": "q6",
@@ -349,7 +390,15 @@
       "confidence": 0.95,
       "q_number": "6",
       "stem_text": "Question 6",
-      "options": {}
+      "options": {},
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
     }
   ],
   "assets": {
@@ -362,7 +411,9 @@
     ],
     "extracted_elements": 46
   },
-  "manipulation_results": {},
+  "manipulation_results": {
+    "enhanced_pdfs": {}
+  },
   "performance_metrics": {},
   "content_elements": [
     {
@@ -1251,5 +1302,35 @@
         }
       }
     }
-  ]
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 6,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
 }

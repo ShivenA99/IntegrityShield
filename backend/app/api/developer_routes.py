@@ -177,7 +177,8 @@ def system_health():
     return jsonify(health)
 
 
-@sock.route("/developer/logs/<run_id>/stream")
+# IMPORTANT: expose websocket under /api prefix to match frontend expectations
+@sock.route("/api/developer/logs/<run_id>/stream")
 def log_stream(ws, run_id: str):  # pragma: no cover - websocket plumbing
     if not PipelineRun.query.get(run_id):
         ws.close(HTTPStatus.NOT_FOUND)

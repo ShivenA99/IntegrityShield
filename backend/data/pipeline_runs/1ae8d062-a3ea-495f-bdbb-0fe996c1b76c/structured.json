@@ -1,0 +1,1378 @@
+{
+  "pipeline_metadata": {
+    "run_id": "1ae8d062-a3ea-495f-bdbb-0fe996c1b76c",
+    "current_stage": "results_generation",
+    "stages_completed": [
+      "results_generation",
+      "smart_substitution",
+      "smart_reading",
+      "content_discovery"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-27T22:30:51.366331+00:00",
+    "version": "2.0.0",
+    "config": {},
+    "ai_extraction_enabled": true,
+    "ai_sources_used": [
+      "openai_vision",
+      "mistral_ocr"
+    ]
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/cybersecurity_mcq_quiz.pdf",
+    "filename": "cybersecurity_mcq_quiz.pdf",
+    "pages": 2
+  },
+  "questions": [
+    {
+      "question_id": "q6",
+      "question_number": "6",
+      "question_type": "mcq_single",
+      "stem_elements": [
+        7
+      ],
+      "option_elements": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "manipulation_targets": [
+        {
+          "target_type": "question_number",
+          "element_id": 7,
+          "original_substring": "Q6.",
+          "replacement_substring": "QA.",
+          "bbox": [
+            31.19,
+            121.16,
+            50.0,
+            137.68
+          ],
+          "font": "Helvetica-Bold",
+          "size": 12.0,
+          "strategy": "number_to_letter",
+          "impact": "high"
+        },
+        {
+          "target_type": "option_label",
+          "element_id": 8,
+          "original_substring": "(A)",
+          "replacement_substring": "(B)",
+          "bbox": [
+            31.19,
+            143.77,
+            50.0,
+            160.26
+          ],
+          "font": "Helvetica",
+          "size": 12.0,
+          "strategy": "option_rotation",
+          "impact": "high"
+        },
+        {
+          "target_type": "option_label",
+          "element_id": 10,
+          "original_substring": "(B)",
+          "replacement_substring": "(C)",
+          "bbox": [
+            31.19,
+            166.45,
+            50.0,
+            182.94
+          ],
+          "font": "Helvetica",
+          "size": 12.0,
+          "strategy": "option_rotation",
+          "impact": "high"
+        },
+        {
+          "target_type": "option_label",
+          "element_id": 12,
+          "original_substring": "(C)",
+          "replacement_substring": "(D)",
+          "bbox": [
+            31.19,
+            189.13,
+            50.0,
+            205.62
+          ],
+          "font": "Helvetica",
+          "size": 12.0,
+          "strategy": "option_rotation",
+          "impact": "high"
+        },
+        {
+          "target_type": "option_label",
+          "element_id": 14,
+          "original_substring": "(D)",
+          "replacement_substring": "(A)",
+          "bbox": [
+            31.19,
+            211.81,
+            50.0,
+            228.3
+          ],
+          "font": "Helvetica",
+          "size": 12.0,
+          "strategy": "option_rotation",
+          "impact": "high"
+        }
+      ],
+      "confidence": 0.95,
+      "q_number": "6",
+      "stem_text": "Question 1",
+      "options": {},
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 237,
+            "original": "Question 1",
+            "replacement": "Question 1 [altered]",
+            "start_pos": 0,
+            "end_pos": 10,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_id": "q7",
+      "question_number": "7",
+      "question_type": "mcq_single",
+      "stem_elements": [
+        16
+      ],
+      "option_elements": [
+        18,
+        20,
+        22,
+        24
+      ],
+      "manipulation_targets": [
+        {
+          "target_type": "question_number",
+          "element_id": 16,
+          "original_substring": "Q7.",
+          "replacement_substring": "QB.",
+          "bbox": [
+            31.19,
+            240.21,
+            50.0,
+            256.73
+          ],
+          "font": "Helvetica-Bold",
+          "size": 12.0,
+          "strategy": "number_to_letter",
+          "impact": "high"
+        },
+        {
+          "target_type": "option_label",
+          "element_id": 18,
+          "original_substring": "(A)",
+          "replacement_substring": "(B)",
+          "bbox": [
+            31.19,
+            262.83,
+            50.0,
+            279.32
+          ],
+          "font": "Helvetica",
+          "size": 12.0,
+          "strategy": "option_rotation",
+          "impact": "high"
+        },
+        {
+          "target_type": "option_label",
+          "element_id": 20,
+          "original_substring": "(B)",
+          "replacement_substring": "(C)",
+          "bbox": [
+            31.19,
+            285.51,
+            50.0,
+            301.99
+          ],
+          "font": "Helvetica",
+          "size": 12.0,
+          "strategy": "option_rotation",
+          "impact": "high"
+        },
+        {
+          "target_type": "option_label",
+          "element_id": 22,
+          "original_substring": "(C)",
+          "replacement_substring": "(D)",
+          "bbox": [
+            31.19,
+            308.18,
+            50.0,
+            324.67
+          ],
+          "font": "Helvetica",
+          "size": 12.0,
+          "strategy": "option_rotation",
+          "impact": "high"
+        },
+        {
+          "target_type": "option_label",
+          "element_id": 24,
+          "original_substring": "(D)",
+          "replacement_substring": "(A)",
+          "bbox": [
+            31.19,
+            330.86,
+            50.0,
+            347.35
+          ],
+          "font": "Helvetica",
+          "size": 12.0,
+          "strategy": "option_rotation",
+          "impact": "high"
+        }
+      ],
+      "confidence": 0.95,
+      "q_number": "7",
+      "stem_text": "Question 2",
+      "options": {},
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 238,
+            "original": "Question 2",
+            "replacement": "Question 2 [altered]",
+            "start_pos": 0,
+            "end_pos": 10,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "assets": {
+    "images": [],
+    "fonts": [
+      "Helvetica",
+      "Helvetica-Bold"
+    ],
+    "extracted_elements": 60
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_content_stream_overlay.pdf",
+        "size_bytes": 3078,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_content_stream_overlay.pdf",
+        "file_size_bytes": 3078,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.0,
+        "overlay_applied": 0,
+        "overlay_targets": 0,
+        "overlay_area_pct": 0.0,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 3078,
+          "effectiveness_score": 0.0,
+          "replacements": 0,
+          "matches_found": 0,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 0,
+          "overlay_applied": 0,
+          "overlay_targets": 0,
+          "overlay_area_pct": 0.0,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:30:51.357974+00:00"
+      },
+      "dual_layer": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_dual_layer.pdf",
+        "size_bytes": 6752,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_dual_layer.pdf",
+        "file_size_bytes": 6752,
+        "visual_quality_score": 0.97,
+        "effectiveness_score": 0.85,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 6752,
+          "effectiveness_score": 0.85
+        },
+        "created_at": "2025-09-27T22:30:51.358094+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_image_overlay.pdf",
+        "size_bytes": 2990,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_image_overlay.pdf",
+        "file_size_bytes": 2990,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.0,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": 0.0,
+        "render_stats": {
+          "mapping_entries": 0,
+          "overlays_applied": 0,
+          "file_size_bytes": 2990,
+          "effectiveness_score": 0.0,
+          "overlay_area_pct": 0.0,
+          "text_pages": 2,
+          "text_tj_hits": 60,
+          "text_replacements": 0,
+          "text_matches_found": 0,
+          "text_tokens_scanned": 2161
+        },
+        "created_at": "2025-09-27T22:30:51.358208+00:00"
+      },
+      "font_manipulation": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_font_manipulation.pdf",
+        "size_bytes": 3056,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_font_manipulation.pdf",
+        "file_size_bytes": 3056,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.75,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 3056,
+          "effectiveness_score": 0.75
+        },
+        "created_at": "2025-09-27T22:30:51.358318+00:00"
+      },
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_content_stream.pdf",
+        "size_bytes": 3078,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_content_stream.pdf",
+        "file_size_bytes": 3078,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.0,
+        "overlay_applied": 0,
+        "overlay_targets": 0,
+        "overlay_area_pct": 0.0,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 3078,
+          "effectiveness_score": 0.0,
+          "replacements": 0,
+          "matches_found": 0,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 0,
+          "overlay_applied": 0,
+          "overlay_targets": 0,
+          "overlay_area_pct": 0.0,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:30:51.358429+00:00"
+      },
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_pymupdf_overlay.pdf",
+        "size_bytes": 3078,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1ae8d062-a3ea-495f-bdbb-0fe996c1b76c/enhanced_pymupdf_overlay.pdf",
+        "file_size_bytes": 3078,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.0,
+        "overlay_applied": 0,
+        "overlay_targets": 0,
+        "overlay_area_pct": 0.0,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 3078,
+          "effectiveness_score": 0.0,
+          "replacements": 0,
+          "textbox_adjustments": 0,
+          "min_fontsize_used": null,
+          "overlay_applied": 0,
+          "overlay_targets": 0,
+          "overlay_area_pct": 0.0,
+          "raw_targets": 0
+        },
+        "created_at": "2025-09-27T22:30:51.358538+00:00"
+      }
+    },
+    "debug": {
+      "content_stream_overlay": {
+        "decoded_sample": null,
+        "per_font_top_tokens": null,
+        "enhanced_mapping_stats": {
+          "total_entries": 2,
+          "discovered_tokens": 0
+        }
+      },
+      "overlay_layers": {
+        "pymupdf_overlay": {
+          "effectiveness_score": 0.0,
+          "mapping_entries_used": 2,
+          "enhanced_mapping_boost": 0
+        },
+        "image_overlay": {
+          "effectiveness_score": 0.0,
+          "mapping_entries_used": 0,
+          "enhanced_mapping_boost": 0
+        }
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 53.3,
+      "mapping_build_time_ms": 6.71,
+      "enhancement_stats": {
+        "base_mapping_size": 2,
+        "enhanced_mapping_size": 2,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream_overlay": {
+          "duration_ms": 9.9,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 3078
+        },
+        "content_stream": {
+          "duration_ms": 8.34,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 3078
+        },
+        "pymupdf_overlay": {
+          "duration_ms": 9.07,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 3078
+        },
+        "image_overlay": {
+          "duration_ms": 7.04,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 2990
+        },
+        "dual_layer": {
+          "duration_ms": 3.37,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 6752
+        },
+        "font_manipulation": {
+          "duration_ms": 0.59,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 3056
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 6,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 3056,
+        "total_output_size_bytes": 22032,
+        "size_efficiency": 7.209424083769633
+      }
+    },
+    "summary": {
+      "questions": 2,
+      "average_effectiveness": 0.0,
+      "generated_at": "2025-09-27T22:30:51.366331+00:00"
+    }
+  },
+  "performance_metrics": {},
+  "content_elements": [
+    {
+      "type": "text",
+      "content": "General Knowledge Quiz",
+      "page": 1,
+      "bbox": [
+        215.1699981689453,
+        31.740032196044922,
+        380.1039123535156,
+        51.01803207397461
+      ],
+      "font": "Helvetica-Bold",
+      "size": 14.0
+    },
+    {
+      "type": "text",
+      "content": "Instructions: Answer all questions. Some questions may have multiple correct answers.",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        58.740013122558594,
+        493.3579406738281,
+        75.22801208496094
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Cybersecurity MCQ Quiz",
+      "page": 1,
+      "bbox": [
+        215.55999755859375,
+        94.11002349853516,
+        379.7099304199219,
+        113.38803100585938
+      ],
+      "font": "Helvetica-Bold",
+      "size": 14.0
+    },
+    {
+      "type": "text",
+      "content": "Instructions: Select the best answer(s). Some questions may have multiple correct answers.",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        121.0999984741211,
+        518.701904296875,
+        137.58799743652344
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q1. Why would a hacker use a proxy server?",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        155.17001342773438,
+        285.96197509765625,
+        171.6940155029297
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) To create a stronger connection with the target.",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        177.79000854492188,
+        301.98193359375,
+        194.2779998779297
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) To create a ghost server on the network.",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        200.47000122070312,
+        265.95794677734375,
+        216.95799255371094
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) To obtain a remote access connection.",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        223.14004516601562,
+        257.2819519042969,
+        239.62803649902344
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) To hide malicious activity on the network.",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        245.82003784179688,
+        269.9299621582031,
+        262.30804443359375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q2. What type of symmetric key algorithm uses a streaming cipher to encrypt information?",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        274.2300109863281,
+        549.3258056640625,
+        290.7539978027344
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) RC4",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        296.8500061035156,
+        74.52200317382812,
+        313.3380126953125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) Blowfish",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        319.52001953125,
+        95.19800567626953,
+        336.0080261230469
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) SHA",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        342.20001220703125,
+        75.85399627685547,
+        358.6880187988281
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) MD5",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        364.8800354003906,
+        76.51399993896484,
+        381.3680419921875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q3. Which of the following is not a factor in securing the environment against an attack on",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        393.280029296875,
+        564.0938720703125,
+        409.80401611328125
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "security?",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        415.96002197265625,
+        84.54200744628906,
+        432.4840087890625
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) The education of the attacker",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        438.58001708984375,
+        205.94595336914062,
+        455.0680236816406
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) The system configuration",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        461.2500305175781,
+        184.573974609375,
+        477.738037109375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) The network architecture",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        483.9300231933594,
+        183.22998046875,
+        500.41802978515625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) The business strategy of the company",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        506.6100158691406,
+        253.94595336914062,
+        523.0980224609375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(E) The level of access provided to employees",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        529.2899780273438,
+        277.28594970703125,
+        545.7780151367188
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q4. What type of attack uses a fraudulent server with a relay address?",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        557.6900024414062,
+        431.3299255371094,
+        574.2140502929688
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) NTLM",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        580.3099975585938,
+        83.18600463867188,
+        596.7980346679688
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) MITM",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        602.989990234375,
+        81.1820068359375,
+        619.47802734375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) NetBIOS",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        625.6599731445312,
+        98.53399658203125,
+        642.1480102539062
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) SMB",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        648.3399658203125,
+        77.18599700927734,
+        664.8280029296875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q5. What port is used to connect to the Active Directory in Windows 2000?",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        676.75,
+        457.2859802246094,
+        693.2740478515625
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) 80",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        699.3599853515625,
+        63.866004943847656,
+        715.8480224609375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) 445",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        722.0399780273438,
+        70.53800201416016,
+        738.5280151367188
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) 139",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        744.719970703125,
+        71.197998046875,
+        761.2080078125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "General Knowledge Quiz",
+      "page": 2,
+      "bbox": [
+        215.1699981689453,
+        31.740032196044922,
+        380.1039123535156,
+        51.01803207397461
+      ],
+      "font": "Helvetica-Bold",
+      "size": 14.0
+    },
+    {
+      "type": "text",
+      "content": "Instructions: Answer all questions. Some questions may have multiple correct answers.",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        58.740013122558594,
+        493.3579406738281,
+        75.22801208496094
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) 389",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        92.7500228881836,
+        71.197998046875,
+        109.23802185058594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q6. To hide information inside a picture, what technology is used?",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        121.16000366210938,
+        410.61798095703125,
+        137.6840057373047
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Rootkits",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        143.77005004882812,
+        93.86599731445312,
+        160.25804138183594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) Bitmapping",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        166.45004272460938,
+        110.54600524902344,
+        182.9380340576172
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Steganography",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        189.13003540039062,
+        132.56597900390625,
+        205.61802673339844
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) Image Rendering",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        211.81002807617188,
+        143.22198486328125,
+        228.2980194091797
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q7. Which phase of hacking performs actual attack on a network or system?",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        240.20999145507812,
+        467.3179626464844,
+        256.7339782714844
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Reconnaissance",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        262.8300476074219,
+        139.22598266601562,
+        279.31805419921875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) Maintaining Access",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        285.5100402832031,
+        153.88998413085938,
+        301.998046875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Scanning",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        308.1800231933594,
+        101.20999145507812,
+        324.66802978515625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) Gaining Access",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        330.8600158691406,
+        134.54598999023438,
+        347.3480224609375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q8. Attempting to gain access to a network using an employee's credentials is called the",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        359.27001953125,
+        564.0978393554688,
+        375.79400634765625
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "_____________ mode of ethical hacking.",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        381.9400329589844,
+        261.30194091796875,
+        398.4640197753906
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Local networking",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        404.5600280761719,
+        140.55799865722656,
+        421.04803466796875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) Social engineering",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        427.2400207519531,
+        149.23399353027344,
+        443.72802734375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Physical entry",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        449.9200134277344,
+        125.8699951171875,
+        466.40802001953125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) Remote networking",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        472.59002685546875,
+        154.54998779296875,
+        489.0780334472656
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q9. Which Federal Code applies the consequences of hacking activities that disrupt subway",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        501.0000305175781,
+        564.0978393554688,
+        517.5240478515625
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "transit systems?",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        523.6799926757812,
+        126.55400085449219,
+        540.2040405273438
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Electronic Communications Interception of Oral Communications",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        546.2899780273438,
+        393.96197509765625,
+        562.7780151367188
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) 18 U.S.C. § 1029",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        568.969970703125,
+        142.57398986816406,
+        585.4580078125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Cyber Security Enhancement Act 2002",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        591.6500244140625,
+        257.94195556640625,
+        608.1380615234375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) 18 U.S.C. § 1030",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        614.3299560546875,
+        143.23397827148438,
+        630.8179931640625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q10. Which of the following is not a typical characteristic of an ethical hacker?",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        642.72998046875,
+        479.3299560546875,
+        659.2540283203125
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Excellent knowledge of Windows.",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        665.3499755859375,
+        228.5899658203125,
+        681.8380126953125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) Understands the process of exploiting network vulnerabilities.",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        688.0299682617188,
+        375.9859313964844,
+        704.5180053710938
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Patience, persistence and perseverance.",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        710.7000122070312,
+        268.6219482421875,
+        727.1880493164062
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) Has the highest level of security for the organization.",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        733.3800048828125,
+        329.9779357910156,
+        749.8680419921875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    }
+  ],
+  "ai_extraction": {
+    "source": "gpt5_fusion",
+    "confidence": 0.0,
+    "questions_found": 0,
+    "processing_time_ms": 51825,
+    "cost_cents": 33.25725,
+    "error": null,
+    "raw_response": {
+      "content": "```json\n{\n  \"fusion_analysis\": {\n    \"total_questions_found\": 10,\n    \"source_agreements\": {\n      \"vision_mistral\": 9,\n      \"vision_only\": 0,\n      \"mistral_only\": 0,\n      \"conflicts_resolved\": 1\n    },\n    \"quality_score\": 0.95\n  },\n  \"questions\": [\n    {\n      \"question_number\": \"1\",\n      \"question_type\": \"mcq_multi\",\n      \"stem_text\": \"Why would a hacker use a proxy server?\",\n      \"options\": {\n        \"A\": \"To create a stronger connection with the target.\",\n        \"B\": \"To create a ghost server on the network.\",\n        \"C\": \"To obtain a remote access connection.\",\n        \"D\": \"To hide malicious activity on the network.\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 155.17, 285.96, 171.69],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"2\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What type of symmetric key algorithm uses a streaming cipher to encrypt information?\",\n      \"options\": {\n        \"A\": \"RC4\",\n        \"B\": \"Blowfish\",\n        \"C\": \"SHA\",\n        \"D\": \"MD5\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 274.23, 549.33, 290.75],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"3\",\n      \"question_type\": \"mcq_multi\",\n      \"stem_text\": \"Which of the following is not a factor in securing the environment against an attack on security?\",\n      \"options\": {\n        \"A\": \"The education of the attacker\",\n        \"B\": \"The system configuration\",\n        \"C\": \"The network architecture\",\n        \"D\": \"The business strategy of the company\",\n        \"E\": \"The level of access provided to employees\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 393.28, 564.09, 432.48],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"4\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What type of attack uses a fraudulent server with a relay address?\",\n      \"options\": {\n        \"A\": \"NTLM\",\n        \"B\": \"MITM\",\n        \"C\": \"NetBIOS\",\n        \"D\": \"SMB\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 557.69, 431.33, 574.21],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"5\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What port is used to connect to the Active Directory in Windows 2000?\",\n      \"options\": {\n        \"A\": \"80\",\n        \"B\": \"445\",\n        \"C\": \"139\",\n        \"D\": \"389\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 676.75, 457.29, 693.27],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"6\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"To hide information inside a picture, what technology is used?\",\n      \"options\": {\n        \"A\": \"Rootkits\",\n        \"B\": \"Bitmapping\",\n        \"C\": \"Steganography\",\n        \"D\": \"Image Rendering\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [31.19, 121.16, 410.62, 137.68],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"7\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which phase of hacking performs actual attack on a network or system?\",\n      \"options\": {\n        \"A\": \"Reconnaissance\",\n        \"B\": \"Maintaining Access\",\n        \"C\": \"Scanning\",\n        \"D\": \"Gaining Access\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [31.19, 240.21, 467.32, 256.73],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"8\",\n      \"question_type\": \"fill_blank\",\n      \"stem_text\": \"Attempting to gain access to a network using an employee's credentials is called the _____________ mode of ethical hacking.\",\n      \"options\": {\n        \"A\": \"Local networking\",\n        \"B\": \"Social engineering\",\n        \"C\": \"Physical entry\",\n        \"D\": \"Remote networking\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [31.19, 359.27, 564.10, 398.46],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"9\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which Federal Code applies the consequences of hacking activities that disrupt subway transit systems?\",\n      \"options\": {\n        \"A\": \"Electronic Communications Interception of Oral Communications\",\n        \"B\": \"18 U.S.C. § 1029\",\n        \"C\": \"Cyber Security Enhancement Act 2002\",\n        \"D\": \"18 U.S.C. § 1030\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [31.19, 501.00, 564.10, 517.52],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"10\",\n      \"question_type\": \"mcq_multi\",\n      \"stem_text\": \"Which of the following is not a typical characteristic of an ethical hacker?\",\n      \"options\": {\n        \"A\": \"Excellent knowledge of Windows.\",\n        \"B\": \"Understands the process of exploiting network vulnerabilities.\",\n        \"C\": \"Patience, persistence and perseverance.\",\n        \"D\": \"Has the highest level of security for the organization.\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [31.19, 0, 0, 0],  // Placeholder for missing bbox\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    }\n  ]\n}\n```",
+      "model": "gpt-4o",
+      "sources_used": [
+        "pymupdf",
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "orchestration": {
+        "extraction_results": {
+          "mistral_ocr": {
+            "questions_count": 10,
+            "confidence": 0.85,
+            "processing_time_ms": 5951
+          },
+          "openai_vision": {
+            "questions_count": 10,
+            "confidence": 0.9,
+            "processing_time_ms": 28660
+          }
+        },
+        "total_processing_time_ms": 80496,
+        "clients_used": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  },
+  "ai_questions": [],
+  "question_index": [
+    {
+      "q_number": "6",
+      "page": null,
+      "stem": {
+        "text": "Question 1",
+        "bbox": null
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "gpt5_fusion"
+        ]
+      }
+    },
+    {
+      "q_number": "7",
+      "page": null,
+      "stem": {
+        "text": "Question 2",
+        "bbox": null
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "gpt5_fusion"
+        ]
+      }
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 2,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

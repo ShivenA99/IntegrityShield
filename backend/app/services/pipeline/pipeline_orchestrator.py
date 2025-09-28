@@ -110,6 +110,19 @@ class PipelineOrchestrator:
 
             try:
                 await self._execute_stage(run_id, stage, config)
+
+                # Pause after content_discovery if it's not a single-stage run and smart_substitution is in targets
+                if (stage == PipelineStageEnum.CONTENT_DISCOVERY and
+                    len(target_stages) > 1 and
+                    PipelineStageEnum.SMART_SUBSTITUTION in target_stages):
+
+                    run.status = "paused_for_mapping"
+                    run.current_stage = PipelineStageEnum.CONTENT_DISCOVERY.value
+                    db.session.add(run)
+                    db.session.commit()
+                    live_logging_service.emit(run_id, "pipeline", "INFO", "Pipeline paused after content_discovery - waiting for user mappings")
+                    return  # Exit pipeline execution here, wait for user to resume
+
             except Exception as exc:
                 # ensure session is clean before emitting error or updating run
                 try:

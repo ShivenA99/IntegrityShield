@@ -1,0 +1,2895 @@
+{
+  "pipeline_metadata": {
+    "run_id": "a93d2c13-01a9-42c8-887b-ece165fbffa2",
+    "current_stage": "results_generation",
+    "stages_completed": [
+      "results_generation",
+      "smart_substitution",
+      "smart_reading",
+      "content_discovery"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-27T22:27:53.381308+00:00",
+    "version": "2.0.0",
+    "config": {},
+    "ai_extraction_enabled": true,
+    "ai_sources_used": [
+      "openai_vision",
+      "mistral_ocr"
+    ]
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/Quiz_3.pdf",
+    "filename": "Quiz_3.pdf",
+    "pages": 1
+  },
+  "questions": [
+    {
+      "question_number": "1",
+      "question_type": "short_answer",
+      "stem_text": "Given the observation sequence O = (O1, O2), compute the probability of observing this sequence using the Forward Algorithm. Specifically, compute: P(O|λ) = ∑ St P(O, St|λ) where λ represents the model parameters.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          133.76800537109375,
+          262.094970703125,
+          454.7828674316406,
+          272.05755615234375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "equation"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 2,
+          "source_agreements": {
+            "vision_mistral": 2,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 227,
+            "original": "Given the observation sequence O = (O1, O2), compute the probability of observing this sequence using the Forward Algorithm. Specifically, compute: P(O|λ) = ∑ St P(O, St|λ) where λ represents the model parameters.",
+            "replacement": "Given the observation sequence O = (O1, O2), compute the probability of observing this sequence using the Forward Algorithm. Specifically, compute: P(O|λ) = ∑ St P(O, St|λ) where λ represents the model parameters. [altered]",
+            "start_pos": 0,
+            "end_pos": 213,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "2",
+      "question_type": "short_answer",
+      "stem_text": "Given the same observation sequence O = (O1, O2), determine the most probable hidden state sequence using the Viterbi Algorithm, i.e., find: S* = arg max S P(S|O, λ) where S* is the most likely sequence of hidden states.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          133.76800537109375,
+          262.094970703125,
+          454.7828674316406,
+          272.05755615234375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "equation"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 2,
+          "source_agreements": {
+            "vision_mistral": 2,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 228,
+            "original": "Given the same observation sequence O = (O1, O2), determine the most probable hidden state sequence using the Viterbi Algorithm, i.e., find: S* = arg max S P(S|O, λ) where S* is the most likely sequence of hidden states.",
+            "replacement": "Given the same observation sequence O = (O1, O2), determine the most probable hidden state sequence using the Viterbi Algorithm, i.e., find: S* = arg max S P(S|O, λ) where S* is the most likely sequence of hidden states. [altered]",
+            "start_pos": 0,
+            "end_pos": 220,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "assets": {
+    "images": [],
+    "fonts": [
+      "CMBX10",
+      "CMBX12",
+      "CMEX10",
+      "CMMI10",
+      "CMMI5",
+      "CMMI7",
+      "CMR10",
+      "CMR17",
+      "CMR7",
+      "CMSY10",
+      "CMSY7",
+      "SFRM1000"
+    ],
+    "extracted_elements": 178
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_content_stream_overlay.pdf",
+        "size_bytes": 558708,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_content_stream_overlay.pdf",
+        "file_size_bytes": 558708,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 2,
+        "overlay_targets": 2,
+        "overlay_area_pct": 0.0077,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 558708,
+          "effectiveness_score": 1.0,
+          "replacements": 2,
+          "matches_found": 2,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 2,
+          "overlay_applied": 2,
+          "overlay_targets": 2,
+          "overlay_area_pct": 0.0077,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:27:53.372130+00:00"
+      },
+      "dual_layer": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_dual_layer.pdf",
+        "size_bytes": 137878,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_dual_layer.pdf",
+        "file_size_bytes": 137878,
+        "visual_quality_score": 0.97,
+        "effectiveness_score": 0.85,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 137878,
+          "effectiveness_score": 0.85
+        },
+        "created_at": "2025-09-27T22:27:53.372257+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_image_overlay.pdf",
+        "size_bytes": 541907,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_image_overlay.pdf",
+        "file_size_bytes": 541907,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": 0.007710345254043596,
+        "render_stats": {
+          "mapping_entries": 2,
+          "overlays_applied": 2,
+          "file_size_bytes": 541907,
+          "effectiveness_score": 1.0,
+          "overlay_area_pct": 0.007710345254043596,
+          "text_pages": 1,
+          "text_tj_hits": 173,
+          "text_replacements": 0,
+          "text_matches_found": 0,
+          "text_tokens_scanned": 766
+        },
+        "created_at": "2025-09-27T22:27:53.372377+00:00"
+      },
+      "font_manipulation": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_font_manipulation.pdf",
+        "size_bytes": 124621,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_font_manipulation.pdf",
+        "file_size_bytes": 124621,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.75,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 124621,
+          "effectiveness_score": 0.75
+        },
+        "created_at": "2025-09-27T22:27:53.372488+00:00"
+      },
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_content_stream.pdf",
+        "size_bytes": 558708,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_content_stream.pdf",
+        "file_size_bytes": 558708,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 2,
+        "overlay_targets": 2,
+        "overlay_area_pct": 0.0077,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 558708,
+          "effectiveness_score": 1.0,
+          "replacements": 2,
+          "matches_found": 2,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 2,
+          "overlay_applied": 2,
+          "overlay_targets": 2,
+          "overlay_area_pct": 0.0077,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:27:53.372623+00:00"
+      },
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_pymupdf_overlay.pdf",
+        "size_bytes": 558708,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a93d2c13-01a9-42c8-887b-ece165fbffa2/enhanced_pymupdf_overlay.pdf",
+        "file_size_bytes": 558708,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 2,
+        "overlay_targets": 2,
+        "overlay_area_pct": 0.0077,
+        "render_stats": {
+          "mapping_entries": 2,
+          "file_size_bytes": 558708,
+          "effectiveness_score": 1.0,
+          "replacements": 2,
+          "textbox_adjustments": 2,
+          "min_fontsize_used": 5.5,
+          "overlay_applied": 2,
+          "overlay_targets": 2,
+          "overlay_area_pct": 0.0077,
+          "raw_targets": 2
+        },
+        "created_at": "2025-09-27T22:27:53.372777+00:00"
+      }
+    },
+    "debug": {
+      "content_stream_overlay": {
+        "decoded_sample": null,
+        "per_font_top_tokens": null,
+        "enhanced_mapping_stats": {
+          "total_entries": 2,
+          "discovered_tokens": 0
+        }
+      },
+      "overlay_layers": {
+        "pymupdf_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 2,
+          "enhanced_mapping_boost": 0
+        },
+        "image_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 2,
+          "enhanced_mapping_boost": 0
+        }
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 190.56,
+      "mapping_build_time_ms": 6.28,
+      "enhancement_stats": {
+        "base_mapping_size": 2,
+        "enhanced_mapping_size": 2,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream_overlay": {
+          "duration_ms": 43.4,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 558708
+        },
+        "content_stream": {
+          "duration_ms": 42.86,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 558708
+        },
+        "pymupdf_overlay": {
+          "duration_ms": 42.14,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 558708
+        },
+        "image_overlay": {
+          "duration_ms": 34.12,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 541907
+        },
+        "dual_layer": {
+          "duration_ms": 10.87,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 137878
+        },
+        "font_manipulation": {
+          "duration_ms": 0.77,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 124621
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 6,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 124621,
+        "total_output_size_bytes": 2480530,
+        "size_efficiency": 19.90459071906019
+      }
+    },
+    "summary": {
+      "questions": 2,
+      "average_effectiveness": 0.0,
+      "generated_at": "2025-09-27T22:27:53.381308+00:00"
+    }
+  },
+  "performance_metrics": {},
+  "content_elements": [
+    {
+      "type": "text",
+      "content": "Hidden Markov Model (HMM)",
+      "page": 1,
+      "bbox": [
+        198.63400268554688,
+        163.16879272460938,
+        412.6385192871094,
+        180.38418579101562
+      ],
+      "font": "CMR17",
+      "size": 17.21540069580078
+    },
+    {
+      "type": "text",
+      "content": "Problem Statement",
+      "page": 1,
+      "bbox": [
+        133.76800537109375,
+        236.84805297851562,
+        271.4914855957031,
+        251.19424438476562
+      ],
+      "font": "CMBX12",
+      "size": 14.346199989318848
+    },
+    {
+      "type": "text",
+      "content": "Consider a Hidden Markov Model (HMM) with the following parameters:",
+      "page": 1,
+      "bbox": [
+        133.76800537109375,
+        262.094970703125,
+        454.7828674316406,
+        272.05755615234375
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        148.71400451660156,
+        281.80792236328125,
+        153.69529724121094,
+        291.7705383300781
+      ],
+      "font": "SFRM1000",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " Hidden States:",
+      "page": 1,
+      "bbox": [
+        153.69529724121094,
+        281.991943359375,
+        232.77682495117188,
+        291.95452880859375
+      ],
+      "font": "CMBX10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " S",
+      "page": 1,
+      "bbox": [
+        232.77682495117188,
+        281.991943359375,
+        243.3220672607422,
+        291.95452880859375
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        243.32398986816406,
+        285.82177734375,
+        247.29905700683594,
+        292.79559326171875
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ", S",
+      "page": 1,
+      "bbox": [
+        247.79298400878906,
+        281.991943359375,
+        258.33343505859375,
+        291.95452880859375
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        258.3299865722656,
+        285.82177734375,
+        262.3050537109375,
+        292.79559326171875
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        148.7139892578125,
+        300.9249267578125,
+        153.69528198242188,
+        310.8875427246094
+      ],
+      "font": "SFRM1000",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " Observations:",
+      "page": 1,
+      "bbox": [
+        153.69528198242188,
+        301.10894775390625,
+        226.55020141601562,
+        311.071533203125
+      ],
+      "font": "CMBX10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " O",
+      "page": 1,
+      "bbox": [
+        226.55020141601562,
+        301.10894775390625,
+        238.57745361328125,
+        311.071533203125
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        238.57498168945312,
+        304.93878173828125,
+        242.550048828125,
+        311.91259765625
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ", O",
+      "page": 1,
+      "bbox": [
+        243.04397583007812,
+        301.10894775390625,
+        255.0788116455078,
+        311.071533203125
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        255.07098388671875,
+        304.93878173828125,
+        259.0460510253906,
+        311.91259765625
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        148.7139892578125,
+        320.04193115234375,
+        153.69528198242188,
+        330.0045471191406
+      ],
+      "font": "SFRM1000",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " Initial State Probabilities:",
+      "page": 1,
+      "bbox": [
+        153.69528198242188,
+        320.2259521484375,
+        289.37432861328125,
+        330.18853759765625
+      ],
+      "font": "CMBX10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        258.760986328125,
+        340.1229553222656,
+        265.156982421875,
+        350.0855407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        266.5409851074219,
+        340.1229553222656,
+        270.41644287109375,
+        350.0855407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        270.4159851074219,
+        340.1229553222656,
+        276.5230712890625,
+        350.0855407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        276.5249938964844,
+        343.9527587890625,
+        280.50006103515625,
+        350.92657470703125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        280.9939880371094,
+        340.1229553222656,
+        303.1408386230469,
+        350.0855407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        303.13299560546875,
+        340.1229553222656,
+        305.902587890625,
+        350.0855407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "6",
+      "page": 1,
+      "bbox": [
+        305.9010009765625,
+        340.1229553222656,
+        310.8822937011719,
+        350.0855407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ",",
+      "page": 1,
+      "bbox": [
+        310.8819885253906,
+        340.1229553222656,
+        313.6515808105469,
+        350.0855407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        325.2779235839844,
+        340.1229553222656,
+        331.6739196777344,
+        350.0855407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        333.052001953125,
+        340.1229553222656,
+        336.9274597167969,
+        350.0855407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        336.927001953125,
+        340.1229553222656,
+        343.0340881347656,
+        350.0855407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        343.0360107421875,
+        343.9527587890625,
+        347.0110778808594,
+        350.92657470703125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        347.5050048828125,
+        340.1229553222656,
+        369.65185546875,
+        350.0855407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        369.6440124511719,
+        340.1229553222656,
+        372.4136047363281,
+        350.0855407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "4",
+      "page": 1,
+      "bbox": [
+        372.4120178222656,
+        340.1229553222656,
+        377.393310546875,
+        350.0855407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        148.71401977539062,
+        363.41693115234375,
+        153.6953125,
+        373.3795471191406
+      ],
+      "font": "SFRM1000",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " Transition Probabilities:",
+      "page": 1,
+      "bbox": [
+        153.6953125,
+        363.6009521484375,
+        280.2984619140625,
+        373.56353759765625
+      ],
+      "font": "CMBX10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        232.68601989746094,
+        383.4979553222656,
+        239.08201599121094,
+        393.4605407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        240.4660186767578,
+        383.4979553222656,
+        244.3414764404297,
+        393.4605407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        244.3400115966797,
+        383.4979553222656,
+        250.44708251953125,
+        393.4605407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        250.44900512695312,
+        387.3277587890625,
+        254.424072265625,
+        394.30157470703125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": " →",
+      "page": 1,
+      "bbox": [
+        254.424072265625,
+        383.36883544921875,
+        267.6485900878906,
+        394.8254089355469
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        270.416015625,
+        383.4979553222656,
+        276.5231018066406,
+        393.4605407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        276.5250244140625,
+        387.3277587890625,
+        280.5000915527344,
+        394.30157470703125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        280.9940185546875,
+        383.4979553222656,
+        303.140869140625,
+        393.4605407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        303.1330261230469,
+        383.4979553222656,
+        305.9026184082031,
+        393.4605407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "7",
+      "page": 1,
+      "bbox": [
+        305.9010314941406,
+        383.4979553222656,
+        310.88232421875,
+        393.4605407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ",",
+      "page": 1,
+      "bbox": [
+        310.88201904296875,
+        383.4979553222656,
+        313.651611328125,
+        393.4605407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        325.2779541015625,
+        383.4979553222656,
+        331.6739501953125,
+        393.4605407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        333.0520324707031,
+        383.4979553222656,
+        336.927490234375,
+        393.4605407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        336.9270324707031,
+        383.4979553222656,
+        343.03411865234375,
+        393.4605407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        343.0360412597656,
+        387.3277587890625,
+        347.0111083984375,
+        394.30157470703125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": " →",
+      "page": 1,
+      "bbox": [
+        347.0111083984375,
+        383.36883544921875,
+        360.234619140625,
+        394.8254089355469
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        363.0020446777344,
+        383.4979553222656,
+        369.109130859375,
+        393.4605407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        369.1120300292969,
+        387.3277587890625,
+        373.08709716796875,
+        394.30157470703125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        373.5810241699219,
+        383.4979553222656,
+        395.7278747558594,
+        393.4605407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        395.72003173828125,
+        383.4979553222656,
+        398.4896240234375,
+        393.4605407714844
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "3",
+      "page": 1,
+      "bbox": [
+        398.4870300292969,
+        383.4979553222656,
+        403.46832275390625,
+        393.4605407714844
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        232.68603515625,
+        398.44195556640625,
+        239.08203125,
+        408.404541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        240.46603393554688,
+        398.44195556640625,
+        244.34149169921875,
+        408.404541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        244.34002685546875,
+        398.44195556640625,
+        250.4470977783203,
+        408.404541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        250.4490203857422,
+        402.2717590332031,
+        254.42408752441406,
+        409.2455749511719
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": " →",
+      "page": 1,
+      "bbox": [
+        254.42408752441406,
+        398.3128356933594,
+        267.64862060546875,
+        409.7694091796875
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        270.4160461425781,
+        398.44195556640625,
+        276.52313232421875,
+        408.404541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        276.5250549316406,
+        402.2717590332031,
+        280.5001220703125,
+        409.2455749511719
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        280.9940490722656,
+        398.44195556640625,
+        303.1408996582031,
+        408.404541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        303.133056640625,
+        398.44195556640625,
+        305.90264892578125,
+        408.404541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "4",
+      "page": 1,
+      "bbox": [
+        305.90106201171875,
+        398.44195556640625,
+        310.8823547363281,
+        408.404541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ",",
+      "page": 1,
+      "bbox": [
+        310.8820495605469,
+        398.44195556640625,
+        313.6516418457031,
+        408.404541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        325.2779846191406,
+        398.44195556640625,
+        331.6739807128906,
+        408.404541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        333.05206298828125,
+        398.44195556640625,
+        336.9275207519531,
+        408.404541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        336.92706298828125,
+        398.44195556640625,
+        343.0341491699219,
+        408.404541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        343.03607177734375,
+        402.2717590332031,
+        347.0111389160156,
+        409.2455749511719
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": " →",
+      "page": 1,
+      "bbox": [
+        347.0111389160156,
+        398.3128356933594,
+        360.23565673828125,
+        409.7694091796875
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        363.0030822753906,
+        398.44195556640625,
+        369.11016845703125,
+        408.404541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        369.1120910644531,
+        402.2717590332031,
+        373.087158203125,
+        409.2455749511719
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        373.5810852050781,
+        398.44195556640625,
+        395.7279357910156,
+        408.404541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        395.7200927734375,
+        398.44195556640625,
+        398.48968505859375,
+        408.404541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "6",
+      "page": 1,
+      "bbox": [
+        398.4870910644531,
+        398.44195556640625,
+        403.4683837890625,
+        408.404541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        148.71409606933594,
+        421.7359313964844,
+        153.6953887939453,
+        431.69854736328125
+      ],
+      "font": "SFRM1000",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " Emission Probabilities:",
+      "page": 1,
+      "bbox": [
+        153.6953887939453,
+        421.9199523925781,
+        273.7730407714844,
+        431.8825378417969
+      ],
+      "font": "CMBX10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        243.92608642578125,
+        441.81695556640625,
+        250.32208251953125,
+        451.779541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        251.70509338378906,
+        441.81695556640625,
+        255.58055114746094,
+        451.779541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "O",
+      "page": 1,
+      "bbox": [
+        255.58009338378906,
+        441.81695556640625,
+        263.1815490722656,
+        451.779541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        263.1791076660156,
+        445.6467590332031,
+        267.1541748046875,
+        452.6205749511719
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "|",
+      "page": 1,
+      "bbox": [
+        267.6481018066406,
+        441.6878356933594,
+        270.4176940917969,
+        451.6504211425781
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        270.4161071777344,
+        441.81695556640625,
+        276.523193359375,
+        451.779541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        276.5251159667969,
+        445.6467590332031,
+        280.50018310546875,
+        452.6205749511719
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        280.9941101074219,
+        441.81695556640625,
+        303.1409606933594,
+        451.779541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        303.13311767578125,
+        441.81695556640625,
+        305.9027099609375,
+        451.779541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "5",
+      "page": 1,
+      "bbox": [
+        305.901123046875,
+        441.81695556640625,
+        310.8824157714844,
+        451.779541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ",",
+      "page": 1,
+      "bbox": [
+        310.8821105957031,
+        441.81695556640625,
+        313.6517028808594,
+        451.779541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        325.2780456542969,
+        441.81695556640625,
+        331.6740417480469,
+        451.779541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        333.0521240234375,
+        441.81695556640625,
+        336.9275817871094,
+        451.779541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "O",
+      "page": 1,
+      "bbox": [
+        336.9271240234375,
+        441.81695556640625,
+        344.5285949707031,
+        451.779541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        344.526123046875,
+        445.6467590332031,
+        348.5011901855469,
+        452.6205749511719
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "|",
+      "page": 1,
+      "bbox": [
+        348.9951171875,
+        441.6878356933594,
+        351.76470947265625,
+        451.6504211425781
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        351.76312255859375,
+        441.81695556640625,
+        357.8702087402344,
+        451.779541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        357.87213134765625,
+        445.6467590332031,
+        361.8471984863281,
+        452.6205749511719
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        362.34112548828125,
+        441.81695556640625,
+        384.48797607421875,
+        451.779541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        384.4801330566406,
+        441.81695556640625,
+        387.2497253417969,
+        451.779541015625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "5",
+      "page": 1,
+      "bbox": [
+        387.2481384277344,
+        441.81695556640625,
+        392.22943115234375,
+        451.779541015625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        243.92613220214844,
+        456.7609558105469,
+        250.32212829589844,
+        466.7235412597656
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        251.70513916015625,
+        456.7609558105469,
+        255.58059692382812,
+        466.7235412597656
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "O",
+      "page": 1,
+      "bbox": [
+        255.58013916015625,
+        456.7609558105469,
+        263.1816101074219,
+        466.7235412597656
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        263.17913818359375,
+        460.59075927734375,
+        267.1542053222656,
+        467.5645751953125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "|",
+      "page": 1,
+      "bbox": [
+        267.64813232421875,
+        456.6318359375,
+        270.417724609375,
+        466.59442138671875
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        270.4161376953125,
+        456.7609558105469,
+        276.5232238769531,
+        466.7235412597656
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        276.525146484375,
+        460.59075927734375,
+        280.5002136230469,
+        467.5645751953125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        280.994140625,
+        456.7609558105469,
+        303.1409912109375,
+        466.7235412597656
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        303.1331481933594,
+        456.7609558105469,
+        305.9027404785156,
+        466.7235412597656
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        305.9011535644531,
+        456.7609558105469,
+        310.8824462890625,
+        466.7235412597656
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ",",
+      "page": 1,
+      "bbox": [
+        310.88214111328125,
+        456.7609558105469,
+        313.6517333984375,
+        466.7235412597656
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        325.278076171875,
+        456.7609558105469,
+        331.674072265625,
+        466.7235412597656
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        333.0521545410156,
+        456.7609558105469,
+        336.9276123046875,
+        466.7235412597656
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "O",
+      "page": 1,
+      "bbox": [
+        336.9271545410156,
+        456.7609558105469,
+        344.52862548828125,
+        466.7235412597656
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        344.5261535644531,
+        460.59075927734375,
+        348.501220703125,
+        467.5645751953125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "|",
+      "page": 1,
+      "bbox": [
+        348.9951477050781,
+        456.6318359375,
+        351.7647399902344,
+        466.59442138671875
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        351.7631530761719,
+        456.7609558105469,
+        357.8702392578125,
+        466.7235412597656
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        357.8721618652344,
+        460.59075927734375,
+        361.84722900390625,
+        467.5645751953125
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ") = 0",
+      "page": 1,
+      "bbox": [
+        362.3411560058594,
+        456.7609558105469,
+        384.4880065917969,
+        466.7235412597656
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ".",
+      "page": 1,
+      "bbox": [
+        384.48016357421875,
+        456.7609558105469,
+        387.249755859375,
+        466.7235412597656
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "9",
+      "page": 1,
+      "bbox": [
+        387.2481689453125,
+        456.7609558105469,
+        392.2294616699219,
+        466.7235412597656
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "Question 1: Forward Algorithm Calculation",
+      "page": 1,
+      "bbox": [
+        133.7691650390625,
+        480.6736755371094,
+        391.7264404296875,
+        492.6288757324219
+      ],
+      "font": "CMBX12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "Given the observation sequence",
+      "page": 1,
+      "bbox": [
+        133.7691650390625,
+        500.6209716796875,
+        272.16961669921875,
+        510.58355712890625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " O",
+      "page": 1,
+      "bbox": [
+        272.16961669921875,
+        500.6209716796875,
+        283.5846252441406,
+        510.58355712890625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " = (",
+      "page": 1,
+      "bbox": [
+        283.5846252441406,
+        500.6209716796875,
+        302.6630859375,
+        510.58355712890625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "O",
+      "page": 1,
+      "bbox": [
+        302.6641540527344,
+        500.6209716796875,
+        310.265625,
+        510.58355712890625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        310.2631530761719,
+        504.4507751464844,
+        314.23822021484375,
+        511.4245910644531
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ", O",
+      "page": 1,
+      "bbox": [
+        314.733154296875,
+        500.6209716796875,
+        326.7679748535156,
+        510.58355712890625
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        326.7601623535156,
+        504.4507751464844,
+        330.7352294921875,
+        511.4245910644531
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "), compute the probability of ob-",
+      "page": 1,
+      "bbox": [
+        331.2291564941406,
+        500.6209716796875,
+        477.5100402832031,
+        510.58355712890625
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "serving this sequence using the",
+      "page": 1,
+      "bbox": [
+        133.76914978027344,
+        512.5759887695312,
+        268.5133361816406,
+        522.53857421875
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " Forward Algorithm",
+      "page": 1,
+      "bbox": [
+        268.5133361816406,
+        512.5759887695312,
+        368.541015625,
+        522.53857421875
+      ],
+      "font": "CMBX10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ". Specifically, compute:",
+      "page": 1,
+      "bbox": [
+        368.5341796875,
+        512.5759887695312,
+        469.5549621582031,
+        522.53857421875
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        251.951171875,
+        536.4859619140625,
+        258.34716796875,
+        546.4485473632812
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        259.7311706542969,
+        536.4859619140625,
+        263.60662841796875,
+        546.4485473632812
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "O",
+      "page": 1,
+      "bbox": [
+        263.60516357421875,
+        536.4859619140625,
+        271.2066345214844,
+        546.4485473632812
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "|",
+      "page": 1,
+      "bbox": [
+        271.4811706542969,
+        536.3568115234375,
+        274.2507629394531,
+        546.3194580078125
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "λ",
+      "page": 1,
+      "bbox": [
+        274.2491760253906,
+        536.4859619140625,
+        280.057373046875,
+        546.4485473632812
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ") =",
+      "page": 1,
+      "bbox": [
+        280.0601806640625,
+        536.4859619140625,
+        294.4561462402344,
+        546.4485473632812
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "X",
+      "page": 1,
+      "bbox": [
+        297.2181701660156,
+        534.1853637695312,
+        311.6141357421875,
+        544.1480102539062
+      ],
+      "font": "CMEX10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        300.3141784667969,
+        550.727783203125,
+        305.20977783203125,
+        557.7015991210938
+      ],
+      "font": "CMMI7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "t",
+      "page": 1,
+      "bbox": [
+        305.2061767578125,
+        553.281005859375,
+        308.015625,
+        558.2623291015625
+      ],
+      "font": "CMMI5",
+      "size": 4.981299877166748
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        313.2691650390625,
+        536.4859619140625,
+        319.6651611328125,
+        546.4485473632812
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        321.0491638183594,
+        536.4859619140625,
+        324.92462158203125,
+        546.4485473632812
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "O, S",
+      "page": 1,
+      "bbox": [
+        324.92315673828125,
+        536.4859619140625,
+        343.33404541015625,
+        546.4485473632812
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "t",
+      "page": 1,
+      "bbox": [
+        343.3361511230469,
+        540.3167724609375,
+        346.3488464355469,
+        547.2905883789062
+      ],
+      "font": "CMMI7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "|",
+      "page": 1,
+      "bbox": [
+        346.8441467285156,
+        536.3568115234375,
+        349.6137390136719,
+        546.3194580078125
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "λ",
+      "page": 1,
+      "bbox": [
+        349.61114501953125,
+        536.4859619140625,
+        355.4193420410156,
+        546.4485473632812
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ")",
+      "page": 1,
+      "bbox": [
+        355.42315673828125,
+        536.4859619140625,
+        359.2986145019531,
+        546.4485473632812
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "where",
+      "page": 1,
+      "bbox": [
+        148.712158203125,
+        563.06396484375,
+        174.1964874267578,
+        573.0265502929688
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " λ",
+      "page": 1,
+      "bbox": [
+        174.1964874267578,
+        563.06396484375,
+        183.32936096191406,
+        573.0265502929688
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " represents the model parameters.",
+      "page": 1,
+      "bbox": [
+        183.32936096191406,
+        563.06396484375,
+        331.3808898925781,
+        573.0265502929688
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "Question 2: Viterbi Algorithm Calculation",
+      "page": 1,
+      "bbox": [
+        133.76815795898438,
+        589.0476684570312,
+        385.29351806640625,
+        601.0028686523438
+      ],
+      "font": "CMBX12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "Given the same observation sequence",
+      "page": 1,
+      "bbox": [
+        133.76815795898438,
+        608.9939575195312,
+        295.01287841796875,
+        618.95654296875
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " O",
+      "page": 1,
+      "bbox": [
+        295.01287841796875,
+        608.9939575195312,
+        305.7796325683594,
+        618.95654296875
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " = (",
+      "page": 1,
+      "bbox": [
+        305.7796325683594,
+        608.9939575195312,
+        323.2171325683594,
+        618.95654296875
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "O",
+      "page": 1,
+      "bbox": [
+        323.211181640625,
+        608.9939575195312,
+        330.8126525878906,
+        618.95654296875
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        330.8111877441406,
+        612.8237915039062,
+        334.7862548828125,
+        619.797607421875
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": ", O",
+      "page": 1,
+      "bbox": [
+        335.2801818847656,
+        608.9939575195312,
+        347.31500244140625,
+        618.95654296875
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "2",
+      "page": 1,
+      "bbox": [
+        347.30718994140625,
+        612.8237915039062,
+        351.2822570800781,
+        619.797607421875
+      ],
+      "font": "CMR7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "), determine the most proba-",
+      "page": 1,
+      "bbox": [
+        351.77618408203125,
+        608.9939575195312,
+        477.4843444824219,
+        618.95654296875
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "ble hidden state sequence using the",
+      "page": 1,
+      "bbox": [
+        133.7681884765625,
+        620.948974609375,
+        288.08892822265625,
+        630.9115600585938
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " Viterbi Algorithm",
+      "page": 1,
+      "bbox": [
+        288.08892822265625,
+        620.948974609375,
+        382.5877990722656,
+        630.9115600585938
+      ],
+      "font": "CMBX10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ", i.e., find:",
+      "page": 1,
+      "bbox": [
+        382.606201171875,
+        620.948974609375,
+        426.89990234375,
+        630.9115600585938
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        253.87120056152344,
+        644.8589477539062,
+        259.978271484375,
+        654.821533203125
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "∗",
+      "page": 1,
+      "bbox": [
+        260.55419921875,
+        642.9913940429688,
+        264.6338806152344,
+        649.9652099609375
+      ],
+      "font": "CMSY7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "= arg max",
+      "page": 1,
+      "bbox": [
+        267.90118408203125,
+        644.8589477539062,
+        312.623291015625,
+        654.821533203125
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        300.7151794433594,
+        653.6207885742188,
+        305.61077880859375,
+        660.5946044921875
+      ],
+      "font": "CMMI7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "P",
+      "page": 1,
+      "bbox": [
+        314.2831726074219,
+        644.8589477539062,
+        320.6791687011719,
+        654.821533203125
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "(",
+      "page": 1,
+      "bbox": [
+        322.06317138671875,
+        644.8589477539062,
+        325.9386291503906,
+        654.821533203125
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        325.9371643066406,
+        644.8589477539062,
+        332.04425048828125,
+        654.821533203125
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "|",
+      "page": 1,
+      "bbox": [
+        332.62017822265625,
+        644.7297973632812,
+        335.3897705078125,
+        654.6924438476562
+      ],
+      "font": "CMSY10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "O, λ",
+      "page": 1,
+      "bbox": [
+        335.38818359375,
+        644.8589477539062,
+        353.50018310546875,
+        654.821533203125
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": ")",
+      "page": 1,
+      "bbox": [
+        353.503173828125,
+        644.8589477539062,
+        357.3786315917969,
+        654.821533203125
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "where",
+      "page": 1,
+      "bbox": [
+        148.71217346191406,
+        664.9609985351562,
+        174.19650268554688,
+        674.923583984375
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": " S",
+      "page": 1,
+      "bbox": [
+        174.19650268554688,
+        664.9609985351562,
+        183.6282501220703,
+        674.923583984375
+      ],
+      "font": "CMMI10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "∗",
+      "page": 1,
+      "bbox": [
+        184.2041778564453,
+        663.5913696289062,
+        188.28384399414062,
+        670.565185546875
+      ],
+      "font": "CMSY7",
+      "size": 6.973800182342529
+    },
+    {
+      "type": "text",
+      "content": "is the most likely sequence of hidden states.",
+      "page": 1,
+      "bbox": [
+        192.1051788330078,
+        664.9609985351562,
+        383.05841064453125,
+        674.923583984375
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        303.1331787109375,
+        694.8489379882812,
+        308.1144714355469,
+        704.8115234375
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    }
+  ],
+  "ai_extraction": {
+    "source": "gpt5_fusion",
+    "confidence": 0.95,
+    "questions_found": 2,
+    "processing_time_ms": 12575,
+    "cost_cents": 16.55625,
+    "error": null,
+    "raw_response": {
+      "content": "```json\n{\n  \"fusion_analysis\": {\n    \"total_questions_found\": 2,\n    \"source_agreements\": {\n      \"vision_mistral\": 2,\n      \"vision_only\": 0,\n      \"mistral_only\": 0,\n      \"conflicts_resolved\": 0\n    },\n    \"quality_score\": 0.95\n  },\n  \"questions\": [\n    {\n      \"question_number\": \"1\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Given the observation sequence O = (O1, O2), compute the probability of observing this sequence using the Forward Algorithm. Specifically, compute: P(O|λ) = ∑ St P(O, St|λ) where λ represents the model parameters.\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [\n          133.76800537109375,\n          262.094970703125,\n          454.7828674316406,\n          272.05755615234375\n        ],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [\"equation\"],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"2\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Given the same observation sequence O = (O1, O2), determine the most probable hidden state sequence using the Viterbi Algorithm, i.e., find: S* = arg max S P(S|O, λ) where S* is the most likely sequence of hidden states.\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [\n          133.76800537109375,\n          262.094970703125,\n          454.7828674316406,\n          272.05755615234375\n        ],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [\"equation\"],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    }\n  ]\n}\n```",
+      "model": "gpt-4o",
+      "sources_used": [
+        "pymupdf",
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "orchestration": {
+        "extraction_results": {
+          "mistral_ocr": {
+            "questions_count": 2,
+            "confidence": 0.85,
+            "processing_time_ms": 2977
+          },
+          "openai_vision": {
+            "questions_count": 2,
+            "confidence": 0.9,
+            "processing_time_ms": 7275
+          }
+        },
+        "total_processing_time_ms": 19858,
+        "clients_used": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  },
+  "ai_questions": [
+    {
+      "question_number": "1",
+      "question_type": "short_answer",
+      "stem_text": "Given the observation sequence O = (O1, O2), compute the probability of observing this sequence using the Forward Algorithm. Specifically, compute: P(O|λ) = ∑ St P(O, St|λ) where λ represents the model parameters.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          133.76800537109375,
+          262.094970703125,
+          454.7828674316406,
+          272.05755615234375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "equation"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 2,
+          "source_agreements": {
+            "vision_mistral": 2,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1"
+    },
+    {
+      "question_number": "2",
+      "question_type": "short_answer",
+      "stem_text": "Given the same observation sequence O = (O1, O2), determine the most probable hidden state sequence using the Viterbi Algorithm, i.e., find: S* = arg max S P(S|O, λ) where S* is the most likely sequence of hidden states.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          133.76800537109375,
+          262.094970703125,
+          454.7828674316406,
+          272.05755615234375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "equation"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 2,
+          "source_agreements": {
+            "vision_mistral": 2,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2"
+    }
+  ],
+  "question_index": [
+    {
+      "q_number": "1",
+      "page": 1,
+      "stem": {
+        "text": "Given the observation sequence O = (O1, O2), compute the probability of observing this sequence using the Forward Algorithm. Specifically, compute: P(O|λ) = ∑ St P(O, St|λ) where λ represents the model parameters.",
+        "bbox": [
+          133.76800537109375,
+          262.094970703125,
+          454.7828674316406,
+          272.05755615234375
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "2",
+      "page": 1,
+      "stem": {
+        "text": "Given the same observation sequence O = (O1, O2), determine the most probable hidden state sequence using the Viterbi Algorithm, i.e., find: S* = arg max S P(S|O, λ) where S* is the most likely sequence of hidden states.",
+        "bbox": [
+          133.76800537109375,
+          262.094970703125,
+          454.7828674316406,
+          272.05755615234375
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 2,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

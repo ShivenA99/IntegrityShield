@@ -17,6 +17,7 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
   const [mappings, setMappings] = useState<SubstringMapping[]>(question.substring_mappings || []);
   const [modelName, setModelName] = useState("openai:gpt-4o-mini");
   const [validError, setValidError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [lastValidation, setLastValidation] = useState<any>(null);
   const stemRef = useRef<HTMLDivElement | null>(null);
 
@@ -29,7 +30,7 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
   };
 
   const addMapping = (m: SubstringMapping) => {
-    const next = [...mappings, m];
+    const next = [...mappings, { ...m, id: Math.random().toString(36).substr(2, 9) }];
     if (!validateNoOverlap(next)) {
       setValidError("Mappings cannot overlap");
       return;
@@ -60,21 +61,90 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
     }
   };
 
+  const validateMapping = async (mappingIndex: number) => {
+    try {
+      const mapping = mappings[mappingIndex];
+      if (!mapping.id) return;
+
+      const res = await validateQuestion(runId, question.id, {
+        substring_mappings: [mapping],
+        model: modelName,
+        mapping_id: mapping.id
+      });
+
+      // Update the mapping with validation results
+      const updatedMappings = [...mappings];
+      updatedMappings[mappingIndex] = {
+        ...updatedMappings[mappingIndex],
+        validated: res.model_response?.response &&
+          question.gold_answer &&
+          res.model_response.response.trim() !== question.gold_answer.trim(),
+        validation: {
+          model: modelName,
+          response: res.model_response?.response || '',
+          gold: question.gold_answer || '',
+          prompt_len: res.modified_question?.length || 0
+        }
+      };
+      setMappings(updatedMappings);
+
+      // Save the updated mappings
+      await updateQuestionManipulation(runId, question.id, {
+        method: question.manipulation_method || "smart_substitution",
+        substring_mappings: updatedMappings
+      });
+      onUpdated?.({ ...question, substring_mappings: updatedMappings });
+    } catch (e: any) {
+      setValidError(e?.response?.data?.error || String(e));
+    }
+  };
+
+  // Get the full question text, preferring stem_text over original_text
+  const fullQuestionText = question.stem_text || question.original_text || "";
+
   const renderPreview = useMemo(() => {
-    const buf = question.original_text as unknown as string;
+    const buf = fullQuestionText;
     const sorted = [...mappings].sort((a, b) => a.start_pos - b.start_pos);
     let offset = 0;
     const parts: React.ReactNode[] = [];
     let cursor = 0;
     sorted.forEach((m, i) => {
       parts.push(<span key={`t-${i}-a`}>{buf.slice(cursor, m.start_pos + offset)}</span>);
-      parts.push(<mark key={`t-${i}-b`} title={`${m.original} → ${m.replacement}`}>{m.replacement}</mark>);
+
+      // Determine validation status styling
+      let markStyle: React.CSSProperties = {};
+      let badge = '';
+      let title = `${m.original} → ${m.replacement}`;
+
+      if (m.validated === true) {
+        markStyle = { backgroundColor: '#d4edda', borderLeft: '3px solid #28a745' };
+        badge = ' ✓';
+        title += ` (Validated: ${m.validation?.response || 'N/A'})`;
+      } else if (m.validated === false) {
+        markStyle = { backgroundColor: '#fff3cd', borderLeft: '3px solid #ffc107' };
+        badge = ' ⚠';
+        title += ` (Invalid: ${m.validation?.response || 'N/A'})`;
+      } else {
+        markStyle = { backgroundColor: '#f8f9fa', borderLeft: '3px solid #6c757d' };
+        badge = ' ⏳';
+        title += ' (Pending validation)';
+      }
+
+      parts.push(
+        <mark
+          key={`t-${i}-b`}
+          style={markStyle}
+          title={title}
+        >
+          {m.replacement}{badge}
+        </mark>
+      );
       cursor = m.end_pos + offset;
       offset += m.replacement.length - (m.end_pos - m.start_pos);
     });
     parts.push(<span key="t-end">{buf.slice(cursor)}</span>);
     return parts;
-  }, [mappings, question.original_text]);
+  }, [mappings, fullQuestionText]);
 
   const onStemMouseUp = () => {
     const node = stemRef.current;
@@ -84,14 +154,28 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
     const range = selection.getRangeAt(0);
     if (!node.contains(range.commonAncestorContainer)) return;
 
-    const text = (question.original_text || "").toString();
-    const selectedText = selection.toString();
+    const text = fullQuestionText;
+    const selectedText = selection.toString().trim();
     if (!selectedText) return;
 
     // Find first occurrence indices in the stem text
     const start = text.indexOf(selectedText);
-    if (start < 0) return;
+    if (start < 0) {
+      setValidError("Selected text not found in question stem");
+      return;
+    }
     const end = start + selectedText.length;
+
+    // Check for overlap with existing mappings
+    const hasOverlap = mappings.some(m =>
+      !(end <= m.start_pos || start >= m.end_pos)
+    );
+
+    if (hasOverlap) {
+      setValidError("Selection overlaps with existing mapping");
+      selection.removeAllRanges();
+      return;
+    }
 
     const newMap: SubstringMapping = {
       original: selectedText,
@@ -102,6 +186,11 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
     };
     addMapping(newMap);
     selection.removeAllRanges();
+    setValidError(null);
+    setSuccessMessage(`Added mapping: "${selectedText}"`);
+
+    // Clear success message after 3 seconds
+    setTimeout(() => setSuccessMessage(null), 3000);
   };
 
   const qTypeHint = useMemo(() => {
@@ -119,13 +208,49 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
     <div className="question-viewer">
       <h3>Question {question.question_number}</h3>
       <p>Type: {question.question_type}</p>
-      {question.gold_answer && <p>Gold (GPT‑5): {question.gold_answer}</p>}
+      {question.gold_answer && (
+        <p>
+          <strong>Gold Answer:</strong> {question.gold_answer}
+          {question.gold_confidence && <span style={{ color: "#666" }}> (confidence: {Math.round(question.gold_confidence * 100)}%)</span>}
+        </p>
+      )}
       <p style={{ color: "#666" }}>{qTypeHint}</p>
 
       <div>
         <h4>Stem</h4>
-        <div ref={stemRef} onMouseUp={onStemMouseUp} style={{ whiteSpace: "pre-wrap", cursor: "text", userSelect: "text", border: "1px dashed #ccc", padding: 8 }}>
-          {question.original_text}
+        <div style={{ marginBottom: 8 }}>
+          <em style={{ color: "#666", fontSize: "0.9em" }}>
+            Click and drag to select text for mapping
+          </em>
+          {successMessage && (
+            <div style={{ color: "green", fontSize: "0.9em", marginTop: 4 }}>
+              ✓ {successMessage}
+            </div>
+          )}
+        </div>
+        <div
+          ref={stemRef}
+          onMouseUp={onStemMouseUp}
+          style={{
+            whiteSpace: "pre-wrap",
+            cursor: "text",
+            userSelect: "text",
+            border: "2px dashed #007bff",
+            borderRadius: "4px",
+            padding: 12,
+            minHeight: "3em",
+            backgroundColor: "#f8f9fa",
+            lineHeight: "1.5",
+            transition: "border-color 0.2s ease"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "#0056b3";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "#007bff";
+          }}
+        >
+          {fullQuestionText || "No question text available"}
         </div>
       </div>
 
@@ -151,7 +276,8 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
               <th>end</th>
               <th>original</th>
               <th>replacement</th>
-              <th></th>
+              <th>status</th>
+              <th>actions</th>
             </tr>
           </thead>
           <tbody>
@@ -177,7 +303,25 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
                   next[i] = { ...next[i], replacement: e.target.value } as SubstringMapping;
                   setMappings(next);
                 }} /></td>
-                <td><button onClick={() => removeMapping(i)}>Remove</button></td>
+                <td>
+                  {m.validated === true ? (
+                    <span style={{ color: "green", fontWeight: "bold" }} title={`Model response: ${m.validation?.response || 'N/A'}`}>
+                      ✓ Validated
+                    </span>
+                  ) : m.validated === false ? (
+                    <span style={{ color: "orange", fontWeight: "bold" }} title={`Model response: ${m.validation?.response || 'N/A'}`}>
+                      ⚠ Invalid
+                    </span>
+                  ) : (
+                    <span style={{ color: "gray" }}>Pending</span>
+                  )}
+                </td>
+                <td style={{ display: "flex", gap: 4 }}>
+                  <button onClick={() => validateMapping(i)} disabled={!m.original || !m.replacement} title="Validate this mapping">
+                    Test
+                  </button>
+                  <button onClick={() => removeMapping(i)}>Remove</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -190,7 +334,30 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
 
       <div>
         <h4>Preview (applied)</h4>
-        <div style={{ whiteSpace: "pre-wrap" }}>{renderPreview}</div>
+        <div style={{ marginBottom: 8, fontSize: "0.85em", color: "#666" }}>
+          <span style={{ marginRight: 16 }}>
+            <span style={{ color: "#28a745" }}>✓ Validated</span>
+          </span>
+          <span style={{ marginRight: 16 }}>
+            <span style={{ color: "#ffc107" }}>⚠ Invalid</span>
+          </span>
+          <span>
+            <span style={{ color: "#6c757d" }}>⏳ Pending</span>
+          </span>
+        </div>
+        <div
+          style={{
+            whiteSpace: "pre-wrap",
+            border: "1px solid #dee2e6",
+            borderRadius: "4px",
+            padding: 12,
+            backgroundColor: "#ffffff",
+            lineHeight: "1.6",
+            minHeight: "2em"
+          }}
+        >
+          {renderPreview}
+        </div>
       </div>
 
       {lastValidation && (

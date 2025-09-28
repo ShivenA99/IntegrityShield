@@ -24,8 +24,9 @@ class ResultsGenerationService:
         metadata = structured.setdefault("pipeline_metadata", {})
         questions = structured.get("questions", [])
 
-        effectiveness_scores = [q.get("manipulation", {}).get("effectiveness_score", 0) for q in questions]
-        avg_effectiveness = mean(effectiveness_scores) if effectiveness_scores else 0.0
+        raw_scores = [q.get("manipulation", {}).get("effectiveness_score") for q in questions]
+        numeric_scores = [float(score) for score in raw_scores if isinstance(score, (int, float))]
+        avg_effectiveness = mean(numeric_scores) if numeric_scores else 0.0
 
         summary = {
             "questions": len(questions),

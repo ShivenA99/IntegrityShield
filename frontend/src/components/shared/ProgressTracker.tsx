@@ -10,20 +10,24 @@ interface ProgressTrackerProps {
   currentStage?: string;
 }
 
-const stageOrder = [
+const baseStageOrder: PipelineStageName[] = [
   "smart_reading",
   "content_discovery",
   "smart_substitution",
+  "effectiveness_testing",
+  "document_enhancement",
   "pdf_creation",
   "results_generation",
-] as const;
+];
 
 const ProgressTracker: React.FC<ProgressTrackerProps> = ({ stages, isLoading, selectedStage, onStageSelect, currentStage }) => {
   const stageMap = new Map(stages.map((stage) => [stage.name, stage]));
+  const extraStages = stages
+    .map((stage) => stage.name)
+    .filter((name) => !baseStageOrder.includes(name));
 
-  const visibleStages: PipelineStageName[] = (stageOrder as readonly PipelineStageName[]).filter(
-    (name) => !["effectiveness_testing", "document_enhancement"].includes(name)
-  );
+  const orderedUnique = [...baseStageOrder, ...extraStages];
+  const visibleStages: PipelineStageName[] = orderedUnique.filter((name, index) => orderedUnique.indexOf(name) === index);
 
   return (
     <div className="progress-tracker">
