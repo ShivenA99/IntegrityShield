@@ -105,6 +105,16 @@ class PyMuPDFRenderer(BaseRenderer):
 
         artifacts["final"] = str(destination)
 
+        try:
+            final_bytes = destination.read_bytes()
+            self.validate_output_with_context(final_bytes, mapping_context, run_id)
+        except Exception as exc:
+            self.logger.error(
+                "validation failure after PyMuPDF render",
+                extra={"run_id": run_id, "error": str(exc)},
+            )
+            raise
+
         visual_targets = snapshot_targets or replacement_stats["targets"]
         base_replacements = replacement_stats["replacements"]
         effectiveness = (
@@ -164,7 +174,7 @@ class PyMuPDFRenderer(BaseRenderer):
 
         targets_by_page: Dict[int, List[Tuple[fitz.Rect, str, float, int]]] = {}
         for page in doc:
-            targets = self._collect_targets(page, mapping, mapping_context)
+            targets = self._collect_targets(page, mapping, mapping_context, run_id=run_id)
             if targets:
                 targets_by_page[page.number] = targets
                 total_targets += len(targets)
@@ -394,6 +404,7 @@ class PyMuPDFRenderer(BaseRenderer):
         page: fitz.Page,
         mapping: Dict[str, str],
         context_map: Dict[str, List[Dict[str, object]]],
+        run_id: str | None = None,
     ) -> List[Tuple[fitz.Rect, str, float, int]]:
         targets: List[Tuple[fitz.Rect, str, float, int]] = []
         pairs = self.expand_mapping_pairs(mapping)
@@ -406,6 +417,8 @@ class PyMuPDFRenderer(BaseRenderer):
 
         used_rects: List[fitz.Rect] = []
         used_counts: Dict[str, int] = defaultdict(int)
+        used_fingerprints: set[str] = set()
+        matched_log: List[Dict[str, object]] = []
 
         # First, honor structured contexts so we only touch the intended regions
         page_contexts: List[Dict[str, object]] = []
@@ -423,8 +436,18 @@ class PyMuPDFRenderer(BaseRenderer):
             )
 
             for ctx in page_contexts:
-                location = self.locate_text_span(page, ctx, used_rects)
+                location = self.locate_text_span(page, ctx, used_rects, used_fingerprints)
                 if not location:
+                    self.logger.warning(
+                        "span location failed",
+                        extra={
+                            "run_id": run_id,
+                            "page": page.number,
+                            "q_number": ctx.get("q_number"),
+                            "original": ctx.get("original"),
+                            "fingerprint": ctx.get("fingerprint"),
+                        },
+                    )
                     continue
                 rect, fontsize, span_len = location
                 used_rects.append(rect)
@@ -432,6 +455,20 @@ class PyMuPDFRenderer(BaseRenderer):
                 replacement_text = str(ctx.get("replacement") or "")
                 used_counts[original] += 1
                 targets.append((rect, replacement_text, fontsize, span_len))
+                fingerprint_key = ctx.get("matched_fingerprint_key")
+                if fingerprint_key:
+                    used_fingerprints.add(fingerprint_key)
+                matched_log.append(
+                    {
+                        "q_number": ctx.get("q_number"),
+                        "original": original,
+                        "replacement": replacement_text,
+                        "page": page.number,
+                        "bbox": tuple(rect),
+                        "fingerprint": ctx.get("fingerprint"),
+                        "occurrence": ctx.get("matched_occurrence"),
+                    }
+                )
 
         # Fallback: handle any remaining mapping entries not covered by structured data
         for original, replacements in grouped.items():
@@ -440,7 +477,12 @@ class PyMuPDFRenderer(BaseRenderer):
                 continue
 
             occurrences = self._find_occurrences(page, original)
-            for rect, fontsize, span_len in occurrences:
+            for occ in occurrences:
+                rect = occ.get("rect")
+                fontsize = float(occ.get("fontsize", 10.0))
+                span_len = int(occ.get("span_len", len(original)))
+                if not isinstance(rect, fitz.Rect):
+                    continue
                 if remaining <= 0:
                     break
                 if self._rects_conflict(rect, used_rects):
@@ -449,6 +491,19 @@ class PyMuPDFRenderer(BaseRenderer):
                 replacement = replacements[len(replacements) - remaining]
                 targets.append((rect, replacement, fontsize, span_len))
                 remaining -= 1
+
+        if matched_log:
+            self.logger.info(
+                "matched %d spans on page %d via fingerprints",
+                len(matched_log),
+                page.number,
+                extra={
+                    "component": self.__class__.__name__,
+                    "run_id": run_id,
+                    "page": page.number,
+                    "matches": matched_log,
+                },
+            )
 
         return targets
 
@@ -502,8 +557,8 @@ class PyMuPDFRenderer(BaseRenderer):
         self,
         page: fitz.Page,
         needle: str,
-    ) -> List[Tuple[fitz.Rect, float, int]]:
-        results: List[Tuple[fitz.Rect, float, int]] = []
+    ) -> List[Dict[str, object]]:
+        results: List[Dict[str, object]] = []
         if not needle:
             return results
 
@@ -540,7 +595,18 @@ class PyMuPDFRenderer(BaseRenderer):
                             rect.y1 = max(rect.y1, float(span_bbox[3]))
                         fontsize = float(span.get("size", 10.0))
                         span_len = end - idx
-                        results.append((rect, fontsize, span_len))
+                        prefix = text[max(0, idx - 32) : idx]
+                        suffix = text[end : end + 32]
+                        results.append(
+                            {
+                                "rect": rect,
+                                "fontsize": fontsize,
+                                "span_len": span_len,
+                                "prefix": prefix,
+                                "suffix": suffix,
+                                "text": text[idx:end],
+                            }
+                        )
                         start = end
 
         return results

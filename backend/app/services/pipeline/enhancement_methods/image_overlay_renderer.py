@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 import re
 import unicodedata
 from pathlib import Path
@@ -62,12 +61,15 @@ class ImageOverlayRenderer(BaseRenderer):
                     "effectiveness_score": 0.0,
                 }
 
+        mapping_context = self.build_mapping_context(run_id) if run_id else {}
+
         # Step 1: Capture precise image snapshots from original PDF before any rewriting
         try:
             original_snapshots = self._capture_original_snapshots(
                 original_bytes,
                 clean_mapping,
                 run_id=run_id,
+                mapping_context=mapping_context,
             )
             fallback_overlay_targets = self._collect_overlay_targets(original_bytes, clean_mapping)
         except Exception:
@@ -76,10 +78,25 @@ class ImageOverlayRenderer(BaseRenderer):
 
         # Step 2: Rewrite content streams using structured ops + ToUnicode (best effort)
         try:
-            rewritten_bytes, text_metrics = self._rewrite_content_streams_structured(original_bytes, clean_mapping)
+            rewritten_bytes, text_metrics = self.rewrite_content_streams_structured(
+                original_bytes,
+                clean_mapping,
+                mapping_context,
+                run_id=run_id,
+            )
         except Exception as exc:
+            self.logger.warning(
+                "content stream rewrite failed, using original bytes",
+                extra={"run_id": run_id, "error": str(exc)},
+            )
             rewritten_bytes = original_bytes
-            text_metrics = {"pages": 0, "tj_hits": 0, "replacements": 0, "matches_found": 0, "tokens_scanned": 0}
+            text_metrics = {
+                "pages": 0,
+                "tj_hits": 0,
+                "replacements": 0,
+                "matches_found": 0,
+                "tokens_scanned": 0,
+            }
 
         # Step 3: Apply precision image snapshots over the rewritten PDF
         doc = fitz.open(stream=rewritten_bytes, filetype="pdf")
@@ -147,6 +164,12 @@ class ImageOverlayRenderer(BaseRenderer):
                     "text_metrics": text_metrics,
                     "output_bytes": destination.stat().st_size,
                 },
+            )
+
+            self.validate_output_with_context(
+                destination.read_bytes(),
+                mapping_context or {},
+                run_id,
             )
 
             return {
@@ -339,6 +362,8 @@ class ImageOverlayRenderer(BaseRenderer):
 
         try:
             used_rects: Dict[int, List[fitz.Rect]] = defaultdict(list)
+            used_fingerprints: Dict[int, set[str]] = defaultdict(set)
+            matched_records: List[Dict[str, object]] = []
 
             if mapping_context:
                 contexts: List[Dict[str, Any]] = []
@@ -367,14 +392,32 @@ class ImageOverlayRenderer(BaseRenderer):
                     if not clean_original or not clean_replacement:
                         continue
 
-                    location = self.locate_text_span(page, ctx, used_rects[page_idx])
+                    location = self.locate_text_span(
+                        page,
+                        ctx,
+                        used_rects[page_idx],
+                        used_fingerprints[page_idx],
+                    )
                     if not location:
+                        self.logger.warning(
+                            "snapshot span not located",
+                            extra={
+                                "page": page_idx,
+                                "q_number": ctx.get("q_number"),
+                                "original": clean_original,
+                                "fingerprint": ctx.get("fingerprint"),
+                            },
+                        )
                         continue
                     rect, _, _ = location
 
                     adjusted_rect = self._ensure_non_overlapping_rect(rect, used_rects[page_idx], page.rect)
                     if adjusted_rect is None:
                         continue
+
+                    fingerprint_key = ctx.get("matched_fingerprint_key")
+                    if fingerprint_key:
+                        used_fingerprints[page_idx].add(fingerprint_key)
 
                     expanded_rect = adjusted_rect + [-1, -1, 1, 1]
                     try:
@@ -393,6 +436,14 @@ class ImageOverlayRenderer(BaseRenderer):
                             "image_width": pix.width,
                             "image_height": pix.height,
                             "capture_dpi": 300,
+                        }
+                    )
+                    matched_records.append(
+                        {
+                            "page": page_idx,
+                            "bbox": tuple(adjusted_rect),
+                            "fingerprint": ctx.get("fingerprint"),
+                            "q_number": ctx.get("q_number"),
                         }
                     )
 
@@ -428,6 +479,11 @@ class ImageOverlayRenderer(BaseRenderer):
                         )
 
         finally:
+            if 'matched_records' in locals() and matched_records:
+                self.logger.info(
+                    "captured %d overlay snapshots via deterministic spans",
+                    len(matched_records),
+                )
             doc.close()
 
         return snapshots
@@ -684,281 +740,6 @@ class ImageOverlayRenderer(BaseRenderer):
                     pass
         return applied
 
-    def _rewrite_content_streams_structured(self, pdf_bytes: bytes, mapping: Dict[str, str]) -> Tuple[bytes, Dict[str, int]]:
-        from PyPDF2 import PdfReader, PdfWriter
-        from PyPDF2.generic import ContentStream, TextStringObject, ByteStringObject, ArrayObject, NameObject, NumberObject, NameObject as PdfName
-
-        SPACE_THRESHOLD = -80.0
-
-        reader = PdfReader(io.BytesIO(pdf_bytes))
-        writer = PdfWriter()
-
-        total_pages = 0
-        tj_segments = 0
-        replacements_applied = 0
-        matches_found = 0
-        tokens_scanned = 0
-
-        pattern = self._compile_mapping_pattern(mapping)
-
-        for page in reader.pages:
-            total_pages += 1
-            content = ContentStream(page.get_contents(), reader)
-            modified = False
-            new_ops: List[Tuple[List[object], bytes]] = []
-
-            font_cmaps = self._build_font_cmaps(page)
-            current_font: str | None = None
-
-            for operands, operator in content.operations:
-                if operator == b"Tf" and len(operands) >= 1:
-                    try:
-                        font_name = operands[0]
-                        if isinstance(font_name, PdfName):
-                            current_font = str(font_name)
-                    except Exception:
-                        pass
-                    new_ops.append((operands, operator))
-                    continue
-
-                if operator == b"Tj" and operands:
-                    text_obj = operands[0]
-                    if isinstance(text_obj, (TextStringObject, ByteStringObject)):
-                        if isinstance(text_obj, ByteStringObject) and current_font:
-                            s = self._decode_with_cmap(bytes(text_obj), current_font, font_cmaps)
-                        else:
-                            s = str(text_obj)
-                        tokens_scanned += len(s)
-                        rewritten, matches, changed_flag = self._replace_text(s, mapping, pattern)
-                        tj_segments += 1
-                        matches_found += matches
-                        if changed_flag:
-                            modified = True
-                            replacements_applied += 1
-                            new_ops.append(([TextStringObject(rewritten)], b"Tj"))
-                            continue
-
-                if operator == b"TJ" and operands:
-                    array_obj = operands[0]
-                    if isinstance(array_obj, ArrayObject):
-                        tj_segments += 1
-                        parts: List[str] = []
-                        for item in array_obj:
-                            if isinstance(item, (TextStringObject, ByteStringObject)):
-                                if isinstance(item, ByteStringObject) and current_font:
-                                    s = self._decode_with_cmap(bytes(item), current_font, font_cmaps)
-                                else:
-                                    s = str(item)
-                                tokens_scanned += len(s)
-                                parts.append(s)
-                            elif isinstance(item, NumberObject):
-                                try:
-                                    if float(item) <= SPACE_THRESHOLD:
-                                        parts.append(" ")
-                                except Exception:
-                                    pass
-                        combined = "".join(parts)
-                        rewritten, matches, changed_flag = self._replace_text(combined, mapping, pattern)
-                        matches_found += matches
-                        if changed_flag:
-                            modified = True
-                            replacements_applied += 1
-                            new_ops.append(([ArrayObject([TextStringObject(rewritten)])], b"TJ"))
-                            continue
-
-                new_ops.append((operands, operator))
-
-            if modified:
-                content.operations = new_ops
-                page[NameObject("/Contents")] = content
-
-            writer.add_page(page)
-
-        out = io.BytesIO()
-        writer.write(out)
-
-        return out.getvalue(), {
-            "pages": total_pages,
-            "tj_hits": tj_segments,
-            "replacements": replacements_applied,
-            "matches_found": matches_found,
-            "tokens_scanned": tokens_scanned,
-        }
-
-    def _build_font_cmaps(self, page) -> Dict[str, Dict[str, object]]:
-        cmaps: Dict[str, Dict[str, object]] = {}
-        try:
-            resources = page.get("/Resources") or {}
-            fonts = resources.get("/Font") or {}
-            for font_key, font_obj in (fonts.items() if hasattr(fonts, "items") else []):
-                try:
-                    font = font_obj.get_object() if hasattr(font_obj, "get_object") else font_obj
-                    to_unicode = font.get("/ToUnicode") if isinstance(font, dict) else None
-                    if to_unicode is None:
-                        continue
-                    stream = to_unicode.get_data() if hasattr(to_unicode, "get_data") else bytes(to_unicode)
-                    cmap_map, min_len, max_len = self._parse_tounicode_cmap(stream)
-                    if cmap_map:
-                        cmaps[str(font_key)] = {"map": cmap_map, "min_len": min_len, "max_len": max_len}
-                except Exception:
-                    continue
-        except Exception:
-            pass
-        return cmaps
-
-    def _parse_tounicode_cmap(self, data: bytes) -> Tuple[Dict[int, str], int, int]:
-        cmap: Dict[int, str] = {}
-        min_len = 1
-        max_len = 2
-        try:
-            s = data.decode("latin-1", errors="ignore")
-            for m in re.finditer(r"begincodespacerange(.*?)endcodespacerange", s, re.DOTALL):
-                block = m.group(1)
-                for line in block.splitlines():
-                    mm = re.findall(r"<([0-9A-Fa-f]+)>", line)
-                    if len(mm) == 2:
-                        l = max(len(mm[0]), len(mm[1])) // 2
-                        min_len = min(min_len, len(mm[0]) // 2) if cmap else len(mm[0]) // 2
-                        max_len = max(max_len, l)
-            for m in re.finditer(r"beginbfchar(.*?)endbfchar", s, re.DOTALL):
-                block = m.group(1)
-                for line in block.splitlines():
-                    mm = re.search(r"<([0-9A-Fa-f]+)>\s+<([0-9A-Fa-f]+)>", line)
-                    if not mm:
-                        continue
-                    src_hex = mm.group(1)
-                    dst_hex = mm.group(2)
-                    src = int(src_hex, 16)
-                    try:
-                        dst = int(dst_hex, 16)
-                        cmap[src] = chr(dst)
-                    except ValueError:
-                        try:
-                            chars = bytes.fromhex(dst_hex).decode("utf-16-be", errors="ignore")
-                            if chars:
-                                cmap[src] = chars
-                        except Exception:
-                            pass
-            for m in re.finditer(r"beginbfrange(.*?)endbfrange", s, re.DOTALL):
-                block = m.group(1)
-                for line in block.splitlines():
-                    mm = re.search(r"<([0-9A-Fa-f]+)>\s+<([0-9A-Fa-f]+)>\s+<([0-9A-Fa-f]+)>", line)
-                    if mm:
-                        start = int(mm.group(1), 16)
-                        end = int(mm.group(2), 16)
-                        dst = int(mm.group(3), 16)
-                        for i, code in enumerate(range(start, end + 1)):
-                            try:
-                                cmap[code] = chr(dst + i)
-                            except ValueError:
-                                pass
-                        continue
-                    mm2 = re.search(r"<([0-9A-Fa-f]+)>\s+<([0-9A-Fa-f]+)>\s+\[(.*?)\]", line)
-                    if mm2:
-                        start = int(mm2.group(1), 16)
-                        end = int(mm2.group(2), 16)
-                        arr = re.findall(r"<([0-9A-Fa-f]+)>", mm2.group(3))
-                        for i, code in enumerate(range(start, end + 1)):
-                            if i < len(arr):
-                                try:
-                                    hexval = arr[i]
-                                    try:
-                                        cmap[code] = chr(int(hexval, 16))
-                                    except ValueError:
-                                        sdst = bytes.fromhex(hexval).decode("utf-16-be", errors="ignore")
-                                        if sdst:
-                                            cmap[code] = sdst
-                                except ValueError:
-                                    pass
-            return cmap, max(1, min_len), max(1, max_len)
-        except Exception:
-            return {}, min_len, max_len
-
-    def _decode_with_cmap(self, data_bytes: bytes, font_key: str, cmaps: Dict[str, Dict[str, object]]) -> str:
-        info = cmaps.get(font_key) or {}
-        cmap = info.get("map") if isinstance(info, dict) else {}
-        min_len = int(info.get("min_len", 1)) if isinstance(info, dict) else 1
-        max_len = int(info.get("max_len", 2)) if isinstance(info, dict) else 2
-        if not cmap:
-            try:
-                if len(data_bytes) >= 2 and data_bytes[0] == 0x00:
-                    return data_bytes.decode("utf-16-be", errors="ignore")
-                return data_bytes.decode("latin-1", errors="ignore")
-            except Exception:
-                return ""
-        out_chars: List[str] = []
-        i = 0
-        n = len(data_bytes)
-        while i < n:
-            consumed = False
-            for L in range(min(max_len, n - i), min_len - 1, -1):
-                code = 0
-                for k in range(L):
-                    code = (code << 8) | data_bytes[i + k]
-                mapped = cmap.get(code)
-                if mapped is not None:
-                    out_chars.append(mapped)
-                    i += L
-                    consumed = True
-                    break
-            if not consumed:
-                out_chars.append(chr(data_bytes[i]))
-                i += 1
-        return "".join(out_chars)
-
-    def _compile_mapping_pattern(self, mapping: Dict[str, str]):
-        import re
-        tokens = []
-        for original, _ in self.expand_mapping_pairs(mapping):
-            if original:
-                tokens.append(re.escape(original))
-        if not tokens:
-            return None
-        # Deduplicate while preserving order
-        seen = set()
-        ordered_tokens = []
-        for token in tokens:
-            if token in seen:
-                continue
-            seen.add(token)
-            ordered_tokens.append(token)
-        return re.compile(r"|".join(ordered_tokens), re.IGNORECASE)
-
-    def _replace_text(self, text: str, mapping: Dict[str, str], pattern) -> Tuple[str, int, int]:
-        if not text or not mapping or not pattern:
-            return text, 0, 0
-
-        pairs = self.expand_mapping_pairs(mapping)
-        if not pairs:
-            return text, 0, 0
-
-        grouped: "OrderedDict[str, List[str]]" = OrderedDict()
-        for original, replacement in pairs:
-            grouped.setdefault(original, []).append(replacement)
-
-        lookup = {original.casefold(): original for original in grouped.keys()}
-        usage_counts: Dict[str, int] = defaultdict(int)
-
-        match_count = 0
-
-        def substitute(match):
-            nonlocal match_count
-            original_text = match.group(0)
-            key = lookup.get(original_text.casefold())
-            if not key:
-                return original_text
-            replacements = grouped.get(key, [])
-            if not replacements:
-                return original_text
-            idx = usage_counts[key]
-            if idx >= len(replacements):
-                idx = len(replacements) - 1
-            usage_counts[key] += 1
-            match_count += 1
-            return replacements[idx]
-
-        new_text = pattern.sub(substitute, text)
-        return new_text, match_count, int(new_text != text)
 
     def _get_matching_font(self, original_font: str, size: float) -> ImageFont.FreeTypeFont | None:
         try:
