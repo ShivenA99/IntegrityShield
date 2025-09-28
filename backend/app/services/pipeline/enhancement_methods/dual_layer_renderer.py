@@ -39,6 +39,8 @@ class DualLayerRenderer(BaseRenderer):
         reader = PdfReader(io.BytesIO(pdf_bytes))
         writer = PdfWriter()
 
+        pairs = self.expand_mapping_pairs(mapping)
+
         for page in reader.pages:
             content = ContentStream(page.get_contents(), reader)
             new_ops: List[Tuple[List[object], bytes]] = []
@@ -48,8 +50,8 @@ class DualLayerRenderer(BaseRenderer):
                     original_text = str(operands[0])
 
                     replacement_text = None
-                    for orig, repl in mapping.items():
-                        if orig in original_text:
+                    for orig, repl in pairs:
+                        if orig and orig in original_text:
                             replacement_text = original_text.replace(orig, repl)
                             break
 

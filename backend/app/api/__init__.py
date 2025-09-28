@@ -12,4 +12,7 @@ def register_blueprints(app: Flask) -> None:
     pipeline_routes.init_app(api_bp)
     questions_routes.init_app(api_bp)
     developer_routes.init_app(api_bp)
+    # Defer files_routes import to avoid circular reference during module init
+    from . import files_routes  # type: ignore
+    files_routes.init_app(api_bp)
     app.register_blueprint(api_bp)

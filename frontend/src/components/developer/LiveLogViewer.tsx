@@ -16,13 +16,19 @@ const LiveLogViewer: React.FC<LiveLogViewerProps> = ({ logs, isStreaming }) => (
       </span>
     </header>
     <ul>
-      {logs.map((log, index) => (
-        <li key={`${log.timestamp}-${index}`}>
-          <span className={`level ${log.level.toLowerCase()}`}>{log.level}</span>
-          <span className="stage">[{log.stage}]</span>
-          <span className="message">{log.message}</span>
-        </li>
-      ))}
+      {logs.map((log, index) => {
+        const level = (log.level ?? "INFO").toString();
+        const normalizedLevel = level.trim().toLowerCase();
+        const stageLabel = log.stage || "pipeline";
+
+        return (
+          <li key={`${log.timestamp ?? index}-${index}`}>
+            <span className={`level ${normalizedLevel}`}>{level}</span>
+            <span className="stage">[{stageLabel}]</span>
+            <span className="message">{log.message}</span>
+          </li>
+        );
+      })}
       {logs.length === 0 ? <li>No log events yet.</li> : null}
     </ul>
   </div>

@@ -1,0 +1,2404 @@
+{
+  "pipeline_metadata": {
+    "run_id": "1a1592bf-86c8-47fb-b23b-b47d73161565",
+    "current_stage": "results_generation",
+    "stages_completed": [
+      "results_generation",
+      "smart_substitution",
+      "smart_reading",
+      "content_discovery"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-27T22:26:13.801434+00:00",
+    "version": "2.0.0",
+    "config": {},
+    "ai_extraction_enabled": true,
+    "ai_sources_used": [
+      "openai_vision",
+      "mistral_ocr"
+    ]
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/HW01.pdf",
+    "filename": "HW01.pdf",
+    "pages": 2
+  },
+  "questions": [
+    {
+      "question_number": "1",
+      "question_type": "short_answer",
+      "stem_text": "Draw an ERD illustrating the relational database schema. Show entities and attributes, primary key, foreign key, relationships, and cardinalities.",
+      "options": {},
+      "positioning": {
+        "page": 2,
+        "method": "openai_vision",
+        "extraction_order": 0,
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "diagram"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 4,
+          "source_agreements": {
+            "vision_mistral": 4,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 215,
+            "original": "Draw an ERD illustrating the relational database schema. Show entities and attributes, primary key, foreign key, relationships, and cardinalities.",
+            "replacement": "Draw an ERD illustrating the relational database schema. Show entities and attributes, primary key, foreign key, relationships, and cardinalities. [altered]",
+            "start_pos": 0,
+            "end_pos": 146,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "2",
+      "question_type": "short_answer",
+      "stem_text": "Define and explain the terms - relation, attributes and tuples, primary key, foreign key, and integrity constraints in the context of the given schema.",
+      "options": {},
+      "positioning": {
+        "page": 2,
+        "method": "openai_vision",
+        "extraction_order": 1,
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 4,
+          "source_agreements": {
+            "vision_mistral": 4,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 216,
+            "original": "Define and explain the terms - relation, attributes and tuples, primary key, foreign key, and integrity constraints in the context of the given schema.",
+            "replacement": "Define and explain the terms - relation, attributes and tuples, primary key, foreign key, and integrity constraints in the context of the given schema. [altered]",
+            "start_pos": 0,
+            "end_pos": 151,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "3",
+      "question_type": "short_answer",
+      "stem_text": "Provide two normalization cases to avoid redundancy and anomalies in the context of the given schema. For each, state the functional dependency or anomaly, explain the normalization step (1NF/2NF/3NF), and describe how this improves the design.",
+      "options": {},
+      "positioning": {
+        "page": 2,
+        "method": "openai_vision",
+        "extraction_order": 2,
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 4,
+          "source_agreements": {
+            "vision_mistral": 4,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 217,
+            "original": "Provide two normalization cases to avoid redundancy and anomalies in the context of the given schema. For each, state the functional dependency or anomaly, explain the normalization step (1NF/2NF/3NF), and describe how this improves the design.",
+            "replacement": "Provide two normalization cases to avoid redundancy and anomalies in the context of the given schema. For each, state the functional dependency or anomaly, explain the normalization step (1NF/2NF/3NF), and describe how this improves the design. [altered]",
+            "start_pos": 0,
+            "end_pos": 244,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "4",
+      "question_type": "short_answer",
+      "stem_text": "Write at least five queries for the given schema. For each query, provide a natural language description of what the query should return, and its equivalent SQL expression. You may choose your queries from the list of operations below, but each query must use a different operation (no repeats): Relational Algebra operations: Selection, Union, Set Difference, Cartesian Product, Insertion, Theta (θ)–Join, Semi-join, Division.",
+      "options": {},
+      "positioning": {
+        "page": 2,
+        "method": "openai_vision",
+        "extraction_order": 3,
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 4,
+          "source_agreements": {
+            "vision_mistral": 4,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 218,
+            "original": "Write at least five queries for the given schema. For each query, provide a natural language description of what the query should return, and its equivalent SQL expression. You may choose your queries from the list of operations below, but each query must use a different operation (no repeats): Relational Algebra operations: Selection, Union, Set Difference, Cartesian Product, Insertion, Theta (θ)–Join, Semi-join, Division.",
+            "replacement": "Write at least five queries for the given schema. For each query, provide a natural language description of what the query should return, and its equivalent SQL expression. You may choose your queries from the list of operations below, but each query must use a different operation (no repeats): Relational Algebra operations: Selection, Union, Set Difference, Cartesian Product, Insertion, Theta (θ)–Join, Semi-join, Division. [altered]",
+            "start_pos": 0,
+            "end_pos": 427,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "assets": {
+    "images": [
+      {
+        "filename": "page1_img1.png",
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/assets/page1_img1.png",
+        "page": 1,
+        "width": 549,
+        "height": 181
+      }
+    ],
+    "fonts": [
+      "ArialMT",
+      "Calibri",
+      "Helvetica",
+      "Helvetica,Bold",
+      "Helvetica,Italic",
+      "SymbolMT"
+    ],
+    "extracted_elements": 127
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_content_stream_overlay.pdf",
+        "size_bytes": 2540105,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_content_stream_overlay.pdf",
+        "file_size_bytes": 2540105,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 2,
+        "overlay_targets": 2,
+        "overlay_area_pct": 0.0438,
+        "render_stats": {
+          "mapping_entries": 4,
+          "file_size_bytes": 2540105,
+          "effectiveness_score": 1.0,
+          "replacements": 4,
+          "matches_found": 4,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 4,
+          "overlay_applied": 2,
+          "overlay_targets": 2,
+          "overlay_area_pct": 0.0438,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:26:13.792560+00:00"
+      },
+      "dual_layer": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_dual_layer.pdf",
+        "size_bytes": 241153,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_dual_layer.pdf",
+        "file_size_bytes": 241153,
+        "visual_quality_score": 0.97,
+        "effectiveness_score": 0.85,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 4,
+          "file_size_bytes": 241153,
+          "effectiveness_score": 0.85
+        },
+        "created_at": "2025-09-27T22:26:13.792677+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_image_overlay.pdf",
+        "size_bytes": 2433326,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_image_overlay.pdf",
+        "file_size_bytes": 2433326,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": 0.04377359055508443,
+        "render_stats": {
+          "mapping_entries": 2,
+          "overlays_applied": 2,
+          "file_size_bytes": 2433326,
+          "effectiveness_score": 1.0,
+          "overlay_area_pct": 0.04377359055508443,
+          "text_pages": 2,
+          "text_tj_hits": 302,
+          "text_replacements": 0,
+          "text_matches_found": 0,
+          "text_tokens_scanned": 3299
+        },
+        "created_at": "2025-09-27T22:26:13.792787+00:00"
+      },
+      "font_manipulation": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_font_manipulation.pdf",
+        "size_bytes": 214536,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_font_manipulation.pdf",
+        "file_size_bytes": 214536,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.75,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 4,
+          "file_size_bytes": 214536,
+          "effectiveness_score": 0.75
+        },
+        "created_at": "2025-09-27T22:26:13.792892+00:00"
+      },
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_content_stream.pdf",
+        "size_bytes": 2540105,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_content_stream.pdf",
+        "file_size_bytes": 2540105,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 2,
+        "overlay_targets": 2,
+        "overlay_area_pct": 0.0438,
+        "render_stats": {
+          "mapping_entries": 4,
+          "file_size_bytes": 2540105,
+          "effectiveness_score": 1.0,
+          "replacements": 4,
+          "matches_found": 4,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 4,
+          "overlay_applied": 2,
+          "overlay_targets": 2,
+          "overlay_area_pct": 0.0438,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:26:13.792999+00:00"
+      },
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_pymupdf_overlay.pdf",
+        "size_bytes": 2540105,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/1a1592bf-86c8-47fb-b23b-b47d73161565/enhanced_pymupdf_overlay.pdf",
+        "file_size_bytes": 2540105,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 2,
+        "overlay_targets": 2,
+        "overlay_area_pct": 0.0438,
+        "render_stats": {
+          "mapping_entries": 4,
+          "file_size_bytes": 2540105,
+          "effectiveness_score": 1.0,
+          "replacements": 4,
+          "textbox_adjustments": 4,
+          "min_fontsize_used": 5.5,
+          "overlay_applied": 2,
+          "overlay_targets": 2,
+          "overlay_area_pct": 0.0438,
+          "raw_targets": 4
+        },
+        "created_at": "2025-09-27T22:26:13.793105+00:00"
+      }
+    },
+    "debug": {
+      "content_stream_overlay": {
+        "decoded_sample": null,
+        "per_font_top_tokens": null,
+        "enhanced_mapping_stats": {
+          "total_entries": 4,
+          "discovered_tokens": 0
+        }
+      },
+      "overlay_layers": {
+        "pymupdf_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 4,
+          "enhanced_mapping_boost": 0
+        },
+        "image_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 2,
+          "enhanced_mapping_boost": 0
+        }
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 375.92,
+      "mapping_build_time_ms": 21.02,
+      "enhancement_stats": {
+        "base_mapping_size": 4,
+        "enhanced_mapping_size": 4,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream_overlay": {
+          "duration_ms": 90.23,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 2540105
+        },
+        "content_stream": {
+          "duration_ms": 81.91,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 2540105
+        },
+        "pymupdf_overlay": {
+          "duration_ms": 78.95,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 2540105
+        },
+        "image_overlay": {
+          "duration_ms": 63.8,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 2433326
+        },
+        "dual_layer": {
+          "duration_ms": 25.65,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 241153
+        },
+        "font_manipulation": {
+          "duration_ms": 1.28,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 214536
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 6,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 214536,
+        "total_output_size_bytes": 10509330,
+        "size_efficiency": 48.986323973598836
+      }
+    },
+    "summary": {
+      "questions": 4,
+      "average_effectiveness": 0.0,
+      "generated_at": "2025-09-27T22:26:13.801434+00:00"
+    }
+  },
+  "performance_metrics": {},
+  "content_elements": [
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        401.260009765625,
+        126.58312225341797,
+        404.31243896484375,
+        138.82582092285156
+      ],
+      "font": "Helvetica",
+      "size": 10.979999542236328
+    },
+    {
+      "type": "text",
+      "content": "Term: ",
+      "page": 1,
+      "bbox": [
+        79.55999755859375,
+        145.9399871826172,
+        116.26800537109375,
+        159.3199920654297
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Fall 2025     ",
+      "page": 1,
+      "bbox": [
+        116.30000305175781,
+        145.9399871826172,
+        182.33599853515625,
+        159.3199920654297
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Subject: ",
+      "page": 1,
+      "bbox": [
+        182.36000061035156,
+        145.9399871826172,
+        232.96400451660156,
+        159.3199920654297
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Computer Science & Engineering (CSE)    ",
+      "page": 1,
+      "bbox": [
+        233.0,
+        145.9399871826172,
+        459.70391845703125,
+        159.3199920654297
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Number: ",
+      "page": 1,
+      "bbox": [
+        459.760009765625,
+        145.9399871826172,
+        512.3920288085938,
+        159.3199920654297
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "512",
+      "page": 1,
+      "bbox": [
+        512.4400024414062,
+        145.9399871826172,
+        532.4319458007812,
+        159.3199920654297
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        532.4199829101562,
+        148.6549835205078,
+        534.9219970703125,
+        158.6899871826172
+      ],
+      "font": "Helvetica",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Course Title: D",
+      "page": 1,
+      "bbox": [
+        157.27999877929688,
+        168.85997009277344,
+        242.6599884033203,
+        182.23997497558594
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "istributed ",
+      "page": 1,
+      "bbox": [
+        242.66000366210938,
+        168.85997009277344,
+        294.6199951171875,
+        182.23997497558594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "D",
+      "page": 1,
+      "bbox": [
+        294.6199951171875,
+        168.85997009277344,
+        303.28399658203125,
+        182.23997497558594
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "atabase ",
+      "page": 1,
+      "bbox": [
+        303.260009765625,
+        168.85997009277344,
+        349.31597900390625,
+        182.23997497558594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "S",
+      "page": 1,
+      "bbox": [
+        349.3599853515625,
+        168.85997009277344,
+        357.3639831542969,
+        182.23997497558594
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "ystems (CSE 512) ",
+      "page": 1,
+      "bbox": [
+        357.3399963378906,
+        168.85997009277344,
+        458.0559997558594,
+        182.23997497558594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Homework 01 (20 Points) ",
+      "page": 1,
+      "bbox": [
+        210.86000061035156,
+        193.5418701171875,
+        405.59356689453125,
+        211.4041748046875
+      ],
+      "font": "Helvetica,Bold",
+      "size": 16.020000457763672
+    },
+    {
+      "type": "text",
+      "content": "Due on Monday, August 2",
+      "page": 1,
+      "bbox": [
+        174.13999938964844,
+        213.38807678222656,
+        345.9344177246094,
+        228.9757843017578
+      ],
+      "font": "Helvetica,Bold",
+      "size": 13.979999542236328
+    },
+    {
+      "type": "text",
+      "content": "nd",
+      "page": 1,
+      "bbox": [
+        346.0,
+        212.9149932861328,
+        357.01898193359375,
+        222.9499969482422
+      ],
+      "font": "Helvetica,Bold",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": " at 11:59 pm ",
+      "page": 1,
+      "bbox": [
+        357.0400085449219,
+        213.38807678222656,
+        441.80645751953125,
+        228.9757843017578
+      ],
+      "font": "Helvetica,Bold",
+      "size": 13.979999542236328
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        229.4680938720703,
+        75.88643646240234,
+        245.05580139160156
+      ],
+      "font": "Helvetica,Bold",
+      "size": 13.979999542236328
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        245.6081085205078,
+        75.88643646240234,
+        261.19580078125
+      ],
+      "font": "Helvetica,Bold",
+      "size": 13.979999542236328
+    },
+    {
+      "type": "text",
+      "content": "Motivation: ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        261.6199951171875,
+        139.37600708007812,
+        274.9999694824219
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Multinational corporations operate in diverse locations and manage multiple ",
+      "page": 1,
+      "bbox": [
+        139.33999633789062,
+        261.6199951171875,
+        543.3079223632812,
+        274.9999694824219
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "projects simultaneously. Tracking employees, responsibilities, project budgets, and ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        276.5,
+        543.2518920898438,
+        289.8799743652344
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "compensation across regions requires a robust relational database. A well-structured ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        291.3800048828125,
+        543.364013671875,
+        304.7599792480469
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "design ensures accurate reporting, reduces redundancy, and supports efficient decision-",
+      "page": 1,
+      "bbox": [
+        72.0,
+        306.32000732421875,
+        539.9759521484375,
+        319.6999816894531
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "making at a global scale. ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        321.20001220703125,
+        207.41600036621094,
+        334.5799865722656
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Problem Statement:",
+      "page": 1,
+      "bbox": [
+        72.0,
+        344.0600280761719,
+        185.51600646972656,
+        357.44000244140625
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " You are hired as a database designer for a multinational company ",
+      "page": 1,
+      "bbox": [
+        185.47999572753906,
+        344.0600280761719,
+        543.2118530273438,
+        357.44000244140625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "that manages projects across several countries. Each project may be located in a different ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        359.0,
+        543.3238525390625,
+        372.3799743652344
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "city or country and requires employees with specific job titles and responsibilities. ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        373.8800048828125,
+        543.1559448242188,
+        387.2599792480469
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Employees can be assigned to multiple projects at once, sometimes in different regions, ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        388.760009765625,
+        543.1519165039062,
+        402.1399841308594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "with varying durations. Salaries are standardized by job title but may need to be compared ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        403.6600036621094,
+        543.3358154296875,
+        417.03997802734375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "across projects and locations for analysis. The company wants to, ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        418.5400085449219,
+        424.8760070800781,
+        431.91998291015625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        90.0,
+        441.1000061035156,
+        95.5199966430664,
+        455.75201416015625
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        95.5199966430664,
+        442.3000183105469,
+        98.85599517822266,
+        455.67999267578125
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Maintain clear relationships among employees, projects, assignments, and ",
+      "page": 1,
+      "bbox": [
+        108.0199966430664,
+        442.3000183105469,
+        543.1998901367188,
+        455.67999267578125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "salaries. ",
+      "page": 1,
+      "bbox": [
+        108.0199966430664,
+        457.1200256347656,
+        156.05599975585938,
+        470.5
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        90.0,
+        471.70001220703125,
+        95.5199966430664,
+        486.3520202636719
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        95.5199966430664,
+        472.9000244140625,
+        98.85599517822266,
+        486.2799987792969
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Avoid redundancy and anomalies by using proper normalization. ",
+      "page": 1,
+      "bbox": [
+        108.0199966430664,
+        472.9000244140625,
+        452.89599609375,
+        486.2799987792969
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        90.0,
+        487.3600158691406,
+        95.5199966430664,
+        502.01202392578125
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        95.5199966430664,
+        488.5600280761719,
+        98.85599517822266,
+        501.94000244140625
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Support complex queries for reporting, including identifying global staffing ",
+      "page": 1,
+      "bbox": [
+        108.0199966430664,
+        488.5600280761719,
+        543.15185546875,
+        501.94000244140625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "patterns, comparing budgets, and analyzing labor costs across multiple locations. ",
+      "page": 1,
+      "bbox": [
+        108.0199966430664,
+        503.44000244140625,
+        543.0360107421875,
+        516.8200073242188
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "The schema includes the following four relations: ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        526.3599853515625,
+        334.8160095214844,
+        539.739990234375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        90.0,
+        548.8599853515625,
+        95.5199966430664,
+        563.511962890625
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        95.5199966430664,
+        550.0599975585938,
+        98.85599517822266,
+        563.4400024414062
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "EMP",
+      "page": 1,
+      "bbox": [
+        108.0199966430664,
+        550.0599975585938,
+        134.0240020751953,
+        563.4400024414062
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(ENO, ENAME, TITLE) ",
+      "page": 1,
+      "bbox": [
+        134.0,
+        550.0599975585938,
+        260.0360107421875,
+        563.4400024414062
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        90.0,
+        564.5800170898438,
+        95.5199966430664,
+        579.2319946289062
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        95.5199966430664,
+        565.780029296875,
+        98.85599517822266,
+        579.1600341796875
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "ASG",
+      "page": 1,
+      "bbox": [
+        108.0199966430664,
+        565.780029296875,
+        134.0240020751953,
+        579.1600341796875
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(ENO, PNO, RESP, DUR) ",
+      "page": 1,
+      "bbox": [
+        134.05999755859375,
+        565.780029296875,
+        275.9960021972656,
+        579.1600341796875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        90.0,
+        580.239990234375,
+        95.5199966430664,
+        594.8919677734375
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        95.5199966430664,
+        581.4400024414062,
+        98.85599517822266,
+        594.8200073242188
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "PROJ",
+      "page": 1,
+      "bbox": [
+        108.0199966430664,
+        581.4400024414062,
+        140.6479949951172,
+        594.8200073242188
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(PNO, PNAME, BUDGET, LOC) ",
+      "page": 1,
+      "bbox": [
+        140.66000366210938,
+        581.4400024414062,
+        315.3559875488281,
+        594.8200073242188
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 1,
+      "bbox": [
+        90.0,
+        595.9000244140625,
+        95.5199966430664,
+        610.552001953125
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        95.5199966430664,
+        597.1000366210938,
+        98.85599517822266,
+        610.4800415039062
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "PAY",
+      "page": 1,
+      "bbox": [
+        108.0199966430664,
+        597.1000366210938,
+        132.69200134277344,
+        610.4800415039062
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(TITLE, SAL) ",
+      "page": 1,
+      "bbox": [
+        132.67999267578125,
+        597.1000366210938,
+        206.03599548339844,
+        610.4800415039062
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Intuition:",
+      "page": 1,
+      "bbox": [
+        72.0,
+        620.02001953125,
+        123.34800720214844,
+        633.4000244140625
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " Employees (EMP) work on projects (PROJ). Their assignments are recorded ",
+      "page": 1,
+      "bbox": [
+        123.37999725341797,
+        620.02001953125,
+        543.3399658203125,
+        633.4000244140625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "in ASG with a responsibility (RESP) and a duration in months (DUR). Titles map to ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        634.9000244140625,
+        543.3040161132812,
+        648.280029296875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "salaries through the PAY relation. ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        649.780029296875,
+        254.0959930419922,
+        663.1600341796875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        672.7000122070312,
+        75.33599853515625,
+        686.0800170898438
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        697.425048828125,
+        74.48148345947266,
+        708.405029296875
+      ],
+      "font": "Calibri",
+      "size": 10.979999542236328
+    },
+    {
+      "type": "text",
+      "content": "Q1. Entity–Relationship Diagram (ERD) - ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        72.42002868652344,
+        318.1759948730469,
+        85.8000259399414
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Draw an ERD illustrating the relational ",
+      "page": 2,
+      "bbox": [
+        321.3999938964844,
+        72.42002868652344,
+        543.2559204101562,
+        85.8000259399414
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "database schema. Show entities and attributes, primary key, foreign key, relationships, ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        87.29997253417969,
+        543.39599609375,
+        100.67996978759766
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "and cardinalities. (5 points) ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        102.17997741699219,
+        218.75599670410156,
+        115.55997467041016
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q2.",
+      "page": 2,
+      "bbox": [
+        72.0,
+        125.11997985839844,
+        91.343994140625,
+        138.49998474121094
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        91.37999725341797,
+        125.11997985839844,
+        94.71599578857422,
+        138.49998474121094
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Relational Schema Definition",
+      "page": 2,
+      "bbox": [
+        95.4000015258789,
+        125.11997985839844,
+        261.9960021972656,
+        138.49998474121094
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " – Define and explain the terms - relation, attributes ",
+      "page": 2,
+      "bbox": [
+        262.0400085449219,
+        125.11997985839844,
+        543.39599609375,
+        138.49998474121094
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "and tuples, primary key, foreign key, and integrity constraints in the context of the given ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        139.99998474121094,
+        543.39599609375,
+        153.37998962402344
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "schema. (5 points) ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        154.87998962402344,
+        174.05599975585938,
+        168.25999450683594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q3.",
+      "page": 2,
+      "bbox": [
+        72.0,
+        177.7999725341797,
+        91.343994140625,
+        191.1799774169922
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        91.37999725341797,
+        177.7999725341797,
+        94.71599578857422,
+        191.1799774169922
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Normalization - ",
+      "page": 2,
+      "bbox": [
+        94.86000061035156,
+        178.7230682373047,
+        177.49244689941406,
+        190.9657745361328
+      ],
+      "font": "Helvetica,Bold",
+      "size": 10.979999542236328
+    },
+    {
+      "type": "text",
+      "content": "Provide",
+      "page": 2,
+      "bbox": [
+        177.6199951171875,
+        178.7230682373047,
+        214.89707946777344,
+        190.9657745361328
+      ],
+      "font": "Helvetica",
+      "size": 10.979999542236328
+    },
+    {
+      "type": "text",
+      "content": " two normalization cases to avoid redundancy and anomalies ",
+      "page": 2,
+      "bbox": [
+        214.94000244140625,
+        177.7999725341797,
+        543.39599609375,
+        191.1799774169922
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "in the context of the given schema. (5 Points) ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        192.6799774169922,
+        315.5360107421875,
+        206.0599822998047
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "For each,  ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        215.6000213623047,
+        129.3560028076172,
+        228.9800262451172
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 2,
+      "bbox": [
+        90.0,
+        238.0999755859375,
+        95.5199966430664,
+        252.75196838378906
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        95.5199966430664,
+        239.2999725341797,
+        98.85599517822266,
+        252.6799774169922
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "State the functional dependency or anomaly ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        239.2999725341797,
+        345.4960021972656,
+        252.6799774169922
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 2,
+      "bbox": [
+        90.0,
+        253.82000732421875,
+        95.5199966430664,
+        268.4720153808594
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        95.5199966430664,
+        255.02000427246094,
+        98.85599517822266,
+        268.3999938964844
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Explain the normalization step (1NF/2NF/3NF) ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        255.02000427246094,
+        357.4960021972656,
+        268.3999938964844
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 2,
+      "bbox": [
+        90.0,
+        269.4200134277344,
+        95.5199966430664,
+        284.072021484375
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        95.5199966430664,
+        270.6200256347656,
+        98.85599517822266,
+        284.0
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Describe how this improves the design. ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        270.6200256347656,
+        320.09600830078125,
+        284.0
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q4.",
+      "page": 2,
+      "bbox": [
+        72.0,
+        293.5400085449219,
+        91.343994140625,
+        306.91998291015625
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " Write at least five queries for the given schema. For each query, provide a natural ",
+      "page": 2,
+      "bbox": [
+        91.37999725341797,
+        293.5400085449219,
+        543.3639526367188,
+        306.91998291015625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "language description of what the query should return, and its equivalent SQL expression. ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        308.4800109863281,
+        543.39599609375,
+        321.8599853515625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "You may choose your queries from the list of operations below, but each query must use ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        323.3600158691406,
+        543.2758178710938,
+        336.739990234375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a different operation (no repeats): (5 Points) ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        338.2400207519531,
+        308.156005859375,
+        351.6199951171875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 2,
+      "bbox": [
+        90.0,
+        360.739990234375,
+        95.5199966430664,
+        375.3919982910156
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        95.5199966430664,
+        361.94000244140625,
+        98.85599517822266,
+        375.3199768066406
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Relational Algebra operations: Selection, Union, Set Difference, Cartesian ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        361.94000244140625,
+        543.1878662109375,
+        375.3199768066406
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Product, Insertion, Theta (θ)–Join, Semi-join, Division ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        376.82000732421875,
+        394.8760070800781,
+        390.1999816894531
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        399.760009765625,
+        75.33599853515625,
+        413.1399841308594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Submission Instruction: ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        422.6200256347656,
+        212.6959991455078,
+        436.0
+      ],
+      "font": "Helvetica,Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 2,
+      "bbox": [
+        90.0,
+        445.17999267578125,
+        95.5199966430664,
+        459.8320007324219
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        95.5199966430664,
+        446.3800048828125,
+        98.85599517822266,
+        459.7599792480469
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Submit a single PDF file containing the complete solutions for Q1–Q4. ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        446.3800048828125,
+        482.83599853515625,
+        459.7599792480469
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 2,
+      "bbox": [
+        90.0,
+        460.8399963378906,
+        95.5199966430664,
+        475.49200439453125
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        95.5199966430664,
+        462.0400085449219,
+        98.85599517822266,
+        475.41998291015625
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "All solutions must be handwritten (digital handwriting, e.g., stylus, iPad, OneNote, ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        462.0400085449219,
+        543.2718505859375,
+        475.41998291015625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "is also acceptable). ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        476.9200134277344,
+        214.0760040283203,
+        490.29998779296875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 2,
+      "bbox": [
+        90.0,
+        491.44000244140625,
+        95.5199966430664,
+        506.0920104980469
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        95.5199966430664,
+        492.6400146484375,
+        98.85599517822266,
+        506.0199890136719
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Typed answers will not be accepted.  ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        492.6400146484375,
+        308.09600830078125,
+        506.0199890136719
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 2,
+      "bbox": [
+        90.0,
+        507.15997314453125,
+        95.5199966430664,
+        521.8119506835938
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        95.5199966430664,
+        508.3599853515625,
+        98.85599517822266,
+        521.739990234375
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "You may scan or take clear photos of your work. ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        508.3599853515625,
+        381.7399597167969,
+        521.739990234375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(Unclear photos used will be ",
+      "page": 2,
+      "bbox": [
+        383.32000732421875,
+        508.3599853515625,
+        543.3519897460938,
+        521.7159423828125
+      ],
+      "font": "Helvetica,Italic",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "rejected.)",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        523.239990234375,
+        158.03599548339844,
+        536.595947265625
+      ],
+      "font": "Helvetica,Italic",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        158.05999755859375,
+        523.239990234375,
+        161.39599609375,
+        536.6199951171875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "•",
+      "page": 2,
+      "bbox": [
+        90.0,
+        537.760009765625,
+        95.5199966430664,
+        552.4119873046875
+      ],
+      "font": "SymbolMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        95.5199966430664,
+        538.9600219726562,
+        98.85599517822266,
+        552.3400268554688
+      ],
+      "font": "ArialMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "The ER Diagram may be either drawn by hand or created digitally using any ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        538.9600219726562,
+        543.3519897460938,
+        552.3400268554688
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "appropriate diagramming tool. ",
+      "page": 2,
+      "bbox": [
+        108.0199966430664,
+        553.780029296875,
+        270.7760009765625,
+        567.1600341796875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        576.7000122070312,
+        75.33599853515625,
+        590.0800170898438
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        599.5599975585938,
+        75.33599853515625,
+        612.9400024414062
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        624.3250122070312,
+        74.48148345947266,
+        635.3049926757812
+      ],
+      "font": "Calibri",
+      "size": 10.979999542236328
+    }
+  ],
+  "ai_extraction": {
+    "source": "gpt5_fusion",
+    "confidence": 0.95,
+    "questions_found": 4,
+    "processing_time_ms": 25587,
+    "cost_cents": 21.07125,
+    "error": null,
+    "raw_response": {
+      "content": "```json\n{\n  \"fusion_analysis\": {\n    \"total_questions_found\": 4,\n    \"source_agreements\": {\n      \"vision_mistral\": 4,\n      \"vision_only\": 0,\n      \"mistral_only\": 0,\n      \"conflicts_resolved\": 0\n    },\n    \"quality_score\": 0.95\n  },\n  \"questions\": [\n    {\n      \"question_number\": \"1\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Draw an ERD illustrating the relational database schema. Show entities and attributes, primary key, foreign key, relationships, and cardinalities.\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 2,\n        \"method\": \"openai_vision\",\n        \"extraction_order\": 0,\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [\"diagram\"],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"2\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Define and explain the terms - relation, attributes and tuples, primary key, foreign key, and integrity constraints in the context of the given schema.\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 2,\n        \"method\": \"openai_vision\",\n        \"extraction_order\": 1,\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"3\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Provide two normalization cases to avoid redundancy and anomalies in the context of the given schema. For each, state the functional dependency or anomaly, explain the normalization step (1NF/2NF/3NF), and describe how this improves the design.\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 2,\n        \"method\": \"openai_vision\",\n        \"extraction_order\": 2,\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"4\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Write at least five queries for the given schema. For each query, provide a natural language description of what the query should return, and its equivalent SQL expression. You may choose your queries from the list of operations below, but each query must use a different operation (no repeats): Relational Algebra operations: Selection, Union, Set Difference, Cartesian Product, Insertion, Theta (θ)–Join, Semi-join, Division.\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 2,\n        \"method\": \"openai_vision\",\n        \"extraction_order\": 3,\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    }\n  ]\n}\n```",
+      "model": "gpt-4o",
+      "sources_used": [
+        "pymupdf",
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "orchestration": {
+        "extraction_results": {
+          "mistral_ocr": {
+            "questions_count": 4,
+            "confidence": 0.85,
+            "processing_time_ms": 4452
+          },
+          "openai_vision": {
+            "questions_count": 4,
+            "confidence": 0.9,
+            "processing_time_ms": 13536
+          }
+        },
+        "total_processing_time_ms": 39130,
+        "clients_used": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  },
+  "ai_questions": [
+    {
+      "question_number": "1",
+      "question_type": "short_answer",
+      "stem_text": "Draw an ERD illustrating the relational database schema. Show entities and attributes, primary key, foreign key, relationships, and cardinalities.",
+      "options": {},
+      "positioning": {
+        "page": 2,
+        "method": "openai_vision",
+        "extraction_order": 0,
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "diagram"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 4,
+          "source_agreements": {
+            "vision_mistral": 4,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1"
+    },
+    {
+      "question_number": "2",
+      "question_type": "short_answer",
+      "stem_text": "Define and explain the terms - relation, attributes and tuples, primary key, foreign key, and integrity constraints in the context of the given schema.",
+      "options": {},
+      "positioning": {
+        "page": 2,
+        "method": "openai_vision",
+        "extraction_order": 1,
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 4,
+          "source_agreements": {
+            "vision_mistral": 4,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2"
+    },
+    {
+      "question_number": "3",
+      "question_type": "short_answer",
+      "stem_text": "Provide two normalization cases to avoid redundancy and anomalies in the context of the given schema. For each, state the functional dependency or anomaly, explain the normalization step (1NF/2NF/3NF), and describe how this improves the design.",
+      "options": {},
+      "positioning": {
+        "page": 2,
+        "method": "openai_vision",
+        "extraction_order": 2,
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 4,
+          "source_agreements": {
+            "vision_mistral": 4,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3"
+    },
+    {
+      "question_number": "4",
+      "question_type": "short_answer",
+      "stem_text": "Write at least five queries for the given schema. For each query, provide a natural language description of what the query should return, and its equivalent SQL expression. You may choose your queries from the list of operations below, but each query must use a different operation (no repeats): Relational Algebra operations: Selection, Union, Set Difference, Cartesian Product, Insertion, Theta (θ)–Join, Semi-join, Division.",
+      "options": {},
+      "positioning": {
+        "page": 2,
+        "method": "openai_vision",
+        "extraction_order": 3,
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 4,
+          "source_agreements": {
+            "vision_mistral": 4,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4"
+    }
+  ],
+  "question_index": [
+    {
+      "q_number": "1",
+      "page": 2,
+      "stem": {
+        "text": "Draw an ERD illustrating the relational database schema. Show entities and attributes, primary key, foreign key, relationships, and cardinalities.",
+        "bbox": null
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "2",
+      "page": 2,
+      "stem": {
+        "text": "Define and explain the terms - relation, attributes and tuples, primary key, foreign key, and integrity constraints in the context of the given schema.",
+        "bbox": null
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "3",
+      "page": 2,
+      "stem": {
+        "text": "Provide two normalization cases to avoid redundancy and anomalies in the context of the given schema. For each, state the functional dependency or anomaly, explain the normalization step (1NF/2NF/3NF), and describe how this improves the design.",
+        "bbox": null
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "4",
+      "page": 2,
+      "stem": {
+        "text": "Write at least five queries for the given schema. For each query, provide a natural language description of what the query should return, and its equivalent SQL expression. You may choose your queries from the list of operations below, but each query must use a different operation (no repeats): Relational Algebra operations: Selection, Union, Set Difference, Cartesian Product, Insertion, Theta (θ)–Join, Semi-join, Division.",
+        "bbox": null
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 4,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

@@ -4,7 +4,6 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Header from "@components/layout/Header";
 import Sidebar from "@components/layout/Sidebar";
 import Footer from "@components/layout/Footer";
-import DeveloperToggle from "@components/layout/DeveloperToggle";
 import NotificationSystem from "@components/shared/NotificationSystem";
 import ErrorBoundary from "@components/shared/ErrorBoundary";
 import Dashboard from "@pages/Dashboard";
@@ -14,6 +13,7 @@ import DeveloperConsole from "@pages/DeveloperConsole";
 import { PipelineProvider } from "@contexts/PipelineContext";
 import { DeveloperProvider } from "@contexts/DeveloperContext";
 import { NotificationProvider } from "@contexts/NotificationContext";
+import PreviousRuns from "@pages/PreviousRuns";
 
 const App: React.FC = () => {
   return (
@@ -26,11 +26,10 @@ const App: React.FC = () => {
               <div className="app-body" style={{ display: "flex", minHeight: "calc(100vh - 160px)" }}>
                 <Sidebar />
                 <main style={{ flex: 1, padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                  <DeveloperToggle />
                   <Routes>
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/runs" element={<RunDetail />} />
+                    <Route path="/runs" element={<PreviousRuns />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/developer" element={<DeveloperConsole />} />
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />

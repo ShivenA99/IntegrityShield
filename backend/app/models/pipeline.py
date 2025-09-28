@@ -5,15 +5,12 @@ from typing import Any, Optional
 
 from sqlalchemy import JSON, func
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..extensions import db
 
 
 json_type = JSON().with_variant(JSONB(), "postgresql")
-JSONDict = MutableDict.as_mutable(json_type)
-JSONList = MutableList.as_mutable(json_type)
 
 
 class TimestampMixin:
@@ -31,9 +28,9 @@ class PipelineRun(db.Model, TimestampMixin):
     original_filename: Mapped[str] = mapped_column(db.Text, nullable=False)
     current_stage: Mapped[str] = mapped_column(db.String(64), nullable=False, default="smart_reading")
     status: Mapped[str] = mapped_column(db.String(32), nullable=False, default="pending")
-    structured_data: Mapped[dict] = mapped_column(JSONDict, default=dict)
-    pipeline_config: Mapped[dict] = mapped_column(JSONDict, default=dict)
-    processing_stats: Mapped[dict] = mapped_column(JSONDict, default=dict)
+    structured_data: Mapped[dict] = mapped_column(json_type, default=dict)
+    pipeline_config: Mapped[dict] = mapped_column(json_type, default=dict)
+    processing_stats: Mapped[dict] = mapped_column(json_type, default=dict)
     error_details: Mapped[Optional[str]] = mapped_column(db.Text)
     completed_at: Mapped[Optional[Any]] = mapped_column(db.DateTime(timezone=True))
 
@@ -67,7 +64,7 @@ class PipelineStage(db.Model, TimestampMixin):
     pipeline_run_id: Mapped[str] = mapped_column(db.String(36), db.ForeignKey("pipeline_runs.id", ondelete="CASCADE"))
     stage_name: Mapped[str] = mapped_column(db.String(64), nullable=False)
     status: Mapped[str] = mapped_column(db.String(32), nullable=False, default="pending")
-    stage_data: Mapped[dict] = mapped_column(JSONDict, default=dict)
+    stage_data: Mapped[dict] = mapped_column(json_type, default=dict)
     duration_ms: Mapped[Optional[int]] = mapped_column(db.Integer)
     memory_usage_mb: Mapped[Optional[float]] = mapped_column(db.Float)
     error_details: Mapped[Optional[str]] = mapped_column(db.Text)
@@ -85,15 +82,15 @@ class QuestionManipulation(db.Model, TimestampMixin):
     question_number: Mapped[str] = mapped_column(db.String(32), nullable=False)
     question_type: Mapped[str] = mapped_column(db.String(32), nullable=False)
     original_text: Mapped[str] = mapped_column(db.Text, nullable=False)
-    stem_position: Mapped[Optional[dict]] = mapped_column(JSONDict, default=dict)
-    options_data: Mapped[Optional[dict]] = mapped_column(JSONDict, default=dict)
+    stem_position: Mapped[Optional[dict]] = mapped_column(json_type, default=dict)
+    options_data: Mapped[Optional[dict]] = mapped_column(json_type, default=dict)
     gold_answer: Mapped[Optional[str]] = mapped_column(db.String(32))
     gold_confidence: Mapped[Optional[float]] = mapped_column(db.Float)
     manipulation_method: Mapped[Optional[str]] = mapped_column(db.String(64))
-    substring_mappings: Mapped[Optional[list]] = mapped_column(JSONList, nullable=True)
+    substring_mappings: Mapped[Optional[list]] = mapped_column(json_type, nullable=True)
     effectiveness_score: Mapped[Optional[float]] = mapped_column(db.Float)
-    ai_model_results: Mapped[dict] = mapped_column(JSONDict, default=dict)
-    visual_elements: Mapped[Optional[list]] = mapped_column(JSONList, nullable=True)
+    ai_model_results: Mapped[dict] = mapped_column(json_type, default=dict)
+    visual_elements: Mapped[Optional[list]] = mapped_column(json_type, nullable=True)
 
     run: Mapped[PipelineRun] = relationship(back_populates="questions")
     ai_results: Mapped[list["AIModelResult"]] = relationship(
@@ -107,10 +104,10 @@ class CharacterMapping(db.Model, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     pipeline_run_id: Mapped[str] = mapped_column(db.String(36), db.ForeignKey("pipeline_runs.id", ondelete="CASCADE"))
     mapping_strategy: Mapped[str] = mapped_column(db.String(64), nullable=False)
-    character_map: Mapped[dict] = mapped_column(JSONDict, nullable=False)
-    usage_statistics: Mapped[dict] = mapped_column(JSONDict, default=dict)
-    effectiveness_metrics: Mapped[dict] = mapped_column(JSONDict, default=dict)
-    generation_config: Mapped[dict] = mapped_column(JSONDict, default=dict)
+    character_map: Mapped[dict] = mapped_column(json_type, nullable=False)
+    usage_statistics: Mapped[dict] = mapped_column(json_type, default=dict)
+    effectiveness_metrics: Mapped[dict] = mapped_column(json_type, default=dict)
+    generation_config: Mapped[dict] = mapped_column(json_type, default=dict)
 
     run: Mapped[PipelineRun] = relationship(back_populates="character_mappings")
 
@@ -123,9 +120,9 @@ class EnhancedPDF(db.Model, TimestampMixin):
     method_name: Mapped[str] = mapped_column(db.String(64), nullable=False)
     file_path: Mapped[str] = mapped_column(db.Text, nullable=False)
     file_size_bytes: Mapped[Optional[int]] = mapped_column(db.Integer)
-    generation_config: Mapped[dict] = mapped_column(JSONDict, default=dict)
-    effectiveness_stats: Mapped[dict] = mapped_column(JSONDict, default=dict)
-    validation_results: Mapped[dict] = mapped_column(JSONDict, default=dict)
+    generation_config: Mapped[dict] = mapped_column(json_type, default=dict)
+    effectiveness_stats: Mapped[dict] = mapped_column(json_type, default=dict)
+    validation_results: Mapped[dict] = mapped_column(json_type, default=dict)
     visual_quality_score: Mapped[Optional[float]] = mapped_column(db.Float)
 
     run: Mapped[PipelineRun] = relationship(back_populates="enhanced_pdfs")
@@ -139,7 +136,7 @@ class PipelineLog(db.Model):
     stage: Mapped[str] = mapped_column(db.String(64), nullable=False)
     level: Mapped[str] = mapped_column(db.String(16), nullable=False)
     message: Mapped[str] = mapped_column(db.Text, nullable=False)
-    context: Mapped[dict] = mapped_column(JSONDict, default=dict)
+    context: Mapped[dict] = mapped_column(json_type, default=dict)
     component: Mapped[Optional[str]] = mapped_column(db.String(128))
     timestamp: Mapped[Any] = mapped_column(db.DateTime(timezone=True), server_default=func.now())
 
@@ -155,7 +152,7 @@ class PerformanceMetric(db.Model, TimestampMixin):
     metric_name: Mapped[str] = mapped_column(db.String(64), nullable=False)
     metric_value: Mapped[float] = mapped_column(db.Float, nullable=False)
     metric_unit: Mapped[Optional[str]] = mapped_column(db.String(32))
-    details: Mapped[dict] = mapped_column(JSONDict, default=dict)
+    details: Mapped[dict] = mapped_column(json_type, default=dict)
 
     run: Mapped[PipelineRun] = relationship(back_populates="metrics")
 
@@ -174,7 +171,7 @@ class AIModelResult(db.Model, TimestampMixin):
     was_fooled: Mapped[Optional[bool]] = mapped_column(db.Boolean)
     response_time_ms: Mapped[Optional[int]] = mapped_column(db.Integer)
     api_cost_cents: Mapped[Optional[float]] = mapped_column(db.Float)
-    full_response: Mapped[dict] = mapped_column(JSONDict, default=dict)
+    full_response: Mapped[dict] = mapped_column(json_type, default=dict)
     tested_at: Mapped[Any] = mapped_column(db.DateTime(timezone=True), server_default=func.now())
 
     run: Mapped[PipelineRun] = relationship(back_populates="ai_model_results")
@@ -186,6 +183,6 @@ class SystemConfig(db.Model, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     config_key: Mapped[str] = mapped_column(db.String(128), unique=True, nullable=False)
-    config_value: Mapped[dict] = mapped_column(JSONDict, nullable=False)
+    config_value: Mapped[dict] = mapped_column(json_type, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(db.Text)
     is_secret: Mapped[bool] = mapped_column(db.Boolean, default=False)

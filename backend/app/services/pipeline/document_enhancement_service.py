@@ -18,6 +18,8 @@ class DocumentEnhancementService:
 
     async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
         methods = config.get("enhancement_methods") or [
+            "content_stream_overlay",
+            "pymupdf_overlay",
             "dual_layer",
             "image_overlay",
             "font_manipulation",

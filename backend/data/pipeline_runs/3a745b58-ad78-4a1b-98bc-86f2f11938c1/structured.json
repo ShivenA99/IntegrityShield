@@ -1,0 +1,42 @@
+{
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 6,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  },
+  "pipeline_metadata": {
+    "current_stage": "smart_substitution",
+    "stages_completed": [
+      "smart_substitution"
+    ],
+    "last_updated": "2025-09-27T05:21:11.793135+00:00"
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {}
+  }
+}

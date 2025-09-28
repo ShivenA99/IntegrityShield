@@ -22,7 +22,10 @@ class BaseConfig:
     GOOGLE_AI_KEY = os.getenv("GOOGLE_AI_KEY")
     ENABLE_DEVELOPER_TOOLS = os.getenv("FAIRTESTAI_ENABLE_DEV_TOOLS", "true").lower() == "true"
     PIPELINE_DEFAULT_MODELS = os.getenv("FAIRTESTAI_DEFAULT_MODELS", "gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro").split(",")
-    PIPELINE_DEFAULT_METHODS = os.getenv("FAIRTESTAI_DEFAULT_METHODS", "dual_layer,image_overlay,font_manipulation,content_stream").split(",")
+    PIPELINE_DEFAULT_METHODS = os.getenv(
+        "FAIRTESTAI_DEFAULT_METHODS",
+        "content_stream_overlay,pymupdf_overlay",
+    ).split(",")
     WEBSOCKET_URL_PREFIX = "/ws"
 
 

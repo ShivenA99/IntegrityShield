@@ -17,3 +17,12 @@ export function loadRecentRuns(): string[] {
     return [];
   }
 }
+
+export function removeRecentRun(runId: string) {
+  const entries = loadRecentRuns().filter((entry) => entry !== runId);
+  window.localStorage.setItem(KEY, JSON.stringify(entries));
+}
+
+export function clearRecentRuns() {
+  window.localStorage.removeItem(KEY);
+}
