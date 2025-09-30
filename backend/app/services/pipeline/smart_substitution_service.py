@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 import json
 import uuid
+from pathlib import Path
+
+import fitz
+from sqlalchemy import text
 
 from ...extensions import db
-from ...models import CharacterMapping, QuestionManipulation
+from ...models import CharacterMapping, QuestionManipulation, PipelineRun
 from ...services.data_management.structured_data_manager import StructuredDataManager
 from ...services.manipulation.context_aware_processor import ContextAwareProcessor
 from ...services.manipulation.substring_manipulator import SubstringManipulator
@@ -16,6 +20,7 @@ from ...services.manipulation.effectiveness import aggregate_effectiveness
 from ...services.integration.external_api_client import ExternalAIClient
 from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
+from .enhancement_methods.base_renderer import BaseRenderer
 
 
 class SmartSubstitutionService:
@@ -158,6 +163,14 @@ class SmartSubstitutionService:
 			positioning = dict(question_dict.get("positioning") or {})
 			page = positioning.get("page") or question_model.stem_position.get("page")
 			bbox = positioning.get("bbox") or question_model.stem_position.get("bbox")
+			selection_page_override = None
+			for entry in list(question_model.substring_mappings or []):
+				candidate = self._normalize_mapping_entry(entry).get("selection_page")
+				if isinstance(candidate, int):
+					selection_page_override = candidate
+					break
+			if selection_page_override is not None:
+				page = selection_page_override
 			if page is not None:
 				positioning["page"] = page
 			if bbox is not None:
@@ -168,11 +181,217 @@ class SmartSubstitutionService:
 		# Preserve substring mappings and metadata if already provided
 		manipulation = dict(question_dict.get("manipulation") or {})
 		if question_model.substring_mappings is not None and not manipulation.get("substring_mappings"):
-			manipulation["substring_mappings"] = list(question_model.substring_mappings or [])
+			manipulation["substring_mappings"] = [
+				self._normalize_mapping_entry(entry) for entry in list(question_model.substring_mappings or [])
+			]
 		if question_model.effectiveness_score is not None:
 			manipulation.setdefault("effectiveness_score", question_model.effectiveness_score)
 		if manipulation:
 			question_dict["manipulation"] = manipulation
+
+	def _normalize_mapping_entry(self, entry: Dict[str, Any]) -> Dict[str, Any]:
+		"""Ensure mapping payload is JSON-safe and includes selection geometry if provided."""
+		normalized = dict(entry or {})
+		if "start_pos" in normalized:
+			try:
+				normalized["start_pos"] = int(normalized.get("start_pos"))
+			except (TypeError, ValueError):
+				normalized["start_pos"] = None
+		if "end_pos" in normalized:
+			try:
+				normalized["end_pos"] = int(normalized.get("end_pos"))
+			except (TypeError, ValueError):
+				normalized["end_pos"] = None
+
+		selection_page = normalized.get("selection_page")
+		if selection_page is not None:
+			try:
+				normalized["selection_page"] = int(selection_page)
+			except (TypeError, ValueError):
+				normalized["selection_page"] = selection_page
+
+		selection_bbox = normalized.get("selection_bbox")
+		if isinstance(selection_bbox, (list, tuple)) and len(selection_bbox) == 4:
+			try:
+				normalized["selection_bbox"] = [float(v) for v in selection_bbox]
+			except (TypeError, ValueError):
+				normalized["selection_bbox"] = selection_bbox
+
+		selection_quads = normalized.get("selection_quads") or []
+		if isinstance(selection_quads, (list, tuple)):
+			quads: List[List[float]] = []
+			for quad in selection_quads:
+				if isinstance(quad, (list, tuple)) and len(quad) == 8:
+					try:
+						quads.append([float(v) for v in quad])
+					except (TypeError, ValueError):
+						continue
+			if quads:
+				normalized["selection_quads"] = quads
+
+		return normalized
+
+	def _safe_page_index(self, value: object) -> Optional[int]:
+		if value is None:
+			return None
+		try:
+			page_int = int(value)
+		except (TypeError, ValueError):
+			return None
+		if page_int < 0:
+			return None
+		if page_int == 0:
+			return 0
+		return page_int - 1
+
+	def _resolve_pdf_path(self, run_id: str) -> Optional[Path]:
+		structured = self.structured_manager.load(run_id)
+		document_info = (structured or {}).get("document") or {}
+		candidate = document_info.get("source_path")
+		if candidate:
+			path = Path(candidate)
+			if path.exists():
+				return path
+
+		run = PipelineRun.query.get(run_id)
+		if run and run.original_pdf_path:
+			path = Path(run.original_pdf_path)
+			if path.exists():
+				return path
+
+		return None
+
+	def _get_structured_question(self, run_id: str, question_number: str) -> Dict[str, Any]:
+		structured = self.structured_manager.load(run_id)
+		for entry in (structured.get("questions") or []):
+			label = str(entry.get("q_number") or entry.get("question_number") or "").strip()
+			if label == str(question_number).strip():
+				return entry
+		return {}
+
+	def _enrich_selection_geometry(
+		self,
+		run_id: str,
+		question_model: QuestionManipulation,
+		mappings: List[Dict[str, Any]],
+	) -> List[Dict[str, Any]]:
+		if not mappings:
+			return mappings
+
+		structured_question = self._get_structured_question(run_id, question_model.question_number)
+		stem_text = (
+			structured_question.get("stem_text")
+			or structured_question.get("original_text")
+			or question_model.original_text
+			or ""
+		)
+
+		positioning = structured_question.get("positioning") or {}
+		stem_position = question_model.stem_position or {}
+		page_value = positioning.get("page") or stem_position.get("page")
+		bbox_value = positioning.get("bbox") or stem_position.get("bbox")
+
+		try:
+			page_idx = self._safe_page_index(page_value)
+		except Exception:
+			page_idx = None
+
+		if page_idx is None:
+			# Attempt to derive from question index if available
+			question_index = (self.structured_manager.load(run_id).get("question_index") or [])
+			for entry in question_index:
+				if str(entry.get("q_number")) == str(question_model.question_number):
+					page_idx = self._safe_page_index(entry.get("page"))
+					stem = entry.get("stem") or {}
+					bbox_value = bbox_value or stem.get("bbox")
+					break
+
+		pdf_path = self._resolve_pdf_path(run_id)
+		if pdf_path is None or page_idx is None:
+			raise ValueError(
+				f"Unable to resolve PDF path or page index for run {run_id} question {question_model.question_number}"
+			)
+
+		try:
+			doc = fitz.open(pdf_path)
+		except Exception as exc:
+			raise ValueError(f"Failed to open PDF {pdf_path}: {exc}") from exc
+
+		base = BaseRenderer()
+		page_obj = doc[page_idx]
+		used_rects: List[fitz.Rect] = []
+		stem_rect = None
+		if isinstance(bbox_value, (list, tuple)) and len(bbox_value) == 4:
+			try:
+				stem_rect = fitz.Rect(*bbox_value)
+			except Exception:
+				stem_rect = None
+
+		enriched: List[Dict[str, Any]] = []
+		for mapping in mappings:
+			norm = self._normalize_mapping_entry(mapping)
+			if norm.get("selection_page") is not None and norm.get("selection_bbox"):
+				enriched.append(norm)
+				continue
+
+			original = base.strip_zero_width(str(norm.get("original") or "")).strip()
+			replacement = base.strip_zero_width(str(norm.get("replacement") or "")).strip()
+			if not original or not replacement:
+				enriched.append(norm)
+				continue
+
+			try:
+				start_pos = int(norm.get("start_pos"))
+				end_pos = int(norm.get("end_pos"))
+			except (TypeError, ValueError):
+				enriched.append(norm)
+				continue
+
+			payload = {
+				"q_number": str(question_model.question_number),
+				"stem_text": stem_text,
+				"page": page_idx,
+				"stem_bbox": tuple(stem_rect) if stem_rect else None,
+				"substring_mappings": [
+					{
+						"original": original,
+						"replacement": replacement,
+						"start_pos": start_pos,
+						"end_pos": end_pos,
+						"entry_index": 0,
+					}
+				],
+			}
+
+			contexts = base._build_contexts_from_payload(payload)
+			if not contexts:
+				doc.close()
+				raise ValueError(
+					f"Unable to assemble mapping context for question {question_model.question_number}"
+				)
+			context = contexts[0]
+			context["page"] = page_idx
+			if stem_rect is not None:
+				context["stem_bbox"] = tuple(stem_rect)
+
+			location = base.locate_text_span(page_obj, context, used_rects)
+			if not location:
+				doc.close()
+				raise ValueError(
+					f"Unable to locate span '{original}' for question {question_model.question_number}"
+				)
+
+			rect, _, _ = location
+			used_rects.append(rect)
+			norm["selection_page"] = page_idx
+			norm["selection_bbox"] = [float(rect.x0), float(rect.y0), float(rect.x1), float(rect.y1)]
+			norm.setdefault("selection_quads", [
+				[rect.x0, rect.y0, rect.x1, rect.y0, rect.x1, rect.y1, rect.x0, rect.y1]
+			])
+			enriched.append(norm)
+
+		doc.close()
+		return enriched
 
 	def refresh_question_mapping(self, run_id: str, question_number: str) -> Dict[str, Any]:
 		structured = self.structured_manager.load(run_id)
@@ -247,7 +466,22 @@ class SmartSubstitutionService:
 
 			self._merge_question_payload(entry, model)
 
-			current_list: List[Dict[str, Any]] = list(model.substring_mappings or [])
+			current_list: List[Dict[str, Any]] = [
+				self._normalize_mapping_entry(item) for item in list(model.substring_mappings or [])
+			]
+			try:
+				enriched_list = self._enrich_selection_geometry(run_id, model, current_list)
+			except ValueError:
+				enriched_list = current_list
+
+			if enriched_list != current_list:
+				db.session.execute(
+					text("UPDATE question_manipulations SET substring_mappings = :mappings WHERE id = :id"),
+					{"mappings": json.dumps(enriched_list), "id": model.id},
+				)
+				current_list = enriched_list
+				changed = True
+
 			json_safe = json.loads(json.dumps(current_list))
 			manipulation = entry.get("manipulation") or {}
 			previous = manipulation.get("substring_mappings") or []
@@ -264,8 +498,8 @@ class SmartSubstitutionService:
 			)
 			entry["manipulation"] = manipulation
 
-		if changed:
-			self.structured_manager.save(run_id, structured)
+		# Always save to ensure mappings are persisted
+		self.structured_manager.save(run_id, structured)
 
 	def _compute_true_gold(self, question: QuestionManipulation) -> tuple[str | None, float | None]:
 		options = question.options_data or {}

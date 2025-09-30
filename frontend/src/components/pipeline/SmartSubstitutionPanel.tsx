@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { usePipeline } from "@hooks/usePipeline";
 import { useQuestions } from "@hooks/useQuestions";
 import { updateQuestionManipulation } from "@services/api/questionApi";
+import type { SubstringMapping } from "@services/types/questions";
 import { formatDuration } from "@services/utils/formatters";
 import EnhancedQuestionViewer from "@components/question-level/EnhancedQuestionViewer";
 
@@ -16,37 +17,62 @@ const SmartSubstitutionPanel: React.FC = () => {
   const totalMappings = useMemo(() => questions.reduce((acc, q) => acc + (q.substring_mappings?.length ?? 0), 0), [questions]);
   const validatedMappings = useMemo(() => questions.reduce((acc, q) => acc + ((q.substring_mappings || []).filter((m) => m.validated === true).length ?? 0), 0), [questions]);
 
-  // Generate random mapping for testing purposes
-  const generateRandomMapping = (questionText: string) => {
+  const DEFAULT_CANONICAL_MAPPINGS: Record<string, Array<{ original: string; replacement: string }>> = {
+    "1": [{ original: "the", replacement: "not" }],
+    "2": [{ original: "the", replacement: "not" }],
+    "3": [{ original: "LSTM", replacement: "CNN" }],
+    "4": [{ original: "LSTM", replacement: "RNN" }],
+    "5": [{ original: "LSTMs", replacement: "RNNs" }],
+    "6": [{ original: "RNNs", replacement: "CNNs" }],
+    "7": [{ original: "bidirectional", replacement: "unidirectional" }],
+    "8": [{ original: "RNN", replacement: "CNN" }],
+  };
+
+  const buildCanonicalMappings = (questionNumber: string, questionText: string) => {
+    const entries = DEFAULT_CANONICAL_MAPPINGS[questionNumber];
+    if (!entries || !questionText) return null;
+
+    const result = entries.map((entry) => {
+      const start = questionText.indexOf(entry.original);
+      if (start === -1) return null;
+      return {
+        id: Math.random().toString(36).substr(2, 9),
+        original: entry.original,
+        replacement: entry.replacement,
+        start_pos: start,
+        end_pos: start + entry.original.length,
+        context: "question_stem"
+      };
+    }).filter((val): val is SubstringMapping => Boolean(val));
+
+    return result.length ? result : null;
+  };
+
+  const generateFallbackMapping = (questionText: string) => {
     if (!questionText) return null;
 
-    // Common words to target for replacement (avoid articles, prepositions)
     const commonWords = ['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'];
     const words = questionText.split(/\s+/);
-
-    // Find a suitable word to replace (prefer longer words, avoid very short ones)
     const candidates = words.filter(word =>
       word.length > 2 &&
       !commonWords.includes(word.toLowerCase()) &&
-      /^[a-zA-Z]+$/.test(word) // Only letters, no punctuation
+      /^[a-zA-Z]+$/.test(word)
     );
 
     if (candidates.length === 0) return null;
 
-    // Pick a random candidate
     const targetWord = candidates[Math.floor(Math.random() * candidates.length)];
     const startPos = questionText.indexOf(targetWord);
-
     if (startPos === -1) return null;
 
-    return {
+    return [{
       id: Math.random().toString(36).substr(2, 9),
       original: targetWord,
       replacement: "not",
       start_pos: startPos,
       end_pos: startPos + targetWord.length,
       context: "question_stem"
-    };
+    }];
   };
 
   const handleQuestionUpdated = useCallback((updated: any) => {
@@ -85,19 +111,21 @@ const SmartSubstitutionPanel: React.FC = () => {
         }
 
         const questionText = question.stem_text || question.original_text || "";
-        const randomMapping = generateRandomMapping(questionText);
+        const canonicalMappings = buildCanonicalMappings(question.question_number, questionText);
+        const fallbackMappings = canonicalMappings ?? generateFallbackMapping(questionText);
 
-        if (randomMapping) {
-          const mappings = [randomMapping];
+        if (fallbackMappings && fallbackMappings.length) {
+          const mappings = fallbackMappings;
 
           // Save to backend
-          await updateQuestionManipulation(activeRunId, question.id, {
+          const response = await updateQuestionManipulation(activeRunId, question.id, {
             method: question.manipulation_method || "smart_substitution",
             substring_mappings: mappings
           });
 
           // Update local cache
-          handleQuestionUpdated({ ...question, substring_mappings: mappings });
+          const serverMappings = response?.substring_mappings ?? mappings;
+          handleQuestionUpdated({ ...question, substring_mappings: serverMappings });
         }
       }
     } catch (error) {

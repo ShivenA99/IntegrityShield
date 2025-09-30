@@ -1,0 +1,415 @@
+{
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/bc740a87-3066-43d3-bf9f-54ae7af807bd/Quiz6.pdf",
+    "filename": "Quiz6.pdf"
+  },
+  "pipeline_metadata": {
+    "stages_completed": [
+      "smart_reading",
+      "smart_substitution",
+      "content_discovery"
+    ],
+    "current_stage": "smart_substitution",
+    "last_updated": "2025-09-30T18:58:56.232234+00:00"
+  },
+  "questions": [
+    {
+      "q_number": "1",
+      "question_number": "1",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "question_type": "mcq_single",
+      "original_text": "What is the primary benefit of stacking multiple RNN layers (i.e., stacked RNNs)?",
+      "stem_text": "What is the primary benefit of stacking multiple RNN layers (i.e., stacked RNNs)?",
+      "options": {
+        "A": "Faster training",
+        "B": "Lower memory usage",
+        "C": "Better learning of hierarchical features",
+        "D": "Simpler architecture"
+      },
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "py4fbhavw",
+            "original": "the",
+            "replacement": "not",
+            "start_pos": 8,
+            "end_pos": 11,
+            "context": "question_stem",
+            "selection_page": 0,
+            "selection_bbox": [
+              110.32539367675781,
+              152.0494842529297,
+              123.1294174194336,
+              161.01588439941406
+            ],
+            "selection_quads": [
+              [
+                110.32539367675781,
+                152.0494842529297,
+                123.1294174194336,
+                152.0494842529297,
+                123.1294174194336,
+                161.01588439941406,
+                110.32539367675781,
+                161.01588439941406
+              ]
+            ]
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "q_number": "2",
+      "question_number": "2",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "question_type": "mcq_single",
+      "original_text": "Which of the following is the main reason RNNs struggle with long-term dependencies?",
+      "stem_text": "Which of the following is the main reason RNNs struggle with long-term dependencies?",
+      "options": {
+        "A": "Overfitting",
+        "B": "Vanishing gradients",
+        "C": "Lack of non-linearity",
+        "D": "Insufficient data"
+      },
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "7r5gj48nz",
+            "original": "RNNs",
+            "replacement": "cnn",
+            "start_pos": 42,
+            "end_pos": 46,
+            "context": "question_stem",
+            "selection_page": 0,
+            "selection_bbox": [
+              246.6147003173828,
+              221.4134979248047,
+              270.8598327636719,
+              230.37989807128906
+            ],
+            "selection_quads": [
+              [
+                246.6147003173828,
+                221.4134979248047,
+                270.8598327636719,
+                221.4134979248047,
+                270.8598327636719,
+                230.37989807128906,
+                246.6147003173828,
+                230.37989807128906
+              ]
+            ]
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "q_number": "3",
+      "question_number": "3",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "question_type": "mcq_single",
+      "original_text": "What differentiates an LSTM cell from a standard RNN cell?",
+      "stem_text": "What differentiates an LSTM cell from a standard RNN cell?",
+      "options": {
+        "A": "It uses ReLU instead of tanh",
+        "B": "It introduces gates to control the flow of information",
+        "C": "It has fewer parameters",
+        "D": "It is a convolutional architecture"
+      },
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "gjo9wqku7",
+            "original": "LSTM",
+            "replacement": "LSTMABCD",
+            "start_pos": 23,
+            "end_pos": 27,
+            "context": "question_stem",
+            "selection_page": 0,
+            "selection_bbox": [
+              168.7325439453125,
+              290.77850341796875,
+              194.7082061767578,
+              299.7449035644531
+            ],
+            "selection_quads": [
+              [
+                168.7325439453125,
+                290.77850341796875,
+                194.7082061767578,
+                290.77850341796875,
+                194.7082061767578,
+                299.7449035644531,
+                168.7325439453125,
+                299.7449035644531
+              ]
+            ]
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "q_number": "4",
+      "question_number": "4",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "question_type": "mcq_single",
+      "original_text": "In a standard LSTM, which gate is responsible for deciding how much of the past memory to keep?",
+      "stem_text": "In a standard LSTM, which gate is responsible for deciding how much of the past memory to keep?",
+      "options": {
+        "A": "Output gate",
+        "B": "Forget gate",
+        "C": "Input gate",
+        "D": "Update gate"
+      },
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "hzw5ahvp0",
+            "original": "is",
+            "replacement": "0",
+            "start_pos": 31,
+            "end_pos": 33,
+            "context": "question_stem",
+            "selection_page": 0,
+            "selection_bbox": [
+              210.82977294921875,
+              360.1434631347656,
+              217.0255584716797,
+              369.10986328125
+            ],
+            "selection_quads": [
+              [
+                210.82977294921875,
+                360.1434631347656,
+                217.0255584716797,
+                360.1434631347656,
+                217.0255584716797,
+                369.10986328125,
+                210.82977294921875,
+                369.10986328125
+              ]
+            ]
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "q_number": "5",
+      "question_number": "5",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "question_type": "short_answer",
+      "original_text": "Why is the forget gate bias in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-term dependency learning.",
+      "stem_text": "Why is the forget gate bias in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-term dependency learning.",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "7l0iit7sp",
+            "original": "often",
+            "replacement": "always",
+            "start_pos": 37,
+            "end_pos": 42,
+            "context": "question_stem",
+            "selection_page": 0,
+            "selection_bbox": [
+              239.1097412109375,
+              460.3304443359375,
+              259.33795166015625,
+              469.2968444824219
+            ],
+            "selection_quads": [
+              [
+                239.1097412109375,
+                460.3304443359375,
+                259.33795166015625,
+                460.3304443359375,
+                259.33795166015625,
+                469.2968444824219,
+                239.1097412109375,
+                469.2968444824219
+              ]
+            ]
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "q_number": "6",
+      "question_number": "6",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "question_type": "short_answer",
+      "original_text": "Bidirectional RNNs are often used for POS tagging but not machine translation. Explain why, considering input-output alignment and context flow.",
+      "stem_text": "Bidirectional RNNs are often used for POS tagging but not machine translation. Explain why, considering input-output alignment and context flow.",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "vkn06vaj3",
+            "original": "not",
+            "replacement": "for",
+            "start_pos": 54,
+            "end_pos": 57,
+            "context": "question_stem",
+            "selection_page": 0,
+            "selection_bbox": [
+              302.1793212890625,
+              491.1524658203125,
+              315.4944152832031,
+              500.1188659667969
+            ],
+            "selection_quads": [
+              [
+                302.1793212890625,
+                491.1524658203125,
+                315.4944152832031,
+                491.1524658203125,
+                315.4944152832031,
+                500.1188659667969,
+                302.1793212890625,
+                500.1188659667969
+              ]
+            ]
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "q_number": "7",
+      "question_number": "7",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "question_type": "short_answer",
+      "original_text": "Designing an RNN model for variable-length legal documents with long dependencies: (a) Choose between vanilla RNN or LSTM. (b) Stack layers or keep it shallow? (c) Make it bidirectional? Justify each choice based on model behavior and task needs.",
+      "stem_text": "Designing an RNN model for variable-length legal documents with long dependencies: (a) Choose between vanilla RNN or LSTM. (b) Stack layers or keep it shallow? (c) Make it bidirectional? Justify each choice based on model behavior and task needs.",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "q286pusef",
+            "original": "long",
+            "replacement": "short",
+            "start_pos": 64,
+            "end_pos": 68,
+            "context": "question_stem",
+            "selection_page": 0,
+            "selection_bbox": [
+              350.7234191894531,
+              521.9745483398438,
+              367.6250915527344,
+              530.94091796875
+            ],
+            "selection_quads": [
+              [
+                350.7234191894531,
+                521.9745483398438,
+                367.6250915527344,
+                521.9745483398438,
+                367.6250915527344,
+                530.94091796875,
+                350.7234191894531,
+                530.94091796875
+              ]
+            ]
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "q_number": "8",
+      "question_number": "8",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "question_type": "short_answer",
+      "original_text": "Consider a vanilla RNN with recurrent weight matrix W and sequence length 50. Analyze gradient behavior: (1) If ||W|| = 0.9: Will gradients vanish or explode? Justify. (2) If ||W|| = 1.2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps.",
+      "stem_text": "Consider a vanilla RNN with recurrent weight matrix W and sequence length 50. Analyze gradient behavior: (1) If ||W|| = 0.9: Will gradients vanish or explode? Justify. (2) If ||W|| = 1.2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps.",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "2l80iwtot",
+            "original": "50",
+            "replacement": "9",
+            "start_pos": 74,
+            "end_pos": 76,
+            "context": "question_stem",
+            "selection_page": 0,
+            "selection_bbox": [
+              398.9591979980469,
+              593.6425170898438,
+              408.1766662597656,
+              602.60888671875
+            ],
+            "selection_quads": [
+              [
+                398.9591979980469,
+                593.6425170898438,
+                408.1766662597656,
+                593.6425170898438,
+                408.1766662597656,
+                602.60888671875,
+                398.9591979980469,
+                602.60888671875
+              ]
+            ]
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 8,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

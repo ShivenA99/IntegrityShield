@@ -243,7 +243,32 @@ class ImageOverlayRenderer(BaseRenderer):
                     overlays_applied += 1
                     overlay_area_sum += float(rect.width * rect.height)
                     page_area_sum += page_area
-                except Exception:
+
+                    # Log successful overlay application
+                    from app.services.developer.live_logging_service import live_logging_service
+                    mapping_id = snapshot.get("mapping_id", "unknown")
+                    original = snapshot.get("original_text", "")
+                    replacement = snapshot.get("replacement_text", "")
+                    if run_id:
+                        live_logging_service.emit(
+                            run_id,
+                            "pdf_creation",
+                            "INFO",
+                            f"✓ Overlay applied: page {page_num} '{original}' → '{replacement}' (mapping_id: {mapping_id})",
+                            component="image_overlay"
+                        )
+                except Exception as e:
+                    # Log overlay failure
+                    from app.services.developer.live_logging_service import live_logging_service
+                    mapping_id = snapshot.get("mapping_id", "unknown")
+                    if run_id:
+                        live_logging_service.emit(
+                            run_id,
+                            "pdf_creation",
+                            "WARNING",
+                            f"✗ Overlay FAILED: page {page_num} mapping_id {mapping_id}: {str(e)}",
+                            component="image_overlay"
+                        )
                     continue
 
                 # Inject invisible replacement text so parsers/LLMs read manipulated content
@@ -392,28 +417,54 @@ class ImageOverlayRenderer(BaseRenderer):
                     if not clean_original or not clean_replacement:
                         continue
 
-                    location = self.locate_text_span(
-                        page,
-                        ctx,
-                        used_rects[page_idx],
-                        used_fingerprints[page_idx],
-                    )
-                    if not location:
-                        self.logger.warning(
-                            "snapshot span not located",
-                            extra={
-                                "page": page_idx,
-                                "q_number": ctx.get("q_number"),
-                                "original": clean_original,
-                                "fingerprint": ctx.get("fingerprint"),
-                            },
+                    selection_bbox = ctx.get("selection_bbox")
+                    selection_quads = ctx.get("selection_quads") or []
+                    rect: Optional[fitz.Rect] = None
+                    if selection_bbox and len(selection_bbox) == 4:
+                        try:
+                            rect = fitz.Rect(*selection_bbox)
+                        except Exception:
+                            rect = None
+                    if rect is None and selection_quads:
+                        rect = self._rect_from_quads(selection_quads)
+
+                    location = None
+                    if rect is None:
+                        location = self.locate_text_span(
+                            page,
+                            ctx,
+                            used_rects[page_idx],
+                            used_fingerprints[page_idx],
                         )
-                        continue
-                    rect, _, _ = location
+                        if not location:
+                            self.logger.warning(
+                                "snapshot span not located",
+                                extra={
+                                    "page": page_idx,
+                                    "q_number": ctx.get("q_number"),
+                                    "original": clean_original,
+                                    "fingerprint": ctx.get("fingerprint"),
+                                },
+                            )
+                            continue
+                        rect, _, _ = location
+
+                    overflow_left = float(ctx.get("rewrite_left_overflow") or 0.0)
+                    overflow_right = float(ctx.get("rewrite_right_overflow") or 0.0)
+                    if overflow_left or overflow_right:
+                        try:
+                            rect = fitz.Rect(rect)
+                            rect.x0 -= overflow_left
+                            rect.x1 += overflow_right
+                        except Exception:
+                            pass
 
                     adjusted_rect = self._ensure_non_overlapping_rect(rect, used_rects[page_idx], page.rect)
                     if adjusted_rect is None:
                         continue
+
+                    if not selection_bbox:
+                        selection_bbox = tuple(rect)
 
                     fingerprint_key = ctx.get("matched_fingerprint_key")
                     if fingerprint_key:
@@ -424,6 +475,9 @@ class ImageOverlayRenderer(BaseRenderer):
                         pix = page.get_pixmap(clip=expanded_rect, dpi=300, alpha=False)
                     except Exception:
                         continue
+
+                    mapping_id = ctx.get("mapping_id", "unknown")
+                    q_number = ctx.get("q_number", "")
 
                     snapshots.append(
                         {
@@ -436,8 +490,23 @@ class ImageOverlayRenderer(BaseRenderer):
                             "image_width": pix.width,
                             "image_height": pix.height,
                             "capture_dpi": 300,
+                            "selection_bbox": selection_bbox,
+                            "selection_quads": selection_quads,
+                            "mapping_id": mapping_id,
+                            "q_number": q_number,
                         }
                     )
+
+                    # Log snapshot capture
+                    from app.services.developer.live_logging_service import live_logging_service
+                    if run_id:
+                        live_logging_service.emit(
+                            run_id,
+                            "pdf_creation",
+                            "INFO",
+                            f"📸 Snapshot captured: Q{q_number} page {page_idx} '{clean_original}' → '{clean_replacement}' (mapping_id: {mapping_id})",
+                            component="snapshot_capture"
+                        )
                     matched_records.append(
                         {
                             "page": page_idx,

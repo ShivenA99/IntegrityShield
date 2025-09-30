@@ -7,13 +7,12 @@ import { fetchStructuredData, fetchSystemHealth } from "@services/api/developerA
 import LiveLogViewer from "./LiveLogViewer";
 import PipelineDebugger from "./PipelineDebugger";
 import StructuredDataViewer from "./StructuredDataViewer";
-import PerformanceMetrics from "./PerformanceMetrics";
 import DatabaseInspector from "./DatabaseInspector";
 
 const DeveloperPanel: React.FC = () => {
   const { isDeveloperMode } = useDeveloperContext();
   const { status, activeRunId } = usePipeline();
-  const { logs, metrics, isStreaming } = useDeveloperTools(activeRunId);
+  const { logs, isStreaming } = useDeveloperTools(activeRunId);
   const [structured, setStructured] = React.useState<Record<string, unknown> | null>(null);
   const [health, setHealth] = React.useState<Record<string, unknown> | null>(null);
 
@@ -44,7 +43,6 @@ const DeveloperPanel: React.FC = () => {
   return (
     <div className="developer-panel">
       <div className="panel-card"><LiveLogViewer logs={logs} isStreaming={isStreaming} /></div>
-      <div className="panel-card"><PerformanceMetrics metrics={metrics} /></div>
       <div className="panel-card"><PipelineDebugger status={status} /></div>
       <div className="panel-card"><StructuredDataViewer data={structured ?? (status?.structured_data as Record<string, unknown>)} /></div>
       <div className="panel-card"><DatabaseInspector /></div>

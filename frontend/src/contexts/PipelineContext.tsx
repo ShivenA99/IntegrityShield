@@ -12,7 +12,10 @@ interface PipelineContextValue {
   isLoading: boolean;
   error: string | null;
   setActiveRunId: (runId: string | null) => void;
-  refreshStatus: (runId?: string, options?: { quiet?: boolean }) => Promise<void>;
+  refreshStatus: (
+    runId?: string,
+    options?: { quiet?: boolean; retries?: number; retryDelayMs?: number }
+  ) => Promise<void>;
   startPipeline: (payload: { file: File; config?: Partial<StartPipelineConfig> }) => Promise<string | null>;
   resumeFromStage: (runId: string, stage: PipelineStageName) => Promise<void>;
   deleteRun: (runId: string) => Promise<void>;
@@ -37,25 +40,48 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
   const [error, setError] = useState<string | null>(null);
 
   const refreshStatus = useCallback(
-    async (runId?: string, options?: { quiet?: boolean }) => {
+    async (
+      runId?: string,
+      options?: { quiet?: boolean; retries?: number; retryDelayMs?: number }
+    ) => {
       const targetRunId = runId ?? activeRunId;
       if (!targetRunId) return;
       const quiet = options?.quiet ?? false;
+      const retries = options?.retries ?? 4;
+      const retryDelayMs = options?.retryDelayMs ?? 350;
       if (!quiet) {
         setIsLoading(true);
       }
       setError(null);
-      try {
-        const data = await pipelineApi.getPipelineStatus(targetRunId);
-        setStatus(data);
-        setActiveRunId(targetRunId);
-        saveRecentRun(targetRunId);
-      } catch (err) {
-        setError(extractErrorMessage(err));
-      } finally {
-        if (!quiet) {
-          setIsLoading(false);
+      let attempt = 0;
+      let lastError: unknown = null;
+      while (attempt <= retries) {
+        try {
+          const data = await pipelineApi.getPipelineStatus(targetRunId);
+          setStatus(data);
+          setActiveRunId(targetRunId);
+          saveRecentRun(targetRunId);
+          lastError = null;
+          break;
+        } catch (err: any) {
+          lastError = err;
+          const statusCode = err?.response?.status ?? err?.status;
+          if (statusCode === 404 && attempt < retries) {
+            const delay = retryDelayMs * Math.max(1, attempt + 1);
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            attempt += 1;
+            continue;
+          }
+          break;
         }
+      }
+
+      if (lastError) {
+        setError(extractErrorMessage(lastError));
+      }
+
+      if (!quiet) {
+        setIsLoading(false);
       }
     },
     [activeRunId]

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+import json
 from http import HTTPStatus
 from pathlib import Path
 import shutil
@@ -12,11 +13,17 @@ from werkzeug.datastructures import FileStorage
 from ..models import PipelineRun, PipelineStage, QuestionManipulation
 from ..services.pipeline.pipeline_orchestrator import PipelineConfig, PipelineOrchestrator
 from ..services.pipeline.resume_service import PipelineResumeService
+from ..services.pipeline.smart_substitution_service import SmartSubstitutionService
 from ..services.data_management.file_manager import FileManager
 from ..services.data_management.structured_data_manager import StructuredDataManager
 from ..utils.exceptions import ResourceNotFound
 from ..extensions import db
-from ..utils.storage_paths import pdf_input_path
+from ..utils.storage_paths import (
+    pdf_input_path,
+    run_directory,
+    structured_data_path,
+    assets_directory,
+)
 
 
 bp = Blueprint("pipeline", __name__, url_prefix="/pipeline")
@@ -29,6 +36,8 @@ def init_app(api_bp: Blueprint) -> None:
 @bp.post("/start")
 def start_pipeline():
     orchestrator = PipelineOrchestrator()
+    structured_manager = StructuredDataManager()
+    structured_manager = StructuredDataManager()
     file_manager = FileManager()
     structured_manager = StructuredDataManager()
 
@@ -433,6 +442,7 @@ def rerun_run():
         return jsonify({"error": "Source run not found"}), HTTPStatus.NOT_FOUND
 
     orchestrator = PipelineOrchestrator()
+    structured_manager = StructuredDataManager()
 
     # Determine readiness: consider either DB questions, structured questions, or AI questions
     structured = source.structured_data or {}
@@ -444,14 +454,54 @@ def rerun_run():
     if ready_for_clone:
         # Clone as a new run prepped for smart_substitution
         new_id = str(uuid.uuid4())
+
+        # Prepare run directory and replicate upstream assets
+        run_directory(new_id)
+        source_run_dir = run_directory(source_run_id)
+
+        # Copy original PDF into the new run directory if available
+        dest_pdf_path: Path | None = None
+        source_pdf_path = Path(source.original_pdf_path) if source.original_pdf_path else None
+        if source_pdf_path and source_pdf_path.exists():
+            dest_pdf_path = pdf_input_path(new_id, source_pdf_path.name)
+            dest_pdf_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_pdf_path, dest_pdf_path)
+
+        # Copy assets (images, fonts, etc.) for downstream renderers
+        source_assets_dir = source_run_dir / "assets"
+        if source_assets_dir.exists():
+            dest_assets_dir = assets_directory(new_id)
+            shutil.rmtree(dest_assets_dir, ignore_errors=True)
+            shutil.copytree(source_assets_dir, dest_assets_dir, dirs_exist_ok=True)
+
+        structured_copy = copy.deepcopy(structured or {})
+        document_info = structured_copy.setdefault("document", {})
+        if dest_pdf_path:
+            document_info["source_path"] = str(dest_pdf_path)
+            document_info.setdefault("filename", dest_pdf_path.name)
+        elif source_pdf_path:
+            document_info.setdefault("source_path", str(source_pdf_path))
+            document_info.setdefault("filename", source_pdf_path.name)
+
+        metadata = structured_copy.setdefault("pipeline_metadata", {})
+        stages_completed = set(metadata.get("stages_completed") or [])
+        stages_completed.update({"smart_reading", "content_discovery"})
+        metadata["stages_completed"] = sorted(stages_completed)
+        metadata["current_stage"] = "smart_substitution"
+
+        # Persist structured copy on disk for the cloned run
+        structured_manager.save(new_id, structured_copy)
+
+        pdf_path_for_run = dest_pdf_path or source_pdf_path
+
         new_run = PipelineRun(
             id=new_id,
-            original_pdf_path=source.original_pdf_path,
-            original_filename=source.original_filename,
+            original_pdf_path=str(pdf_path_for_run) if pdf_path_for_run else source.original_pdf_path,
+            original_filename=(pdf_path_for_run.name if pdf_path_for_run else source.original_filename),
             current_stage="smart_substitution",
             status="pending",
-            pipeline_config=source.pipeline_config or {},
-            structured_data=structured or {},
+            pipeline_config=copy.deepcopy(source.pipeline_config or {}),
+            structured_data=structured_copy,
         )
         db.session.add(new_run)
         db.session.flush()
@@ -475,6 +525,8 @@ def rerun_run():
                     ai_model_results=q.ai_model_results or {},
                     visual_elements=q.visual_elements,
                 )
+                mappings_copy = json.loads(json.dumps(q.substring_mappings or []))
+                clone.substring_mappings = mappings_copy
                 db.session.add(clone)
         else:
             # Seed minimal QuestionManipulation rows from structured AI questions
@@ -494,6 +546,19 @@ def rerun_run():
                 )
                 db.session.add(clone)
 
+        db.session.commit()
+
+        # Verify mappings were copied correctly
+        cloned_count = QuestionManipulation.query.filter_by(pipeline_run_id=new_id).count()
+        cloned_with_mappings = db.session.query(QuestionManipulation).filter(
+            QuestionManipulation.pipeline_run_id == new_id,
+            QuestionManipulation.substring_mappings != None,
+            QuestionManipulation.substring_mappings != '[]'
+        ).count()
+
+        # Ensure structured data mirrors the cloned DB rows (including substring mappings)
+        SmartSubstitutionService().sync_structured_mappings(new_id)
+        new_run.structured_data = structured_manager.load(new_id)
         db.session.commit()
 
         # Default to only smart_substitution (UI will carry forward after mappings are validated)

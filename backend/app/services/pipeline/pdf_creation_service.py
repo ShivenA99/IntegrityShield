@@ -236,7 +236,7 @@ class PdfCreationService:
                     "enhanced_mapping_boost": len(enhanced_mapping) - len(base_renderer.build_mapping_from_questions(run_id)),
                 }
 
-            record.file_size_bytes = int(metadata.get("file_size_bytes", destination.stat().st_size))
+            record.file_size_bytes = int(metadata.get("file_size_bytes") or (destination.stat().st_size if destination.exists() else 0))
             record.effectiveness_stats = {**(record.effectiveness_stats or {}), **metadata}
             record.visual_quality_score = 0.97 if record.method_name == "dual_layer" else 0.92
             db.session.add(record)

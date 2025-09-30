@@ -27,12 +27,42 @@ const ContentDiscoveryPanel: React.FC = () => {
     }
   };
 
+  const hasAdvancedToNextStage = React.useMemo(() => {
+    const currentIdx = status?.stages.findIndex(s => s.name === 'content_discovery') ?? -1;
+    const nextIdx = status?.stages.findIndex(s => s.name === 'smart_substitution') ?? -1;
+    const nextStage = status?.stages[nextIdx];
+
+    return nextIdx > currentIdx && nextStage && nextStage.status !== 'pending';
+  }, [status?.stages]);
+
   return (
     <div className="panel content-discovery" style={{ display: 'grid', gap: '1.25rem' }}>
-      <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', margin: 0 }}>
-        <span role="img" aria-hidden="true">🎯</span> Content Discovery
-      </h2>
-      <p style={{ margin: 0, color: 'var(--muted)' }}>Review detected questions, answer choices, and structural anchors.</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+        <div>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', margin: 0 }}>
+            <span role="img" aria-hidden="true">🎯</span> Content Discovery
+          </h2>
+          <p style={{ margin: '0.5rem 0 0 0', color: 'var(--muted)' }}>Review detected questions, answer choices, and structural anchors.</p>
+        </div>
+
+        {stage?.status === 'completed' && !hasAdvancedToNextStage && (
+          <button
+            type="button"
+            className="pill-button"
+            onClick={handleAdvance}
+            disabled={isAdvancing}
+            title="Continue to Smart Substitution"
+            style={{
+              backgroundColor: 'rgba(56,189,248,0.3)',
+              color: 'var(--text)',
+              padding: '8px 16px',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {isAdvancing ? 'Advancing…' : 'Continue to Smart Substitution →'}
+          </button>
+        )}
+      </div>
 
       <div className="info-grid">
         <div className="info-card">
@@ -57,23 +87,13 @@ const ContentDiscoveryPanel: React.FC = () => {
         </div>
       </div>
 
-      {stage?.status === 'completed' ? (
-        <div className="panel-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-          <div>
-            <h4 style={{ margin: '0 0 0.4rem' }}>Next step</h4>
-            <p style={{ margin: 0, color: 'var(--muted)' }}>Review question stems and configure mappings before continuing.</p>
-          </div>
-          <button
-            type="button"
-            className="pill-button"
-            onClick={handleAdvance}
-            disabled={isAdvancing}
-            title="Continue to Smart Substitution"
-          >
-            {isAdvancing ? 'Advancing…' : 'Continue to Smart Substitution'}
-          </button>
+      {stage?.status === 'completed' && hasAdvancedToNextStage && (
+        <div className="panel-card">
+          <p style={{ margin: 0, color: 'var(--muted)' }}>
+            ✓ Stage completed. Advanced to Smart Substitution.
+          </p>
         </div>
-      ) : null}
+      )}
 
       <div className="panel-card">
         <h4 style={{ marginBottom: '0.5rem' }}>Detected Questions</h4>

@@ -19,7 +19,7 @@ const Header: React.FC = () => {
     const message = `Reset current run${runLabel ? ` (${runLabel})` : ""}? This clears the active session so you can start fresh.`;
     if (!window.confirm(message)) return;
 
-    await resetActiveRun({ softDelete: true });
+    await resetActiveRun();
     navigate("/dashboard");
   };
 

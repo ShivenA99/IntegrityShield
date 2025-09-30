@@ -104,18 +104,19 @@ const EnhancedQuestionViewer: React.FC<EnhancedQuestionViewerProps> = ({
       return;
     }
 
-    setMappings(updatedMappings);
-
-    // Save immediately
     try {
-      await updateQuestionManipulation(runId, question.id, {
+      const response = await updateQuestionManipulation(runId, question.id, {
         method: question.manipulation_method || "smart_substitution",
         substring_mappings: updatedMappings
       });
-      onUpdated?.({ ...question, substring_mappings: updatedMappings });
+      const serverMappings = response?.substring_mappings ?? updatedMappings;
+      setMappings(serverMappings);
+      setActiveMappingIndex(serverMappings.length - 1);
+      onUpdated?.({ ...question, substring_mappings: serverMappings });
     } catch (error) {
       setValidationError("Failed to save mapping");
       console.error("Save error:", error);
+      return;
     }
 
     // Reset form
@@ -128,17 +129,19 @@ const EnhancedQuestionViewer: React.FC<EnhancedQuestionViewerProps> = ({
 
   const removeMapping = useCallback(async (index: number) => {
     const updatedMappings = mappings.filter((_, i) => i !== index);
-    setMappings(updatedMappings);
 
     try {
-      await updateQuestionManipulation(runId, question.id, {
+      const response = await updateQuestionManipulation(runId, question.id, {
         method: question.manipulation_method || "smart_substitution",
         substring_mappings: updatedMappings
       });
-      onUpdated?.({ ...question, substring_mappings: updatedMappings });
+      const serverMappings = response?.substring_mappings ?? updatedMappings;
+      setMappings(serverMappings);
+      onUpdated?.({ ...question, substring_mappings: serverMappings });
     } catch (error) {
       setValidationError("Failed to remove mapping");
       console.error("Remove error:", error);
+      return;
     }
 
     if (activeMappingIndex === index) {
@@ -162,18 +165,19 @@ const EnhancedQuestionViewer: React.FC<EnhancedQuestionViewerProps> = ({
     };
 
     try {
-      await updateQuestionManipulation(runId, question.id, {
+      const response = await updateQuestionManipulation(runId, question.id, {
         method: question.manipulation_method || "smart_substitution",
         substring_mappings: [newMapping],
       });
-      setMappings([newMapping]);
-      setActiveMappingIndex(0);
+      const serverMappings = response?.substring_mappings ?? [newMapping];
+      setMappings(serverMappings);
+      setActiveMappingIndex(serverMappings.length ? 0 : null);
       setShowMappingForm(false);
       setPendingSelection(null);
       setSelectedText("");
       setReplacementText("");
       setValidationError(null);
-      onUpdated?.({ ...question, substring_mappings: [newMapping] });
+      onUpdated?.({ ...question, substring_mappings: serverMappings });
     } catch (error) {
       console.error("Auto-map error", error);
       setValidationError("Failed to auto-map question stem");
@@ -220,11 +224,13 @@ const EnhancedQuestionViewer: React.FC<EnhancedQuestionViewerProps> = ({
       setMappings(updatedMappings);
 
       // Save the updated mappings
-      await updateQuestionManipulation(runId, question.id, {
+      const response = await updateQuestionManipulation(runId, question.id, {
         method: question.manipulation_method || "smart_substitution",
         substring_mappings: updatedMappings
       });
-      onUpdated?.({ ...question, substring_mappings: updatedMappings });
+      const serverMappings = response?.substring_mappings ?? updatedMappings;
+      setMappings(serverMappings);
+      onUpdated?.({ ...question, substring_mappings: serverMappings });
     } catch (error: any) {
       setValidationError(error?.response?.data?.error || String(error));
     } finally {

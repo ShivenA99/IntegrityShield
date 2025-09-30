@@ -180,6 +180,13 @@ class PipelineOrchestrator:
 
         db.session.commit()
 
+        # Sync mappings to structured.json after smart_substitution completes
+        if stage == PipelineStageEnum.SMART_SUBSTITUTION:
+            try:
+                SmartSubstitutionService().sync_structured_mappings(run_id)
+            except Exception as sync_exc:
+                self.logger.warning(f"Failed to sync mappings for run {run_id}: {sync_exc}")
+
         record_metric(run_id, stage.value, "duration_ms", duration_ms, unit="ms")
         live_logging_service.emit(run_id, stage.value, "INFO", "Stage completed", context=result or {})
 
