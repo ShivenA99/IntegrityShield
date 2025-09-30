@@ -73,7 +73,9 @@ const PreviousRuns: React.FC = () => {
     const newId = (result as any).run_id;
     setActiveRunId(newId);
     saveRecentRun(newId);
-    await refreshStatus(newId);
+    // give backend a brief moment to hydrate the rerun record
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await refreshStatus(newId, { retries: 5, retryDelayMs: 400 });
     navigate("/dashboard");
   };
 
@@ -188,7 +190,7 @@ const PreviousRuns: React.FC = () => {
                     <button
                       className="pill-button"
                       onClick={() => onReRun(r.run_id)}
-                      title="Launch a rerun with the same PDF"
+                      title="Create a new run from stage 3 with this run's mappings"
                     >
                       🔁 Re-run
                     </button>
@@ -196,19 +198,12 @@ const PreviousRuns: React.FC = () => {
                       <button
                         className="pill-button"
                         onClick={() => onSoftDelete(r.run_id)}
-                        title="Mark run as deleted without removing files"
+                        title="Mark run as deleted"
+                        style={{ background: 'rgba(239,68,68,0.15)', color: '#fca5a5' }}
                       >
-                        💤 Soft delete
+                        🗑️ Delete
                       </button>
                     )}
-                    <button
-                      className="pill-button"
-                      onClick={() => onDelete(r.run_id)}
-                      title="Permanently delete this run"
-                      style={{ background: 'rgba(239,68,68,0.25)', border: '1px solid rgba(239,68,68,0.4)', color: '#fecaca' }}
-                    >
-                      🗑️ Delete
-                    </button>
                   </div>
                 </td>
               </tr>

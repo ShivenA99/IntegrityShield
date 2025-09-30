@@ -5,6 +5,9 @@ export interface SubstringMapping {
   start_pos: number;
   end_pos: number;
   context: string;
+  selection_page?: number;
+  selection_bbox?: number[];
+  selection_quads?: number[][];
   character_mappings?: Record<string, string>;
   effectiveness_score?: number;
   visual_similarity?: number;

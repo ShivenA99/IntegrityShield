@@ -69,7 +69,21 @@ const PdfCreationPanel: React.FC = () => {
   };
 
   const resolvePath = (meta: EnhancedPDF) => meta.path || meta.file_path || "";
-  const resolveRelativePath = (meta: EnhancedPDF) => meta.relative_path || resolvePath(meta);
+  const resolveRelativePath = (meta: EnhancedPDF) => {
+    const rawPath = meta.relative_path || meta.path || meta.file_path || "";
+
+    // If path is absolute, extract relative part
+    if (rawPath.includes('/pipeline_runs/')) {
+      const parts = rawPath.split('/pipeline_runs/');
+      if (parts.length > 1) {
+        // Remove run_id from path since URL already has it
+        const afterRunId = parts[1].split('/').slice(1).join('/');
+        return afterRunId;
+      }
+    }
+
+    return rawPath;
+  };
   const resolveSize = (meta: EnhancedPDF) => (meta.size_bytes ?? meta.file_size_bytes ?? 0);
   const methodLabel = (method: string) =>
     (ENHANCEMENT_METHOD_LABELS as Record<string, string>)[method] || method.replace(/_/g, " ");
@@ -135,7 +149,28 @@ const PdfCreationPanel: React.FC = () => {
 
   return (
     <div className="panel pdf-creation">
-      <h2>📑 Enhanced PDF Creation</h2>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1rem'
+      }}>
+        <h2 style={{ margin: 0 }}>📑 Enhanced PDF Creation</h2>
+
+        {stage?.status === 'pending' && allValidated && (
+          <button
+            onClick={handleCreatePdf}
+            className="pill-button"
+            style={{
+              backgroundColor: 'rgba(56,189,248,0.3)',
+              color: 'var(--text)',
+              padding: '8px 16px'
+            }}
+          >
+            🚀 Create Enhanced PDF
+          </button>
+        )}
+      </div>
 
       <div className="info-grid" style={{ marginBottom: '1rem' }}>
         <div className="info-card">
@@ -158,23 +193,10 @@ const PdfCreationPanel: React.FC = () => {
         </div>
       </div>
 
-      {stage?.status === 'pending' && (
+      {stage?.status === 'pending' && !allValidated && (
         <div style={{ marginBottom: 16 }}>
-          <button
-            onClick={handleCreatePdf}
-            disabled={!allValidated}
-            className="pill-button"
-            style={{
-              backgroundColor: allValidated ? 'rgba(56,189,248,0.3)' : 'rgba(148,163,184,0.18)',
-              color: allValidated ? 'var(--text)' : 'var(--muted)'
-            }}
-          >
-            🚀 Create Enhanced PDF
-          </button>
-          <p style={{ color: 'var(--muted)', marginTop: 8, fontSize: '0.9em' }}>
-            {allValidated
-              ? 'All questions have at least one mapping. Ready to generate enhanced PDFs.'
-              : 'Add at least one mapping per question to enable PDF creation.'}
+          <p style={{ color: 'var(--muted)', fontSize: '0.9em' }}>
+            Add at least one mapping per question to enable PDF creation.
           </p>
         </div>
       )}
@@ -345,14 +367,7 @@ const PdfCreationPanel: React.FC = () => {
           </div>
 
           <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
-            <button
-              onClick={onEvaluate}
-              className="pill-button"
-              title="Run the evaluation pipeline"
-              style={{ backgroundColor: 'rgba(56,189,248,0.22)', color: 'var(--text)' }}
-            >
-              📊 Run Evaluation
-            </button>
+            {/* Eval button disabled for now */}
             {originalDoc?.filename && activeRunId && (
               <a
                 href={`/api/files/${activeRunId}/${originalDoc.filename}`}
@@ -370,19 +385,6 @@ const PdfCreationPanel: React.FC = () => {
               </a>
             )}
           </div>
-        </div>
-      )}
-
-      {entries.length === 0 && stage?.status === 'completed' && (
-        <div style={{
-          backgroundColor: 'rgba(250, 204, 21, 0.08)',
-          border: '1px solid rgba(250, 204, 21, 0.3)',
-          padding: 12,
-          borderRadius: 4,
-          color: 'var(--muted)'
-        }}>
-          <strong>Notice:</strong> PDF creation completed but no enhanced files were generated.
-          Check validation status of your mappings and try again.
         </div>
       )}
 

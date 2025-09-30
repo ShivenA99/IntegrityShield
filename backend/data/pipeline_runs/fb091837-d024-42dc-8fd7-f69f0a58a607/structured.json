@@ -1,0 +1,13 @@
+{
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/fb091837-d024-42dc-8fd7-f69f0a58a607/Quiz6.pdf",
+    "filename": "Quiz6.pdf"
+  },
+  "pipeline_metadata": {
+    "stages_completed": [
+      "content_discovery",
+      "smart_reading"
+    ],
+    "current_stage": "smart_substitution"
+  }
+}

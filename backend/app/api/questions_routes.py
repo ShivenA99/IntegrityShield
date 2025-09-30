@@ -4,6 +4,7 @@ from http import HTTPStatus
 
 from flask import Blueprint, jsonify, request
 import json
+from typing import Any, Dict, List
 from sqlalchemy import text
 
 from ..extensions import db
@@ -109,11 +110,19 @@ def update_manipulation(run_id: str, question_id: int):
 	substring_mappings = payload.get("substring_mappings", [])
 	custom_mappings = payload.get("custom_mappings")
 
+	service = SmartSubstitutionService()
+	normalized = [service._normalize_mapping_entry(entry) for entry in substring_mappings]
+	try:
+		enriched = service._enrich_selection_geometry(run_id, question, normalized)
+	except ValueError as exc:
+		return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+
 	question.manipulation_method = method
+	question.substring_mappings = enriched
 	# Use raw SQL to bypass mutable tracking issues
 	db.session.execute(
 		text("UPDATE question_manipulations SET substring_mappings = :mappings WHERE id = :id"),
-		{"mappings": json.dumps(substring_mappings), "id": question.id}
+		{"mappings": json.dumps(enriched), "id": question.id}
 	)
 	if custom_mappings:
 		question.ai_model_results = question.ai_model_results or {}
@@ -121,12 +130,23 @@ def update_manipulation(run_id: str, question_id: int):
 
 	db.session.add(question)
 	db.session.commit()
-	SmartSubstitutionService().sync_structured_mappings(run_id)
 
 	if payload.get("regenerate_mappings"):
-		SmartSubstitutionService().refresh_question_mapping(run_id, question.question_number)
+		service.refresh_question_mapping(run_id, question.question_number)
 
-	return jsonify({"status": "updated", "question_id": question.id, "method": method})
+	service.sync_structured_mappings(run_id)
+
+	updated_entry = QuestionManipulation.query.filter_by(pipeline_run_id=run_id, id=question_id).first()
+	return jsonify(
+		{
+			"status": "updated",
+			"question_id": question.id,
+			"method": method,
+			"substring_mappings": enriched,
+			"effectiveness_score": updated_entry.effectiveness_score if updated_entry else None,
+		}
+	)
+	# response already returned above
 
 
 @bp.post("/<run_id>/<question_id>/validate")
@@ -274,8 +294,10 @@ def bulk_save_mappings(run_id: str):
 	if not questions_data:
 		return jsonify({"error": "No questions data provided"}), HTTPStatus.BAD_REQUEST
 
+	service = SmartSubstitutionService()
 	updated_count = 0
 	errors = []
+	updated_payloads: Dict[int, List[Dict[str, Any]]] = {}
 
 	for question_data in questions_data:
 		question_id = question_data.get("id")
@@ -288,14 +310,22 @@ def bulk_save_mappings(run_id: str):
 			continue
 
 		try:
+			normalized = [service._normalize_mapping_entry(entry) for entry in substring_mappings]
+			enriched = service._enrich_selection_geometry(run_id, question, normalized)
+		except ValueError as exc:
+			errors.append(f"Question {question_id}: {exc}")
+			continue
+		try:
 			question.manipulation_method = manipulation_method
+			question.substring_mappings = enriched
 			# Use raw SQL to bypass mutable tracking issues with JSONB
 			db.session.execute(
 				text("UPDATE question_manipulations SET substring_mappings = :mappings WHERE id = :id"),
-				{"mappings": json.dumps(substring_mappings), "id": question.id}
+				{"mappings": json.dumps(enriched), "id": question.id}
 			)
 			db.session.add(question)
 			updated_count += 1
+			updated_payloads[question.id] = enriched
 		except Exception as e:
 			errors.append(f"Question {question_id}: {str(e)}")
 
@@ -305,12 +335,13 @@ def bulk_save_mappings(run_id: str):
 		db.session.rollback()
 		return jsonify({"error": f"Failed to save mappings: {str(e)}"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
-	SmartSubstitutionService().sync_structured_mappings(run_id)
+	service.sync_structured_mappings(run_id)
 
 	result = {
 		"run_id": run_id,
 		"updated_count": updated_count,
-		"total_questions": len(questions_data)
+		"total_questions": len(questions_data),
+		"updated_questions": updated_payloads,
 	}
 
 	if errors:

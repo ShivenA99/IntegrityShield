@@ -20,6 +20,16 @@ const baseStageOrder: PipelineStageName[] = [
   "results_generation",
 ];
 
+const stageLabels: Record<PipelineStageName, string> = {
+  smart_reading: "Smart Reading",
+  content_discovery: "Content Discovery",
+  smart_substitution: "Smart Substitution",
+  effectiveness_testing: "Effectiveness Testing",
+  document_enhancement: "Document Enhancement",
+  pdf_creation: "PDF Creation",
+  results_generation: "Results",
+};
+
 const ProgressTracker: React.FC<ProgressTrackerProps> = ({ stages, isLoading, selectedStage, onStageSelect, currentStage }) => {
   const stageMap = new Map(stages.map((stage) => [stage.name, stage]));
   const extraStages = stages
@@ -45,7 +55,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ stages, isLoading, se
             title={isCurrent ? "Pipeline is here now" : undefined}
           >
             <div className="stage-icon">{status === "completed" ? "✔" : status === "running" || isCurrent ? "⏳" : "•"}</div>
-            <div className="stage-label">{name.replace("_", " ")}</div>
+            <div className="stage-label">{stageLabels[name] || name.replace(/_/g, " ")}</div>
           </button>
         );
       })}

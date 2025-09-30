@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC
+import difflib
 from collections import OrderedDict, defaultdict
 import copy
 import hashlib
 import io
+import json
 from pathlib import Path
 import re
 from typing import Dict, Iterable, List, Tuple, Optional
@@ -21,7 +23,7 @@ from PyPDF2.generic import (
 )
 
 from ...data_management.structured_data_manager import StructuredDataManager
-from ....models.pipeline import QuestionManipulation
+from ....models.pipeline import PipelineRun, QuestionManipulation
 from ....utils.logging import get_logger
 
 
@@ -248,7 +250,11 @@ class BaseRenderer:
         seen_qnums: set[str] = set()
         missing_payloads: set[str] = set()
 
-        def process_question(q_label: str, structured_entry: Optional[dict], model: Optional[QuestionManipulation]) -> None:
+        def process_question(
+            q_label: str,
+            structured_entry: Optional[dict],
+            model: Optional[QuestionManipulation],
+        ) -> None:
             if not q_label:
                 return
             try:
@@ -257,6 +263,7 @@ class BaseRenderer:
                     structured_entry or {},
                     index_by_q.get(q_label, {}),
                     model,
+                    run_id,
                 )
             except ValueError as exc:
                 self.logger.error("%s", exc)
@@ -315,6 +322,7 @@ class BaseRenderer:
         structured_entry: Dict[str, object],
         index_entry: Dict[str, object],
         model: Optional[QuestionManipulation],
+        run_id: Optional[str],
     ) -> Dict[str, object]:
         stem_text = (
             structured_entry.get("stem_text")
@@ -366,15 +374,26 @@ class BaseRenderer:
 
         page_idx = self._safe_page_index(page)
 
-        if substring_mappings and page_idx is None:
-            raise ValueError(
-                f"Question {q_label} missing page index for deterministic matching"
-            )
+        if substring_mappings:
+            if (page_idx is None or bbox is None) and run_id:
+                rec_page, rec_bbox = self._recover_question_geometry(
+                    run_id,
+                    stem_text,
+                )
+                if page_idx is None:
+                    page_idx = rec_page
+                if bbox is None:
+                    bbox = rec_bbox
 
-        if substring_mappings and not bbox:
-            raise ValueError(
-                f"Question {q_label} missing stem bounding box for deterministic matching"
-            )
+            if page_idx is None:
+                raise ValueError(
+                    f"Question {q_label} missing page index for deterministic matching"
+                )
+
+            if not bbox:
+                raise ValueError(
+                    f"Question {q_label} missing stem bounding box for deterministic matching"
+                )
 
         payload: Dict[str, object] = {
             "q_number": q_label,
@@ -387,6 +406,121 @@ class BaseRenderer:
         }
 
         return payload
+
+    def _normalize_bbox(self, value: object) -> Optional[Tuple[float, float, float, float]]:
+        if isinstance(value, (list, tuple)) and len(value) == 4:
+            try:
+                return tuple(float(v) for v in value)
+            except (TypeError, ValueError):
+                return None
+        return None
+
+    def _normalize_quads(self, value: object) -> List[List[float]]:
+        quads: List[List[float]] = []
+        if isinstance(value, (list, tuple)):
+            for quad in value:
+                if isinstance(quad, (list, tuple)) and len(quad) == 8:
+                    try:
+                        quads.append([float(v) for v in quad])
+                    except (TypeError, ValueError):
+                        continue
+        return quads
+
+    def _rect_from_quads(self, quads: List[List[float]]) -> Optional[fitz.Rect]:
+        if not quads:
+            return None
+        try:
+            union = fitz.Quad(quads[0]).rect
+            for quad in quads[1:]:
+                q = fitz.Quad(quad)
+                union |= q.rect
+            return union
+        except Exception:
+            return None
+
+    def _span_info_from_rect(
+        self,
+        page: fitz.Page,
+        rect: fitz.Rect,
+        context: Dict[str, object],
+    ) -> Optional[Tuple[fitz.Rect, float, int]]:
+        original = self.strip_zero_width(str(context.get("original") or "")).strip()
+        if not original:
+            return None
+
+        raw = page.get_text("rawdict") or {}
+        needle_cf = original.casefold()
+
+        for block_index, block in enumerate(raw.get("blocks", [])):
+            for line_index, line in enumerate(block.get("lines", [])):
+                for span_index, span in enumerate(line.get("spans", [])):
+                    span_bbox = span.get("bbox")
+                    if not span_bbox:
+                        continue
+                    try:
+                        span_rect = fitz.Rect(*span_bbox)
+                    except Exception:
+                        continue
+                    if not span_rect.intersects(rect):
+                        continue
+
+                    chars = span.get("chars", [])
+                    if not chars:
+                        continue
+                    text = "".join(ch.get("c", "") for ch in chars)
+                    lowered = text.casefold()
+                    start = lowered.find(needle_cf)
+                    while start != -1:
+                        end = start + len(needle_cf)
+                        if end > len(chars):
+                            break
+                        try:
+                            char_rect = fitz.Rect(chars[start]["bbox"])
+                            for ch in chars[start + 1 : end]:
+                                char_rect |= fitz.Rect(ch["bbox"])
+                        except Exception:
+                            char_rect = fitz.Rect(span_bbox)
+
+                        if not char_rect.intersects(rect):
+                            start = lowered.find(needle_cf, start + 1)
+                            continue
+
+                        fontsize = float(span.get("size", 10.0))
+                        fontname = span.get("font")
+                        first_origin = None
+                        last_origin = None
+                        if chars:
+                            try:
+                                first_origin = tuple(chars[start].get("origin", (char_rect.x0, char_rect.y0)))
+                            except Exception:
+                                first_origin = None
+                            try:
+                                last_origin = tuple(chars[end - 1].get("origin", (char_rect.x1, char_rect.y1)))
+                            except Exception:
+                                last_origin = None
+                        context["matched_font"] = fontname
+                        context["matched_fontsize"] = fontsize
+                        if first_origin:
+                            context["matched_origin_x"] = float(first_origin[0])
+                            context["matched_origin_y"] = float(first_origin[1])
+                        if last_origin:
+                            context["matched_end_origin_x"] = float(last_origin[0])
+                            context["matched_end_origin_y"] = float(last_origin[1])
+                        context["matched_rect_width"] = float(char_rect.width)
+                        context["matched_text"] = text[start:end]
+                        context["matched_rect"] = tuple(char_rect)
+                        context["matched_fontsize"] = fontsize
+                        context["matched_span_len"] = end - start
+                        context["matched_glyph_path"] = {
+                            "block": block_index,
+                            "line": line_index,
+                            "span": span_index,
+                            "char_start": start,
+                            "char_end": end,
+                        }
+                        return char_rect, fontsize, end - start
+
+        return None
 
     def _build_contexts_from_payload(self, payload: Dict[str, object]) -> List[Dict[str, object]]:
         contexts: List[Dict[str, object]] = []
@@ -448,6 +582,24 @@ class BaseRenderer:
                 "occurrence": occurrence_index,
             }
 
+            selection_bbox = self._normalize_bbox(mapping.get("selection_bbox"))
+            selection_quads = self._normalize_quads(mapping.get("selection_quads"))
+            selection_page = mapping.get("selection_page")
+            try:
+                selection_page_idx = int(selection_page)
+            except (TypeError, ValueError):
+                selection_page_idx = None
+
+            if selection_page_idx is not None:
+                page = selection_page_idx
+                page_idx = self._safe_page_index(selection_page_idx)
+
+            union_rect = None
+            if selection_quads:
+                union_rect = self._rect_from_quads(selection_quads)
+            if not selection_bbox and union_rect is not None:
+                selection_bbox = tuple(union_rect)
+
             context = {
                 "original": original,
                 "replacement": replacement,
@@ -465,7 +617,13 @@ class BaseRenderer:
                 "stem_text": stem_text,
                 "question_type": payload.get("question_type"),
                 "options": payload.get("options"),
+                "selection_page": selection_page_idx,
+                "selection_bbox": tuple(selection_bbox) if selection_bbox else None,
+                "selection_quads": selection_quads,
             }
+
+            if selection_bbox:
+                context["bbox"] = tuple(selection_bbox)
 
             contexts.append(context)
 
@@ -575,6 +733,86 @@ class BaseRenderer:
         closest = min(occurrences, key=lambda val: abs(val - target_index))
         return occurrences.index(closest)
 
+    def _recover_question_geometry(
+        self,
+        run_id: str,
+        stem_text: str,
+    ) -> Tuple[Optional[int], Optional[Tuple[float, float, float, float]]]:
+        pdf_path = self._get_original_pdf_path(run_id)
+        if not pdf_path or not pdf_path.exists():
+            self.logger.error(
+                "Unable to locate original PDF for run %s while recovering geometry",
+                run_id,
+            )
+            return None, None
+
+        try:
+            doc = fitz.open(pdf_path)
+        except Exception as exc:
+            self.logger.error(
+                "Failed to open PDF %s for run %s: %s",
+                pdf_path,
+                run_id,
+                exc,
+            )
+            return None, None
+
+        target = self.strip_zero_width(stem_text or "").replace("\n", " ").strip()
+        snippet = target[: min(120, len(target))]
+
+        try:
+            for page_index, page in enumerate(doc):
+                for needle in (target, snippet):
+                    if not needle:
+                        continue
+                    try:
+                        rects = page.search_for(needle)
+                    except Exception:
+                        rects = []
+                    if rects:
+                        rect = rects[0]
+                        buffer = fitz.Rect(rect)
+                        buffer.x0 -= 2
+                        buffer.y0 -= 2
+                        buffer.x1 += 2
+                        buffer.y1 += 2
+                        return page_index, (buffer.x0, buffer.y0, buffer.x1, buffer.y1)
+        finally:
+            doc.close()
+
+        self.logger.warning(
+            "Could not recover geometry for run %s question snippet '%s'",
+            run_id,
+            snippet,
+        )
+        return None, None
+
+    def _get_original_pdf_path(self, run_id: str) -> Optional[Path]:
+        structured = self.structured_manager.load(run_id)
+        document_info = (structured or {}).get("document") or {}
+        potential = document_info.get("source_path") or document_info.get("path")
+        if potential:
+            path = Path(str(potential))
+            if path.exists():
+                return path
+
+        try:
+            run = PipelineRun.query.get(run_id)
+        except Exception as exc:
+            self.logger.warning(
+                "Unable to query pipeline run %s for original path: %s",
+                run_id,
+                exc,
+            )
+            return None
+
+        if run and run.original_pdf_path:
+            path = Path(run.original_pdf_path)
+            if path.exists():
+                return path
+
+        return None
+
     def _group_contexts_by_page(
         self,
         mapping_context: Dict[str, List[Dict[str, object]]],
@@ -624,6 +862,11 @@ class BaseRenderer:
             fingerprint_key = probe.get("matched_fingerprint_key")
             if fingerprint_key:
                 used_fingerprints.add(str(fingerprint_key))
+            if isinstance(rect, fitz.Rect):
+                probe["available_width"] = rect.width
+                probe["available_height"] = rect.height
+                if not probe.get("selection_bbox"):
+                    probe["selection_bbox"] = tuple(rect)
             matches.append(probe)
 
         return matches
@@ -640,13 +883,20 @@ class BaseRenderer:
 
         font_cmaps = self._build_font_cmaps(page)
         current_font: Optional[str] = None
+        current_font_size: Optional[float] = None
         SPACE_THRESHOLD = -80.0
 
         for op_index, (operands, operator) in enumerate(content.operations):
-            if operator == b"Tf" and len(operands) >= 1:
+            if operator == b"Tf" and len(operands) >= 2:
                 font_name = operands[0]
+                font_size = operands[1]
                 if isinstance(font_name, NameObject):
                     current_font = str(font_name)
+                # Extract font size - FloatObject/NumberObject can be converted to float
+                try:
+                    current_font_size = float(font_size)
+                except (TypeError, ValueError, AttributeError):
+                    pass
                 continue
 
             if operator == b"Tj" and operands:
@@ -660,8 +910,16 @@ class BaseRenderer:
                         "operator": operator,
                         "operands": operands,
                         "text": decoded,
+                        "original_text": decoded,
                         "start": current_offset,
                         "end": current_offset + len(decoded),
+                        "kern_map": {},
+                        "original_kern_map": {},
+                        "modified": False,
+                        "font_context": {
+                            "font": current_font,
+                            "fontsize": current_font_size,
+                        },
                     }
                 )
                 current_offset += len(decoded)
@@ -673,13 +931,18 @@ class BaseRenderer:
                     continue
                 tj_segments += 1
                 decoded_parts: List[str] = []
+                kern_map: Dict[int, float] = {}
+                relative_offset = 0
                 for item in array_obj:
                     if isinstance(item, (TextStringObject, ByteStringObject)):
                         decoded_parts.append(self._decode_pdf_text(item, current_font, font_cmaps))
+                        relative_offset += len(decoded_parts[-1])
                     elif isinstance(item, NumberObject):
                         try:
                             if float(item) <= SPACE_THRESHOLD:
                                 decoded_parts.append(" ")
+                                relative_offset += 1
+                            kern_map[relative_offset] = kern_map.get(relative_offset, 0.0) + float(item)
                         except Exception:
                             pass
                 decoded = "".join(decoded_parts)
@@ -690,8 +953,16 @@ class BaseRenderer:
                         "operator": operator,
                         "operands": operands,
                         "text": decoded,
+                        "original_text": decoded,
                         "start": current_offset,
                         "end": current_offset + len(decoded),
+                        "kern_map": kern_map,
+                        "original_kern_map": dict(kern_map),
+                        "modified": False,
+                        "font_context": {
+                            "font": current_font,
+                            "fontsize": current_font_size,
+                        },
                     }
                 )
                 current_offset += len(decoded)
@@ -710,6 +981,146 @@ class BaseRenderer:
             return self._decode_with_cmap(bytes(text_obj), current_font, font_cmaps)
         return ""
 
+    def _attach_stream_ranges_from_geometry(
+        self,
+        doc_page: fitz.Page,
+        segments: List[Dict[str, object]],
+        contexts: List[Dict[str, object]],
+    ) -> None:
+        geometry_contexts = [ctx for ctx in contexts if ctx.get("matched_glyph_path")]
+        if not geometry_contexts or not segments:
+            return
+
+        raw = doc_page.get_text("rawdict") or {}
+        blocks = raw.get("blocks") or []
+        if not blocks:
+            return
+
+        combined_text = "".join(segment.get("text", "") for segment in segments)
+        if not combined_text:
+            return
+
+        span_positions: Dict[Tuple[int, int, int], Dict[str, object]] = {}
+        raw_parts: List[str] = []
+        raw_index = 0
+
+        for block_index, block in enumerate(blocks):
+            for line_index, line in enumerate(block.get("lines", [])):
+                for span_index, span in enumerate(line.get("spans", [])):
+                    chars = span.get("chars", []) or []
+                    if not chars:
+                        continue
+
+                    cursor = raw_index
+                    char_positions: List[int] = [cursor]
+                    char_origins: List[float] = []
+
+                    for char_info in chars:
+                        glyph = str(char_info.get("c", ""))
+                        if glyph == "":
+                            glyph = "\u0000"
+                        raw_parts.append(glyph)
+                        cursor += len(glyph)
+                        char_positions.append(cursor)
+                        origin = char_info.get("origin")
+                        if isinstance(origin, (list, tuple)) and len(origin) >= 1:
+                            try:
+                                char_origins.append(float(origin[0]))
+                            except (TypeError, ValueError):
+                                char_origins.append(char_origins[-1] if char_origins else 0.0)
+                        else:
+                            char_origins.append(char_origins[-1] if char_origins else 0.0)
+
+                    span_positions[(block_index, line_index, span_index)] = {
+                        "positions": char_positions,
+                        "origins": char_origins,
+                        "font": span.get("font"),
+                        "fontsize": span.get("size"),
+                    }
+                    raw_index = cursor
+
+        if not raw_parts:
+            return
+
+        raw_string = "".join(raw_parts)
+        matcher = difflib.SequenceMatcher(None, raw_string, combined_text, autojunk=False)
+        alignment: Dict[int, int] = {}
+        for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+            if tag != "equal":
+                continue
+            for offset in range(i2 - i1):
+                alignment[i1 + offset] = j1 + offset
+
+        if not alignment:
+            return
+
+        for ctx in geometry_contexts:
+            glyph_path = ctx.get("matched_glyph_path") or {}
+            block_idx = glyph_path.get("block")
+            line_idx = glyph_path.get("line")
+            span_idx = glyph_path.get("span")
+            char_start = glyph_path.get("char_start")
+            char_end = glyph_path.get("char_end")
+
+            if None in (block_idx, line_idx, span_idx, char_start, char_end):
+                continue
+
+            span_key = (int(block_idx), int(line_idx), int(span_idx))
+            span_data = span_positions.get(span_key)
+            if not span_data:
+                continue
+
+            positions: List[int] = span_data.get("positions") or []
+            origins: List[float] = span_data.get("origins") or []
+            if len(positions) < 2:
+                continue
+
+            char_count = len(positions) - 1
+            if char_count <= 0:
+                continue
+
+            # Clamp indices to valid range
+            char_start = max(0, min(int(char_start), char_count - 1))
+            char_end = max(0, min(int(char_end), char_count))
+            if char_end <= char_start:
+                continue
+
+            raw_start = positions[char_start]
+            raw_end = positions[char_end]
+            stream_origin = None
+            if origins and char_start < len(origins):
+                stream_origin = origins[char_start]
+
+            mapped_start = None
+            for raw_idx in range(raw_start, raw_end):
+                if raw_idx in alignment:
+                    mapped_start = alignment[raw_idx]
+                    break
+
+            if mapped_start is None:
+                continue
+
+            mapped_end = None
+            for raw_idx in range(raw_end - 1, raw_start - 1, -1):
+                if raw_idx in alignment:
+                    mapped_end = alignment[raw_idx] + 1
+                    break
+
+            if mapped_end is None or mapped_end <= mapped_start:
+                continue
+
+            ctx["stream_range"] = (mapped_start, mapped_end)
+            ctx["stream_text"] = combined_text[mapped_start:mapped_end]
+            if stream_origin is not None:
+                ctx["stream_start_origin"] = float(stream_origin)
+            if span_data.get("font"):
+                ctx.setdefault("matched_font", span_data.get("font"))
+            if span_data.get("fontsize"):
+                try:
+                    ctx.setdefault("matched_fontsize", float(span_data.get("fontsize")))
+                except (TypeError, ValueError):
+                    pass
+
     def _plan_replacements(
         self,
         segments: List[Dict[str, object]],
@@ -717,11 +1128,19 @@ class BaseRenderer:
         used_fingerprints: set[str],
         run_id: Optional[str],
         page_index: int,
+        doc_page: fitz.Page,
     ) -> List[Dict[str, object]]:
         combined_text = "".join(segment["text"] for segment in segments)
         replacements: List[Dict[str, object]] = []
         used_ranges: List[Tuple[int, int]] = []
         local_fingerprints: set[str] = set()
+
+        def range_conflicts(candidate: Tuple[int, int]) -> bool:
+            start, end = candidate
+            for used_start, used_end in used_ranges:
+                if start < used_end and end > used_start:
+                    return True
+            return False
 
         for ctx in contexts:
             fingerprint_key = str(ctx.get("matched_fingerprint_key") or ctx.get("fingerprint_key") or "")
@@ -730,34 +1149,122 @@ class BaseRenderer:
             if fingerprint_key and fingerprint_key in local_fingerprints:
                 continue
 
-            target_text = ctx.get("matched_text") or ctx.get("original")
             replacement_text = ctx.get("replacement")
-            if not target_text or not replacement_text:
+            if not replacement_text:
                 continue
 
-            span = self._find_match_position_in_combined_text(
-                combined_text,
-                str(target_text),
-                ctx,
-                used_ranges,
-            )
-            if not span:
-                self.logger.warning(
-                    "stream rewrite text span not found",
-                    extra={
-                        "run_id": run_id,
-                        "page": page_index,
-                        "q_number": ctx.get("q_number"),
-                        "original": ctx.get("original"),
-                    },
+            span: Optional[Tuple[int, int]] = None
+            stream_range = ctx.get("stream_range")
+            if stream_range and len(stream_range) == 2:
+                start_candidate = max(0, int(stream_range[0]))
+                end_candidate = max(start_candidate, int(stream_range[1]))
+                end_candidate = min(end_candidate, len(combined_text))
+                if end_candidate > start_candidate and not range_conflicts((start_candidate, end_candidate)):
+                    span = (start_candidate, end_candidate)
+                    ctx["matched_text"] = ctx.get("stream_text") or combined_text[start_candidate:end_candidate]
+
+            if span is None:
+                target_text = ctx.get("matched_text") or ctx.get("original")
+                if not target_text:
+                    continue
+                span = self._find_match_position_in_combined_text(
+                    combined_text,
+                    str(target_text),
+                    ctx,
+                    used_ranges,
                 )
-                continue
+                if not span:
+                    self.logger.warning(
+                        "stream rewrite text span not found",
+                        extra={
+                            "run_id": run_id,
+                            "page": page_index,
+                            "q_number": ctx.get("q_number"),
+                            "original": ctx.get("original"),
+                        },
+                    )
+                    continue
 
             start, end = span
             used_ranges.append((start, end))
             if fingerprint_key:
                 used_fingerprints.add(fingerprint_key)
                 local_fingerprints.add(fingerprint_key)
+
+            if end > start:
+                ctx["matched_text"] = combined_text[start:end]
+
+            available_width = ctx.get("available_width")
+            if not available_width and ctx.get("matched_rect"):
+                try:
+                    available_width = fitz.Rect(*ctx.get("matched_rect")).width
+                except Exception:
+                    available_width = None
+
+            font_name = ctx.get("matched_font")
+            try:
+                font_size = float(ctx.get("matched_fontsize") or 0.0)
+            except (TypeError, ValueError):
+                font_size = 0.0
+
+            original_text = ctx.get("matched_text") or combined_text[start:end]
+            original_width = ctx.get("matched_rect_width")
+            if font_name and font_size > 0 and original_text:
+                try:
+                    original_width = doc_page.get_text_length(original_text, fontname=font_name, fontsize=font_size)
+                except Exception:
+                    pass
+
+            if available_width is None and original_width is not None:
+                available_width = float(original_width)
+
+            replacement_text_str = str(replacement_text)
+            replacement_width = 0.0
+            glyph_widths: List[float] = []
+            if font_name and font_size > 0 and replacement_text_str:
+                for ch in replacement_text_str:
+                    try:
+                        glyph_width = doc_page.get_text_length(ch, fontname=font_name, fontsize=font_size)
+                    except Exception:
+                        glyph_width = 0.0
+                    glyph_widths.append(glyph_width)
+                replacement_width = sum(glyph_widths)
+            else:
+                replacement_width = float(len(replacement_text_str))
+
+            ctx["matched_width"] = float(original_width or 0.0)
+            ctx["replacement_width"] = float(replacement_width)
+
+            matched_origin = ctx.get("matched_origin_x")
+            stream_origin = ctx.get("stream_start_origin")
+            leading_adjust_ts = 0.0
+            if font_size > 0 and matched_origin is not None and stream_origin is not None:
+                try:
+                    delta_left = float(matched_origin) - float(stream_origin)
+                    if abs(delta_left) > 1e-3:
+                        leading_adjust_ts = -delta_left * 1000.0 / font_size
+                except Exception:
+                    leading_adjust_ts = 0.0
+
+            target_width = float(original_width or replacement_width)
+            delta_width_pt = float(replacement_width) - float(target_width)
+
+            gap_adjust_ts: List[float] = []
+            trailing_adjust_ts = 0.0
+            char_count = len(replacement_text_str)
+            delta_ts_total = 0.0
+            if font_size > 0:
+                delta_ts_total = (float(replacement_width) - float(target_width)) * 1000.0 / font_size
+                trailing_adjust_ts = delta_ts_total
+
+            ctx["leading_adjust_ts"] = leading_adjust_ts
+            ctx["gap_adjust_ts"] = gap_adjust_ts
+            ctx["trailing_adjust_ts"] = trailing_adjust_ts
+
+            stream_value = float(stream_origin) if stream_origin is not None else float(matched_origin or 0.0)
+            matched_value = float(matched_origin) if matched_origin is not None else stream_value
+            ctx["rewrite_left_overflow"] = max(0.0, matched_value - stream_value)
+            ctx["rewrite_right_overflow"] = max(0.0, float(replacement_width) - float(target_width))
 
             replacements.append(
                 {
@@ -767,8 +1274,35 @@ class BaseRenderer:
                     "context": ctx,
                     "fingerprint_key": fingerprint_key,
                     "applied": False,
+                    "scale": 1.0,
+                    "kerning_plan": {
+                        "leading_adjust_ts": leading_adjust_ts,
+                        "gap_adjust_ts": gap_adjust_ts,
+                        "trailing_adjust_ts": trailing_adjust_ts,
+                    },
+                    "replacement_width": replacement_width,
                 }
             )
+
+            if font_name and font_size > 0:
+                try:
+                    self.logger.debug(
+                        "kerning plan for replacement",
+                        extra={
+                            "run_id": run_id,
+                            "page": page_index,
+                            "q_number": ctx.get("q_number"),
+                            "original": ctx.get("original"),
+                            "replacement": replacement_text_str,
+                            "original_width": float(target_width),
+                            "replacement_width": float(replacement_width),
+                            "leading_ts": leading_adjust_ts,
+                            "trailing_ts": trailing_adjust_ts,
+                            "gap_count": len(gap_adjust_ts),
+                        },
+                    )
+                except Exception:
+                    pass
 
         return replacements
 
@@ -834,15 +1368,18 @@ class BaseRenderer:
         replacements: List[Dict[str, object]],
         run_id: Optional[str],
         page_index: int,
+        doc_page: fitz.Page,
     ) -> bool:
         segment_map = {id(seg): seg for seg in segments}
-        edits_by_segment: Dict[int, List[Tuple[int, int, str]]] = defaultdict(list)
+        edits_by_segment: Dict[int, List[Dict[str, object]]] = defaultdict(list)
         modified = False
 
         for replacement in replacements:
             start = int(replacement.get("start", 0))
             end = int(replacement.get("end", 0))
             insert_text = str(replacement.get("replacement") or "")
+            scale_value = float(replacement.get("scale", 1.0))
+            kerning_plan = replacement.get("kerning_plan") or {}
 
             covering_segments = [
                 seg for seg in segments if seg["start"] < end and seg["end"] > start
@@ -859,8 +1396,14 @@ class BaseRenderer:
                 )
                 continue
 
+            plan_has_adjustments = False
+            if kerning_plan:
+                lead = abs(float(kerning_plan.get("leading_adjust_ts", 0.0)))
+                trail = abs(float(kerning_plan.get("trailing_adjust_ts", 0.0)))
+                plan_has_adjustments = (lead >= 1e-3) or (trail >= 1e-3)
+
             inserted = False
-            for index, seg in enumerate(covering_segments):
+            for idx, seg in enumerate(covering_segments):
                 seg_start = seg["start"]
                 seg_end = seg["end"]
                 local_start = max(start, seg_start) - seg_start
@@ -868,28 +1411,94 @@ class BaseRenderer:
                 if local_end < local_start:
                     continue
 
-                text_to_insert = insert_text if not inserted else ""
-                edits_by_segment[id(seg)].append((local_start, local_end, text_to_insert))
+                text_fragment = insert_text if not inserted else ""
+                plan = {}
+                if idx == 0 and kerning_plan:
+                    plan = {
+                        "leading_adjust_ts": kerning_plan.get("leading_adjust_ts", 0.0),
+                        "trailing_adjust_ts": kerning_plan.get("trailing_adjust_ts", 0.0),
+                    }
+                edits_by_segment[id(seg)].append(
+                    {
+                        "start": local_start,
+                        "end": local_end,
+                        "text": text_fragment,
+                        "kerning_plan": plan,
+                        "insert_len": len(text_fragment),
+                    }
+                )
+                if scale_value < seg.get("scale", 1.0):
+                    seg["scale"] = scale_value
                 inserted = True
 
+            if scale_value < 0.995 or plan_has_adjustments:
+                modified = True
+
             replacement["applied"] = True
+
+            # Log each replacement for debugging
+            from app.services.developer.live_logging_service import live_logging_service
+            mapping_id = replacement.get("context", {}).get("mapping_id", "unknown")
+            original = replacement.get("context", {}).get("original", "")
+            repl_text = replacement.get("context", {}).get("replacement", "")
+            q_num = replacement.get("context", {}).get("question_number", "")
+            if run_id:
+                live_logging_service.emit(
+                    run_id,
+                    "pdf_creation",
+                    "INFO",
+                    f"✓ Replacement applied: Q{q_num} '{original}' → '{repl_text}' (mapping_id: {mapping_id})",
+                    component="stream_rewrite"
+                )
 
         for seg_id, edits in edits_by_segment.items():
             segment = segment_map.get(seg_id)
             if not segment:
                 continue
-            text = segment.get("text", "")
-            edits.sort(key=lambda item: item[0])
-            cursor = 0
-            new_text_parts: List[str] = []
-            for start, end, insert_text in edits:
-                new_text_parts.append(text[cursor:start])
-                new_text_parts.append(insert_text)
-                cursor = end
-            new_text_parts.append(text[cursor:])
-            new_text = "".join(new_text_parts)
-            if new_text != text:
-                segment["new_text"] = new_text
+
+            original_text = segment.get("text", "") or ""
+            original_kerns = dict(segment.get("kern_map") or {})
+            text = original_text
+            kern_map = dict(original_kerns)
+
+            for edit in sorted(edits, key=lambda item: item.get("start", 0), reverse=True):
+                local_start = max(int(edit.get("start", 0)), 0)
+                local_end = max(local_start, int(edit.get("end", 0)))
+                insert_fragment = str(edit.get("text") or "")
+                removed_len = local_end - local_start
+                shift = len(insert_fragment) - removed_len
+
+                text = text[:local_start] + insert_fragment + text[local_end:]
+
+                if kern_map:
+                    updated_map: Dict[int, float] = {}
+                    for pos, value in kern_map.items():
+                        if local_start < pos < local_end:
+                            continue
+                        if pos >= local_end:
+                            new_pos = pos + shift
+                        else:
+                            new_pos = pos
+                        updated_map[new_pos] = float(updated_map.get(new_pos, 0.0) + value)
+                    kern_map = updated_map
+
+                plan = edit.get("kerning_plan") or {}
+                leading_ts = float(plan.get("leading_adjust_ts", 0.0))
+                trailing_ts = float(plan.get("trailing_adjust_ts", 0.0))
+                insert_len = int(edit.get("insert_len", len(insert_fragment)))
+
+                if abs(leading_ts) >= 1e-3:
+                    kern_map[local_start] = float(kern_map.get(local_start, 0.0) + leading_ts)
+
+                if abs(trailing_ts) >= 1e-3 and insert_len >= 0:
+                    insert_pos = local_start + insert_len
+                    kern_map[insert_pos] = float(kern_map.get(insert_pos, 0.0) + trailing_ts)
+
+            if text != original_text or kern_map != original_kerns:
+                segment["text"] = text
+                segment["kern_map"] = kern_map
+                segment["modified"] = True
+                segment["end"] = segment.get("start", 0) + len(text)
                 modified = True
 
         return modified
@@ -899,17 +1508,66 @@ class BaseRenderer:
         operations: List[Tuple[List[object], bytes]],
         segments: List[Dict[str, object]],
     ) -> List[Tuple[List[object], bytes]]:
-        updated = list(operations)
-        for segment in segments:
-            new_text = segment.get("new_text")
-            if new_text is None:
+        segments_by_index = {seg["index"]: seg for seg in segments}
+        updated: List[Tuple[List[object], bytes]] = []
+
+        for idx, (operands, operator) in enumerate(operations):
+            segment = segments_by_index.get(idx)
+            if not segment:
+                updated.append((operands, operator))
                 continue
-            index = segment["index"]
-            operator = segment["operator"]
-            if operator == b"Tj":
-                updated[index] = ([TextStringObject(new_text)], operator)
-            elif operator == b"TJ":
-                updated[index] = ([ArrayObject([TextStringObject(new_text)])], operator)
+
+            scale = float(segment.get("scale", 1.0))
+            modified = bool(segment.get("modified"))
+
+            if not modified and scale >= 0.995:
+                updated.append((operands, operator))
+                continue
+
+            if scale < 0.995:
+                updated.append(([NumberObject(round(scale * 100, 4))], b"Tz"))
+
+            if modified:
+                text_value = segment.get("text") or ""
+                kern_map = dict(segment.get("kern_map") or {})
+                pieces: List[Tuple[str, object]] = []
+                cursor = 0
+                for pos in sorted(kern_map.keys()):
+                    pos_clamped = max(0, min(int(pos), len(text_value)))
+                    if pos_clamped > cursor:
+                        pieces.append(("text", text_value[cursor:pos_clamped]))
+                    value = float(kern_map[pos])
+                    if abs(value) >= 0.001:
+                        pieces.append(("kern", round(value, 6)))
+                    cursor = pos_clamped
+                if cursor < len(text_value):
+                    pieces.append(("text", text_value[cursor:]))
+                if not pieces:
+                    pieces.append(("text", ""))
+
+                has_kern = any(kind == "kern" for kind, _ in pieces)
+                if (
+                    not has_kern
+                    and len(pieces) == 1
+                    and pieces[0][0] == "text"
+                    and operator == b"Tj"
+                    and not segment.get("original_kern_map")
+                ):
+                    updated.append(([TextStringObject(pieces[0][1])], b"Tj"))
+                else:
+                    array = ArrayObject()
+                    for kind, value in pieces:
+                        if kind == "text":
+                            array.append(TextStringObject(value))
+                        else:
+                            array.append(NumberObject(value))
+                    updated.append(([array], b"TJ"))
+            else:
+                updated.append((operands, operator))
+
+            if scale < 0.995:
+                updated.append(([NumberObject(100)], b"Tz"))
+
         return updated
 
     def _build_font_cmaps(self, page) -> Dict[str, Dict[str, object]]:
@@ -1024,6 +1682,7 @@ class BaseRenderer:
         mapping: Dict[str, str],
         mapping_context: Dict[str, List[Dict[str, object]]],
         run_id: Optional[str] = None,
+        original_pdf_path: Optional[Path] = None,
     ) -> Tuple[bytes, Dict[str, int]]:
         reader = PdfReader(io.BytesIO(pdf_bytes))
         writer = PdfWriter()
@@ -1059,12 +1718,25 @@ class BaseRenderer:
             tokens_scanned += tokens
             tj_segments += tj_hits
 
+            try:
+                self._attach_stream_ranges_from_geometry(
+                    doc[page_index],
+                    segments,
+                    matched_contexts,
+                )
+            except Exception:
+                self.logger.exception(
+                    "Failed to align geometry to stream on page %s",
+                    page_index,
+                )
+
             replacements = self._plan_replacements(
                 segments,
                 matched_contexts,
                 used_fingerprints,
                 run_id,
                 page_index,
+                doc[page_index],
             )
 
             if not replacements:
@@ -1076,12 +1748,78 @@ class BaseRenderer:
                 replacements,
                 run_id,
                 page_index,
+                doc[page_index],
             )
 
             if modified:
                 matches_found += len(replacements)
                 replacements_applied += sum(1 for item in replacements if item.get("applied"))
-                content.operations = self._rebuild_operations(content.operations, segments)
+
+                # Use new Courier font strategy instead of old reconstruction
+                self.logger.info(
+                    f"DEBUG: About to apply Courier font strategy",
+                    extra={
+                        "run_id": run_id,
+                        "page": page_index,
+                        "num_operations": len(content.operations),
+                        "num_segments": len(segments),
+                        "num_replacements": len(replacements)
+                    },
+                )
+
+                try:
+                    # Save operations before transformation
+                    operations_before = content.operations.copy()
+
+                    content.operations = self._rebuild_operations_with_courier_font(
+                        content.operations, segments, replacements, run_id
+                    )
+
+                    # Save operations after transformation
+                    operations_after = content.operations.copy()
+
+                    self.logger.info(
+                        f"DEBUG: Courier font strategy completed successfully",
+                        extra={"run_id": run_id, "page": page_index},
+                    )
+
+                    # Save enhanced debug output with full page hierarchy
+                    if original_pdf_path and original_pdf_path.exists():
+                        try:
+                            # Extract font context from segments
+                            font_context_summary = {}
+                            for seg in segments:
+                                fc = seg.get('font_context', {})
+                                if fc.get('font'):
+                                    font_context_summary[seg['index']] = {
+                                        'font': fc.get('font'),
+                                        'fontsize': fc.get('fontsize'),
+                                        'text_preview': seg.get('text', '')[:50]
+                                    }
+
+                            self._save_enhanced_debug(
+                                run_id=run_id,
+                                stage=f"page_{page_index}_rewrite",
+                                original_pdf_path=original_pdf_path,
+                                page_index=page_index,
+                                operations_before=operations_before,
+                                operations_after=operations_after,
+                                font_context=font_context_summary
+                            )
+                        except Exception as debug_exc:
+                            self.logger.warning(
+                                f"Enhanced debug save failed: {debug_exc}",
+                                extra={"run_id": run_id, "page": page_index}
+                            )
+
+                except Exception as exc:
+                    # Fallback to original method if new approach fails
+                    self.logger.warning(
+                        "Courier font strategy failed, falling back to original method",
+                        extra={"run_id": run_id, "page": page_index, "error": str(exc)},
+                    )
+                    content.operations = self._rebuild_operations(content.operations, segments)
+
                 page[NameObject("/Contents")] = content
 
             writer.add_page(page)
@@ -1114,26 +1852,55 @@ class BaseRenderer:
             for entries in mapping_context.values():
                 for ctx in entries:
                     page_idx = ctx.get("page")
-                    bbox = ctx.get("stem_bbox") or ctx.get("bbox")
-                    if not isinstance(page_idx, int) or not bbox or len(bbox) != 4:
+                    bbox = ctx.get("selection_bbox") or ctx.get("stem_bbox") or ctx.get("bbox")
+                    if not isinstance(page_idx, int):
                         continue
 
                     try:
-                        rect = fitz.Rect(*bbox)
+                        rect = fitz.Rect(*bbox) if bbox and len(bbox) == 4 else None
                     except Exception:
-                        continue
-
-                    expanded = fitz.Rect(rect)
-                    expanded.x0 -= 2
-                    expanded.y0 -= 2
-                    expanded.x1 += 2
-                    expanded.y1 += 2
+                        rect = None
 
                     if page_idx < 0 or page_idx >= len(doc):
                         continue
 
                     page = doc[page_idx]
-                    region_text = page.get_text("text", clip=expanded) or ""
+                    selection_quads = ctx.get("selection_quads") or []
+                    texts: List[str] = []
+                    if selection_quads:
+                        for quad in selection_quads:
+                            try:
+                                quad_rect = fitz.Quad(quad).rect
+                            except Exception:
+                                continue
+                            expanded = fitz.Rect(quad_rect)
+                            expanded.x0 -= 1
+                            expanded.y0 -= 1
+                            expanded.x1 += 1
+                            expanded.y1 += 1
+                            overflow_left = float(ctx.get("rewrite_left_overflow") or 0.0)
+                            overflow_right = float(ctx.get("rewrite_right_overflow") or 0.0)
+                            if overflow_left:
+                                expanded.x0 -= overflow_left
+                            if overflow_right:
+                                expanded.x1 += overflow_right
+                            texts.append(page.get_text("text", clip=expanded) or "")
+                        region_text = " ".join(texts)
+                    elif rect is not None:
+                        expanded = fitz.Rect(rect)
+                        expanded.x0 -= 10
+                        expanded.y0 -= 10
+                        expanded.x1 += 10
+                        expanded.y1 += 10
+                        overflow_left = float(ctx.get("rewrite_left_overflow") or 0.0)
+                        overflow_right = float(ctx.get("rewrite_right_overflow") or 0.0)
+                        if overflow_left:
+                            expanded.x0 -= overflow_left
+                        if overflow_right:
+                            expanded.x1 += overflow_right
+                        region_text = page.get_text("text", clip=expanded) or ""
+                    else:
+                        continue
                     normalized = self.strip_zero_width(region_text).strip()
                     normalized_lower = normalized.casefold()
 
@@ -1283,13 +2050,36 @@ class BaseRenderer:
         if not original:
             return None
 
-        clip_data = context.get("stem_bbox") or context.get("bbox")
+        clip_data = (
+            context.get("selection_bbox")
+            or context.get("stem_bbox")
+            or context.get("bbox")
+        )
         clip_rect = None
         if clip_data and len(clip_data) == 4:
             try:
                 clip_rect = fitz.Rect(*clip_data)
             except Exception:
                 clip_rect = None
+
+        selection_rect = None
+        selection_bbox = context.get("selection_bbox")
+        selection_quads = context.get("selection_quads") or []
+        if selection_bbox and len(selection_bbox) == 4:
+            try:
+                selection_rect = fitz.Rect(*selection_bbox)
+            except Exception:
+                selection_rect = None
+        if selection_rect is None and selection_quads:
+            selection_rect = self._rect_from_quads(selection_quads)
+
+        if selection_rect is not None:
+            info = self._span_info_from_rect(page, selection_rect, context)
+            if info:
+                rect, fontsize, span_len = info
+                if used_rects and self._rects_conflict(rect, used_rects):
+                    return None
+                return rect, fontsize, span_len
 
         padded_rect = None
         if clip_rect is not None:
@@ -1352,3 +2142,626 @@ class BaseRenderer:
             return rect, fontsize, span_len
 
         return None
+
+    # === Custom Font Replacement Methods ===================================================
+
+    def calculate_courier_font_size(self, replacement_text: str, target_width_pts: float, original_text: str = "") -> float:
+        """
+        Calculate intelligent Courier font size with smart scaling strategy.
+
+        When replacement is shorter than original: use reasonable font size + spacing
+        When replacement is longer than original: scale down to fit
+        """
+        if not replacement_text:
+            return 8.0  # Default size for empty replacements
+
+        # Courier character width ratio (0.6em per character)
+        courier_char_width_ratio = 0.6
+        replacement_length = len(replacement_text)
+        original_length = len(original_text) if original_text else replacement_length
+
+        # Calculate what font size would be needed for perfect fit
+        required_font_size = target_width_pts / (replacement_length * courier_char_width_ratio)
+
+        # Smart scaling strategy
+        if replacement_length <= original_length:
+            # Replacement is shorter or same length - avoid excessive scaling up
+            # Use minimum viable font size and rely on spacing to fill the gap
+            reasonable_font_size = min(required_font_size, 12.0)  # Cap at 12pt for readability
+            return max(6.0, reasonable_font_size)  # Minimum 6pt for readability
+        else:
+            # Replacement is longer - scale down to fit but maintain readability
+            scaled_font_size = required_font_size
+            return max(4.0, min(scaled_font_size, 16.0))  # Between 4pt and 16pt
+
+    def calculate_text_width_courier(self, text: str, font_size: float) -> float:
+        """
+        Calculate visual width of text using Courier font at given size.
+        """
+        if not text:
+            return 0.0
+
+        courier_char_width_ratio = 0.6
+        return len(text) * font_size * courier_char_width_ratio
+
+    def split_tj_operator_for_font_replacement(
+        self,
+        original_tj_array: ArrayObject,
+        replace_start_idx: int,
+        replace_end_idx: int,
+        replacement_text: str,
+        original_width_pts: float,
+        current_font_name: Optional[str] = "/F1",
+        current_font_size: float = 12.0,
+    ) -> List[Tuple[List[object], bytes]]:
+        """
+        Split a TJ operator to allow font change for replacement text.
+
+        Returns a list of PDF operations that replace the original TJ operator.
+        """
+        operations = []
+
+        # Part 1: Before replacement (keep original font)
+        before_array = ArrayObject(original_tj_array[:replace_start_idx])
+        if len(before_array) > 0:
+            operations.append(([before_array], b'TJ'))
+
+        # Part 2: Replacement text with Courier font
+        if replacement_text:
+            # Calculate perfect Courier font size
+            courier_font_size = self.calculate_courier_font_size(replacement_text, original_width_pts)
+
+            # Switch to Courier
+            operations.append(([NameObject('/Courier'), NumberObject(courier_font_size)], b'Tf'))
+
+            # Insert replacement text
+            replacement_array = ArrayObject([TextStringObject(replacement_text)])
+            operations.append(([replacement_array], b'TJ'))
+
+            # Calculate any needed spacing adjustment for perfect width match
+            actual_width = self.calculate_text_width_courier(replacement_text, courier_font_size)
+            width_diff = original_width_pts - actual_width
+
+            if abs(width_diff) > 0.1:  # Add spacing if significant difference
+                spacing_adjustment = -(width_diff * 1000) / courier_font_size
+                spacing_array = ArrayObject([NumberObject(spacing_adjustment)])
+                operations.append(([spacing_array], b'TJ'))
+
+        else:
+            # Empty replacement - just add spacing to fill the gap
+            spacing_adjustment = -(original_width_pts * 1000) / current_font_size
+            spacing_array = ArrayObject([NumberObject(spacing_adjustment)])
+            operations.append(([spacing_array], b'TJ'))
+
+        # Part 3: Restore original font for remaining text
+        after_array = ArrayObject(original_tj_array[replace_end_idx:])
+        if len(after_array) > 0:
+            # Restore original font
+            operations.append(([NameObject(current_font_name), NumberObject(current_font_size)], b'Tf'))
+            operations.append(([after_array], b'TJ'))
+
+        return operations
+
+    def handle_text_replacement_edge_cases(
+        self,
+        replacement_text: str,
+        target_width_pts: float,
+        max_readable_font_size: float = 4.0,
+    ) -> Tuple[str, str]:
+        """
+        Handle edge cases for text replacement (very long text, empty text, etc.).
+
+        Returns: (processed_replacement_text, strategy_used)
+        """
+        if not replacement_text:
+            return "", "empty_replacement"
+
+        # Calculate minimum required font size
+        required_font_size = self.calculate_courier_font_size(replacement_text, target_width_pts)
+
+        if required_font_size >= max_readable_font_size:
+            return replacement_text, "normal_replacement"
+
+        # Text is too long for readable font size - need to abbreviate
+        courier_char_width_ratio = 0.6
+        max_chars = int(target_width_pts / (max_readable_font_size * courier_char_width_ratio))
+
+        if max_chars <= 3:
+            # Extremely narrow space - use single character or empty
+            return replacement_text[0] if replacement_text else "", "single_char"
+
+        elif max_chars <= len(replacement_text):
+            # Abbreviate with ellipsis
+            abbreviated = replacement_text[:max_chars-3] + "..."
+            return abbreviated, "abbreviated"
+
+        else:
+            # Should fit normally (fallback case)
+            return replacement_text, "normal_replacement"
+
+    def _rebuild_operations_with_courier_font(
+        self,
+        operations: List[Tuple[List[object], bytes]],
+        segments: List[Dict[str, object]],
+        replacements: List[Dict[str, object]],
+        run_id: Optional[str] = None,
+    ) -> List[Tuple[List[object], bytes]]:
+        """
+        New rebuild operations method that uses Courier font strategy.
+
+        Instead of rebuilding entire TJ operators, we split them surgically
+        and use Courier font for replacement text with perfect width matching.
+        """
+        segments_by_index = {seg["index"]: seg for seg in segments}
+        updated: List[Tuple[List[object], bytes]] = []
+
+        # Group replacements by segment index for processing
+        replacements_by_segment = defaultdict(list)
+        for replacement in replacements:
+            # Find which segment this replacement belongs to
+            start_pos = replacement.get("start", 0)
+            for seg in segments:
+                if seg["start"] <= start_pos < seg["end"]:
+                    replacements_by_segment[seg["index"]].append(replacement)
+                    break
+
+        for idx, (operands, operator) in enumerate(operations):
+            segment = segments_by_index.get(idx)
+            segment_replacements = replacements_by_segment.get(idx, [])
+
+            # If no segment or no replacements, keep original operation
+            if not segment or not segment_replacements:
+                updated.append((operands, operator))
+                continue
+
+            # Handle TJ/Tj operators with replacements
+            if operator in (b"TJ", b"Tj") and segment_replacements:
+                try:
+                    split_operations = self._process_tj_replacements(
+                        operands, operator, segment, segment_replacements, run_id
+                    )
+                    updated.extend(split_operations)
+                except Exception as exc:
+                    # Fallback to original operation if splitting fails
+                    self.logger.warning(
+                        "TJ splitting failed, using original operation",
+                        extra={"run_id": run_id, "error": str(exc)},
+                    )
+                    updated.append((operands, operator))
+            else:
+                # Non-text operators or no replacements
+                updated.append((operands, operator))
+
+        return updated
+
+    def _process_tj_replacements(
+        self,
+        operands: List[object],
+        operator: bytes,
+        segment: Dict[str, object],
+        replacements: List[Dict[str, object]],
+        run_id: Optional[str] = None,
+    ) -> List[Tuple[List[object], bytes]]:
+        """
+        Process replacements within a TJ/Tj operator using PRECISION WIDTH MATCHING.
+
+        Key principle: Replace text while preserving exact text matrix positioning.
+        """
+        if operator == b"TJ":
+            tj_array = operands[0] if operands else ArrayObject()
+        else:  # Tj
+            tj_array = ArrayObject([operands[0]]) if operands else ArrayObject()
+
+        # Save original stream for debugging
+        self._save_debug_stream(run_id, "before_reconstruction", tj_array, operator)
+
+        # Extract replacement context with width information and font context
+        replacement_contexts = {}
+        for replacement in replacements:
+            context = replacement.get("context", {})
+            original_text = context.get("original", "")
+            replacement_text = str(replacement.get("replacement", ""))
+
+            if original_text:
+                # Include segment font context for proper font restoration
+                enhanced_context = context.copy()
+                enhanced_context['segment_font_context'] = segment.get('font_context', {})
+
+                replacement_contexts[original_text] = {
+                    'replacement': replacement_text,
+                    'original_width': context.get("matched_width", 0.0),
+                    'font_size': context.get("matched_fontsize", 12.0),
+                    'context': enhanced_context
+                }
+
+        if not replacement_contexts:
+            return [([tj_array], operator)]
+
+        # Find the first replacement to process
+        target_element_idx = None
+        target_original = None
+        target_info = None
+
+        for i, element in enumerate(tj_array):
+            if isinstance(element, (TextStringObject, ByteStringObject)):
+                element_text = str(element)
+                for original_text, info in replacement_contexts.items():
+                    if original_text in element_text:
+                        target_element_idx = i
+                        target_original = original_text
+                        target_info = info
+                        break
+                if target_element_idx is not None:
+                    break
+
+        if target_element_idx is None:
+            # No replacements found in this TJ array
+            return [([tj_array], operator)]
+
+        # Execute precision width matching replacement
+        split_operations = self._execute_precision_width_replacement(
+            tj_array, target_element_idx, target_original, target_info, segment, run_id
+        )
+
+        # Save final stream for debugging
+        self._save_debug_stream(run_id, "after_reconstruction", split_operations)
+
+        return split_operations
+
+    def _execute_precision_width_replacement(
+        self,
+        tj_array: ArrayObject,
+        element_idx: int,
+        original_text: str,
+        replacement_info: Dict[str, object],
+        segment: Dict[str, object],
+        run_id: Optional[str] = None,
+    ) -> List[Tuple[List[object], bytes]]:
+        """
+        Execute precision width matching replacement with TJ operator splitting.
+        """
+        replacement_text = replacement_info['replacement']
+        original_width = replacement_info['original_width']
+        original_font_size = replacement_info['font_size']
+
+        if run_id:
+            self.logger.info(
+                f"Precision replacement: '{original_text}' -> '{replacement_text}' "
+                f"(width: {original_width}pt, font: {original_font_size}pt)",
+                extra={"run_id": run_id}
+            )
+
+        # Step 1: Intelligent Courier font size selection
+        # Strategy: For shorter replacements, use original font size to maintain visual consistency
+        #           For longer replacements, scale down intelligently to fit
+        replacement_length = len(replacement_text)
+        original_length = len(original_text)
+
+        if replacement_length <= original_length:
+            # Replacement is shorter or equal - use original font size for visual consistency
+            # Then adjust spacing to position suffix correctly
+            courier_font_size = original_font_size
+            if run_id:
+                self.logger.info(
+                    f"Using original font size {courier_font_size:.2f}pt for shorter/equal replacement",
+                    extra={"run_id": run_id}
+                )
+        else:
+            # Replacement is longer - use intelligent scaling
+            courier_font_size = self.calculate_courier_font_size(replacement_text, original_width, original_text)
+            if run_id:
+                self.logger.info(
+                    f"Calculated scaled font size {courier_font_size:.2f}pt for longer replacement",
+                    extra={"run_id": run_id}
+                )
+
+        # Step 2: Calculate spacing adjustment to position suffix exactly where it should be
+        actual_replacement_width = self.calculate_text_width_courier(replacement_text, courier_font_size)
+        width_difference = original_width - actual_replacement_width
+
+        # Add spacing adjustment to position suffix correctly
+        # Positive width_difference means we need to add space (replacement is narrower)
+        # Negative width_difference means replacement is wider (will overlap, but that's expected for longer text)
+        spacing_adjustment = 0.0
+        if abs(width_difference) > 0.1:  # Add spacing for any significant difference
+            # In PDF text space, NEGATIVE values move RIGHT (add space), POSITIVE moves LEFT (reduce space)
+            # TJ operator uses values in 1/1000 of font size units
+            # CRITICAL FIX: Negate the value because PDF TJ operator has inverted polarity
+            spacing_adjustment = -(width_difference * 1000) / courier_font_size
+
+        if run_id:
+            self.logger.info(
+                f"Width matching: Courier {courier_font_size:.2f}pt -> {actual_replacement_width:.2f}pt, "
+                f"width_diff: {width_difference:.2f}pt, spacing: {spacing_adjustment:.2f}",
+                extra={"run_id": run_id}
+            )
+
+        # Step 3: Split TJ array into prefix, replacement, suffix
+        target_element = tj_array[element_idx]
+        element_text = str(target_element)
+
+        # Find exact position of target text within the element
+        start_pos = element_text.find(original_text)
+        if start_pos == -1:
+            # Fallback if exact match not found
+            return [([tj_array], b'TJ')]
+
+        prefix_text = element_text[:start_pos]
+        suffix_text = element_text[start_pos + len(original_text):]
+
+        # Step 4: Build split operations
+        operations = []
+
+        # Part 1: Prefix elements + prefix text (if any)
+        prefix_elements = list(tj_array[:element_idx])
+        if prefix_text:
+            prefix_elements.append(TextStringObject(prefix_text))
+
+        if prefix_elements:
+            operations.append(([ArrayObject(prefix_elements)], b'TJ'))
+
+        # Part 2: Replacement with Courier font
+        operations.extend([
+            # Switch to Courier at calculated size
+            ([NameObject('/Courier'), NumberObject(courier_font_size)], b'Tf'),
+            # Insert replacement text
+            ([ArrayObject([TextStringObject(replacement_text)])], b'TJ'),
+        ])
+
+        # Part 3: Restore original font and continue with suffix
+        # Extract original font from the segment's font context (now properly captured during extraction)
+        segment_font_context = segment.get('font_context', {})
+        original_font_name = segment_font_context.get('font')
+        actual_original_font_size = segment_font_context.get('fontsize')
+
+        # Fallback to matched context if segment font context is not available
+        if not original_font_name:
+            fallback_context = replacement_info.get('context', {}).get('segment_font_context', {})
+            original_font_name = fallback_context.get('font', '/F1')
+            actual_original_font_size = fallback_context.get('fontsize', original_font_size)
+        elif not actual_original_font_size:
+            actual_original_font_size = original_font_size
+
+        if run_id:
+            self.logger.info(
+                f"Font restoration: {original_font_name} @ {actual_original_font_size}pt",
+                extra={"run_id": run_id}
+            )
+
+        operations.extend([
+            # Restore original font from segment's actual font context
+            ([NameObject(original_font_name), NumberObject(actual_original_font_size)], b'Tf'),
+        ])
+
+        # Part 4: Suffix text + remaining elements
+        suffix_elements = []
+
+        # Add spacing adjustment BEFORE suffix text to position it correctly
+        if abs(spacing_adjustment) > 0.1:
+            suffix_elements.append(NumberObject(spacing_adjustment))
+
+        if suffix_text:
+            suffix_elements.append(TextStringObject(suffix_text))
+        suffix_elements.extend(tj_array[element_idx + 1:])
+
+        if suffix_elements:
+            operations.append(([ArrayObject(suffix_elements)], b'TJ'))
+
+        return operations
+
+    def _save_debug_stream(
+        self,
+        run_id: Optional[str],
+        stage: str,
+        data: object,
+        operator: bytes = b'TJ'
+    ) -> None:
+        """
+        Save debug information about stream reconstruction to artifacts folder.
+        """
+        if not run_id:
+            return
+
+        try:
+            from ....utils.storage_paths import method_stage_artifact_path
+            from pathlib import Path
+            import json
+
+            debug_dir = method_stage_artifact_path(run_id, "stream_rewrite-overlay", "debug")
+            debug_dir.mkdir(parents=True, exist_ok=True)
+
+            if isinstance(data, list):
+                # Multiple operations
+                debug_content = {
+                    'stage': stage,
+                    'operations': []
+                }
+                for i, (operands, op) in enumerate(data):
+                    debug_content['operations'].append({
+                        'index': i,
+                        'operator': op.decode('latin-1'),
+                        'operands': [str(operand) for operand in operands]
+                    })
+            else:
+                # Single TJ array
+                debug_content = {
+                    'stage': stage,
+                    'operator': operator.decode('latin-1'),
+                    'tj_elements': [str(elem) for elem in data] if hasattr(data, '__iter__') else [str(data)]
+                }
+
+            debug_file = debug_dir / f"{stage}.json"
+            with open(debug_file, 'w') as f:
+                json.dump(debug_content, f, indent=2)
+
+        except Exception as e:
+            self.logger.warning(f"Failed to save debug stream: {e}", extra={"run_id": run_id})
+
+    def _save_enhanced_debug(
+        self,
+        run_id: Optional[str],
+        stage: str,
+        original_pdf_path: Path,
+        page_index: int = 0,
+        operations_before: List[Tuple[List[object], bytes]] = None,
+        operations_after: List[Tuple[List[object], bytes]] = None,
+        font_context: Dict[str, object] = None
+    ) -> None:
+        """
+        Save comprehensive debug information including full page hierarchy and text matrix positions.
+        """
+        if not run_id:
+            return
+
+        try:
+            from ....utils.storage_paths import method_stage_artifact_path
+            import fitz
+            from PyPDF2 import PdfReader
+            from PyPDF2.generic import ContentStream
+            import json
+
+            debug_dir = method_stage_artifact_path(run_id, "stream_rewrite-overlay", "debug")
+            debug_dir.mkdir(parents=True, exist_ok=True)
+
+            # Read original PDF for analysis
+            pdf_bytes = original_pdf_path.read_bytes()
+            reader = PdfReader(io.BytesIO(pdf_bytes))
+            doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
+            page = reader.pages[page_index] if page_index < len(reader.pages) else None
+            fitz_page = doc[page_index] if page_index < len(doc) else None
+
+            debug_data = {
+                "stage": stage,
+                "run_id": run_id,
+                "page_index": page_index,
+                "font_context": font_context or {},
+                "text_matrix_analysis": {},
+                "full_page_hierarchy": {},
+                "operations_comparison": {}
+            }
+
+            # Extract full page hierarchy using PyMuPDF
+            if fitz_page:
+                text_dict = fitz_page.get_text('dict')
+                debug_data["full_page_hierarchy"] = {
+                    "page_width": fitz_page.rect.width,
+                    "page_height": fitz_page.rect.height,
+                    "blocks": []
+                }
+
+                for block_num, block in enumerate(text_dict.get('blocks', [])):
+                    if 'lines' in block:
+                        block_info = {
+                            "block_number": block_num,
+                            "bbox": block.get('bbox', []),
+                            "lines": []
+                        }
+
+                        for line_num, line in enumerate(block['lines']):
+                            line_info = {
+                                "line_number": line_num,
+                                "bbox": line.get('bbox', []),
+                                "spans": []
+                            }
+
+                            for span_num, span in enumerate(line.get('spans', [])):
+                                span_info = {
+                                    "span_number": span_num,
+                                    "text": span.get('text', ''),
+                                    "font": span.get('font', ''),
+                                    "size": span.get('size', 0),
+                                    "flags": span.get('flags', 0),
+                                    "color": span.get('color', 0),
+                                    "bbox": span.get('bbox', []),
+                                    "matrix": span.get('matrix', [])
+                                }
+                                line_info["spans"].append(span_info)
+
+                            block_info["lines"].append(line_info)
+                        debug_data["full_page_hierarchy"]["blocks"].append(block_info)
+
+            # Extract text matrix positions using PyPDF2 content stream
+            if page:
+                content_stream = ContentStream(page.get_contents(), reader)
+                debug_data["text_matrix_analysis"] = self._analyze_text_matrix_positions(content_stream)
+
+            # Compare operations before and after
+            if operations_before or operations_after:
+                debug_data["operations_comparison"] = {
+                    "before": self._format_operations_for_debug(operations_before) if operations_before else [],
+                    "after": self._format_operations_for_debug(operations_after) if operations_after else []
+                }
+
+            # Save to file
+            debug_file = debug_dir / f"{stage}_enhanced.json"
+            with open(debug_file, 'w') as f:
+                json.dump(debug_data, f, indent=2)
+
+            doc.close()
+
+        except Exception as exc:
+            self.logger.warning(
+                f"Failed to save enhanced debug: {exc}",
+                extra={"run_id": run_id, "stage": stage}
+            )
+
+    def _analyze_text_matrix_positions(self, content_stream: ContentStream) -> Dict[str, object]:
+        """
+        Analyze text matrix positions from PDF content stream.
+        """
+        text_positions = []
+        current_matrix = [1, 0, 0, 1, 0, 0]  # Default text matrix
+
+        try:
+            for operands, operator in content_stream.operations:
+                if operator == b'Tm':
+                    # Text matrix operator
+                    if len(operands) >= 6:
+                        current_matrix = [float(op) for op in operands]
+                        text_positions.append({
+                            "operator": "Tm",
+                            "matrix": current_matrix.copy(),
+                            "position": [current_matrix[4], current_matrix[5]]
+                        })
+                elif operator == b'Td':
+                    # Text positioning operator
+                    if len(operands) >= 2:
+                        dx, dy = float(operands[0]), float(operands[1])
+                        current_matrix[4] += dx
+                        current_matrix[5] += dy
+                        text_positions.append({
+                            "operator": "Td",
+                            "offset": [dx, dy],
+                            "matrix": current_matrix.copy(),
+                            "position": [current_matrix[4], current_matrix[5]]
+                        })
+                elif operator in [b'TJ', b'Tj']:
+                    # Text showing operators
+                    text_positions.append({
+                        "operator": operator.decode('ascii', errors='ignore'),
+                        "operands": [str(op) for op in operands],
+                        "matrix": current_matrix.copy(),
+                        "position": [current_matrix[4], current_matrix[5]]
+                    })
+
+        except Exception as exc:
+            self.logger.warning(f"Error analyzing text matrix: {exc}")
+
+        return {
+            "total_positions": len(text_positions),
+            "positions": text_positions
+        }
+
+    def _format_operations_for_debug(self, operations: List[Tuple[List[object], bytes]]) -> List[Dict[str, object]]:
+        """
+        Format operations list for debug output.
+        """
+        formatted = []
+        for i, (operands, operator) in enumerate(operations):
+            formatted.append({
+                "index": i,
+                "operator": operator.decode('ascii', errors='ignore'),
+                "operands": [str(op) for op in operands]
+            })
+        return formatted

@@ -45,11 +45,13 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
   };
 
   const saveMappings = async () => {
-    await updateQuestionManipulation(runId, question.id, {
+    const response = await updateQuestionManipulation(runId, question.id, {
       method: question.manipulation_method || "smart_substitution",
       substring_mappings: mappings
     });
-    onUpdated?.({ ...question, substring_mappings: mappings });
+    const serverMappings = response?.substring_mappings ?? mappings;
+    setMappings(serverMappings);
+    onUpdated?.({ ...question, substring_mappings: serverMappings });
   };
 
   const onValidate = async () => {
@@ -86,14 +88,14 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
           prompt_len: res.modified_question?.length || 0
         }
       };
-      setMappings(updatedMappings);
-
       // Save the updated mappings
-      await updateQuestionManipulation(runId, question.id, {
+      const response = await updateQuestionManipulation(runId, question.id, {
         method: question.manipulation_method || "smart_substitution",
         substring_mappings: updatedMappings
       });
-      onUpdated?.({ ...question, substring_mappings: updatedMappings });
+      const serverMappings = response?.substring_mappings ?? updatedMappings;
+      setMappings(serverMappings);
+      onUpdated?.({ ...question, substring_mappings: serverMappings });
     } catch (e: any) {
       setValidError(e?.response?.data?.error || String(e));
     }

@@ -1,0 +1,49 @@
+{
+  "stage": "after_reconstruction",
+  "operations": [
+    {
+      "index": 0,
+      "operator": "TJ",
+      "operands": [
+        "['Consider', -342, 'a', -343, 'v', 57, 'anilla', -342]"
+      ]
+    },
+    {
+      "index": 1,
+      "operator": "Tf",
+      "operands": [
+        "/Courier",
+        "8"
+      ]
+    },
+    {
+      "index": 2,
+      "operator": "TJ",
+      "operands": [
+        "['CNN']"
+      ]
+    },
+    {
+      "index": 3,
+      "operator": "TJ",
+      "operands": [
+        "[499]"
+      ]
+    },
+    {
+      "index": 4,
+      "operator": "Tf",
+      "operands": [
+        "/F50",
+        "8"
+      ]
+    },
+    {
+      "index": 5,
+      "operator": "TJ",
+      "operands": [
+        "[-343, 'with', -343, 're', 1, 'curren', 28, 't', -342, 'w', 28, 'eigh', 29, 't', -343, 'matrix']"
+      ]
+    }
+  ]
+}

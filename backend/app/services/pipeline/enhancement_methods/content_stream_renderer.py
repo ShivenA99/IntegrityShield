@@ -8,7 +8,6 @@ import fitz
 
 from .base_renderer import BaseRenderer
 from .image_overlay_renderer import ImageOverlayRenderer
-from .pymupdf_renderer import PyMuPDFRenderer
 from app.utils.storage_paths import method_stage_artifact_path
 
 LOGGER = logging.getLogger(__name__)
@@ -45,40 +44,20 @@ class ContentStreamRenderer(BaseRenderer):
         mapping_context = self.build_mapping_context(run_id) if run_id else {}
         original_bytes = original_pdf.read_bytes()
 
-        fallback_used = False
-        replace_stats: Dict[str, object]
-        try:
-            rewritten_bytes, rewrite_stats = self.rewrite_content_streams_structured(
-                original_bytes,
-                clean_mapping,
-                mapping_context,
-                run_id=run_id,
-            )
-            replace_stats = {
-                "replacements": rewrite_stats.get("replacements", 0),
-                "targets": rewrite_stats.get("matches_found", 0),
-                "textbox_adjustments": 0,
-                "rewritten_bytes": rewritten_bytes,
-                "tokens_scanned": rewrite_stats.get("tokens_scanned", 0),
-            }
-        except Exception as exc:
-            LOGGER.warning(
-                "structured stream rewrite failed; falling back to PyMuPDF",
-                extra={"run_id": run_id, "error": str(exc)},
-            )
-            fallback_used = True
-            renderer = PyMuPDFRenderer()
-            doc = fitz.open(stream=original_bytes, filetype="pdf")
-            replace_stats = renderer._replace_text(doc, clean_mapping, run_id, mapping_context)
-            rewritten_bytes = replace_stats.get("rewritten_bytes") or doc.tobytes()
-            doc.close()
-            rewrite_stats = {
-                "pages": len(replace_stats.get("targets") or []),
-                "tj_hits": 0,
-                "replacements": replace_stats.get("replacements", 0),
-                "matches_found": replace_stats.get("targets", 0),
-                "tokens_scanned": 0,
-            }
+        rewritten_bytes, rewrite_stats = self.rewrite_content_streams_structured(
+            original_bytes,
+            clean_mapping,
+            mapping_context,
+            run_id=run_id,
+            original_pdf_path=original_pdf,
+        )
+        replace_stats: Dict[str, object] = {
+            "replacements": rewrite_stats.get("replacements", 0),
+            "targets": rewrite_stats.get("matches_found", 0),
+            "textbox_adjustments": 0,
+            "rewritten_bytes": rewritten_bytes,
+            "tokens_scanned": rewrite_stats.get("tokens_scanned", 0),
+        }
 
         artifacts: Dict[str, str] = {}
         try:
@@ -132,16 +111,6 @@ class ContentStreamRenderer(BaseRenderer):
         doc_overlay.close()
         artifacts["final"] = str(destination)
 
-        try:
-            final_bytes = destination.read_bytes()
-            self.validate_output_with_context(final_bytes, mapping_context, run_id)
-        except Exception as exc:
-            LOGGER.error(
-                "validation failure after content stream render",
-                extra={"run_id": run_id, "error": str(exc)},
-            )
-            raise
-
         replacements = int(replace_stats.get("replacements", 0))
         matches = int(replace_stats.get("targets", 0))
         typography_scaled_segments = int(replace_stats.get("textbox_adjustments", 0))
@@ -154,7 +123,7 @@ class ContentStreamRenderer(BaseRenderer):
         )
         overlay_area_pct = overlay_area_sum / max(page_area_sum, 1.0) if page_area_sum else 0.0
 
-        rewrite_engine = "structured_stream" if not fallback_used else "pymupdf"
+        rewrite_engine = "courier_font_strategy"
 
         live_logging_service.emit(
             run_id,

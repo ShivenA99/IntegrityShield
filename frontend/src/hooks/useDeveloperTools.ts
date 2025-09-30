@@ -14,6 +14,12 @@ export function useDeveloperTools(runId: string | null) {
   const [state, setState] = useState<DeveloperState>({ logs: [], metrics: [], isStreaming: false });
 
   useEffect(() => {
+    if (!runId) {
+      setState({ logs: [], metrics: [], isStreaming: false });
+    }
+  }, [runId]);
+
+  useEffect(() => {
     if (!runId) return;
 
     let socket: WebSocket | null = null;
@@ -54,6 +60,7 @@ export function useDeveloperTools(runId: string | null) {
     return () => {
       cancelled = true;
       socket?.close();
+      setState({ logs: [], metrics: [], isStreaming: false });
     };
   }, [runId]);
 

@@ -87,6 +87,41 @@ const ResultsPanel: React.FC = () => {
                     <h5 style={{ margin: 0, color: 'var(--text)' }}>{friendly}</h5>
                     <span className="badge tag-muted">{meta.effectiveness_score != null ? `${Math.round(meta.effectiveness_score * 100)}%` : '—'}</span>
                   </div>
+
+                  {/* PDF Preview */}
+                  {artifactSet.final && runId ? (
+                    <div style={{ marginTop: '0.75rem', border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}>
+                      <iframe
+                        src={`/api/files/${runId}/${artifactSet.final}`}
+                        style={{ width: '100%', height: '400px', border: 'none', display: 'block' }}
+                        title={`${friendly} preview`}
+                      />
+                    </div>
+                  ) : null}
+
+                  {/* Stats */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.5rem', marginTop: '0.75rem' }}>
+                    {meta.replacements != null && (
+                      <div style={{ fontSize: '0.85rem' }}>
+                        <span style={{ color: 'var(--muted)' }}>Replacements: </span>
+                        <span style={{ fontWeight: 500 }}>{meta.replacements}</span>
+                      </div>
+                    )}
+                    {meta.overlay_applied != null && (
+                      <div style={{ fontSize: '0.85rem' }}>
+                        <span style={{ color: 'var(--muted)' }}>Overlays: </span>
+                        <span style={{ fontWeight: 500 }}>{meta.overlay_applied}/{meta.overlay_targets ?? 0}</span>
+                      </div>
+                    )}
+                    {meta.file_size_bytes != null && (
+                      <div style={{ fontSize: '0.85rem' }}>
+                        <span style={{ color: 'var(--muted)' }}>Size: </span>
+                        <span style={{ fontWeight: 500 }}>{Math.round(meta.file_size_bytes / 1024)}KB</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Download Buttons */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>
                     {artifactSet.final && runId ? (
                       <a className="pill-button" href={`/api/files/${runId}/${artifactSet.final}`} download title="Download final overlay">
