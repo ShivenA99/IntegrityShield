@@ -14,6 +14,17 @@ from ..services.data_management.structured_data_manager import StructuredDataMan
 from ..services.ai_clients.ai_client_orchestrator import AIClientOrchestrator
 
 
+def _client_status(client: object) -> dict[str, bool]:
+	"""Return a normalized availability payload for optional AI clients."""
+	if not client:
+		return {"configured": False, "available": False}
+	try:
+		configured = bool(client.is_configured())  # type: ignore[attr-defined]
+	except Exception:  # noqa: BLE001
+		configured = False
+	return {"configured": configured, "available": configured}
+
+
 bp = Blueprint("developer", __name__, url_prefix="/developer")
 
 
@@ -116,18 +127,9 @@ def test_ai_clients():
     orchestrator = AIClientOrchestrator()
 
     test_results = {
-        "openai_vision": {
-            "configured": orchestrator.openai_client.is_configured(),
-            "available": orchestrator.openai_client.is_configured()
-        },
-        "mistral_ocr": {
-            "configured": orchestrator.mistral_client.is_configured(),
-            "available": orchestrator.mistral_client.is_configured()
-        },
-        "gpt5_fusion": {
-            "configured": orchestrator.gpt5_fusion_client.is_configured(),
-            "available": orchestrator.gpt5_fusion_client.is_configured()
-        }
+        "openai_vision": _client_status(orchestrator.openai_client),
+        "mistral_ocr": _client_status(orchestrator.mistral_client),
+        "gpt5_fusion": _client_status(getattr(orchestrator, "gpt5_fusion_client", None)),
     }
 
     return jsonify(test_results)
@@ -158,9 +160,9 @@ def system_health():
     health = {
         "database": True,  # If we got here, database is working
         "ai_clients": {
-            "openai_vision": orchestrator.openai_client.is_configured(),
-            "mistral_ocr": orchestrator.mistral_client.is_configured(),
-            "gpt5_fusion": orchestrator.gpt5_fusion_client.is_configured()
+            "openai_vision": _client_status(orchestrator.openai_client),
+            "mistral_ocr": _client_status(orchestrator.mistral_client),
+            "gpt5_fusion": _client_status(getattr(orchestrator, "gpt5_fusion_client", None)),
         },
         "storage": True,  # Basic assumption
         "websockets": True  # Basic assumption
@@ -171,7 +173,7 @@ def system_health():
         health["database"],
         health["storage"],
         health["websockets"],
-        any(health["ai_clients"].values())  # At least one AI client should work
+        any(status.get("configured") for status in health["ai_clients"].values()),
     ]) else "degraded"
 
     return jsonify(health)

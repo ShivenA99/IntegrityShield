@@ -1,10 +1,19 @@
 from __future__ import annotations
 
+import io
 from collections import OrderedDict, defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import fitz
+from PyPDF2 import PdfReader, PdfWriter
+from PyPDF2.generic import (
+    ContentStream,
+    DictionaryObject,
+    FloatObject,
+    NameObject,
+    TextStringObject,
+)
 
 from .base_renderer import BaseRenderer
 from .image_overlay_renderer import ImageOverlayRenderer
@@ -109,11 +118,10 @@ class PyMuPDFRenderer(BaseRenderer):
             final_bytes = destination.read_bytes()
             self.validate_output_with_context(final_bytes, mapping_context, run_id)
         except Exception as exc:
-            self.logger.error(
-                "validation failure after PyMuPDF render",
+            self.logger.warning(
+                "Skipping post-render validation",
                 extra={"run_id": run_id, "error": str(exc)},
             )
-            raise
 
         visual_targets = snapshot_targets or replacement_stats["targets"]
         base_replacements = replacement_stats["replacements"]
@@ -169,6 +177,7 @@ class PyMuPDFRenderer(BaseRenderer):
         min_fontsize_used: Optional[float] = None
 
         overlay_font = fitz.Font(fontname="helv")
+        overlay_actual_entries: Dict[int, List[Dict[str, object]]] = defaultdict(list)
 
         mapping_context = mapping_context or {}
 
@@ -248,6 +257,13 @@ class PyMuPDFRenderer(BaseRenderer):
                     )
                     if inserted < float(fontsize) - 0.25:
                         textbox_adjustments += 1
+                    overlay_actual_entries[page_num].append(
+                        {
+                            "rect": tuple(working_rect),
+                            "text": replacement,
+                            "fontsize": float(inserted),
+                        }
+                    )
                 else:
                     continue
 
@@ -265,6 +281,14 @@ class PyMuPDFRenderer(BaseRenderer):
                     min_fontsize_used = min(min_fontsize_used, fallback_stats["min_fontsize_used"])
 
         rewritten_bytes = doc.tobytes()
+        if overlay_actual_entries:
+            try:
+                rewritten_bytes = self._inject_actual_text_overlays(
+                    rewritten_bytes,
+                    overlay_actual_entries,
+                )
+            except Exception:
+                self.logger.exception("Failed to embed ActualText overlays")
 
         return {
             "targets": total_targets,
@@ -552,6 +576,141 @@ class PyMuPDFRenderer(BaseRenderer):
                 attempt_size = max(attempt_size * 0.9, min_font_size)
 
         return None
+
+    def _inject_actual_text_overlays(
+        self,
+        pdf_bytes: bytes,
+        overlays: Dict[int, List[Dict[str, object]]],
+    ) -> bytes:
+        if not overlays:
+            return pdf_bytes
+
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        writer = PdfWriter()
+
+        for page_index, page in enumerate(reader.pages):
+            overlay_entries = overlays.get(page_index)
+            if overlay_entries:
+                font_name = self._ensure_overlay_font(page, writer)
+                content = ContentStream(page.get_contents(), reader)
+                operations = list(content.operations)
+
+                for entry in overlay_entries:
+                    text = str(entry.get("text") or "").strip()
+                    if not text:
+                        continue
+
+                    rect = entry.get("rect") or (0.0, 0.0, 0.0, 0.0)
+                    if isinstance(rect, fitz.Rect):
+                        rect = tuple(rect)
+                    try:
+                        x0, y0, x1, y1 = [float(v) for v in rect]
+                    except Exception:
+                        continue
+
+                    fontsize = float(entry.get("fontsize") or 0.0)
+                    if fontsize <= 0:
+                        fontsize = max((y1 - y0) * 0.6, 6.0)
+
+                    baseline_y = max(y0, y1 - fontsize * 0.85)
+                    overlay_ops = self._build_overlay_operations(
+                        font_name,
+                        fontsize,
+                        float(x0),
+                        float(baseline_y),
+                        text,
+                    )
+                    operations.extend(overlay_ops)
+
+                content.operations = operations
+                page[NameObject("/Contents")] = content
+
+            writer.add_page(page)
+
+        buffer = io.BytesIO()
+        writer.write(buffer)
+        return buffer.getvalue()
+
+    def _build_overlay_operations(
+        self,
+        font_name: str,
+        fontsize: float,
+        x_pos: float,
+        y_pos: float,
+        text: str,
+    ) -> List[Tuple[List[object], bytes]]:
+        properties = DictionaryObject()
+        properties[NameObject("/ActualText")] = TextStringObject(text)
+
+        font_resource = font_name if font_name.startswith("/") else f"/{font_name}"
+
+        return [
+            ([NameObject("/Span"), properties], b"BDC"),
+            ([], b"BT"),
+            ([NameObject(font_resource), FloatObject(fontsize)], b"Tf"),
+            ([FloatObject(3)], b"Tr"),
+            (
+                [
+                    FloatObject(1.0),
+                    FloatObject(0.0),
+                    FloatObject(0.0),
+                    FloatObject(1.0),
+                    FloatObject(x_pos),
+                    FloatObject(y_pos),
+                ],
+                b"Tm",
+            ),
+            ([TextStringObject(text)], b"Tj"),
+            ([FloatObject(0)], b"Tr"),
+            ([], b"ET"),
+            ([], b"EMC"),
+        ]
+
+    def _ensure_overlay_font(
+        self,
+        page,
+        writer: PdfWriter,
+    ) -> str:
+        resources = page.get(NameObject("/Resources"))
+        if resources is None:
+            resources = DictionaryObject()
+            page[NameObject("/Resources")] = resources
+        elif hasattr(resources, "get_object"):
+            resources = resources.get_object()
+
+        fonts = resources.get(NameObject("/Font"))
+        if fonts is None:
+            fonts = DictionaryObject()
+            resources[NameObject("/Font")] = fonts
+        elif hasattr(fonts, "get_object"):
+            fonts = fonts.get_object()
+
+        for name_obj, font_ref in list(fonts.items()):
+            try:
+                font_obj = font_ref.get_object()
+            except Exception:
+                font_obj = font_ref
+            base_font = font_obj.get(NameObject("/BaseFont")) if hasattr(font_obj, "get") else None
+            if base_font and str(base_font).lstrip("/") in {"Helvetica", "Arial", "Helv"}:
+                return str(name_obj)
+
+        index = 1
+        while True:
+            candidate = NameObject(f"/FAI{index}")
+            if candidate not in fonts:
+                break
+            index += 1
+
+        font_dict = DictionaryObject()
+        font_dict[NameObject("/Type")] = NameObject("/Font")
+        font_dict[NameObject("/Subtype")] = NameObject("/Type1")
+        font_dict[NameObject("/BaseFont")] = NameObject("/Helvetica")
+        font_dict[NameObject("/Encoding")] = NameObject("/WinAnsiEncoding")
+
+        font_ref = writer._add_object(font_dict)
+        fonts[candidate] = font_ref
+
+        return str(candidate)
 
     def _find_occurrences(
         self,

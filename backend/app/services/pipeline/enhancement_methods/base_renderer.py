@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 import difflib
+from bisect import bisect_left, bisect_right
 from collections import OrderedDict, defaultdict
 import copy
 import hashlib
@@ -9,7 +10,7 @@ import io
 import json
 from pathlib import Path
 import re
-from typing import Dict, Iterable, List, Tuple, Optional
+from typing import Dict, Iterable, List, Tuple, Optional, TYPE_CHECKING
 
 import fitz
 from PyPDF2 import PdfReader, PdfWriter
@@ -25,6 +26,10 @@ from PyPDF2.generic import (
 from ...data_management.structured_data_manager import StructuredDataManager
 from ....models.pipeline import PipelineRun, QuestionManipulation
 from ....utils.logging import get_logger
+from .span_extractor import collect_span_records
+
+if TYPE_CHECKING:  # pragma: no cover
+    from .span_rewrite_plan import SpanRewriteEntry
 
 
 class BaseRenderer:
@@ -36,11 +41,44 @@ class BaseRenderer:
         "\u2061",  # function application
         "\u2062",  # invisible times
         "\u2063",  # invisible separator
+        "\ufeff",  # byte-order mark
     )
+
+    _NORMALIZATION_TABLE = str.maketrans(
+        {
+            "ﬁ": "fi",
+            "ﬂ": "fl",
+            "ﬀ": "ff",
+            "ﬃ": "ffi",
+            "ﬄ": "ffl",
+            "ﬅ": "ft",
+            "ﬆ": "st",
+            "–": "-",
+            "—": "-",
+            "−": "-",
+            "‑": "-",
+            "‐": "-",
+            "“": '"',
+            "”": '"',
+            "‟": '"',
+            "’": "'",
+            "‘": "'",
+            "‚": ",",
+            "‛": "'",
+            "…": "...",
+            " ": " ",  # non-breaking space
+            "^": "",
+            "ˆ": "",
+        }
+    )
+
+    _SPACE_THRESHOLD = -80.0
 
     def __init__(self) -> None:
         self.structured_manager = StructuredDataManager()
         self.logger = get_logger(self.__class__.__name__)
+        self._span_record_cache: Dict[int, Dict[str, object]] = {}
+        self._span_cache_run_id: Optional[str] = None
 
     def render(
         self,
@@ -229,6 +267,10 @@ class BaseRenderer:
         if not run_id:
             return contexts
 
+        if run_id and run_id != self._span_cache_run_id:
+            self._span_record_cache = {}
+            self._span_cache_run_id = run_id
+
         structured = self.structured_manager.load(run_id)
         questions = (structured.get("questions") if structured else []) or []
         question_index = (structured.get("question_index") if structured else []) or []
@@ -316,6 +358,60 @@ class BaseRenderer:
             return ""
         return "".join(ch for ch in text if ch not in self._ZERO_WIDTH_MARKERS)
 
+    def _normalize_for_span_match(self, value: str | None) -> str:
+        if not value:
+            return ""
+        cleaned = self.strip_zero_width(value)
+        cleaned = cleaned.translate(self._NORMALIZATION_TABLE)
+        collapsed = " ".join(cleaned.split())
+        return collapsed.strip()
+
+    def _normalize_for_compare(self, value: str | None) -> str:
+        return self._normalize_for_span_match(value).lower()
+
+    def _build_normalized_map(self, value: str | None) -> Tuple[str, List[int]]:
+        """Return normalized text alongside glyph index mapping for span comparisons."""
+        if not value:
+            return "", []
+
+        stripped = self.strip_zero_width(value)
+        normalized_chars: List[str] = []
+        index_map: List[int] = []
+        last_was_space = False
+
+        for glyph_index, raw_char in enumerate(stripped):
+            translated = raw_char.translate(self._NORMALIZATION_TABLE)
+            if not translated:
+                translated = raw_char
+
+            for piece in translated:
+                char = " " if piece.isspace() else piece
+                if char == " ":
+                    if last_was_space:
+                        continue
+                    last_was_space = True
+                else:
+                    last_was_space = False
+
+                normalized_chars.append(char)
+                index_map.append(glyph_index)
+
+        if not normalized_chars:
+            return "", []
+
+        start_trim = 0
+        end_trim = len(normalized_chars)
+        while start_trim < end_trim and normalized_chars[start_trim] == " ":
+            start_trim += 1
+        while end_trim > start_trim and normalized_chars[end_trim - 1] == " ":
+            end_trim -= 1
+
+        if start_trim or end_trim != len(normalized_chars):
+            normalized_chars = normalized_chars[start_trim:end_trim]
+            index_map = index_map[start_trim:end_trim]
+
+        return "".join(normalized_chars), index_map
+
     def _assemble_question_payload(
         self,
         q_label: str,
@@ -395,6 +491,34 @@ class BaseRenderer:
                     f"Question {q_label} missing stem bounding box for deterministic matching"
                 )
 
+        stem_span_ids: List[str] = []
+
+        def collect_span_ids(source: Optional[Dict[str, object]]) -> None:
+            nonlocal stem_span_ids
+            if not isinstance(source, dict):
+                return
+            if stem_span_ids:
+                return
+            candidates = source.get("stem_spans") or source.get("span_ids") or source.get("spans")
+            if isinstance(candidates, list):
+                stem_span_ids = [str(entry) for entry in candidates if entry]
+            elif isinstance(candidates, str):
+                stem_span_ids = [candidates]
+
+        collect_span_ids(structured_entry)
+        collect_span_ids(structured_entry.get("stem"))  # type: ignore[arg-type]
+        collect_span_ids(structured_entry.get("positioning"))  # type: ignore[arg-type]
+        collect_span_ids(index_entry)
+        collect_span_ids(index_entry.get("stem"))  # type: ignore[arg-type]
+        if model and model.stem_position:
+            collect_span_ids(model.stem_position)
+            stem_bbox = model.stem_position.get("bbox")
+            try:
+                if stem_bbox and len(stem_bbox) == 4:
+                    bbox = tuple(float(v) for v in stem_bbox)
+            except (TypeError, ValueError):
+                pass
+
         payload: Dict[str, object] = {
             "q_number": q_label,
             "stem_text": stem_text,
@@ -404,6 +528,9 @@ class BaseRenderer:
             "options": options,
             "substring_mappings": substring_mappings,
         }
+
+        if stem_span_ids:
+            payload["stem_spans"] = stem_span_ids
 
         return payload
 
@@ -528,6 +655,11 @@ class BaseRenderer:
         stem_text = self.strip_zero_width(str(stem_text_raw))
         page = payload.get("page")
         bbox = payload.get("stem_bbox")
+        stem_span_ids = [
+            str(span_id)
+            for span_id in (payload.get("stem_spans") or [])
+            if span_id
+        ]
         q_label = str(payload.get("q_number") or "")
 
         substring_mappings = payload.get("substring_mappings") or []
@@ -622,8 +754,30 @@ class BaseRenderer:
                 "selection_quads": selection_quads,
             }
 
+            mapping_span_ids_raw = (
+                mapping.get("selection_span_ids")
+                or mapping.get("span_ids")
+                or mapping.get("spans")
+            )
+            if isinstance(mapping_span_ids_raw, (list, tuple)):
+                span_id_list = [str(span_id) for span_id in mapping_span_ids_raw if span_id]
+            elif isinstance(mapping_span_ids_raw, str):
+                span_id_list = [mapping_span_ids_raw]
+            else:
+                span_id_list = []
+
+            if span_id_list:
+                context["span_ids"] = span_id_list
+                context["selection_span_ids"] = span_id_list
+
+            if stem_span_ids:
+                context["stem_span_ids"] = list(stem_span_ids)
+                context.setdefault("span_ids", list(stem_span_ids))
+
             if selection_bbox:
                 context["bbox"] = tuple(selection_bbox)
+            elif bbox:
+                context["bbox"] = tuple(bbox)
 
             contexts.append(context)
 
@@ -635,11 +789,10 @@ class BaseRenderer:
         expected_prefix: str,
         expected_suffix: str,
     ) -> bool:
-        actual_prefix = self.strip_zero_width(str(occurrence.get("prefix") or ""))
-        actual_suffix = self.strip_zero_width(str(occurrence.get("suffix") or ""))
-
-        expected_prefix_clean = self.strip_zero_width(expected_prefix)
-        expected_suffix_clean = self.strip_zero_width(expected_suffix)
+        actual_prefix = self._normalize_for_compare(str(occurrence.get("prefix") or ""))
+        actual_suffix = self._normalize_for_compare(str(occurrence.get("suffix") or ""))
+        expected_prefix_clean = self._normalize_for_compare(expected_prefix)
+        expected_suffix_clean = self._normalize_for_compare(expected_suffix)
 
         prefix_ok = True
         if expected_prefix_clean:
@@ -664,6 +817,217 @@ class BaseRenderer:
         ]
         raw = "|".join(parts)
         return hashlib.sha1(raw.encode("utf-8", errors="ignore")).hexdigest()
+
+    def _collect_span_text(
+        self,
+        span_map: Dict[str, Dict[str, object]],
+        span_ids: Iterable[str],
+    ) -> str:
+        parts: List[str] = []
+        for span_id in span_ids:
+            record = span_map.get(span_id)
+            if not record:
+                continue
+            text = record.get("text") or ""
+            normalized = self._normalize_for_span_match(text)
+            if normalized:
+                parts.append(normalized)
+        return " ".join(parts)
+
+    def _compact_text(self, value: str) -> str:
+        return re.sub(r"[^0-9a-z]+", "", value)
+
+    def _substring_in_text(self, substring: str, text: str) -> bool:
+        if not substring or not text:
+            return False
+        normalized_sub = self._normalize_for_compare(substring)
+        normalized_text = self._normalize_for_compare(text)
+        if normalized_sub in normalized_text:
+            return True
+        compact_sub = self._compact_text(normalized_sub)
+        compact_text = self._compact_text(normalized_text)
+        return compact_sub in compact_text
+
+    def _build_span_index(
+        self,
+        span_records: List[Dict[str, object]],
+    ) -> Tuple[str, List[Tuple[str, int, int]]]:
+        composite_parts: List[str] = []
+        span_ranges: List[Tuple[str, int, int]] = []
+        cursor = 0
+
+        for record in span_records:
+            span_id = str(record.get("id"))
+            raw_text = record.get("text") or ""
+            normalized = self._normalize_for_span_match(raw_text)
+            if not normalized:
+                continue
+            if composite_parts and not composite_parts[-1].endswith(" "):
+                composite_parts.append(" ")
+                cursor += 1
+            start = cursor
+            composite_parts.append(normalized)
+            cursor += len(normalized)
+            end = cursor
+            span_ranges.append((span_id, start, end))
+
+        composite = "".join(composite_parts)
+        return composite, span_ranges
+
+    def _find_occurrence_positions(self, text: str, substring: str) -> List[Tuple[int, int]]:
+        positions: List[Tuple[int, int]] = []
+        lower_text = text.lower()
+        lower_sub = substring.lower()
+        start = 0
+        sub_len = len(lower_sub)
+        occurrence = 0
+        while True:
+            idx = lower_text.find(lower_sub, start)
+            if idx == -1:
+                break
+            positions.append((occurrence, idx))
+            occurrence += 1
+            start = idx + sub_len
+        return positions
+
+    def _union_rect_for_span_ids(
+        self,
+        span_map: Dict[str, Dict[str, object]],
+        span_ids: Iterable[str],
+    ) -> Optional[fitz.Rect]:
+        rect: Optional[fitz.Rect] = None
+        for span_id in span_ids:
+            record = span_map.get(span_id)
+            if not record:
+                continue
+            bbox = record.get("bbox")
+            if not isinstance(bbox, (list, tuple)) or len(bbox) != 4:
+                continue
+            try:
+                span_rect = fitz.Rect(*bbox)
+            except Exception:
+                continue
+            rect = span_rect if rect is None else rect | span_rect
+        return rect
+
+    def _match_single_span_by_similarity(
+        self,
+        span_records: List[Dict[str, object]],
+        span_map: Dict[str, Dict[str, object]],
+        substring: str,
+    ) -> Optional[Tuple[List[str], Optional[fitz.Rect]]]:
+        target = self._normalize_for_compare(substring)
+        if not target:
+            return None
+        target_compact = self._compact_text(target)
+        best_candidate: Optional[Tuple[List[str], Optional[fitz.Rect]]] = None
+        best_score = 0.0
+
+        for record in span_records:
+            span_id = str(record.get("id"))
+            raw_text = record.get("text") or ""
+            normalized = self._normalize_for_compare(raw_text)
+            if not normalized:
+                continue
+            normalized_compact = self._compact_text(normalized)
+            if target_compact and target_compact in normalized_compact:
+                rect = self._union_rect_for_span_ids(span_map, [span_id])
+                return [span_id], rect
+            score = difflib.SequenceMatcher(None, normalized_compact, target_compact).ratio()
+            if score > best_score:
+                best_score = score
+                rect = self._union_rect_for_span_ids(span_map, [span_id])
+                best_candidate = ([span_id], rect)
+
+        if best_candidate and best_score >= 0.6:
+            return best_candidate
+        return None
+
+    def _fallback_span_ids_by_text(
+        self,
+        span_records: List[Dict[str, object]],
+        span_map: Dict[str, Dict[str, object]],
+        substring: str,
+        expected_prefix: Optional[str],
+        expected_suffix: Optional[str],
+        occurrence_hint: Optional[int],
+    ) -> Optional[Tuple[List[str], Optional[fitz.Rect]]]:
+        composite, span_ranges = self._build_span_index(span_records)
+        target = self._normalize_for_compare(substring)
+        if not target:
+            return None
+
+        occurrence_positions = self._find_occurrence_positions(composite, target)
+        if not occurrence_positions:
+            loose_match = self._match_single_span_by_similarity(span_records, span_map, substring)
+            if loose_match:
+                return loose_match
+            return None
+
+        expected_prefix_norm = self._normalize_for_compare(expected_prefix)
+        expected_suffix_norm = self._normalize_for_compare(expected_suffix)
+        target_len = len(target)
+
+        chosen_start: Optional[int] = None
+        chosen_order: Optional[int] = None
+
+        if occurrence_hint is not None:
+            for order, idx in occurrence_positions:
+                if order == occurrence_hint:
+                    chosen_order = order
+                    chosen_start = idx
+                    break
+
+        if chosen_start is None:
+            best_score = float("-inf")
+            for order, idx in occurrence_positions:
+                score = 0
+                if expected_prefix_norm:
+                    prefix_segment = composite[max(0, idx - len(expected_prefix_norm)) : idx]
+                    if prefix_segment.endswith(expected_prefix_norm):
+                        score += 2
+                if expected_suffix_norm:
+                    suffix_segment = composite[
+                        idx + target_len : idx + target_len + len(expected_suffix_norm)
+                    ]
+                    if suffix_segment.startswith(expected_suffix_norm):
+                        score += 2
+                if occurrence_hint is not None:
+                    score -= abs(order - occurrence_hint)
+                if score > best_score:
+                    best_score = score
+                    chosen_order = order
+                    chosen_start = idx
+
+        if chosen_start is None:
+            chosen_order, chosen_start = occurrence_positions[0]
+
+        substring_start = chosen_start
+        substring_end = substring_start + target_len
+
+        selected_ids: List[str] = []
+        union_rect: Optional[fitz.Rect] = None
+
+        for span_id, span_start, span_end in span_ranges:
+            if span_end <= substring_start or span_start >= substring_end:
+                continue
+            selected_ids.append(span_id)
+            record = span_map.get(span_id)
+            if not record:
+                continue
+            bbox = record.get("bbox")
+            if not isinstance(bbox, (list, tuple)) or len(bbox) != 4:
+                continue
+            try:
+                span_rect = fitz.Rect(*bbox)
+            except Exception:
+                continue
+            union_rect = span_rect if union_rect is None else union_rect | span_rect
+
+        if not selected_ids:
+            return None
+
+        return list(dict.fromkeys(selected_ids)), union_rect
 
     def _safe_page_index(self, page_value: object) -> Optional[int]:
         if page_value is None:
@@ -854,6 +1218,7 @@ class BaseRenderer:
                         "page": page.number,
                         "q_number": ctx.get("q_number"),
                         "original": ctx.get("original"),
+                        "span_ids": ctx.get("stem_span_ids") or ctx.get("span_ids"),
                     },
                 )
                 continue
@@ -1055,71 +1420,141 @@ class BaseRenderer:
             return
 
         for ctx in geometry_contexts:
-            glyph_path = ctx.get("matched_glyph_path") or {}
-            block_idx = glyph_path.get("block")
-            line_idx = glyph_path.get("line")
-            span_idx = glyph_path.get("span")
-            char_start = glyph_path.get("char_start")
-            char_end = glyph_path.get("char_end")
+            glyph_paths_raw = ctx.get("matched_glyph_paths")
+            glyph_paths: List[Dict[str, object]] = []
+            if isinstance(glyph_paths_raw, list):
+                glyph_paths.extend(path for path in glyph_paths_raw if isinstance(path, dict))
+            single_path = ctx.get("matched_glyph_path")
+            if isinstance(single_path, dict) and single_path not in glyph_paths:
+                glyph_paths.append(single_path)
 
-            if None in (block_idx, line_idx, span_idx, char_start, char_end):
+            if not glyph_paths:
                 continue
 
-            span_key = (int(block_idx), int(line_idx), int(span_idx))
-            span_data = span_positions.get(span_key)
-            if not span_data:
+            aggregated_start: Optional[int] = None
+            aggregated_end: Optional[int] = None
+            chosen_origin: Optional[float] = None
+            font_hint: Optional[str] = None
+            fontsize_hint: Optional[float] = None
+
+            for glyph_path in glyph_paths:
+                block_idx = glyph_path.get("block")
+                line_idx = glyph_path.get("line")
+                span_idx = glyph_path.get("span")
+                char_start = glyph_path.get("char_start")
+                char_end = glyph_path.get("char_end")
+
+                if None in (block_idx, line_idx, span_idx, char_start, char_end):
+                    continue
+
+                span_key = (int(block_idx), int(line_idx), int(span_idx))
+                span_data = span_positions.get(span_key)
+                if not span_data:
+                    continue
+
+                positions: List[int] = span_data.get("positions") or []
+                origins: List[float] = span_data.get("origins") or []
+                if len(positions) < 2:
+                    continue
+
+                char_count = len(positions) - 1
+                if char_count <= 0:
+                    continue
+
+                char_start = max(0, min(int(char_start), char_count - 1))
+                char_end = max(0, min(int(char_end), char_count))
+                if char_end <= char_start:
+                    continue
+
+                raw_start = positions[char_start]
+                raw_end = positions[char_end]
+                path_origin = None
+                if origins and char_start < len(origins):
+                    path_origin = origins[char_start]
+
+                mapped_start = None
+                for raw_idx in range(raw_start, raw_end):
+                    if raw_idx in alignment:
+                        mapped_start = alignment[raw_idx]
+                        break
+
+                if mapped_start is None:
+                    continue
+
+                mapped_end = None
+                for raw_idx in range(raw_end - 1, raw_start - 1, -1):
+                    if raw_idx in alignment:
+                        mapped_end = alignment[raw_idx] + 1
+                        break
+
+                if mapped_end is None or mapped_end <= mapped_start:
+                    continue
+
+                aggregated_start = mapped_start if aggregated_start is None else min(aggregated_start, mapped_start)
+                aggregated_end = mapped_end if aggregated_end is None else max(aggregated_end, mapped_end)
+                if chosen_origin is None and path_origin is not None:
+                    chosen_origin = float(path_origin)
+                if font_hint is None and span_data.get("font"):
+                    font_hint = span_data.get("font")
+                if fontsize_hint is None and span_data.get("fontsize"):
+                    try:
+                        fontsize_hint = float(span_data.get("fontsize"))
+                    except (TypeError, ValueError):
+                        fontsize_hint = None
+
+            if aggregated_start is None or aggregated_end is None or aggregated_end <= aggregated_start:
                 continue
 
-            positions: List[int] = span_data.get("positions") or []
-            origins: List[float] = span_data.get("origins") or []
-            if len(positions) < 2:
+            expected_raw = str(ctx.get("matched_text") or ctx.get("original") or "")
+            expected_clean = self.strip_zero_width(expected_raw)
+
+            def matches_range(start_idx: int, end_idx: int) -> bool:
+                if start_idx < 0 or end_idx > len(combined_text) or end_idx <= start_idx:
+                    return False
+                candidate = combined_text[start_idx:end_idx]
+                candidate_clean = self.strip_zero_width(candidate)
+                if candidate_clean == expected_clean:
+                    return True
+                return self._compact_text(candidate_clean.casefold()) == self._compact_text(expected_clean.casefold())
+
+            if expected_clean:
+                if not matches_range(aggregated_start, aggregated_end):
+                    if len(expected_raw):
+                        aggregated_end = min(len(combined_text), aggregated_start + len(expected_raw))
+
+                    if not matches_range(aggregated_start, aggregated_end):
+                        for shift in range(1, 8):
+                            start_candidate = aggregated_start - shift
+                            end_candidate = start_candidate + len(expected_raw)
+                            if end_candidate > len(combined_text):
+                                continue
+                            if matches_range(start_candidate, end_candidate):
+                                aggregated_start = start_candidate
+                                aggregated_end = end_candidate
+                                break
+
+                    if not matches_range(aggregated_start, aggregated_end):
+                        window_start = max(0, aggregated_start - 50)
+                        window_end = min(len(combined_text), aggregated_end + 50)
+                        found_idx = combined_text.find(expected_raw, window_start, window_end)
+                        if found_idx != -1:
+                            aggregated_start = found_idx
+                            aggregated_end = min(len(combined_text), found_idx + len(expected_raw))
+
+                if not matches_range(aggregated_start, aggregated_end):
+                    continue
+
+            if not self._context_matches_surroundings(combined_text, aggregated_start, aggregated_end, ctx):
                 continue
 
-            char_count = len(positions) - 1
-            if char_count <= 0:
-                continue
-
-            # Clamp indices to valid range
-            char_start = max(0, min(int(char_start), char_count - 1))
-            char_end = max(0, min(int(char_end), char_count))
-            if char_end <= char_start:
-                continue
-
-            raw_start = positions[char_start]
-            raw_end = positions[char_end]
-            stream_origin = None
-            if origins and char_start < len(origins):
-                stream_origin = origins[char_start]
-
-            mapped_start = None
-            for raw_idx in range(raw_start, raw_end):
-                if raw_idx in alignment:
-                    mapped_start = alignment[raw_idx]
-                    break
-
-            if mapped_start is None:
-                continue
-
-            mapped_end = None
-            for raw_idx in range(raw_end - 1, raw_start - 1, -1):
-                if raw_idx in alignment:
-                    mapped_end = alignment[raw_idx] + 1
-                    break
-
-            if mapped_end is None or mapped_end <= mapped_start:
-                continue
-
-            ctx["stream_range"] = (mapped_start, mapped_end)
-            ctx["stream_text"] = combined_text[mapped_start:mapped_end]
-            if stream_origin is not None:
-                ctx["stream_start_origin"] = float(stream_origin)
-            if span_data.get("font"):
-                ctx.setdefault("matched_font", span_data.get("font"))
-            if span_data.get("fontsize"):
-                try:
-                    ctx.setdefault("matched_fontsize", float(span_data.get("fontsize")))
-                except (TypeError, ValueError):
-                    pass
+            ctx["stream_range"] = (aggregated_start, aggregated_end)
+            ctx["stream_text"] = combined_text[aggregated_start:aggregated_end]
+            if chosen_origin is not None:
+                ctx["stream_start_origin"] = float(chosen_origin)
+            if font_hint:
+                ctx.setdefault("matched_font", font_hint)
+            if fontsize_hint is not None:
+                ctx.setdefault("matched_fontsize", fontsize_hint)
 
     def _plan_replacements(
         self,
@@ -1156,12 +1591,27 @@ class BaseRenderer:
             span: Optional[Tuple[int, int]] = None
             stream_range = ctx.get("stream_range")
             if stream_range and len(stream_range) == 2:
-                start_candidate = max(0, int(stream_range[0]))
-                end_candidate = max(start_candidate, int(stream_range[1]))
+                try:
+                    start_candidate = max(0, int(stream_range[0]))
+                    end_candidate = max(start_candidate, int(stream_range[1]))
+                except (TypeError, ValueError):
+                    start_candidate = 0
+                    end_candidate = 0
                 end_candidate = min(end_candidate, len(combined_text))
                 if end_candidate > start_candidate and not range_conflicts((start_candidate, end_candidate)):
-                    span = (start_candidate, end_candidate)
-                    ctx["matched_text"] = ctx.get("stream_text") or combined_text[start_candidate:end_candidate]
+                    candidate_text = combined_text[start_candidate:end_candidate]
+                    candidate_clean = self.strip_zero_width(candidate_text)
+                    stream_text_clean = self.strip_zero_width(str(ctx.get("stream_text") or ""))
+                    original_clean = self.strip_zero_width(str(ctx.get("original") or ""))
+                    reference_clean = stream_text_clean or original_clean
+                    if reference_clean and candidate_clean != reference_clean:
+                        span = None
+                    elif self._context_matches_surroundings(combined_text, start_candidate, end_candidate, ctx):
+                        span = (start_candidate, end_candidate)
+                        if not ctx.get("stream_text"):
+                            ctx["stream_text"] = candidate_text
+                    else:
+                        span = None
 
             if span is None:
                 target_text = ctx.get("matched_text") or ctx.get("original")
@@ -1186,85 +1636,35 @@ class BaseRenderer:
                     continue
 
             start, end = span
-            used_ranges.append((start, end))
+            if end <= start:
+                continue
+
+            observed_text = combined_text[start:end]
+            observed_clean = self.strip_zero_width(observed_text)
+            expected_clean = self.strip_zero_width(str(ctx.get("matched_text") or ctx.get("original") or ""))
+            if expected_clean and observed_clean != expected_clean:
+                observed_compact = self._compact_text(observed_clean.casefold())
+                expected_compact = self._compact_text(expected_clean.casefold())
+                if not observed_compact or observed_compact != expected_compact:
+                    self.logger.warning(
+                        "stream rewrite span mismatch",
+                        extra={
+                            "run_id": run_id,
+                            "page": page_index,
+                            "q_number": ctx.get("q_number"),
+                            "original": ctx.get("original"),
+                            "observed": observed_text,
+                        },
+                    )
+                    continue
+
+            ctx["matched_text"] = observed_text
+
             if fingerprint_key:
                 used_fingerprints.add(fingerprint_key)
                 local_fingerprints.add(fingerprint_key)
 
-            if end > start:
-                ctx["matched_text"] = combined_text[start:end]
-
-            available_width = ctx.get("available_width")
-            if not available_width and ctx.get("matched_rect"):
-                try:
-                    available_width = fitz.Rect(*ctx.get("matched_rect")).width
-                except Exception:
-                    available_width = None
-
-            font_name = ctx.get("matched_font")
-            try:
-                font_size = float(ctx.get("matched_fontsize") or 0.0)
-            except (TypeError, ValueError):
-                font_size = 0.0
-
-            original_text = ctx.get("matched_text") or combined_text[start:end]
-            original_width = ctx.get("matched_rect_width")
-            if font_name and font_size > 0 and original_text:
-                try:
-                    original_width = doc_page.get_text_length(original_text, fontname=font_name, fontsize=font_size)
-                except Exception:
-                    pass
-
-            if available_width is None and original_width is not None:
-                available_width = float(original_width)
-
-            replacement_text_str = str(replacement_text)
-            replacement_width = 0.0
-            glyph_widths: List[float] = []
-            if font_name and font_size > 0 and replacement_text_str:
-                for ch in replacement_text_str:
-                    try:
-                        glyph_width = doc_page.get_text_length(ch, fontname=font_name, fontsize=font_size)
-                    except Exception:
-                        glyph_width = 0.0
-                    glyph_widths.append(glyph_width)
-                replacement_width = sum(glyph_widths)
-            else:
-                replacement_width = float(len(replacement_text_str))
-
-            ctx["matched_width"] = float(original_width or 0.0)
-            ctx["replacement_width"] = float(replacement_width)
-
-            matched_origin = ctx.get("matched_origin_x")
-            stream_origin = ctx.get("stream_start_origin")
-            leading_adjust_ts = 0.0
-            if font_size > 0 and matched_origin is not None and stream_origin is not None:
-                try:
-                    delta_left = float(matched_origin) - float(stream_origin)
-                    if abs(delta_left) > 1e-3:
-                        leading_adjust_ts = -delta_left * 1000.0 / font_size
-                except Exception:
-                    leading_adjust_ts = 0.0
-
-            target_width = float(original_width or replacement_width)
-            delta_width_pt = float(replacement_width) - float(target_width)
-
-            gap_adjust_ts: List[float] = []
-            trailing_adjust_ts = 0.0
-            char_count = len(replacement_text_str)
-            delta_ts_total = 0.0
-            if font_size > 0:
-                delta_ts_total = (float(replacement_width) - float(target_width)) * 1000.0 / font_size
-                trailing_adjust_ts = delta_ts_total
-
-            ctx["leading_adjust_ts"] = leading_adjust_ts
-            ctx["gap_adjust_ts"] = gap_adjust_ts
-            ctx["trailing_adjust_ts"] = trailing_adjust_ts
-
-            stream_value = float(stream_origin) if stream_origin is not None else float(matched_origin or 0.0)
-            matched_value = float(matched_origin) if matched_origin is not None else stream_value
-            ctx["rewrite_left_overflow"] = max(0.0, matched_value - stream_value)
-            ctx["rewrite_right_overflow"] = max(0.0, float(replacement_width) - float(target_width))
+            used_ranges.append((start, end))
 
             replacements.append(
                 {
@@ -1274,37 +1674,55 @@ class BaseRenderer:
                     "context": ctx,
                     "fingerprint_key": fingerprint_key,
                     "applied": False,
-                    "scale": 1.0,
-                    "kerning_plan": {
-                        "leading_adjust_ts": leading_adjust_ts,
-                        "gap_adjust_ts": gap_adjust_ts,
-                        "trailing_adjust_ts": trailing_adjust_ts,
-                    },
-                    "replacement_width": replacement_width,
                 }
             )
 
-            if font_name and font_size > 0:
-                try:
-                    self.logger.debug(
-                        "kerning plan for replacement",
-                        extra={
-                            "run_id": run_id,
-                            "page": page_index,
-                            "q_number": ctx.get("q_number"),
-                            "original": ctx.get("original"),
-                            "replacement": replacement_text_str,
-                            "original_width": float(target_width),
-                            "replacement_width": float(replacement_width),
-                            "leading_ts": leading_adjust_ts,
-                            "trailing_ts": trailing_adjust_ts,
-                            "gap_count": len(gap_adjust_ts),
-                        },
-                    )
-                except Exception:
-                    pass
-
         return replacements
+
+    def _context_matches_surroundings(
+        self,
+        combined_text: str,
+        start: int,
+        end: int,
+        context: Dict[str, object],
+    ) -> bool:
+        if start < 0 or end > len(combined_text) or end <= start:
+            return False
+
+        expected_prefix = self.strip_zero_width(str(context.get("prefix") or ""))
+        expected_suffix = self.strip_zero_width(str(context.get("suffix") or ""))
+
+        prefix_ok = True
+        if expected_prefix:
+            actual_prefix = self.strip_zero_width(
+                combined_text[max(0, start - len(expected_prefix)) : start]
+            )
+            actual_norm = self._normalize_for_compare(actual_prefix)
+            expected_norm = self._normalize_for_compare(expected_prefix)
+            if expected_norm:
+                actual_compact = self._compact_text(actual_norm)
+                expected_compact = self._compact_text(expected_norm)
+                if expected_compact:
+                    prefix_ok = actual_compact.endswith(expected_compact)
+
+        suffix_ok = True
+        if expected_suffix:
+            actual_suffix = self.strip_zero_width(
+                combined_text[end : end + len(expected_suffix)]
+            )
+            actual_norm = self._normalize_for_compare(actual_suffix)
+            expected_norm = self._normalize_for_compare(expected_suffix)
+            if expected_norm:
+                actual_compact = self._compact_text(actual_norm)
+                expected_compact = self._compact_text(expected_norm)
+                if expected_compact:
+                    suffix_ok = actual_compact.startswith(expected_compact)
+
+        if expected_prefix and not prefix_ok:
+            return False
+        if not expected_prefix and expected_suffix and not suffix_ok:
+            return False
+        return True
 
     def _find_match_position_in_combined_text(
         self,
@@ -1333,32 +1751,45 @@ class BaseRenderer:
                 search_start = idx + 1
                 continue
 
-            actual_prefix = self.strip_zero_width(
-                combined_text[max(0, idx - len(expected_prefix)) : idx]
-            )
-            actual_suffix = self.strip_zero_width(
-                combined_text[end : end + len(expected_suffix)]
-            )
-
-            prefix_ok = True
-            if expected_prefix:
-                compare_len = min(len(actual_prefix), len(expected_prefix))
-                prefix_ok = actual_prefix[-compare_len:] == expected_prefix[-compare_len:]
-
-            suffix_ok = True
-            if expected_suffix:
-                compare_len = min(len(actual_suffix), len(expected_suffix))
-                suffix_ok = actual_suffix[:compare_len] == expected_suffix[:compare_len]
-
-            if prefix_ok and suffix_ok:
-                if occurrence_expected is None or occurrence_counter == occurrence_expected:
-                    return idx, end
-                occurrence_counter += 1
-            else:
+            if not self._context_matches_surroundings(combined_text, idx, end, context):
                 search_start = idx + 1
                 continue
 
+            if occurrence_expected is None or occurrence_counter == occurrence_expected:
+                return idx, end
+            occurrence_counter += 1
             search_start = idx + 1
+
+        normalized_target = self.strip_zero_width(target_text)
+        compact_target = self._compact_text(normalized_target.casefold())
+        if compact_target:
+            combined_lower = combined_text.casefold()
+            compact_chars: List[str] = []
+            index_map: List[int] = []
+            for idx, ch in enumerate(combined_lower):
+                if ch.isalnum():
+                    compact_chars.append(ch)
+                    index_map.append(idx)
+            compact_source = "".join(compact_chars)
+            search_pos = 0
+            while True:
+                idx_compact = compact_source.find(compact_target, search_pos)
+                if idx_compact == -1:
+                    break
+                if idx_compact + len(compact_target) - 1 >= len(index_map):
+                    break
+                start_orig = index_map[idx_compact]
+                end_orig = index_map[idx_compact + len(compact_target) - 1] + 1
+                if any(not (end_orig <= start or start_orig >= finish) for start, finish in used_ranges):
+                    search_pos = idx_compact + 1
+                    continue
+                if not self._context_matches_surroundings(combined_text, start_orig, end_orig, context):
+                    search_pos = idx_compact + 1
+                    continue
+                if occurrence_expected is None or occurrence_counter == occurrence_expected:
+                    return start_orig, end_orig
+                occurrence_counter += 1
+                search_pos = idx_compact + 1
 
         return None
 
@@ -1371,15 +1802,13 @@ class BaseRenderer:
         doc_page: fitz.Page,
     ) -> bool:
         segment_map = {id(seg): seg for seg in segments}
-        edits_by_segment: Dict[int, List[Dict[str, object]]] = defaultdict(list)
+        edits_by_segment: Dict[int, List[Tuple[int, int, str]]] = defaultdict(list)
         modified = False
 
         for replacement in replacements:
             start = int(replacement.get("start", 0))
             end = int(replacement.get("end", 0))
             insert_text = str(replacement.get("replacement") or "")
-            scale_value = float(replacement.get("scale", 1.0))
-            kerning_plan = replacement.get("kerning_plan") or {}
 
             covering_segments = [
                 seg for seg in segments if seg["start"] < end and seg["end"] > start
@@ -1396,14 +1825,10 @@ class BaseRenderer:
                 )
                 continue
 
-            plan_has_adjustments = False
-            if kerning_plan:
-                lead = abs(float(kerning_plan.get("leading_adjust_ts", 0.0)))
-                trail = abs(float(kerning_plan.get("trailing_adjust_ts", 0.0)))
-                plan_has_adjustments = (lead >= 1e-3) or (trail >= 1e-3)
+            replacement.setdefault("operator_index", covering_segments[0].get("index"))
 
             inserted = False
-            for idx, seg in enumerate(covering_segments):
+            for seg in covering_segments:
                 seg_start = seg["start"]
                 seg_end = seg["end"]
                 local_start = max(start, seg_start) - seg_start
@@ -1411,97 +1836,178 @@ class BaseRenderer:
                 if local_end < local_start:
                     continue
 
-                text_fragment = insert_text if not inserted else ""
-                plan = {}
-                if idx == 0 and kerning_plan:
-                    plan = {
-                        "leading_adjust_ts": kerning_plan.get("leading_adjust_ts", 0.0),
-                        "trailing_adjust_ts": kerning_plan.get("trailing_adjust_ts", 0.0),
-                    }
-                edits_by_segment[id(seg)].append(
-                    {
-                        "start": local_start,
-                        "end": local_end,
-                        "text": text_fragment,
-                        "kerning_plan": plan,
-                        "insert_len": len(text_fragment),
-                    }
-                )
-                if scale_value < seg.get("scale", 1.0):
-                    seg["scale"] = scale_value
+                text_to_insert = insert_text if not inserted else ""
+                edits_by_segment[id(seg)].append((local_start, local_end, text_to_insert))
                 inserted = True
 
-            if scale_value < 0.995 or plan_has_adjustments:
-                modified = True
-
-            replacement["applied"] = True
-
-            # Log each replacement for debugging
-            from app.services.developer.live_logging_service import live_logging_service
-            mapping_id = replacement.get("context", {}).get("mapping_id", "unknown")
-            original = replacement.get("context", {}).get("original", "")
-            repl_text = replacement.get("context", {}).get("replacement", "")
-            q_num = replacement.get("context", {}).get("question_number", "")
-            if run_id:
-                live_logging_service.emit(
-                    run_id,
-                    "pdf_creation",
-                    "INFO",
-                    f"✓ Replacement applied: Q{q_num} '{original}' → '{repl_text}' (mapping_id: {mapping_id})",
-                    component="stream_rewrite"
+            if not inserted:
+                self.logger.warning(
+                    "stream rewrite could not queue edit for segment",
+                    extra={
+                        "run_id": run_id,
+                        "page": page_index,
+                        "start": start,
+                        "end": end,
+                    },
                 )
+                continue
+
+            replacement["_queued_for_segment"] = True
 
         for seg_id, edits in edits_by_segment.items():
             segment = segment_map.get(seg_id)
             if not segment:
                 continue
-
-            original_text = segment.get("text", "") or ""
-            original_kerns = dict(segment.get("kern_map") or {})
-            text = original_text
-            kern_map = dict(original_kerns)
-
-            for edit in sorted(edits, key=lambda item: item.get("start", 0), reverse=True):
-                local_start = max(int(edit.get("start", 0)), 0)
-                local_end = max(local_start, int(edit.get("end", 0)))
-                insert_fragment = str(edit.get("text") or "")
-                removed_len = local_end - local_start
-                shift = len(insert_fragment) - removed_len
-
-                text = text[:local_start] + insert_fragment + text[local_end:]
-
-                if kern_map:
-                    updated_map: Dict[int, float] = {}
-                    for pos, value in kern_map.items():
-                        if local_start < pos < local_end:
-                            continue
-                        if pos >= local_end:
-                            new_pos = pos + shift
-                        else:
-                            new_pos = pos
-                        updated_map[new_pos] = float(updated_map.get(new_pos, 0.0) + value)
-                    kern_map = updated_map
-
-                plan = edit.get("kerning_plan") or {}
-                leading_ts = float(plan.get("leading_adjust_ts", 0.0))
-                trailing_ts = float(plan.get("trailing_adjust_ts", 0.0))
-                insert_len = int(edit.get("insert_len", len(insert_fragment)))
-
-                if abs(leading_ts) >= 1e-3:
-                    kern_map[local_start] = float(kern_map.get(local_start, 0.0) + leading_ts)
-
-                if abs(trailing_ts) >= 1e-3 and insert_len >= 0:
-                    insert_pos = local_start + insert_len
-                    kern_map[insert_pos] = float(kern_map.get(insert_pos, 0.0) + trailing_ts)
-
-            if text != original_text or kern_map != original_kerns:
-                segment["text"] = text
-                segment["kern_map"] = kern_map
-                segment["modified"] = True
-                segment["end"] = segment.get("start", 0) + len(text)
+            text = segment.get("text", "")
+            edits.sort(key=lambda item: item[0])
+            cursor = 0
+            new_text_parts: List[str] = []
+            for local_start, local_end, insert_text in edits:
+                new_text_parts.append(text[cursor:local_start])
+                new_text_parts.append(insert_text)
+                cursor = local_end
+            new_text_parts.append(text[cursor:])
+            new_text = "".join(new_text_parts)
+            if new_text != text:
+                segment["new_text"] = new_text
                 modified = True
 
         return modified
+
+    def _capture_span_plan_entries(
+        self,
+        span_plan_capture: Optional[Dict[int, List["SpanRewriteEntry"]]],
+        page_index: int,
+        replacements: List[Dict[str, object]],
+        doc_page: fitz.Page,
+    ) -> None:
+        if span_plan_capture is None:
+            return
+
+        try:
+            from .span_rewrite_plan import SpanMappingRef, SpanRewriteEntry
+        except Exception:
+            return
+
+        page_entries = span_plan_capture.setdefault(page_index, [])
+
+        for replacement in replacements:
+            if not replacement.get("applied"):
+                continue
+
+            ctx = replacement.get("context") or {}
+            if not isinstance(ctx, dict):
+                ctx = {}
+
+            original_text = str(ctx.get("matched_text") or ctx.get("original") or "")
+            replacement_text = str(replacement.get("replacement") or ctx.get("replacement") or "")
+
+            glyph_path = ctx.get("matched_glyph_path") or {}
+
+            def to_int(value, default: int = -1) -> int:
+                try:
+                    return int(value)
+                except (TypeError, ValueError):
+                    return default
+
+            block_index = to_int(glyph_path.get("block"))
+            line_index = to_int(glyph_path.get("line"))
+            span_index = to_int(glyph_path.get("span"))
+
+            bbox_source = (
+                ctx.get("matched_rect")
+                or ctx.get("selection_bbox")
+                or ctx.get("bbox")
+            )
+            bbox: Tuple[float, float, float, float]
+            if isinstance(bbox_source, (list, tuple)) and len(bbox_source) == 4:
+                try:
+                    bbox = tuple(float(v) for v in bbox_source)  # type: ignore[assignment]
+                except (TypeError, ValueError):
+                    bbox = (0.0, 0.0, 0.0, 0.0)
+            else:
+                bbox = (0.0, 0.0, 0.0, 0.0)
+
+            font_name = ctx.get("matched_font")
+            try:
+                font_size = float(ctx.get("matched_fontsize") or 0.0)
+            except (TypeError, ValueError):
+                font_size = 0.0
+
+            original_width = ctx.get("matched_rect_width")
+            try:
+                original_width = float(original_width) if original_width is not None else None
+            except (TypeError, ValueError):
+                original_width = None
+            if original_width is None:
+                original_width = self._measure_text_width(doc_page, original_text, font_name, font_size)
+
+            replacement_width = self._measure_text_width(doc_page, replacement_text, font_name, font_size)
+
+            scale_factor = 1.0
+            if original_width and replacement_width and replacement_width > original_width:
+                scale_factor = max(original_width / replacement_width, 0.01)
+
+            mapping_ref = SpanMappingRef(
+                q_number=str(ctx.get("q_number") or ""),
+                original=original_text,
+                replacement=replacement_text,
+                context_index=ctx.get("entry_index"),
+                start=int(replacement.get("start") or 0),
+                end=int(replacement.get("end") or 0),
+                operator_index=replacement.get("operator_index"),
+            )
+
+            slice_record = {
+                "normalized_start": 0,
+                "normalized_end": len(original_text),
+                "raw_start": 0,
+                "raw_end": len(original_text),
+                "replacement_text": replacement_text,
+            }
+
+            entry = SpanRewriteEntry(
+                page_index=page_index,
+                block_index=block_index,
+                line_index=line_index,
+                span_index=span_index,
+                operator_index=replacement.get("operator_index"),
+                original_text=original_text,
+                replacement_text=replacement_text,
+                font=font_name,
+                font_size=float(font_size or 0.0),
+                bbox=bbox,
+                matrix=(1.0, 0.0, 0.0, 1.0, float(bbox[0]), float(bbox[1])),
+                original_width=float(original_width or 0.0),
+                replacement_width=float(replacement_width or 0.0),
+                scale_factor=float(scale_factor),
+                mappings=[mapping_ref],
+                fragment_rewrites=[],
+                slice_replacements=[slice_record],
+                overlay_fallback=False,
+                requires_scaling=scale_factor < 0.999,
+                validation_failures=[],
+            )
+
+            page_entries.append(entry)
+
+    def _measure_text_width(
+        self,
+        doc_page: Optional[fitz.Page],
+        text: str,
+        font_name: Optional[str],
+        font_size: float,
+    ) -> float:
+        if not text:
+            return 0.0
+        if doc_page is not None and font_name and font_size > 0:
+            try:
+                return float(doc_page.get_text_length(text, fontname=font_name, fontsize=float(font_size)))
+            except Exception:
+                pass
+        if font_size > 0:
+            return float(len(text)) * float(font_size)
+        return float(len(text))
 
     def _rebuild_operations(
         self,
@@ -1683,6 +2189,7 @@ class BaseRenderer:
         mapping_context: Dict[str, List[Dict[str, object]]],
         run_id: Optional[str] = None,
         original_pdf_path: Optional[Path] = None,
+        span_plan_capture: Optional[Dict[int, List["SpanRewriteEntry"]]] = None,
     ) -> Tuple[bytes, Dict[str, int]]:
         reader = PdfReader(io.BytesIO(pdf_bytes))
         writer = PdfWriter()
@@ -1690,6 +2197,9 @@ class BaseRenderer:
 
         contexts_by_page = self._group_contexts_by_page(mapping_context)
         used_fingerprints: set[str] = set()
+
+        if span_plan_capture is not None:
+            span_plan_capture.clear()
 
         total_pages = len(reader.pages)
         tokens_scanned = 0
@@ -1753,7 +2263,6 @@ class BaseRenderer:
 
             if modified:
                 matches_found += len(replacements)
-                replacements_applied += sum(1 for item in replacements if item.get("applied"))
 
                 # Use new Courier font strategy instead of old reconstruction
                 self.logger.info(
@@ -1819,6 +2328,26 @@ class BaseRenderer:
                         extra={"run_id": run_id, "page": page_index, "error": str(exc)},
                     )
                     content.operations = self._rebuild_operations(content.operations, segments)
+                    for replacement in replacements:
+                        if replacement.get("_queued_for_segment"):
+                            replacement["applied"] = True
+
+                finally:
+                    if span_plan_capture is not None:
+                        try:
+                            self._capture_span_plan_entries(
+                                span_plan_capture,
+                                page_index,
+                                replacements,
+                                doc[page_index],
+                            )
+                        except Exception:
+                            self.logger.exception(
+                                "failed to record span plan entries",
+                                extra={"run_id": run_id, "page": page_index},
+                            )
+
+                    replacements_applied += sum(1 for item in replacements if item.get("applied"))
 
                 page[NameObject("/Contents")] = content
 
@@ -2039,6 +2568,401 @@ class BaseRenderer:
                 return True
         return False
 
+    def _format_span_id(
+        self,
+        page_idx: int,
+        block_idx: int,
+        line_idx: int,
+        span_idx: int,
+    ) -> str:
+        return f"page{page_idx}:block{block_idx}:line{line_idx}:span{span_idx}"
+
+    def _get_span_records_for_page(self, page: fitz.Page) -> Dict[str, object]:
+        page_idx = int(getattr(page, "number", 0))
+        cached = self._span_record_cache.get(page_idx)
+        if cached is not None:
+            return cached
+
+        records = collect_span_records(page, page_idx)
+        span_map: Dict[str, object] = {}
+        for record in records:
+            span_id = self._format_span_id(
+                page_idx,
+                record.block_index,
+                record.line_index,
+                record.span_index,
+            )
+            span_map[span_id] = record
+        self._span_record_cache[page_idx] = span_map
+        return span_map
+
+    def _order_span_ids(
+        self,
+        span_ids: Iterable[str],
+        span_records: Dict[str, object],
+    ) -> List[str]:
+        deduped: List[str] = []
+        seen: set[str] = set()
+        index_lookup: Dict[str, int] = {}
+        for idx, span_id in enumerate(span_ids):
+            sid = str(span_id)
+            if not sid or sid in seen:
+                continue
+            seen.add(sid)
+            deduped.append(sid)
+            index_lookup[sid] = idx
+
+        def safe_int(val: object) -> int:
+            try:
+                return int(val)
+            except (TypeError, ValueError):
+                return 10**6
+
+        def parse_components(value: str) -> Tuple[int, int, int]:
+            try:
+                parts = value.split(":")
+                block_raw = parts[1].replace("block", "") if len(parts) > 1 else ""
+                line_raw = parts[2].replace("line", "") if len(parts) > 2 else ""
+                span_raw = parts[3].replace("span", "") if len(parts) > 3 else ""
+                block_idx = safe_int(block_raw)
+                line_idx = safe_int(line_raw)
+                span_idx = safe_int(span_raw)
+                return block_idx, line_idx, span_idx
+            except Exception:
+                return (10**6, 10**6, 10**6)
+
+        def order_key(value: str) -> Tuple[int, int, int, int]:
+            record = span_records.get(value)
+            if record is not None:
+                return (
+                    safe_int(getattr(record, "block_index", 10**6)),
+                    safe_int(getattr(record, "line_index", 10**6)),
+                    safe_int(getattr(record, "span_index", 10**6)),
+                    index_lookup.get(value, 0),
+                )
+            block_idx, line_idx, span_idx = parse_components(value)
+            return (block_idx, line_idx, span_idx, index_lookup.get(value, 0))
+
+        return sorted(deduped, key=order_key)
+
+    def _normalized_to_raw_index(self, record: object, norm_index: int) -> int:
+        try:
+            mapping = getattr(record, "normalized_to_raw_indices", None)
+        except AttributeError:
+            mapping = None
+        if mapping is None:
+            return int(norm_index)
+        if isinstance(mapping, dict):
+            try:
+                return int(mapping.get(int(norm_index), norm_index))
+            except (TypeError, ValueError):
+                return int(norm_index)
+        cache = getattr(record, "_normalized_index_map", None)
+        if cache is None:
+            try:
+                cache = {int(norm): int(raw) for norm, raw in mapping}
+            except Exception:
+                cache = {}
+            setattr(record, "_normalized_index_map", cache)
+        try:
+            return int(cache.get(int(norm_index), norm_index))
+        except (TypeError, ValueError):
+            return int(norm_index)
+
+    def _rect_from_record_slice(
+        self,
+        record: object,
+        start_index: int,
+        end_index: int,
+    ) -> Optional[fitz.Rect]:
+        normalized_chars = getattr(record, "normalized_chars", [])
+        if not normalized_chars:
+            return None
+        clamped_start = max(0, min(int(start_index), len(normalized_chars)))
+        clamped_end = max(clamped_start, min(int(end_index), len(normalized_chars)))
+        if clamped_end <= clamped_start:
+            return None
+
+        rect: Optional[fitz.Rect] = None
+        for idx in range(clamped_start, clamped_end):
+            try:
+                _, bbox = normalized_chars[idx]
+            except (ValueError, TypeError):
+                continue
+            if not bbox:
+                continue
+            try:
+                char_rect = fitz.Rect(*bbox)
+            except Exception:
+                continue
+            if rect is None:
+                rect = char_rect
+            else:
+                rect |= char_rect
+
+        return rect
+
+    def _locate_using_span_ids(
+        self,
+        page: fitz.Page,
+        context: Dict[str, object],
+        span_ids: object,
+    ) -> Optional[Tuple[fitz.Rect, float, int]]:
+        if not span_ids:
+            return None
+
+        if isinstance(span_ids, (list, tuple)):
+            candidate_span_ids = [str(span_id) for span_id in span_ids if span_id]
+        elif isinstance(span_ids, str):
+            candidate_span_ids = [span_ids]
+        else:
+            return None
+
+        if not candidate_span_ids:
+            return None
+
+        original_text = str(context.get("original") or "")
+        target_normalized, _ = self._build_normalized_map(original_text)
+        if not target_normalized:
+            return None
+        target_lower = target_normalized.lower()
+
+        span_records = self._get_span_records_for_page(page)
+        ordered_span_ids = self._order_span_ids(candidate_span_ids, span_records)
+
+        if not ordered_span_ids:
+            return None
+
+        for span_id in ordered_span_ids:
+            record = span_records.get(span_id)
+            if not record:
+                continue
+
+            span_text_raw = getattr(record, "normalized_text", None)
+            if span_text_raw is None:
+                span_text_raw = getattr(record, "text", "")
+
+            candidate_normalized, glyph_map = self._build_normalized_map(str(span_text_raw or ""))
+            if not candidate_normalized or not glyph_map:
+                continue
+
+            candidate_lower = candidate_normalized.lower()
+            index = candidate_lower.find(target_lower)
+            if index == -1:
+                continue
+
+            end_norm_index = index + len(target_lower) - 1
+            if end_norm_index >= len(glyph_map):
+                end_norm_index = len(glyph_map) - 1
+            glyph_start_norm = glyph_map[index]
+            glyph_end_norm = glyph_map[end_norm_index] + 1
+
+            rect = self._rect_from_record_slice(record, glyph_start_norm, glyph_end_norm)
+            if rect is None:
+                continue
+
+            raw_start = self._normalized_to_raw_index(record, glyph_start_norm)
+            raw_end = self._normalized_to_raw_index(record, glyph_end_norm - 1) + 1
+
+            context["matched_rect"] = tuple(rect)
+            context["matched_rect_width"] = float(rect.width)
+            context["matched_font"] = getattr(record, "font", None)
+            try:
+                context["matched_fontsize"] = float(getattr(record, "font_size", 0.0) or 0.0)
+            except (TypeError, ValueError):
+                context["matched_fontsize"] = 0.0
+            stripped_span = self.strip_zero_width(str(span_text_raw or ""))
+            context["matched_span_len"] = glyph_end_norm - glyph_start_norm
+            context["matched_text"] = stripped_span[glyph_start_norm:glyph_end_norm] or (
+                original_text.strip() or target_normalized
+            )
+            context["matched_origin_x"] = float(rect.x0)
+            context["matched_origin_y"] = float(rect.y0)
+            context["matched_end_origin_x"] = float(rect.x1)
+            context["matched_end_origin_y"] = float(rect.y1)
+            glyph_path = {
+                "block": getattr(record, "block_index", None),
+                "line": getattr(record, "line_index", None),
+                "span": getattr(record, "span_index", None),
+                "char_start": raw_start,
+                "char_end": raw_end,
+                "norm_start": glyph_start_norm,
+                "norm_end": glyph_end_norm,
+                "span_id": span_id,
+            }
+            context["matched_glyph_path"] = glyph_path
+            context["matched_glyph_paths"] = [glyph_path]
+            context["matched_span_ids"] = [span_id]
+            context.setdefault("span_ids", [span_id])
+            context.setdefault("stem_span_ids", ordered_span_ids)
+
+            fontsize = float(context.get("matched_fontsize") or 0.0) or 10.0
+            return rect, fontsize, glyph_end_norm - glyph_start_norm
+
+        if len(ordered_span_ids) > 1:
+            combined_location = self._locate_across_span_sequence(
+                context,
+                ordered_span_ids,
+                span_records,
+                target_lower,
+                original_text,
+            )
+            if combined_location:
+                return combined_location
+
+        return None
+
+    def _locate_across_span_sequence(
+        self,
+        context: Dict[str, object],
+        span_ids: List[str],
+        span_records: Dict[str, object],
+        target_lower: str,
+        original_text: str,
+    ) -> Optional[Tuple[fitz.Rect, float, int]]:
+        combined_entries: List[Dict[str, object]] = []
+        compact_chars: List[str] = []
+        compact_map: List[int] = []
+
+        for span_id in span_ids:
+            record = span_records.get(span_id)
+            if not record:
+                continue
+            raw_text = getattr(record, "normalized_text", None)
+            if raw_text is None:
+                raw_text = getattr(record, "text", "")
+            normalized, glyph_map = self._build_normalized_map(str(raw_text or ""))
+            if not normalized or not glyph_map:
+                continue
+
+            for idx, char in enumerate(normalized):
+                glyph_index = glyph_map[idx]
+                entry = {
+                    "record": record,
+                    "char": char,
+                    "glyph_index": glyph_index,
+                    "span_id": span_id,
+                }
+                combined_entries.append(entry)
+                if char != " ":
+                    compact_map.append(len(combined_entries) - 1)
+                    compact_chars.append(char)
+
+        if not combined_entries:
+            return None
+
+        target_compact = target_lower.replace(" ", "")
+        compact_text = "".join(compact_chars)
+        compact_index = compact_text.find(target_compact)
+
+        if compact_index != -1 and target_compact:
+            start_entry = compact_map[compact_index]
+            end_entry = compact_map[compact_index + len(target_compact) - 1] + 1
+        else:
+            combined_text = "".join(entry["char"] for entry in combined_entries)
+            combined_lower = combined_text.lower()
+            index = combined_lower.find(target_lower)
+            if index == -1:
+                return None
+            start_entry = index
+            end_entry = index + len(target_lower)
+
+        # Extend range to include interior spaces between characters
+        while start_entry > 0 and combined_entries[start_entry]["char"] == " ":
+            start_entry -= 1
+        while end_entry < len(combined_entries) and combined_entries[end_entry - 1]["char"] == " ":
+            end_entry += 1
+
+        record_ranges: Dict[str, Dict[str, object]] = {}
+        matched_span_order: List[str] = []
+        matched_font = None
+        matched_fontsize = 0.0
+
+        for idx in range(start_entry, end_entry):
+            entry = combined_entries[idx]
+            record = entry["record"]
+            glyph_idx = int(entry["glyph_index"])
+            span_id = str(entry.get("span_id"))
+            raw_index = self._normalized_to_raw_index(record, glyph_idx)
+            if span_id not in record_ranges:
+                record_ranges[span_id] = {
+                    "record": record,
+                    "start_norm": glyph_idx,
+                    "end_norm": glyph_idx,
+                    "start_raw": raw_index,
+                    "end_raw": raw_index,
+                }
+                matched_span_order.append(span_id)
+            else:
+                span_data = record_ranges[span_id]
+                span_data["start_norm"] = min(int(span_data["start_norm"]), glyph_idx)
+                span_data["end_norm"] = max(int(span_data["end_norm"]), glyph_idx)
+                span_data["start_raw"] = min(int(span_data["start_raw"]), raw_index)
+                span_data["end_raw"] = max(int(span_data["end_raw"]), raw_index)
+
+            if matched_font is None:
+                matched_font = getattr(record, "font", None)
+            if not matched_fontsize:
+                try:
+                    matched_fontsize = float(getattr(record, "font_size", 0.0) or 0.0)
+                except (TypeError, ValueError):
+                    matched_fontsize = 0.0
+
+        if not record_ranges:
+            return None
+
+        union_rect: Optional[fitz.Rect] = None
+        matched_paths: List[Dict[str, object]] = []
+        total_span_len = 0
+
+        for span_id, span_data in record_ranges.items():
+            record = span_data["record"]
+            glyph_start_norm = int(span_data["start_norm"])
+            glyph_end_norm = int(span_data["end_norm"]) + 1
+            rect = self._rect_from_record_slice(record, glyph_start_norm, glyph_end_norm)
+            if rect is None:
+                continue
+            union_rect = rect if union_rect is None else union_rect | rect
+            raw_start = int(span_data.get("start_raw", glyph_start_norm))
+            raw_end = int(span_data.get("end_raw", glyph_end_norm - 1)) + 1
+            matched_paths.append(
+                {
+                    "block": getattr(record, "block_index", None),
+                    "line": getattr(record, "line_index", None),
+                    "span": getattr(record, "span_index", None),
+                    "char_start": raw_start,
+                    "char_end": raw_end,
+                    "norm_start": glyph_start_norm,
+                    "norm_end": glyph_end_norm,
+                    "span_id": span_id,
+                }
+            )
+            total_span_len += glyph_end_norm - glyph_start_norm
+
+        if union_rect is None:
+            return None
+
+        context["matched_rect"] = tuple(union_rect)
+        context["matched_rect_width"] = float(union_rect.width)
+        context["matched_font"] = matched_font
+        context["matched_fontsize"] = matched_fontsize or 10.0
+        context["matched_span_len"] = total_span_len
+        context["matched_text"] = self.strip_zero_width(original_text) or target_lower
+        context["matched_origin_x"] = float(union_rect.x0)
+        context["matched_origin_y"] = float(union_rect.y0)
+        context["matched_end_origin_x"] = float(union_rect.x1)
+        context["matched_end_origin_y"] = float(union_rect.y1)
+        if matched_paths:
+            context["matched_glyph_path"] = matched_paths[0]
+            context["matched_glyph_paths"] = matched_paths
+        if matched_span_order:
+            context["matched_span_ids"] = matched_span_order
+            context["span_ids"] = matched_span_order
+        context.setdefault("stem_span_ids", span_ids)
+
+        fontsize = float(context.get("matched_fontsize") or 0.0) or 10.0
+        return union_rect, fontsize, total_span_len
+
     def locate_text_span(
         self,
         page: fitz.Page,
@@ -2046,6 +2970,19 @@ class BaseRenderer:
         used_rects: Optional[List[fitz.Rect]] = None,
         used_fingerprints: Optional[set[str]] = None,
     ) -> Optional[Tuple[fitz.Rect, float, int]]:
+        span_ids = (
+            context.get("matched_span_ids")
+            or context.get("selection_span_ids")
+            or context.get("span_ids")
+            or context.get("stem_span_ids")
+        )
+        direct_span_location = self._locate_using_span_ids(page, context, span_ids)
+        if direct_span_location:
+            rect_candidate, _, _ = direct_span_location
+            if used_rects and self._rects_conflict(rect_candidate, used_rects):
+                return None
+            return direct_span_location
+
         original = str(context.get("original") or "").strip()
         if not original:
             return None
@@ -2121,10 +3058,6 @@ class BaseRenderer:
                 continue
 
             if not self._fingerprint_matches(occ, expected_prefix, expected_suffix):
-                occurrence_in_scope += 1
-                continue
-
-            if expected_occurrence is not None and occurrence_in_scope != expected_occurrence:
                 occurrence_in_scope += 1
                 continue
 
@@ -2334,6 +3267,380 @@ class BaseRenderer:
 
         return updated
 
+    def _coerce_text_operator_operands(
+        self,
+        operands: List[object],
+        operator: bytes,
+    ) -> Tuple[ArrayObject, bytes]:
+        if operator == b"TJ":
+            if operands and isinstance(operands[0], ArrayObject):
+                return ArrayObject(list(operands[0])), b"TJ"
+            return ArrayObject(), b"TJ"
+        if operator == b"Tj":
+            literal = operands[0] if operands else TextStringObject("")
+            return ArrayObject([literal]), b"Tj"
+        return ArrayObject(), operator
+
+    def _decode_text_operand(self, operand: object) -> str:
+        if isinstance(operand, TextStringObject):
+            return str(operand)
+        if isinstance(operand, ByteStringObject):
+            try:
+                return operand.decode("latin-1")
+            except Exception:
+                return operand.decode("latin-1", errors="ignore")
+        return ""
+
+    def _clone_text_operand(self, template: object, text: str) -> object:
+        if isinstance(template, ByteStringObject):
+            try:
+                data = text.encode("latin-1")
+            except UnicodeEncodeError:
+                data = text.encode("latin-1", "replace")
+            return ByteStringObject(data)
+        return TextStringObject(text)
+
+    def _build_tj_entries(self, array: ArrayObject) -> List[Dict[str, object]]:
+        entries: List[Dict[str, object]] = []
+        cursor = 0
+        for item in array:
+            if isinstance(item, (TextStringObject, ByteStringObject)):
+                text_value = self._decode_text_operand(item)
+                entry = {
+                    "kind": "text",
+                    "template": item,
+                    "text": text_value,
+                    "value": 0.0,
+                    "adds_space": False,
+                    "keep": True,
+                    "start": cursor,
+                    "end": cursor + len(text_value),
+                }
+                cursor += len(text_value)
+                entries.append(entry)
+            elif isinstance(item, NumberObject):
+                value = float(item)
+                adds_space = value <= self._SPACE_THRESHOLD
+                char_length = 1 if adds_space else 0
+                entry = {
+                    "kind": "kern",
+                    "template": item,
+                    "text": "",
+                    "value": value,
+                    "adds_space": adds_space,
+                    "keep": True,
+                    "start": cursor,
+                    "end": cursor + char_length,
+                }
+                cursor += char_length
+                entries.append(entry)
+            else:
+                entries.append(
+                    {
+                        "kind": "other",
+                        "template": item,
+                        "text": "",
+                        "value": None,
+                        "adds_space": False,
+                        "keep": True,
+                        "start": cursor,
+                        "end": cursor,
+                    }
+                )
+        return entries
+
+    def _recalculate_tj_entries(self, entries: List[Dict[str, object]]) -> int:
+        cursor = 0
+        for entry in entries:
+            if not entry.get("keep", True):
+                entry["start"] = cursor
+                entry["end"] = cursor
+                continue
+            if entry["kind"] == "text":
+                length = len(entry.get("text", ""))
+            elif entry["kind"] == "kern" and entry.get("adds_space"):
+                length = 1
+            else:
+                length = 0
+            entry["start"] = cursor
+            entry["end"] = cursor + length
+            cursor = entry["end"]
+        return cursor
+
+    def _build_tj_char_index(
+        self, entries: List[Dict[str, object]]
+    ) -> Tuple[List[Dict[str, int]], Dict[int, List[int]]]:
+        char_map: List[Dict[str, int]] = []
+        chars_by_entry: Dict[int, List[int]] = defaultdict(list)
+        for entry_index, entry in enumerate(entries):
+            if not entry.get("keep", True):
+                continue
+            if entry["kind"] == "text":
+                text_value = entry.get("text", "")
+                for offset in range(len(text_value)):
+                    position = len(char_map)
+                    char_map.append({"entry": entry_index, "kind": "text", "offset": offset})
+                    chars_by_entry[entry_index].append(position)
+            elif entry["kind"] == "kern" and entry.get("adds_space"):
+                position = len(char_map)
+                char_map.append({"entry": entry_index, "kind": "kern_space", "offset": 0})
+                chars_by_entry[entry_index].append(position)
+        return char_map, chars_by_entry
+
+    def _find_entry_index_between(
+        self,
+        char_map: List[Dict[str, int]],
+        start: int,
+        end: int,
+        forward: bool = True,
+    ) -> Optional[int]:
+        if not char_map:
+            return None
+        lower = max(0, min(start, len(char_map)))
+        upper = max(0, min(end, len(char_map)))
+        if forward:
+            indices = range(lower, upper)
+        else:
+            indices = range(upper - 1, lower - 1, -1)
+        for idx in indices:
+            token = char_map[idx]
+            if token["kind"] == "text":
+                return token["entry"]
+        return None
+
+    def _find_entry_index_before(
+        self,
+        entries: List[Dict[str, object]],
+        char_map: List[Dict[str, int]],
+        position: int,
+    ) -> Optional[int]:
+        if char_map:
+            idx = min(position, len(char_map)) - 1
+            while idx >= 0:
+                token = char_map[idx]
+                if token["kind"] == "text":
+                    return token["entry"]
+                idx -= 1
+        for entry_index in range(len(entries) - 1, -1, -1):
+            entry = entries[entry_index]
+            if entry.get("keep", True) and entry["kind"] == "text":
+                return entry_index
+        return None
+
+    def _find_entry_index_after(
+        self,
+        entries: List[Dict[str, object]],
+        char_map: List[Dict[str, int]],
+        position: int,
+    ) -> Optional[int]:
+        if char_map:
+            idx = max(0, min(position, len(char_map)))
+            while idx < len(char_map):
+                token = char_map[idx]
+                if token["kind"] == "text":
+                    return token["entry"]
+                idx += 1
+        for entry_index, entry in enumerate(entries):
+            if entry.get("keep", True) and entry["kind"] == "text":
+                return entry_index
+        return None
+
+    def _get_default_text_template(self, entries: List[Dict[str, object]]) -> object:
+        for entry in entries:
+            if entry["kind"] == "text":
+                return entry["template"]
+        return TextStringObject("")
+
+    def _make_text_entry(self, template: object, text: str) -> Dict[str, object]:
+        return {
+            "kind": "text",
+            "template": template,
+            "text": text,
+            "value": 0.0,
+            "adds_space": False,
+            "keep": True,
+            "start": 0,
+            "end": 0,
+        }
+
+    def _apply_tj_insertion(
+        self,
+        entries: List[Dict[str, object]],
+        position: int,
+        replacement_text: str,
+        char_map: List[Dict[str, int]],
+        chars_by_entry: Dict[int, List[int]],
+    ) -> None:
+        if not replacement_text:
+            return
+        entry_index = self._find_entry_index_between(char_map, position, position + 1)
+        if entry_index is None:
+            entry_index = self._find_entry_index_after(entries, char_map, position)
+        if entry_index is None:
+            entry_index = self._find_entry_index_before(entries, char_map, position)
+        if entry_index is None:
+            template = self._get_default_text_template(entries)
+            entries.append(self._make_text_entry(template, replacement_text))
+            self._recalculate_tj_entries(entries)
+            return
+
+        entry = entries[entry_index]
+        text_value = entry.get("text", "")
+        positions = chars_by_entry.get(entry_index, [])
+        if positions:
+            insert_offset = bisect_left(positions, min(position, len(char_map)))
+        else:
+            insert_offset = len(text_value) if position >= entry.get("end", 0) else 0
+        entry["text"] = text_value[:insert_offset] + replacement_text + text_value[insert_offset:]
+        entry["keep"] = True
+        self._recalculate_tj_entries(entries)
+
+    def _apply_tj_substitution(
+        self,
+        entries: List[Dict[str, object]],
+        local_start: int,
+        local_end: int,
+        replacement_text: str,
+    ) -> None:
+        start_boundary = max(local_start, 0)
+        end_boundary = max(local_end, start_boundary)
+
+        initial_length = self._recalculate_tj_entries(entries)
+        initial_positions = [entry.get("start", 0) for entry in entries]
+
+        total_length = initial_length
+        clip_start = min(max(local_start, 0), total_length)
+        clip_end = min(max(local_end, clip_start), total_length)
+
+        char_map, chars_by_entry = self._build_tj_char_index(entries)
+
+        if clip_start == clip_end:
+            if replacement_text:
+                self._apply_tj_insertion(entries, clip_start, replacement_text, char_map, chars_by_entry)
+            return
+
+        first_text_index = self._find_entry_index_between(char_map, clip_start, clip_end, forward=True)
+        if first_text_index is None:
+            first_text_index = self._find_entry_index_before(entries, char_map, clip_start)
+        if first_text_index is None:
+            first_text_index = self._find_entry_index_after(entries, char_map, clip_end)
+
+        if first_text_index is None:
+            template = self._get_default_text_template(entries)
+            entries.append(self._make_text_entry(template, replacement_text))
+            self._recalculate_tj_entries(entries)
+            return
+
+        last_text_index = self._find_entry_index_between(char_map, clip_start, clip_end, forward=False)
+        if last_text_index is None:
+            last_text_index = first_text_index
+        if last_text_index < first_text_index:
+            last_text_index = first_text_index
+
+        first_entry = entries[first_text_index]
+        first_positions = chars_by_entry.get(first_text_index, [])
+        prefix_chars = bisect_left(first_positions, clip_start) if first_positions else 0
+        prefix_text = first_entry.get("text", "")[:prefix_chars]
+
+        if first_text_index == last_text_index:
+            total_chars = len(first_positions)
+            suffix_chars = 0
+            if total_chars:
+                suffix_chars = total_chars - bisect_right(first_positions, clip_end - 1)
+            suffix_chars = max(0, min(suffix_chars, len(first_entry.get("text", ""))))
+            suffix_start = len(first_entry.get("text", "")) - suffix_chars
+            suffix_text = first_entry.get("text", "")[suffix_start:]
+            first_entry["text"] = prefix_text + replacement_text + suffix_text
+            first_entry["keep"] = True
+        else:
+            first_entry["text"] = prefix_text + replacement_text
+            first_entry["keep"] = True
+
+            last_entry = entries[last_text_index]
+            last_positions = chars_by_entry.get(last_text_index, [])
+            suffix_chars = 0
+            if last_positions:
+                suffix_chars = len(last_positions) - bisect_right(last_positions, clip_end - 1)
+            suffix_chars = max(0, min(suffix_chars, len(last_entry.get("text", ""))))
+            if suffix_chars:
+                last_entry["text"] = last_entry.get("text", "")[-suffix_chars:]
+                last_entry["keep"] = True
+            else:
+                last_entry["text"] = ""
+                last_entry["keep"] = False
+
+            for index in range(first_text_index + 1, last_text_index):
+                middle_entry = entries[index]
+                if middle_entry["kind"] == "text":
+                    middle_entry["text"] = ""
+                    middle_entry["keep"] = False
+
+        for entry in entries:
+            if entry["kind"] == "text" and not entry.get("text"):
+                entry["keep"] = False
+
+        for index, entry in enumerate(entries):
+            if entry["kind"] == "kern" and entry.get("keep", True):
+                position = initial_positions[index]
+                if start_boundary <= position < end_boundary:
+                    entry["keep"] = False
+
+        self._recalculate_tj_entries(entries)
+
+    def _apply_tj_edit(
+        self,
+        entries: List[Dict[str, object]],
+        local_start: int,
+        local_end: int,
+        replacement_text: str,
+    ) -> None:
+        replacement_text = str(replacement_text or "")
+        local_start = max(local_start, 0)
+        local_end = max(local_end, local_start)
+        if local_start == local_end:
+            total_length = self._recalculate_tj_entries(entries)
+            char_map, chars_by_entry = self._build_tj_char_index(entries)
+            self._apply_tj_insertion(entries, min(local_start, total_length), replacement_text, char_map, chars_by_entry)
+            return
+
+        self._apply_tj_substitution(entries, local_start, local_end, replacement_text)
+
+    def _entries_to_tj_array(self, entries: List[Dict[str, object]]) -> ArrayObject:
+        array = ArrayObject()
+        for entry in entries:
+            if not entry.get("keep", True):
+                continue
+            if entry["kind"] == "text":
+                literal = self._clone_text_operand(entry["template"], entry.get("text", ""))
+                array.append(literal)
+            elif entry["kind"] == "kern":
+                array.append(NumberObject(float(entry.get("value", 0.0))))
+            else:
+                array.append(entry["template"])
+        return array
+
+    def _entries_to_segment_state(
+        self, entries: List[Dict[str, object]]
+    ) -> Tuple[str, Dict[int, float]]:
+        text_parts: List[str] = []
+        cursor = 0
+        kern_map: Dict[int, float] = {}
+        for entry in entries:
+            if not entry.get("keep", True):
+                continue
+            if entry["kind"] == "text":
+                text_value = entry.get("text", "")
+                text_parts.append(text_value)
+                cursor += len(text_value)
+            elif entry["kind"] == "kern":
+                value = float(entry.get("value", 0.0))
+                if entry.get("adds_space"):
+                    text_parts.append(" ")
+                    cursor += 1
+                if abs(value) >= 1e-6:
+                    kern_map[cursor] = float(kern_map.get(cursor, 0.0) + value)
+        return "".join(text_parts), kern_map
+
     def _process_tj_replacements(
         self,
         operands: List[object],
@@ -2342,210 +3649,175 @@ class BaseRenderer:
         replacements: List[Dict[str, object]],
         run_id: Optional[str] = None,
     ) -> List[Tuple[List[object], bytes]]:
-        """
-        Process replacements within a TJ/Tj operator using PRECISION WIDTH MATCHING.
+        array_operands, operator_type = self._coerce_text_operator_operands(operands, operator)
+        entries = self._build_tj_entries(array_operands)
 
-        Key principle: Replace text while preserving exact text matrix positioning.
-        """
-        if operator == b"TJ":
-            tj_array = operands[0] if operands else ArrayObject()
-        else:  # Tj
-            tj_array = ArrayObject([operands[0]]) if operands else ArrayObject()
+        self._save_debug_stream(run_id, "before_reconstruction", array_operands, operator_type)
 
-        # Save original stream for debugging
-        self._save_debug_stream(run_id, "before_reconstruction", tj_array, operator)
+        if not replacements:
+            return [([array_operands], operator_type)]
 
-        # Extract replacement context with width information and font context
-        replacement_contexts = {}
-        for replacement in replacements:
-            context = replacement.get("context", {})
-            original_text = context.get("original", "")
-            replacement_text = str(replacement.get("replacement", ""))
+        segment_start = int(segment.get("start", 0))
+        replacements_sorted = sorted(replacements, key=lambda item: int(item.get("start", 0)))
 
-            if original_text:
-                # Include segment font context for proper font restoration
-                enhanced_context = context.copy()
-                enhanced_context['segment_font_context'] = segment.get('font_context', {})
-
-                replacement_contexts[original_text] = {
-                    'replacement': replacement_text,
-                    'original_width': context.get("matched_width", 0.0),
-                    'font_size': context.get("matched_fontsize", 12.0),
-                    'context': enhanced_context
-                }
-
-        if not replacement_contexts:
-            return [([tj_array], operator)]
-
-        # Find the first replacement to process
-        target_element_idx = None
-        target_original = None
-        target_info = None
-
-        for i, element in enumerate(tj_array):
-            if isinstance(element, (TextStringObject, ByteStringObject)):
-                element_text = str(element)
-                for original_text, info in replacement_contexts.items():
-                    if original_text in element_text:
-                        target_element_idx = i
-                        target_original = original_text
-                        target_info = info
-                        break
-                if target_element_idx is not None:
-                    break
-
-        if target_element_idx is None:
-            # No replacements found in this TJ array
-            return [([tj_array], operator)]
-
-        # Execute precision width matching replacement
-        split_operations = self._execute_precision_width_replacement(
-            tj_array, target_element_idx, target_original, target_info, segment, run_id
+        baseline_text = "".join(
+            entry.get("text", "")
+            for entry in entries
+            if entry.get("keep", True) and entry.get("kind") == "text"
         )
+        reserved_ranges: List[Tuple[int, int]] = []
 
-        # Save final stream for debugging
-        self._save_debug_stream(run_id, "after_reconstruction", split_operations)
+        for replacement in reversed(replacements_sorted):
+            start = int(replacement.get("start", 0)) - segment_start
+            end = int(replacement.get("end", 0)) - segment_start
+            replacement_text = str(replacement.get("replacement") or "")
+            ctx = replacement.get("context", {}) or {}
+            original_subtext = str(ctx.get("matched_text") or ctx.get("original") or "")
 
-        return split_operations
+            if end <= start:
+                start = max(start, 0)
+                end = max(end, start)
 
-    def _execute_precision_width_replacement(
-        self,
-        tj_array: ArrayObject,
-        element_idx: int,
-        original_text: str,
-        replacement_info: Dict[str, object],
-        segment: Dict[str, object],
-        run_id: Optional[str] = None,
-    ) -> List[Tuple[List[object], bytes]]:
-        """
-        Execute precision width matching replacement with TJ operator splitting.
-        """
-        replacement_text = replacement_info['replacement']
-        original_width = replacement_info['original_width']
-        original_font_size = replacement_info['font_size']
+            if end <= start and original_subtext:
+                candidate_len = len(original_subtext)
+                search_idx = max(0, min(len(baseline_text), start))
+                fallback_idx = baseline_text.find(original_subtext, search_idx)
+                if fallback_idx == -1:
+                    fallback_idx = baseline_text.find(original_subtext)
+                while fallback_idx != -1:
+                    candidate = (fallback_idx, fallback_idx + candidate_len)
+                    if not any(
+                        candidate[0] < taken_end and candidate[1] > taken_start
+                        for taken_start, taken_end in reserved_ranges
+                    ):
+                        start, end = candidate
+                        break
+                    fallback_idx = baseline_text.find(original_subtext, fallback_idx + 1)
 
-        if run_id:
-            self.logger.info(
-                f"Precision replacement: '{original_text}' -> '{replacement_text}' "
-                f"(width: {original_width}pt, font: {original_font_size}pt)",
-                extra={"run_id": run_id}
+            if end <= start:
+                if run_id:
+                    self.logger.warning(
+                        "unable to resolve replacement bounds for segment",
+                        extra={
+                            "run_id": run_id,
+                            "start_offset": start,
+                            "end_offset": end,
+                            "replacement": replacement_text,
+                            "original_subtext": original_subtext,
+                        },
+                    )
+                replacement["applied"] = False
+                continue
+
+            prev_text, _ = self._entries_to_segment_state(entries)
+            self._apply_tj_edit(entries, start, end, replacement_text)
+            updated_text, _ = self._entries_to_segment_state(entries)
+
+            if updated_text == prev_text:
+                replacement["applied"] = False
+                if run_id:
+                    self.logger.warning(
+                        "replacement left segment unchanged",
+                        extra={
+                            "run_id": run_id,
+                            "start_offset": start,
+                            "end_offset": end,
+                            "replacement": replacement_text,
+                            "original_subtext": original_subtext,
+                        },
+                    )
+                continue
+
+            replacement["applied"] = True
+            span_length = len(original_subtext) or len(replacement_text)
+            reserved_ranges.append((start, start + span_length))
+            baseline_text = updated_text
+
+        if not any(entry.get("keep", True) and entry["kind"] == "text" for entry in entries):
+            template = self._get_default_text_template(entries)
+            entries.append(self._make_text_entry(template, ""))
+            self._recalculate_tj_entries(entries)
+
+        new_array = self._entries_to_tj_array(entries)
+        text_value, kern_map = self._entries_to_segment_state(entries)
+
+        previous_text = segment.get("text", "") or ""
+        previous_kern = dict(segment.get("kern_map") or {})
+
+        segment["text"] = text_value
+        segment["kern_map"] = kern_map
+        segment["modified"] = bool(segment.get("modified")) or text_value != previous_text or kern_map != previous_kern
+        segment["end"] = int(segment.get("start", 0)) + len(text_value)
+
+        original_font = None
+        original_size = 12.0
+        font_ctx = segment.get("font_context") or {}
+        if isinstance(font_ctx, dict):
+            original_font = font_ctx.get("font")
+            try:
+                original_size = float(font_ctx.get("fontsize") or original_size)
+            except (TypeError, ValueError):
+                original_size = 12.0
+        if not original_font:
+            original_font = "/F1"
+
+        text_value = segment.get("text", "") or ""
+        operations: List[Tuple[List[object], bytes]] = []
+        cursor = 0
+
+        for replacement in replacements_sorted:
+            if not replacement.get("applied"):
+                continue
+
+            ctx = replacement.get("context", {}) or {}
+            replacement_text = str(replacement.get("replacement") or "")
+            original_subtext = str(ctx.get("matched_text") or ctx.get("original") or "")
+
+            search_start = max(cursor, 0)
+            insertion_index = text_value.find(replacement_text, search_start)
+            if insertion_index == -1:
+                insertion_index = text_value.find(replacement_text)
+            if insertion_index == -1:
+                insertion_index = search_start
+
+            if insertion_index > cursor:
+                before_text = text_value[cursor:insertion_index]
+                if before_text:
+                    before_array = ArrayObject([TextStringObject(before_text)])
+                    operations.append(([before_array], b"TJ"))
+
+            target_width = ctx.get("matched_rect_width") or ctx.get("available_width") or ctx.get("matched_width")
+            try:
+                target_width = float(target_width) if target_width is not None else None
+            except (TypeError, ValueError):
+                target_width = None
+            if not target_width:
+                reference_text = original_subtext or replacement_text
+                target_width = float(len(reference_text)) * (original_size or 12.0)
+
+            courier_font_size = self.calculate_courier_font_size(
+                replacement_text,
+                float(target_width),
+                original_subtext,
             )
 
-        # Step 1: Intelligent Courier font size selection
-        # Strategy: For shorter replacements, use original font size to maintain visual consistency
-        #           For longer replacements, scale down intelligently to fit
-        replacement_length = len(replacement_text)
-        original_length = len(original_text)
+            operations.append(([NameObject('/Courier'), NumberObject(courier_font_size)], b'Tf'))
+            replacement_array = ArrayObject([TextStringObject(replacement_text)])
+            operations.append(([replacement_array], b"TJ"))
+            operations.append(([NameObject(original_font), NumberObject(original_size)], b'Tf'))
 
-        if replacement_length <= original_length:
-            # Replacement is shorter or equal - use original font size for visual consistency
-            # Then adjust spacing to position suffix correctly
-            courier_font_size = original_font_size
-            if run_id:
-                self.logger.info(
-                    f"Using original font size {courier_font_size:.2f}pt for shorter/equal replacement",
-                    extra={"run_id": run_id}
-                )
-        else:
-            # Replacement is longer - use intelligent scaling
-            courier_font_size = self.calculate_courier_font_size(replacement_text, original_width, original_text)
-            if run_id:
-                self.logger.info(
-                    f"Calculated scaled font size {courier_font_size:.2f}pt for longer replacement",
-                    extra={"run_id": run_id}
-                )
+            cursor = insertion_index + len(replacement_text)
 
-        # Step 2: Calculate spacing adjustment to position suffix exactly where it should be
-        actual_replacement_width = self.calculate_text_width_courier(replacement_text, courier_font_size)
-        width_difference = original_width - actual_replacement_width
+        if cursor < len(text_value):
+            after_text = text_value[cursor:]
+            if after_text:
+                after_array = ArrayObject([TextStringObject(after_text)])
+                operations.append(([after_array], b"TJ"))
 
-        # Add spacing adjustment to position suffix correctly
-        # Positive width_difference means we need to add space (replacement is narrower)
-        # Negative width_difference means replacement is wider (will overlap, but that's expected for longer text)
-        spacing_adjustment = 0.0
-        if abs(width_difference) > 0.1:  # Add spacing for any significant difference
-            # In PDF text space, NEGATIVE values move RIGHT (add space), POSITIVE moves LEFT (reduce space)
-            # TJ operator uses values in 1/1000 of font size units
-            # CRITICAL FIX: Negate the value because PDF TJ operator has inverted polarity
-            spacing_adjustment = -(width_difference * 1000) / courier_font_size
+        if not operations:
+            operations = [([new_array], b"TJ" if operator_type == b"TJ" else b"Tj")]
 
-        if run_id:
-            self.logger.info(
-                f"Width matching: Courier {courier_font_size:.2f}pt -> {actual_replacement_width:.2f}pt, "
-                f"width_diff: {width_difference:.2f}pt, spacing: {spacing_adjustment:.2f}",
-                extra={"run_id": run_id}
-            )
-
-        # Step 3: Split TJ array into prefix, replacement, suffix
-        target_element = tj_array[element_idx]
-        element_text = str(target_element)
-
-        # Find exact position of target text within the element
-        start_pos = element_text.find(original_text)
-        if start_pos == -1:
-            # Fallback if exact match not found
-            return [([tj_array], b'TJ')]
-
-        prefix_text = element_text[:start_pos]
-        suffix_text = element_text[start_pos + len(original_text):]
-
-        # Step 4: Build split operations
-        operations = []
-
-        # Part 1: Prefix elements + prefix text (if any)
-        prefix_elements = list(tj_array[:element_idx])
-        if prefix_text:
-            prefix_elements.append(TextStringObject(prefix_text))
-
-        if prefix_elements:
-            operations.append(([ArrayObject(prefix_elements)], b'TJ'))
-
-        # Part 2: Replacement with Courier font
-        operations.extend([
-            # Switch to Courier at calculated size
-            ([NameObject('/Courier'), NumberObject(courier_font_size)], b'Tf'),
-            # Insert replacement text
-            ([ArrayObject([TextStringObject(replacement_text)])], b'TJ'),
-        ])
-
-        # Part 3: Restore original font and continue with suffix
-        # Extract original font from the segment's font context (now properly captured during extraction)
-        segment_font_context = segment.get('font_context', {})
-        original_font_name = segment_font_context.get('font')
-        actual_original_font_size = segment_font_context.get('fontsize')
-
-        # Fallback to matched context if segment font context is not available
-        if not original_font_name:
-            fallback_context = replacement_info.get('context', {}).get('segment_font_context', {})
-            original_font_name = fallback_context.get('font', '/F1')
-            actual_original_font_size = fallback_context.get('fontsize', original_font_size)
-        elif not actual_original_font_size:
-            actual_original_font_size = original_font_size
-
-        if run_id:
-            self.logger.info(
-                f"Font restoration: {original_font_name} @ {actual_original_font_size}pt",
-                extra={"run_id": run_id}
-            )
-
-        operations.extend([
-            # Restore original font from segment's actual font context
-            ([NameObject(original_font_name), NumberObject(actual_original_font_size)], b'Tf'),
-        ])
-
-        # Part 4: Suffix text + remaining elements
-        suffix_elements = []
-
-        # Add spacing adjustment BEFORE suffix text to position it correctly
-        if abs(spacing_adjustment) > 0.1:
-            suffix_elements.append(NumberObject(spacing_adjustment))
-
-        if suffix_text:
-            suffix_elements.append(TextStringObject(suffix_text))
-        suffix_elements.extend(tj_array[element_idx + 1:])
-
-        if suffix_elements:
-            operations.append(([ArrayObject(suffix_elements)], b'TJ'))
+        self._save_debug_stream(run_id, "after_reconstruction", operations)
 
         return operations
 

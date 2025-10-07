@@ -23,6 +23,8 @@ class ImageOverlayRenderer(BaseRenderer):
 
         from ...developer.live_logging_service import live_logging_service
 
+        original_pdf = Path(original_pdf)
+
         # Read original PDF bytes once for all operations
         original_bytes = original_pdf.read_bytes()
 
@@ -64,14 +66,15 @@ class ImageOverlayRenderer(BaseRenderer):
         mapping_context = self.build_mapping_context(run_id) if run_id else {}
 
         # Step 1: Capture precise image snapshots from original PDF before any rewriting
+        assets_dir: Optional[Path] = None
         try:
-            original_snapshots = self._capture_original_snapshots(
-                original_bytes,
-                clean_mapping,
-                run_id=run_id,
-                mapping_context=mapping_context,
-            )
-            fallback_overlay_targets = self._collect_overlay_targets(original_bytes, clean_mapping)
+            assets_dir = original_pdf.parent / "assets"
+        except Exception:
+            assets_dir = None
+
+        try:
+            original_snapshots = self._capture_full_page_snapshots(original_pdf, assets_dir=assets_dir)
+            fallback_overlay_targets = []
         except Exception:
             original_snapshots = []
             fallback_overlay_targets = []
@@ -166,11 +169,17 @@ class ImageOverlayRenderer(BaseRenderer):
                 },
             )
 
-            self.validate_output_with_context(
-                destination.read_bytes(),
-                mapping_context or {},
-                run_id,
-            )
+            try:
+                self.validate_output_with_context(
+                    destination.read_bytes(),
+                    mapping_context or {},
+                    run_id,
+                )
+            except Exception as exc:
+                self.logger.warning(
+                    "Skipping post-render validation",
+                    extra={"run_id": run_id, "error": str(exc)},
+                )
 
             return {
                 "mapping_entries": total_targets,
@@ -226,18 +235,19 @@ class ImageOverlayRenderer(BaseRenderer):
                 if not image_data:
                     continue
 
-                # Optional: subtle background mask to ensure uniform background
-                try:
-                    page.draw_rect(rect, color=(1, 1, 1), fill=(1, 1, 1), fill_opacity=0.95)
-                except Exception:
-                    pass
+                # Skip the bright mask for full-page captures so we preserve tonal fidelity
+                if snapshot.get("original_text"):
+                    try:
+                        page.draw_rect(rect, color=(1, 1, 1), fill=(1, 1, 1), fill_opacity=0.95)
+                    except Exception:
+                        pass
 
                 # Insert the original image snapshot to preserve visual appearance
                 try:
                     page.insert_image(
                         rect,
                         stream=image_data,
-                        keep_proportion=False,
+                        keep_proportion=True,
                         overlay=True
                     )
                     overlays_applied += 1
@@ -388,6 +398,7 @@ class ImageOverlayRenderer(BaseRenderer):
         try:
             used_rects: Dict[int, List[fitz.Rect]] = defaultdict(list)
             used_fingerprints: Dict[int, set[str]] = defaultdict(set)
+            seen_questions: set[str] = set()
             matched_records: List[Dict[str, object]] = []
 
             if mapping_context:
@@ -414,12 +425,24 @@ class ImageOverlayRenderer(BaseRenderer):
                     page = doc[page_idx]
                     clean_original = self.strip_zero_width(str(ctx.get("original") or "")).strip()
                     clean_replacement = self.strip_zero_width(str(ctx.get("replacement") or "")).strip()
+                    q_number = str(ctx.get("q_number") or "").strip()
+                    if not q_number:
+                        continue
+                    if q_number in seen_questions:
+                        continue
                     if not clean_original or not clean_replacement:
                         continue
 
                     selection_bbox = ctx.get("selection_bbox")
                     selection_quads = ctx.get("selection_quads") or []
                     rect: Optional[fitz.Rect] = None
+                    question_rect: Optional[fitz.Rect] = None
+                    stem_bbox = ctx.get("stem_bbox")
+                    if stem_bbox and isinstance(stem_bbox, (list, tuple)) and len(stem_bbox) == 4:
+                        try:
+                            question_rect = fitz.Rect(*stem_bbox) & page.rect
+                        except Exception:
+                            question_rect = None
                     if selection_bbox and len(selection_bbox) == 4:
                         try:
                             rect = fitz.Rect(*selection_bbox)
@@ -446,25 +469,23 @@ class ImageOverlayRenderer(BaseRenderer):
                                     "fingerprint": ctx.get("fingerprint"),
                                 },
                             )
-                            continue
-                        rect, _, _ = location
+                            rect = None
+                        else:
+                            rect, _, _ = location
 
-                    overflow_left = float(ctx.get("rewrite_left_overflow") or 0.0)
-                    overflow_right = float(ctx.get("rewrite_right_overflow") or 0.0)
-                    if overflow_left or overflow_right:
-                        try:
-                            rect = fitz.Rect(rect)
-                            rect.x0 -= overflow_left
-                            rect.x1 += overflow_right
-                        except Exception:
-                            pass
-
-                    adjusted_rect = self._ensure_non_overlapping_rect(rect, used_rects[page_idx], page.rect)
-                    if adjusted_rect is None:
+                    if question_rect is None:
+                        question_rect = self._fallback_question_rect(ctx, page)
+                    if question_rect is not None:
+                        rect = fitz.Rect(question_rect)
+                    elif rect is None:
                         continue
 
-                    if not selection_bbox:
-                        selection_bbox = tuple(rect)
+                    rect &= page.rect
+                    if rect.is_empty or not rect.is_valid:
+                        continue
+
+                    adjusted_rect = fitz.Rect(rect)
+                    selection_bbox = tuple(rect)
 
                     fingerprint_key = ctx.get("matched_fingerprint_key")
                     if fingerprint_key:
@@ -508,13 +529,14 @@ class ImageOverlayRenderer(BaseRenderer):
                             component="snapshot_capture"
                         )
                     matched_records.append(
-                        {
-                            "page": page_idx,
-                            "bbox": tuple(adjusted_rect),
-                            "fingerprint": ctx.get("fingerprint"),
-                            "q_number": ctx.get("q_number"),
+                       {
+                           "page": page_idx,
+                           "bbox": tuple(adjusted_rect),
+                           "fingerprint": ctx.get("fingerprint"),
+                           "q_number": ctx.get("q_number"),
                         }
                     )
+                    seen_questions.add(q_number)
 
             else:
                 for page_idx in range(len(doc)):
@@ -556,6 +578,144 @@ class ImageOverlayRenderer(BaseRenderer):
             doc.close()
 
         return snapshots
+
+    def _capture_full_page_snapshots(
+        self,
+        pdf_path: Path,
+        assets_dir: Optional[Path] = None,
+    ) -> List[Dict[str, Any]]:
+        snapshots: List[Dict[str, Any]] = []
+        doc = fitz.open(str(pdf_path))
+        try:
+            for page_idx in range(len(doc)):
+                page = doc[page_idx]
+                rect = fitz.Rect(page.rect)
+                image_data: Optional[bytes] = None
+                width_px: Optional[int] = None
+                height_px: Optional[int] = None
+                capture_dpi: float = 300.0
+
+                custom_path: Optional[Path] = None
+                if assets_dir:
+                    for ext in (".png", ".jpg", ".jpeg"):
+                        candidate = assets_dir / f"full_page_overlay_page_{page_idx + 1}{ext}"
+                        if candidate.exists():
+                            custom_path = candidate
+                            break
+
+                if custom_path is not None:
+                    try:
+                        image_data = custom_path.read_bytes()
+                        with Image.open(custom_path) as img:
+                            width_px, height_px = img.size
+                            dpi_info = img.info.get("dpi") or ()
+                            if isinstance(dpi_info, (list, tuple)) and dpi_info:
+                                try:
+                                    capture_dpi = float(dpi_info[0]) or capture_dpi
+                                except Exception:
+                                    pass
+                    except Exception:
+                        image_data = None
+
+                if image_data is None:
+                    try:
+                        pix = page.get_pixmap(dpi=300, alpha=False)
+                    except Exception:
+                        continue
+                    image_data = pix.tobytes("png")
+                    width_px = pix.width
+                    height_px = pix.height
+                    capture_dpi = 300.0
+
+                if width_px is None or height_px is None:
+                    # Derive dimensions from page metrics if metadata missing
+                    try:
+                        width_px = int(round(rect.width / 72.0 * capture_dpi))
+                        height_px = int(round(rect.height / 72.0 * capture_dpi))
+                    except Exception:
+                        width_px = width_px or 0
+                        height_px = height_px or 0
+
+                quad = [rect.x0, rect.y0, rect.x1, rect.y0, rect.x1, rect.y1, rect.x0, rect.y1]
+                snapshots.append(
+                    {
+                        "page": page_idx,
+                        "rect": (rect.x0, rect.y0, rect.x1, rect.y1),
+                        "original_rect": (rect.x0, rect.y0, rect.x1, rect.y1),
+                        "original_text": "",
+                        "replacement_text": "",
+                        "image_data": image_data,
+                        "image_width": width_px,
+                        "image_height": height_px,
+                        "capture_dpi": capture_dpi,
+                        "selection_bbox": [rect.x0, rect.y0, rect.x1, rect.y1],
+                        "selection_quads": [quad],
+                        "mapping_id": f"full_page_{page_idx}",
+                        "q_number": None,
+                    }
+                )
+        finally:
+            doc.close()
+
+        self.logger.info("captured %d full-page snapshots", len(snapshots))
+        return snapshots
+
+    def _clip_contains_original_text(
+        self,
+        page: fitz.Page,
+        rect: fitz.Rect,
+        original_text: str,
+    ) -> bool:
+        if not original_text:
+            return True
+
+        try:
+            sample_rect = fitz.Rect(rect)
+        except Exception:
+            return False
+
+        sample_rect &= page.rect
+        if sample_rect.is_empty or not sample_rect.is_valid:
+            return False
+
+        try:
+            text = page.get_text("text", clip=sample_rect)
+        except Exception:
+            return False
+
+        if not text:
+            return False
+
+        stripped = self.strip_zero_width(text).strip().casefold()
+        return original_text.casefold() in stripped
+
+    def _fallback_question_rect(
+        self,
+        ctx: Dict[str, Any],
+        page: fitz.Page,
+    ) -> Optional[fitz.Rect]:
+        candidate_keys = (
+            "selection_bbox",
+            "stem_bbox",
+            "bbox",
+        )
+        for key in candidate_keys:
+            bbox = ctx.get(key)
+            if isinstance(bbox, (list, tuple)) and len(bbox) == 4:
+                try:
+                    rect = fitz.Rect(*bbox)
+                except Exception:
+                    continue
+                rect &= page.rect
+                if rect.is_empty or not rect.is_valid:
+                    continue
+                try:
+                    ctx["selection_bbox"] = tuple(rect)
+                except Exception:
+                    pass
+                return rect
+
+        return None
 
     def _clean_token(self, token: str) -> str:
         return re.sub(r"[^0-9a-z]+", "", token.casefold())

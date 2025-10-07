@@ -61,6 +61,15 @@ export async function validateQuestion(
   return response.data;
 }
 
+export async function autoGenerateMappings(
+  runId: string,
+  questionId: number,
+  payload: { model?: string; force?: boolean } = {}
+) {
+  const response = await client.post(`/${runId}/${questionId}/auto_generate`, payload);
+  return response.data;
+}
+
 export async function fetchQuestionHistory(runId: string, questionId: number) {
   const response = await client.get(`/${runId}/${questionId}/history`);
   return response.data;

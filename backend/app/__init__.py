@@ -6,13 +6,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, jsonify
 
+load_dotenv(Path.cwd() / ".env")
+
 from .config import get_config
 from .extensions import db, init_extensions
 from .utils.json import ORJSONProvider
 from .utils.logging import configure_logging
-
-
-load_dotenv(Path.cwd() / ".env")
 
 
 def create_app(config_name: str | None = None) -> Flask:

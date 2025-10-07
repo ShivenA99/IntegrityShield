@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 from .openai_vision_client import OpenAIVisionClient
 from .mistral_ocr_client import MistralOCRClient
-from .gpt5_fusion_client import GPT5FusionClient
 from .base_ai_client import AIExtractionResult
 from ...utils.logging import get_logger
 from ..developer.live_logging_service import live_logging_service
@@ -20,7 +18,6 @@ class AIClientOrchestrator:
     def __init__(self):
         self.openai_client = OpenAIVisionClient()
         self.mistral_client = MistralOCRClient()
-        self.gpt5_fusion_client = GPT5FusionClient()
         self.logger = get_logger(__name__)
 
     def extract_questions_comprehensive(
@@ -31,7 +28,7 @@ class AIClientOrchestrator:
         parallel: bool = True
     ) -> AIExtractionResult:
         """
-        Extract questions using all available AI sources and intelligently merge results.
+        Extract questions using the configured AI sources and return the most reliable result.
 
         Args:
             pdf_path: Path to the PDF file
@@ -40,23 +37,22 @@ class AIClientOrchestrator:
             parallel: Whether to run extractions in parallel
 
         Returns:
-            Fused extraction result from all sources
+            Highest confidence extraction result from the available sources
         """
         start_time = time.perf_counter()
 
+        # Check which clients are configured
+        available_clients = self._get_available_clients()
         live_logging_service.emit(
             run_id,
             "ai_orchestrator",
             "INFO",
             "Starting comprehensive AI extraction",
             context={
-                "sources": ["openai_vision", "mistral_ocr", "gpt5_fusion"],
+                "sources": list(available_clients.keys()),
                 "parallel": parallel
             }
         )
-
-        # Check which clients are configured
-        available_clients = self._get_available_clients()
 
         if not available_clients:
             return AIExtractionResult(
@@ -73,50 +69,26 @@ class AIClientOrchestrator:
             else:
                 extraction_results = self._extract_sequential(pdf_path, run_id, available_clients)
 
-            # Fusion step using GPT-5
-            if self.gpt5_fusion_client.is_configured() and len(extraction_results) > 1:
-                live_logging_service.emit(
-                    run_id,
-                    "ai_orchestrator",
-                    "INFO",
-                    "Starting GPT-5 intelligent fusion",
-                    context={"extraction_results": len(extraction_results)}
-                )
+            best_result = self._select_best_result(extraction_results)
+            best_result.raw_response = best_result.raw_response or {}
+            best_result.raw_response['orchestration'] = {
+                'decision_strategy': 'best_available_source',
+                'selected_source': best_result.source,
+                'available_sources': list(extraction_results.keys()),
+                'extraction_results': {
+                    source: {
+                        'questions_count': len(result.questions),
+                        'confidence': result.confidence,
+                        'processing_time_ms': result.processing_time_ms,
+                        'error': result.error,
+                    }
+                    for source, result in extraction_results.items()
+                },
+                'total_processing_time_ms': int((time.perf_counter() - start_time) * 1000),
+                'clients_used': list(extraction_results.keys())
+            }
 
-                fused_result = self.gpt5_fusion_client.fuse_extraction_results(
-                    pymupdf_data,
-                    extraction_results.get('openai_vision', AIExtractionResult("openai_vision", 0.0, [])),
-                    extraction_results.get('mistral_ocr', AIExtractionResult("mistral_ocr", 0.0, [])),
-                    run_id
-                )
-
-                # Add orchestration metadata
-                fused_result.raw_response = fused_result.raw_response or {}
-                fused_result.raw_response['orchestration'] = {
-                    'extraction_results': {
-                        source: {
-                            'questions_count': len(result.questions),
-                            'confidence': result.confidence,
-                            'processing_time_ms': result.processing_time_ms
-                        }
-                        for source, result in extraction_results.items()
-                    },
-                    'total_processing_time_ms': int((time.perf_counter() - start_time) * 1000),
-                    'clients_used': list(available_clients.keys())
-                }
-
-                return fused_result
-
-            else:
-                # Fallback: use best single source
-                best_result = self._select_best_result(extraction_results)
-                best_result.raw_response = best_result.raw_response or {}
-                best_result.raw_response['orchestration'] = {
-                    'fallback_reason': 'GPT-5 fusion not available or insufficient sources',
-                    'selected_source': best_result.source,
-                    'available_sources': list(extraction_results.keys())
-                }
-                return best_result
+            return best_result
 
         except Exception as e:
             self.logger.error(f"AI orchestration failed: {e}", run_id=run_id, error=str(e))
@@ -241,7 +213,7 @@ class AIClientOrchestrator:
         return results
 
     def _select_best_result(self, extraction_results: Dict[str, AIExtractionResult]) -> AIExtractionResult:
-        """Select the best result when fusion is not available."""
+        """Select the most reliable extraction result among available sources."""
         if not extraction_results:
             return AIExtractionResult(
                 source="ai_orchestrator",
@@ -298,7 +270,6 @@ class AIClientOrchestrator:
         clients_to_test = {
             'openai_vision': self.openai_client,
             'mistral_ocr': self.mistral_client,
-            'gpt5_fusion': self.gpt5_fusion_client
         }
 
         for client_name, client in clients_to_test.items():

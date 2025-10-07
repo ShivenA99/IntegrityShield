@@ -15,6 +15,7 @@ RENDERERS: Dict[str, Type[BaseRenderer]] = {
     "font_manipulation": FontManipulationRenderer,
     "content_stream_overlay": ContentStreamRenderer,
     "content_stream": ContentStreamRenderer,
+    "content_stream_span_overlay": ContentStreamRenderer,
     "pymupdf_overlay": PyMuPDFRenderer,
 }
 

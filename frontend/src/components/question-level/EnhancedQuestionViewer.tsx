@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 
 import type { QuestionManipulation, SubstringMapping } from "@services/types/questions";
-import { updateQuestionManipulation, validateQuestion } from "@services/api/questionApi";
+import { updateQuestionManipulation } from "@services/api/questionApi";
 
 interface EnhancedQuestionViewerProps {
   runId: string;
@@ -26,7 +26,6 @@ const EnhancedQuestionViewer: React.FC<EnhancedQuestionViewerProps> = ({
   const [activeMappingIndex, setActiveMappingIndex] = useState<number | null>(null);
   const [selectedText, setSelectedText] = useState<string>("");
   const [replacementText, setReplacementText] = useState<string>("");
-  const [isValidating, setIsValidating] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [showMappingForm, setShowMappingForm] = useState<boolean>(false);
   const [pendingSelection, setPendingSelection] = useState<{start: number, end: number, text: string} | null>(null);
@@ -138,6 +137,7 @@ const EnhancedQuestionViewer: React.FC<EnhancedQuestionViewerProps> = ({
       const serverMappings = response?.substring_mappings ?? updatedMappings;
       setMappings(serverMappings);
       onUpdated?.({ ...question, substring_mappings: serverMappings });
+      setValidationError(null);
     } catch (error) {
       setValidationError("Failed to remove mapping");
       console.error("Remove error:", error);
@@ -189,54 +189,6 @@ const EnhancedQuestionViewer: React.FC<EnhancedQuestionViewerProps> = ({
     runId,
     onUpdated,
   ]);
-
-  const validateMapping = useCallback(async (mappingIndex: number) => {
-    const mapping = mappings[mappingIndex];
-    if (!mapping.id) return;
-
-    setIsValidating(true);
-    setValidationError(null);
-
-    try {
-      const res = await validateQuestion(runId, question.id, {
-        substring_mappings: [mapping],
-        model: "openai:gpt-4o-mini",
-        mapping_id: mapping.id
-      });
-
-      // Update the mapping with enhanced GPT-5 validation results
-      const gpt5Validation = res.gpt5_validation || {};
-      const updatedMappings = [...mappings];
-      updatedMappings[mappingIndex] = {
-        ...updatedMappings[mappingIndex],
-        validated: gpt5Validation.is_valid || false,
-        confidence: gpt5Validation.confidence || 0,
-        deviation_score: gpt5Validation.deviation_score || 0,
-        validation: {
-          model: "openai:gpt-4o-mini",
-          response: res.model_response?.response || '',
-          gold: question.gold_answer || '',
-          prompt_len: res.modified_question?.length || 0,
-          gpt5_validation: gpt5Validation
-        }
-      };
-
-      setMappings(updatedMappings);
-
-      // Save the updated mappings
-      const response = await updateQuestionManipulation(runId, question.id, {
-        method: question.manipulation_method || "smart_substitution",
-        substring_mappings: updatedMappings
-      });
-      const serverMappings = response?.substring_mappings ?? updatedMappings;
-      setMappings(serverMappings);
-      onUpdated?.({ ...question, substring_mappings: serverMappings });
-    } catch (error: any) {
-      setValidationError(error?.response?.data?.error || String(error));
-    } finally {
-      setIsValidating(false);
-    }
-  }, [mappings, runId, question, onUpdated]);
 
   const renderQuestionWithHighlights = useMemo(() => {
     if (!fullQuestionText) return "No question text available";
@@ -634,25 +586,6 @@ const EnhancedQuestionViewer: React.FC<EnhancedQuestionViewerProps> = ({
                     </div>
 
                     <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          validateMapping(index);
-                        }}
-                        disabled={isValidating}
-                        style={{
-                          padding: '6px 12px',
-                          backgroundColor: '#17a2b8',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '12px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {isValidating ? '⏳' : '🧪'} Test
-                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

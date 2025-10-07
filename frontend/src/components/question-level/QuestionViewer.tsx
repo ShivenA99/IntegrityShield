@@ -2,7 +2,7 @@ import * as React from "react";
 import { useMemo, useState, useRef } from "react";
 
 import type { QuestionManipulation, SubstringMapping } from "@services/types/questions";
-import { updateQuestionManipulation, validateQuestion } from "@services/api/questionApi";
+import { updateQuestionManipulation, validateQuestion, autoGenerateMappings } from "@services/api/questionApi";
 
 interface QuestionViewerProps {
   runId: string;
@@ -19,6 +19,8 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
   const [validError, setValidError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [lastValidation, setLastValidation] = useState<any>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
   const stemRef = useRef<HTMLDivElement | null>(null);
 
   const validateNoOverlap = (items: SubstringMapping[]) => {
@@ -57,43 +59,41 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
   const onValidate = async () => {
     try {
       const res = await validateQuestion(runId, question.id, { substring_mappings: mappings, model: modelName });
+      const serverMappings = res?.substring_mappings ?? mappings;
+      setMappings(serverMappings);
       setLastValidation(res);
+      onUpdated?.({ ...question, substring_mappings: serverMappings });
     } catch (e: any) {
       setValidError(e?.response?.data?.error || String(e));
     }
   };
 
+  const onAutoGenerate = async () => {
+    setGenerateError(null);
+    setValidError(null);
+    setIsGenerating(true);
+    try {
+      const res = await autoGenerateMappings(runId, question.id, { model: modelName });
+      const serverMappings = res?.substring_mappings ?? [];
+      setMappings(serverMappings);
+      onUpdated?.({ ...question, substring_mappings: serverMappings });
+      setSuccessMessage("Generated mappings via GPT-5");
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (e: any) {
+      setGenerateError(e?.response?.data?.error || String(e));
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const validateMapping = async (mappingIndex: number) => {
     try {
-      const mapping = mappings[mappingIndex];
-      if (!mapping.id) return;
-
       const res = await validateQuestion(runId, question.id, {
-        substring_mappings: [mapping],
+        substring_mappings: mappings,
         model: modelName,
-        mapping_id: mapping.id
       });
 
-      // Update the mapping with validation results
-      const updatedMappings = [...mappings];
-      updatedMappings[mappingIndex] = {
-        ...updatedMappings[mappingIndex],
-        validated: res.model_response?.response &&
-          question.gold_answer &&
-          res.model_response.response.trim() !== question.gold_answer.trim(),
-        validation: {
-          model: modelName,
-          response: res.model_response?.response || '',
-          gold: question.gold_answer || '',
-          prompt_len: res.modified_question?.length || 0
-        }
-      };
-      // Save the updated mappings
-      const response = await updateQuestionManipulation(runId, question.id, {
-        method: question.manipulation_method || "smart_substitution",
-        substring_mappings: updatedMappings
-      });
-      const serverMappings = response?.substring_mappings ?? updatedMappings;
+      const serverMappings = res?.substring_mappings ?? mappings;
       setMappings(serverMappings);
       onUpdated?.({ ...question, substring_mappings: serverMappings });
     } catch (e: any) {
@@ -271,6 +271,7 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
         <h4>Substring mappings</h4>
         <button onClick={() => addMapping({ original: "", replacement: "", start_pos: 0, end_pos: 0, context: "question_stem" })}>Add</button>
         {validError && <p style={{ color: "red" }}>{validError}</p>}
+        {generateError && <p style={{ color: "red" }}>{generateError}</p>}
         <table>
           <thead>
             <tr>
@@ -329,6 +330,9 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
           </tbody>
         </table>
         <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={onAutoGenerate} disabled={isGenerating} title="Use GPT-5 to generate mappings">
+            {isGenerating ? "Generating..." : "Auto-generate"}
+          </button>
           <button onClick={saveMappings}>Save</button>
           <button onClick={onValidate} disabled={(mappings?.length ?? 0) === 0}>Validate</button>
         </div>

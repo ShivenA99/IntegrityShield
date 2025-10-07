@@ -5,8 +5,12 @@ from typing import Any, Dict
 
 import orjson
 
+from ...utils.logging import get_logger
 from ...utils.storage_paths import structured_data_path
 from ...utils.time import isoformat, utc_now
+
+
+logger = get_logger(__name__)
 
 
 class StructuredDataManager:
@@ -43,6 +47,35 @@ class StructuredDataManager:
         path = structured_data_path(run_id)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(orjson.dumps(data, option=orjson.OPT_INDENT_2))
+
+        db_ext = None
+        try:
+            from ...extensions import db as db_ext  # type: ignore
+            from ...models import PipelineRun
+
+            run = db_ext.session.get(PipelineRun, run_id)
+            if run is not None:
+                run.structured_data = data
+                db_ext.session.add(run)
+                db_ext.session.commit()
+            else:
+                updated = (
+                    db_ext.session.query(PipelineRun)
+                    .filter_by(id=run_id)
+                    .update({"structured_data": data}, synchronize_session=False)
+                )
+                if updated:
+                    db_ext.session.commit()
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("StructuredDataManager.save failed for run %s: %s", run_id, exc)
+            if db_ext is not None:
+                try:
+                    db_ext.session.rollback()
+                except Exception:  # noqa: BLE001
+                    logger.warning(
+                        "Could not roll back session after structured data failure",
+                        exc_info=True,
+                    )
 
     def update(self, run_id: str, update: Dict[str, Any]) -> Dict[str, Any]:
         data = self.load(run_id)

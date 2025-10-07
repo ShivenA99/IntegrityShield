@@ -2,26 +2,35 @@
 
 This document catalogs the prompts used when calling external AI services. Update it whenever prompt wording or parameters change.
 
-## GPT-5 Fusion (OpenAI `gpt-4o`)
+## OpenAI Vision (Image to Text)
 
-### Question Analysis Prompt
-- **Location:** `backend/app/services/ai_clients/gpt5_fusion_client.py::_create_question_analysis_prompt`
-- **Use Case:** Analyze PyMuPDF text elements to identify questions and manipulation targets.
-- **System Prompt:** “You are an expert at analyzing academic assessment documents…”
-- **User Prompt Content:**
-  - Sorted list of text spans with bounding boxes.
-  - Request to identify questions, classify them, and propose manipulation targets.
-- **Parameters:** `temperature=0.1`, `max_tokens=4000`.
+- **Location:** `backend/app/services/ai_clients/openai_vision_client.py`
+- **System Prompt:** “You are an expert educational assessor…” (see file for full text).
+- **User Prompt:** Provides base64-encoded page image + instructions to output questions as JSON (question number, type, stem, options, positioning).
+- **Parameters:** `temperature=0.0`, `max_tokens=3000`.
 
-### Fusion Prompt
-- **Location:** `gpt5_fusion_client.py::_create_fusion_prompt`
-- **System Prompt:** “You are an expert AI system that intelligently merges question extraction results from multiple sources to produce the most accurate final output.”
-- **User Prompt Content:**
-  - PyMuPDF `content_elements` JSON.
-  - OpenAI Vision results (structured questions + confidence).
-  - Mistral OCR markdown/annotations.
-  - Instructions to return a JSON object containing fusion analysis + final question list (see code for exact template).
-- **Parameters:** `temperature=0.0`, `max_tokens=6000`.
+### Mapping Geometry Prompt (Vision)
+- **Location:** `backend/app/services/pipeline/smart_substitution_service.py` (future helper)
+- **Purpose:** Request bounding boxes for specific substrings (mappings) within a question stem.
+- **Prompt Outline (per page):**
+  ```json
+  {
+    "task": "Identify the bounding boxes of the specified substrings within the provided question stems.",
+    "page": 1,
+    "questions": [
+      {
+        "question_number": "4",
+        "stem_text": "If a code block has complexity O(n)...",
+        "mappings": [
+          {"substring": "complexity O(n)"},
+          {"substring": "another token"}
+        ]
+      }
+    ]
+  }
+  ```
+- **Expected Output:** JSON `{ "geometry": [{"question_number": "4", "substring": "complexity O(n)", "bbox": [...] }], "warnings": [] }`
+- **Parameters:** same as standard Vision call (temperature 0, page image input).
 
 ## GPT-5 Validation (OpenAI `gpt-4o`)
 

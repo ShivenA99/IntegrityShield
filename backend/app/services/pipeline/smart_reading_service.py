@@ -12,6 +12,7 @@ from ...services.ai_clients.ai_client_orchestrator import AIClientOrchestrator
 from ...services.developer.live_logging_service import live_logging_service
 from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
+from ...services.pipeline.enhancement_methods.span_extractor import collect_span_records
 
 
 class SmartReadingService:
@@ -83,6 +84,7 @@ class SmartReadingService:
         doc = fitz.open(pdf_path)
         content_elements: List[Dict[str, Any]] = []
         images: List[Dict[str, Any]] = []
+        span_index: List[Dict[str, Any]] = []
         fonts = set()
 
         page_count = doc.page_count
@@ -126,6 +128,43 @@ class SmartReadingService:
                     }
                 )
 
+            # Collect detailed span metadata for downstream span selection
+            span_records = collect_span_records(page, page_index)
+            page_spans: List[Dict[str, Any]] = []
+            for record in span_records:
+                span_id = (
+                    f"page{page_index}:block{record.block_index}:"
+                    f"line{record.line_index}:span{record.span_index}"
+                )
+                raw_text = record.text or ""
+                prompt_text = raw_text.replace("\n", " ").strip()
+                if len(prompt_text) > 320:
+                    prompt_text = prompt_text[:317] + "..."
+                bbox = [float(record.bbox[0]), float(record.bbox[1]), float(record.bbox[2]), float(record.bbox[3])]
+                quad = [
+                    bbox[0], bbox[1],
+                    bbox[2], bbox[1],
+                    bbox[2], bbox[3],
+                    bbox[0], bbox[3],
+                ]
+                page_spans.append(
+                    {
+                        "id": span_id,
+                        "page": page_index + 1,
+                        "block": record.block_index,
+                        "line": record.line_index,
+                        "span": record.span_index,
+                        "text": raw_text,
+                        "prompt_text": prompt_text,
+                        "bbox": bbox,
+                        "quad": quad,
+                        "font": record.font,
+                        "size": record.font_size,
+                    }
+                )
+
+            span_index.append({"page": page_index + 1, "spans": page_spans})
+
         doc.close()
 
         return {
@@ -139,7 +178,8 @@ class SmartReadingService:
                 "fonts": sorted(fonts),
                 "extracted_elements": len(content_elements),
             },
-            "content_elements": content_elements
+            "content_elements": content_elements,
+            "span_index": span_index,
         }
 
     def _build_enhanced_structured_data(
@@ -168,6 +208,7 @@ class SmartReadingService:
         structured["document"] = pymupdf_data["document"]
         structured["assets"] = pymupdf_data["assets"]
         structured["content_elements"] = pymupdf_data["content_elements"]
+        structured["pymupdf_span_index"] = pymupdf_data.get("span_index", [])
 
         # Add AI extraction results
         structured["ai_extraction"] = {

@@ -9,8 +9,8 @@ This document summarizes the REST endpoints exposed to the React SPA (and, by ex
 | `POST /start` | Upload a new PDF & kick off `smart_reading` → `content_discovery`. | `FormData` with `original_pdf` and optional arrays: `target_stages`, `ai_models`, `enhancement_methods`, `skip_if_exists`, `parallel_processing`, `mapping_strategy`. | `202 Accepted` with `{ run_id, status, config }`. Background thread continues execution. |
 | `GET /runs` | Paginated list of runs. Supports search and filtering. | Query params: `q`, `status`, `include_deleted`, `sort_by`, `sort_dir`, `limit`, `offset`. | `{ runs: [...], count, offset, limit }`. Each run row includes status, stage, validation stats. |
 | `GET /<run_id>/status` | Snapshot of run state (current stage, status, structured data, metrics). Used for polling UI. | None. | `PipelineRunSummary` JSON (see `frontend/src/services/types/pipeline.ts`). Returns 404 while a new rerun is still being hydrated. |
-| `POST /<run_id>/resume/<stage>` | Resume a paused pipeline (usually from `content_discovery`). | Empty body. | `200 OK` on success; orchestrator restarts from the requested stage. |
-| `POST /<run_id>/continue` | Deprecated alias for resume. |
+| `POST /<run_id>/resume/<stage>` | Force execution to restart from the specified stage (useful for reruns). | Empty body. | `200 OK` on success; orchestrator restarts from the requested stage. |
+| `POST /<run_id>/continue` | Resume downstream stages (typically `pdf_creation`, `results_generation`) after mappings are ready. |
 | `POST /fork` | Clone an existing run to a new ID, copying artifacts and creating a fresh pipeline (e.g., branch experiments). | `{ source_run_id, target_stages? }`. | `202 Accepted` with new `run_id`. |
 | `POST /rerun` | Create a rerun. If structured data and questions exist, the rerun starts at `smart_substitution`; otherwise it replays from scratch. | `{ source_run_id, target_stages? }`. | `202 Accepted` with `{ run_id, rerun_from, mode, status }`. Requires brief polling; docs note new status may 404 for a few hundred ms. |
 | `POST /<run_id>/soft_delete` | Mark a run as deleted without removing artifacts (sets `processing_stats.deleted=true`). | None. | `{ run_id, deleted: true }`. |
@@ -22,7 +22,7 @@ This document summarizes the REST endpoints exposed to the React SPA (and, by ex
 {
   "run": {
     "id": "…",
-    "status": "running|paused_for_mapping|completed|failed",
+    "status": "pending|running|completed|failed",
     "current_stage": "smart_substitution",
     "structured_data": {...},
     "pipeline_config": {...},
