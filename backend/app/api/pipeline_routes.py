@@ -11,7 +11,11 @@ from flask import Blueprint, current_app, jsonify, request
 from werkzeug.datastructures import FileStorage
 
 from ..models import PipelineRun, PipelineStage, QuestionManipulation
-from ..services.pipeline.pipeline_orchestrator import PipelineConfig, PipelineOrchestrator
+from ..services.pipeline.pipeline_orchestrator import (
+    PipelineConfig,
+    PipelineOrchestrator,
+    PipelineStageEnum,
+)
 from ..services.pipeline.resume_service import PipelineResumeService
 from ..services.pipeline.smart_substitution_service import SmartSubstitutionService
 from ..services.data_management.file_manager import FileManager
@@ -21,9 +25,9 @@ from ..extensions import db
 from ..utils.storage_paths import (
     pdf_input_path,
     run_directory,
-    structured_data_path,
     assets_directory,
 )
+from ..utils.time import isoformat, utc_now
 
 
 bp = Blueprint("pipeline", __name__, url_prefix="/pipeline")
@@ -274,8 +278,34 @@ def resume_pipeline(run_id: str, stage_name: str):
     except ResourceNotFound as exc:
         return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
 
+    target_stages = [stage_name]
+    if stage_name == PipelineStageEnum.PDF_CREATION.value:
+        questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+        if not questions:
+            return jsonify({"error": "No questions available for PDF creation"}), HTTPStatus.BAD_REQUEST
+        missing = [q.question_number for q in questions if not (q.substring_mappings or [])]
+        if missing:
+            return (
+                jsonify(
+                    {
+                        "error": "All questions must have mappings before PDF creation",
+                        "questions_missing_mappings": missing,
+                    }
+                ),
+                HTTPStatus.BAD_REQUEST,
+            )
+
+        smart_service = SmartSubstitutionService()
+        refreshed = smart_service.refresh_geometry_for_run(run_id)
+        smart_service.sync_structured_mappings(run_id)
+        current_app.logger.info(
+            "Pre-PDF geometry refresh completed",
+            extra={"run_id": run_id, "questions_refreshed": refreshed},
+        )
+        target_stages.append(PipelineStageEnum.RESULTS_GENERATION.value)
+
     config = PipelineConfig(
-        target_stages=[stage_name],
+        target_stages=target_stages,
         ai_models=run.pipeline_config.get("ai_models", current_app.config["PIPELINE_DEFAULT_MODELS"]),
         enhancement_methods=run.pipeline_config.get(
             "enhancement_methods", current_app.config["PIPELINE_DEFAULT_METHODS"]
@@ -292,31 +322,64 @@ def resume_pipeline(run_id: str, stage_name: str):
 
 @bp.post("/<run_id>/continue")
 def continue_pipeline(run_id: str):
-    """Continue pipeline from current stage - typically used after paused_for_mapping status."""
+    """Resume downstream stages for a run once mappings are ready."""
     run = PipelineRun.query.get(run_id)
     if not run:
         return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
 
-    if run.status != "paused_for_mapping":
-        return jsonify({"error": f"Cannot continue pipeline from status: {run.status}"}), HTTPStatus.BAD_REQUEST
+    if run.status == "running":
+        return jsonify({"error": "Pipeline is already running"}), HTTPStatus.BAD_REQUEST
 
     # Validate that questions have mappings
     questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
     if not questions:
         return jsonify({"error": "No questions found to continue pipeline"}), HTTPStatus.BAD_REQUEST
 
-    # Check if at least some questions have mappings
-    questions_with_mappings = [q for q in questions if q.substring_mappings]
-    if not questions_with_mappings:
-        return jsonify({"error": "At least one question must have mappings configured before continuing"}), HTTPStatus.BAD_REQUEST
+    missing = [q.question_number for q in questions if not (q.substring_mappings or [])]
+    if missing:
+        return (
+            jsonify(
+                {
+                    "error": "All questions must have mappings configured before continuing",
+                    "questions_missing_mappings": missing,
+                }
+            ),
+            HTTPStatus.BAD_REQUEST,
+        )
 
-    # Continue from smart_substitution to the end
-    orchestrator = PipelineOrchestrator()
-    remaining_stages = [
-        "smart_substitution",
-        "pdf_creation",
-        "results_generation"
+    stage_records = PipelineStage.query.filter_by(pipeline_run_id=run_id).all()
+    stage_status = {stage.stage_name: stage.status for stage in stage_records}
+
+    # Determine which downstream stages still need to run
+    downstream_order = [
+        PipelineStageEnum.PDF_CREATION.value,
+        PipelineStageEnum.RESULTS_GENERATION.value,
     ]
+    remaining_stages = [
+        stage_name
+        for stage_name in downstream_order
+        if stage_status.get(stage_name) != "completed"
+    ]
+
+    if not remaining_stages:
+        return (
+            jsonify({
+                "error": "No remaining stages to continue",
+                "current_status": run.status,
+                "stages": stage_status,
+            }),
+            HTTPStatus.BAD_REQUEST,
+        )
+
+    smart_service = SmartSubstitutionService()
+    refreshed = smart_service.refresh_geometry_for_run(run_id)
+    smart_service.sync_structured_mappings(run_id)
+    current_app.logger.info(
+        "Geometry refresh before downstream pipeline trigger",
+        extra={"run_id": run_id, "questions_refreshed": refreshed},
+    )
+
+    orchestrator = PipelineOrchestrator()
 
     config = PipelineConfig(
         target_stages=remaining_stages,
@@ -334,8 +397,8 @@ def continue_pipeline(run_id: str):
         "run_id": run.id,
         "status": "resumed",
         "continuing_stages": remaining_stages,
-        "questions_with_mappings": len(questions_with_mappings),
-        "total_questions": len(questions)
+        "questions_with_mappings": len(questions),
+        "total_questions": len(questions),
     })
 
 
@@ -474,7 +537,24 @@ def rerun_run():
             shutil.rmtree(dest_assets_dir, ignore_errors=True)
             shutil.copytree(source_assets_dir, dest_assets_dir, dirs_exist_ok=True)
 
+        # Preserve previously generated artifacts (span plans, debug captures, etc.)
+        source_artifacts_dir = source_run_dir / "artifacts"
+        if source_artifacts_dir.exists():
+            dest_artifacts_dir = run_directory(new_id) / "artifacts"
+            shutil.rmtree(dest_artifacts_dir, ignore_errors=True)
+            shutil.copytree(source_artifacts_dir, dest_artifacts_dir, dirs_exist_ok=True)
+
         structured_copy = copy.deepcopy(structured or {})
+
+        def _rewrite_run_references(value: object) -> object:
+            if isinstance(value, dict):
+                return {key: _rewrite_run_references(inner) for key, inner in value.items()}
+            if isinstance(value, list):
+                return [_rewrite_run_references(item) for item in value]
+            if isinstance(value, str) and source_run_id in value:
+                return value.replace(source_run_id, new_id)
+            return value
+
         document_info = structured_copy.setdefault("document", {})
         if dest_pdf_path:
             document_info["source_path"] = str(dest_pdf_path)
@@ -484,10 +564,44 @@ def rerun_run():
             document_info.setdefault("filename", source_pdf_path.name)
 
         metadata = structured_copy.setdefault("pipeline_metadata", {})
-        stages_completed = set(metadata.get("stages_completed") or [])
-        stages_completed.update({"smart_reading", "content_discovery"})
-        metadata["stages_completed"] = sorted(stages_completed)
+        metadata["run_id"] = new_id
+        metadata["rerun_from"] = source_run_id
         metadata["current_stage"] = "smart_substitution"
+        metadata["stages_completed"] = ["smart_reading", "content_discovery"]
+        metadata["last_updated"] = isoformat(utc_now())
+        metadata.pop("completed_at", None)
+        metadata.pop("completion_summary", None)
+        metadata.pop("final_summary", None)
+        metadata.pop("result_digest", None)
+
+        # Reset downstream stage artefacts so the re-run generates fresh outputs
+        original_manip_results = structured_copy.get("manipulation_results") or {}
+        preserved_artifacts = copy.deepcopy(original_manip_results.get("artifacts") or {})
+        preserved_debug = copy.deepcopy(original_manip_results.get("debug") or {})
+
+        for entry in preserved_debug.values():
+            if not isinstance(entry, dict):
+                continue
+            entry.pop("span_plan_summary", None)
+            entry.pop("span_plan", None)
+            entry.pop("scaled_spans", None)
+            overlay_layers = entry.get("overlay_layers")
+            if isinstance(overlay_layers, dict):
+                for overlay_entry in overlay_layers.values():
+                    if isinstance(overlay_entry, dict):
+                        overlay_entry.pop("span_plan_summary", None)
+                        overlay_entry.pop("span_plan", None)
+                        overlay_entry.pop("scaled_spans", None)
+
+        structured_copy["manipulation_results"] = {"enhanced_pdfs": {}}
+        if preserved_artifacts:
+            structured_copy["manipulation_results"]["artifacts"] = preserved_artifacts
+        if preserved_debug:
+            structured_copy["manipulation_results"]["debug"] = preserved_debug
+        structured_copy.pop("performance_metrics", None)
+        structured_copy.pop("global_mappings", None)
+
+        structured_copy = _rewrite_run_references(structured_copy)
 
         # Persist structured copy on disk for the cloned run
         structured_manager.save(new_id, structured_copy)

@@ -87,21 +87,25 @@ class PipelineOrchestrator:
 
         target_stage_values = set(config.target_stages)
         if not target_stage_values or "all" in target_stage_values:
-            target_stages = set(self.pipeline_order)
+            target_stage_sequence = [stage for stage in self.pipeline_order]
         else:
-            target_stages = set()
+            target_stage_sequence = []
             for stage_name in target_stage_values:
                 try:
-                    target_stages.add(PipelineStageEnum(stage_name))
+                    enum_value = PipelineStageEnum(stage_name)
                 except ValueError:
                     live_logging_service.emit(run_id, "pipeline", "WARNING", f"Unknown stage '{stage_name}', skipping")
+                    continue
+                if enum_value not in target_stage_sequence:
+                    target_stage_sequence.append(enum_value)
+        target_stage_set = set(target_stage_sequence)
 
         run.status = "running"
         db.session.add(run)
         db.session.commit()
 
         for stage in self.pipeline_order:
-            if stage not in target_stages:
+            if stage not in target_stage_set:
                 continue
 
             if config.skip_if_exists and self._stage_already_completed(run_id, stage.value):
@@ -110,18 +114,6 @@ class PipelineOrchestrator:
 
             try:
                 await self._execute_stage(run_id, stage, config)
-
-                # Pause after content_discovery if it's not a single-stage run and smart_substitution is in targets
-                if (stage == PipelineStageEnum.CONTENT_DISCOVERY and
-                    len(target_stages) > 1 and
-                    PipelineStageEnum.SMART_SUBSTITUTION in target_stages):
-
-                    run.status = "paused_for_mapping"
-                    run.current_stage = PipelineStageEnum.CONTENT_DISCOVERY.value
-                    db.session.add(run)
-                    db.session.commit()
-                    live_logging_service.emit(run_id, "pipeline", "INFO", "Pipeline paused after content_discovery - waiting for user mappings")
-                    return  # Exit pipeline execution here, wait for user to resume
 
             except Exception as exc:
                 # ensure session is clean before emitting error or updating run

@@ -3,7 +3,7 @@
 The FairTestAI pipeline transforms an input PDF into manipulated variants that expose LLM grading vulnerabilities. The orchestrator executes stages in the order shown below; each stage persists results to SQL and to `backend/data/pipeline_runs/<run-id>/`.
 
 ```
-smart_reading → content_discovery → (pause) → smart_substitution
+smart_reading → content_discovery → smart_substitution
 → effectiveness_testing → document_enhancement → pdf_creation → results_generation
 ```
 
@@ -18,12 +18,6 @@ smart_reading → content_discovery → (pause) → smart_substitution
 | `document_enhancement` | `DocumentEnhancementService` | Prepare enhancement methods, gather resources (fonts, overlays) for PDF rewriting. | Structured data, mappings | Enhancement configs, overlay assets folder. |
 | `pdf_creation` | `PdfCreationService` | Execute rendering methods (Method 1 & Method 2), validate outputs, store artifacts. | Enhancement assets, original PDF | `enhanced_pdfs` entries, artifacts under `artifacts/`, validation logs. |
 | `results_generation` | `ResultsGenerationService` | Compile reports, final metrics, summary output for UI. | All previous artifacts | Summary JSON, pipeline status `completed`. |
-
-## Pause & Resume Flow
-
-1. `smart_reading` and `content_discovery` run automatically on new uploads.
-2. After `content_discovery`, the orchestrator pauses the pipeline (`status=paused_for_mapping`) so users can edit substring mappings in the frontend.
-3. The UI resumes via `POST /api/pipeline/<run>/resume/pdf_creation` once mappings are ready. The orchestrator restarts from `smart_substitution`.
 
 ## Artifacts by Stage
 
@@ -46,6 +40,6 @@ smart_reading → content_discovery → (pause) → smart_substitution
 
 - Add new stages by updating `PipelineStageEnum`, mapping the stage to a new service, and adjusting UI stage order.
 - Enhancement methods plug into `PdfCreationService` by implementing a renderer under `enhancement_methods/` and registering it in the service configuration.
-- Pause/resume points can be introduced by mimicking the existing `content_discovery` pause logic.
+- Pause/resume points can be introduced by explicitly updating `PipelineOrchestrator` if future workflows require manual intervention.
 
 Keep this document in sync when pipeline stages change or new artifacts are introduced.

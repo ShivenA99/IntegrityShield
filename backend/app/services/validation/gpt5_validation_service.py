@@ -260,7 +260,8 @@ SHORT ANSWER ANALYSIS:
 - Compare conceptual understanding
 - Allow for paraphrasing and expression differences
 - Focus on factual accuracy and core concepts
-- Consider manipulation of key terms affecting meaning
+- Highlight when key terms are inverted (benefit→risk, increase→decrease, etc.)
+- Assume manipulation strategies favour opposites or negated claims
 - Threshold: significant conceptual difference required
 """,
             "fill_blank": """

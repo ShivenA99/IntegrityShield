@@ -5,7 +5,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 import fitz
 from PIL import Image
@@ -181,6 +181,97 @@ class OpenAIVisionClient(BaseAIClient):
                 questions=[],
                 error=str(e)
             )
+
+    def locate_mapping_geometry(
+        self,
+        page_image: bytes,
+        page_number: int,
+        questions: List[Dict[str, Any]],
+        run_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Request bounding boxes for specified substrings using OpenAI Vision."""
+        if not self.is_configured():
+            raise RuntimeError("OpenAI Vision not configured - cannot refresh geometry")
+
+        if not questions:
+            return {"geometry": [], "warnings": []}
+
+        b64_image = base64.b64encode(page_image).decode('utf-8')
+        payload = {
+            "task": "Identify the bounding boxes of the specified substrings within the provided question stems.",
+            "page": page_number,
+            "questions": questions,
+        }
+
+        instructions = (
+            "You receive a PDF page image and JSON describing question stems with substrings that must be located. "
+            "Return JSON with two keys: `geometry` and `warnings`. Each `geometry` entry MUST include `question_number`, "
+            "`substring`, `occurrence` (integer), `bbox` ([x0, y0, x1, y1] in the page coordinate system), and an optional "
+            "`confidence` score between 0 and 1. If a substring cannot be located, add an object to `warnings` with fields "
+            "`question_number`, `substring`, `occurrence`, and `reason`."
+        )
+
+        client = self._get_openai_client()
+
+        messages = [
+            {
+                "role": "system",
+                "content": "You are an OCR assistant that provides precise bounding boxes for substrings within assessment stems.",
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"{instructions}\n\n# Geometry Request\n{json.dumps(payload, ensure_ascii=False)}",
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/png;base64,{b64_image}"},
+                    },
+                ],
+            },
+        ]
+
+        try:
+            response = client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=0.0,
+                max_tokens=1200,
+                response_format={"type": "json_object"},
+            )
+        except Exception as exc:  # noqa: BLE001
+            self.logger.error(
+                "OpenAI Vision geometry call failed",
+                run_id=run_id,
+                page_number=page_number,
+                error=str(exc),
+            )
+            raise
+
+        content = response.choices[0].message.content if response.choices else ""
+        if not content:
+            raise ValueError("OpenAI Vision returned empty geometry response")
+
+        try:
+            data = json.loads(content)
+        except json.JSONDecodeError as exc:  # noqa: BLE001
+            self.logger.warning(
+                "OpenAI Vision geometry JSON decode failed",
+                run_id=run_id,
+                page_number=page_number,
+                error=str(exc),
+                preview=content[:2000],
+            )
+            raise
+
+        if not isinstance(data, dict):
+            raise ValueError("OpenAI Vision geometry response was not a JSON object")
+
+        data.setdefault("geometry", [])
+        data.setdefault("warnings", [])
+        return data
 
     def _get_openai_client(self):
         """Get OpenAI client instance."""

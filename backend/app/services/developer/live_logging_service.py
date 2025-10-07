@@ -40,8 +40,16 @@ class LiveLoggingService:
             component=component,
             context=context or {},
         )
-        db.session.add(log_record)
-        db.session.commit()
+        try:
+            db.session.add(log_record)
+            db.session.commit()
+        except Exception as exc:  # noqa: BLE001
+            db.session.rollback()
+            self.logger.warning(
+                "live log commit failed",
+                extra={"run_id": run_id, "stage": stage, "component": component, "error": str(exc)},
+                exc_info=True,
+            )
 
         payload = {
             "id": log_record.id,

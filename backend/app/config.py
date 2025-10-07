@@ -27,6 +27,7 @@ class BaseConfig:
         "content_stream_overlay,pymupdf_overlay",
     ).split(",")
     WEBSOCKET_URL_PREFIX = "/ws"
+    POST_FUSER_MODEL = os.getenv("POST_FUSER_MODEL", "gpt-5")
 
 
 class TestConfig(BaseConfig):

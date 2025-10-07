@@ -11,6 +11,9 @@ const ResultsPanel: React.FC = () => {
   const comprehensive = manipulationResults.comprehensive_metrics ?? {};
   const artifacts: Record<string, Record<string, string>> = manipulationResults.artifacts ?? {};
   const enhancedPdfs: Record<string, any> = manipulationResults.enhanced_pdfs ?? {};
+  const filteredEnhancedEntries = Object.entries(enhancedPdfs).filter(
+    ([method]) => method === "content_stream_span_overlay",
+  );
 
   const reportPaths = (structured as any)?.pipeline_metadata?.report_paths || {};
   const questionCoverage = summary.total_questions ? Math.round((summary.questions_successfully_manipulated ?? 0) / summary.total_questions * 100) : null;
@@ -74,11 +77,11 @@ const ResultsPanel: React.FC = () => {
       <div className="panel-card" style={{ display: 'grid', gap: '0.75rem' }}>
         <h4 style={{ margin: 0 }}>Enhanced PDFs</h4>
         <p style={{ marginTop: 0, color: 'var(--muted)' }}>Download final overlays and intermediate artifacts for each rendering path.</p>
-        {Object.entries(enhancedPdfs).length === 0 ? (
+        {filteredEnhancedEntries.length === 0 ? (
           <p style={{ color: 'var(--muted)' }}>No enhanced PDFs have been generated yet.</p>
         ) : (
           <div className="download-grid">
-            {Object.entries(enhancedPdfs).map(([method, meta]) => {
+            {filteredEnhancedEntries.map(([method, meta]) => {
               const friendly = method.replace(/_/g, ' ');
               const artifactSet = artifacts[method] || {};
               return (

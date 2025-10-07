@@ -437,6 +437,18 @@ Overlay:   Covers "not" (exact area)
 
 ---
 
+## 8. Follow-up: Span Alignment & Overlay Readiness
+
+We pivoted to the span overlay pipeline to stabilise visual output while inline surgery matures. To make span-level rewrites fully reliable we still need to:
+
+1. **Normalise Offsets** – Map `substring_mappings` (which include human-readable spacing) onto the collapsed span text we use during planning. Use `SpanRecord.normalized_to_raw_indices` and persist `matched_glyph_path` hints so the planner always starts/ends on the intended glyphs.
+2. **Allow Fragment Expansion** – Update `_map_replacement_to_text_fragments` and the span-plan collector so replacements can add new `TJ` fragments (with kerning numbers) instead of truncating neighbours. Capture the expanded fragment list in `SpanRewriteEntry.fragment_rewrites`.
+3. **Verify End-to-End Runs** – Regenerate sample runs (`f6b51fa3-ae29-4058-a9ad-04ed1b2412a9`, `de3d91e8-2ed9-404c-9141-b8544414f2a2`) to confirm text extraction, overlays, and span diagnostics stay consistent after the alignment fixes.
+
+These items feed directly into the comprehensive plan (Phase B/C) and should be completed before we consider the span pipeline production-ready.
+
+---
+
 ## Conclusion
 
 This surgical approach addresses the fundamental issue: **we were rebuilding entire operators when we only needed to replace tiny byte sequences**. By working at the byte level and preserving original font encoding, we maintain visual fidelity while achieving precise text replacement.

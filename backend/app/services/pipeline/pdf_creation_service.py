@@ -3,7 +3,9 @@ from __future__ import annotations
 import asyncio
 import time
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
+
+from flask import current_app
 
 from ...extensions import db
 from ...models import EnhancedPDF, PipelineRun, QuestionManipulation
@@ -12,6 +14,7 @@ from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
 from ...utils.storage_paths import enhanced_pdf_path, run_directory
 from .enhancement_methods import RENDERERS
+from .enhancement_methods.base_renderer import BaseRenderer
 
 
 class PdfCreationService:
@@ -21,16 +24,18 @@ class PdfCreationService:
         self.structured_manager = StructuredDataManager()
 
     async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
-        return await asyncio.to_thread(self._generate_pdfs, run_id)
+        return self._generate_pdfs(run_id)
 
     def _all_questions_have_mappings(self, run_id: str) -> bool:
-        """TEMP: For testing, just check if all questions have mappings (not validation required)"""
+        """Ensure every question has at least one validated substring mapping."""
         questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
         if not questions:
             return False
         for q in questions:
             mappings = q.substring_mappings or []
             if not mappings:
+                return False
+            if not any(bool(mapping.get("validated")) for mapping in mappings):
                 return False
         return True
 
@@ -39,10 +44,14 @@ class PdfCreationService:
         If some exist, add any missing ones (always include image_overlay).
         """
         from ..developer.live_logging_service import live_logging_service
+        from .enhancement_methods.base_renderer import BaseRenderer
 
-        configured = run.pipeline_config.get("enhancement_methods") or ["content_stream_overlay", "pymupdf_overlay"]
-        if "content_stream_overlay" not in configured:
-            configured.insert(0, "content_stream_overlay")
+        configured = run.pipeline_config.get("enhancement_methods") or [
+            "content_stream_span_overlay",
+            "pymupdf_overlay",
+        ]
+        if "content_stream_span_overlay" not in configured:
+            configured.insert(0, "content_stream_span_overlay")
         if "pymupdf_overlay" not in configured:
             configured.append("pymupdf_overlay")
         # Deduplicate while preserving order
@@ -75,6 +84,87 @@ class PdfCreationService:
             context={"methods": configured, "added": methods_to_add},
         )
 
+    def _audit_geometry_mappings(
+        self,
+        run_id: str,
+        questions: list[QuestionManipulation],
+        base_renderer,
+    ) -> Dict[str, Any]:
+        from ..developer.live_logging_service import live_logging_service
+
+        structured = self.structured_manager.load(run_id) or {}
+        span_index_data = structured.get("pymupdf_span_index") or []
+        span_lookup: Dict[str, Dict[str, Any]] = {}
+        for entry in span_index_data:
+            spans = entry.get("spans") or []
+            for span in spans:
+                span_id = str(span.get("id"))
+                if span_id:
+                    span_lookup[span_id] = span
+
+        audited = 0
+        issues: List[Dict[str, Any]] = []
+
+        for question in questions:
+            q_label = str(question.question_number or question.id)
+            mappings = list(question.substring_mappings or [])
+            for mapping in mappings:
+                original = base_renderer.strip_zero_width(str(mapping.get("original") or "")).strip()
+                replacement = base_renderer.strip_zero_width(str(mapping.get("replacement") or "")).strip()
+                if not original:
+                    continue
+
+                span_ids = list(mapping.get("selection_span_ids") or mapping.get("span_ids") or [])
+                if not span_ids:
+                    continue
+
+                combined_text = base_renderer._collect_span_text(span_lookup, span_ids)
+                normalized_span = base_renderer._normalize_for_compare(combined_text)
+                normalized_original = base_renderer._normalize_for_compare(original)
+                normalized_replacement = (
+                    base_renderer._normalize_for_compare(replacement) if replacement else ""
+                )
+
+                audited += 1
+
+                contains_original = bool(normalized_original) and normalized_original in normalized_span
+                replacement_collides = bool(normalized_replacement) and normalized_replacement in normalized_span
+
+                if not contains_original or (
+                    replacement_collides and normalized_replacement != normalized_original
+                ):
+                    issues.append(
+                        {
+                            "question": q_label,
+                            "mapping_id": mapping.get("id"),
+                            "span_ids": span_ids,
+                            "contains_original": contains_original,
+                            "replacement_overlap": replacement_collides,
+                        }
+                    )
+
+        summary = {
+            "audited_mappings": audited,
+            "issue_count": len(issues),
+            "issues": issues[:10],
+        }
+
+        level = "WARNING" if issues else "INFO"
+        live_logging_service.emit(
+            run_id,
+            "pdf_creation",
+            level,
+            "geometry audit completed",
+            component="geometry_audit",
+            context={
+                "audited_mappings": audited,
+                "issues": len(issues),
+                "highlighted": issues[:3],
+            },
+        )
+
+        return summary
+
     def _generate_pdfs(self, run_id: str) -> Dict[str, Any]:
         from ..developer.live_logging_service import live_logging_service
 
@@ -100,6 +190,9 @@ class PdfCreationService:
                 "PDF creation blocked: All questions must have at least one mapping."
             )
 
+        base_renderer = BaseRenderer()
+        audit_summary = self._audit_geometry_mappings(run_id, questions, base_renderer)
+
         # Ensure we have EnhancedPDF rows; add any missing methods
         self._prepare_methods_if_missing(run)
 
@@ -120,8 +213,6 @@ class PdfCreationService:
             pdf_bytes = f.read()
 
         # Use a base renderer instance to get enhanced mapping
-        from .enhancement_methods.base_renderer import BaseRenderer
-        base_renderer = BaseRenderer()
         enhanced_mapping, discovered_tokens = base_renderer.build_enhanced_mapping_with_discovery(run_id, pdf_bytes)
         mapping_build_time = time.time() - mapping_start_time
 
@@ -150,7 +241,7 @@ class PdfCreationService:
 
         # Phase 4: Dual-layer architecture - process in optimal order
         # Stream layer first (content_stream), then visual layer (image_overlay)
-        stream_first_methods = {"content_stream_overlay", "content_stream"}
+        stream_first_methods = {"content_stream_overlay", "content_stream", "content_stream_span_overlay"}
         overlay_methods = {"image_overlay"}
         pymupdf_methods = {"pymupdf_overlay"}
 
@@ -165,6 +256,8 @@ class PdfCreationService:
 
         # Process in coordinated order for dual-layer architecture
         ordered_records = content_stream_records + pymupdf_records + image_overlay_records + other_records
+
+        app = current_app._get_current_object()
 
         for record in ordered_records:
             destination = Path(record.file_path)
@@ -195,13 +288,21 @@ class PdfCreationService:
 
             # Pass the enhanced mapping to the renderer (renderers now handle enhancement internally)
             try:
-                metadata = renderer.render(run_id, original_pdf, destination, enhanced_mapping)
+                with app.app_context():
+                    metadata = renderer.render(run_id, original_pdf, destination, enhanced_mapping)
                 render_success = True
                 render_error = None
             except Exception as e:
                 metadata = {"error": str(e), "file_size_bytes": 0, "effectiveness_score": 0.0}
                 render_success = False
                 render_error = str(e)
+                self.logger.exception(
+                    "Renderer execution failed",
+                    extra={
+                        "run_id": run_id,
+                        "method": record.method_name,
+                    },
+                )
                 live_logging_service.emit(
                     run_id,
                     "pdf_creation",
@@ -212,6 +313,8 @@ class PdfCreationService:
                 )
 
             renderer_duration = time.time() - renderer_start_time
+            span_plan_for_results = metadata.get("span_plan")
+            span_plan_summary = metadata.get("span_plan_summary")
             performance_metrics[record.method_name] = {
                 "duration_ms": round(renderer_duration * 1000, 2),
                 "success": render_success,
@@ -221,13 +324,15 @@ class PdfCreationService:
 
             # Capture debug information
             if record.method_name in stream_first_methods:
-                debug_capture["content_stream_overlay"] = {
-                    "decoded_sample": metadata.get("debug_sample"),
-                    "per_font_top_tokens": metadata.get("debug_per_font_top_tokens"),
+                debug_capture[record.method_name] = {
                     "enhanced_mapping_stats": {
                         "total_entries": len(enhanced_mapping),
                         "discovered_tokens": len(discovered_tokens),
                     },
+                    "span_plan_summary": span_plan_summary,
+                    "scaled_spans": metadata.get("scaled_spans"),
+                    "span_plan_path": metadata.get("artifact_rel_paths", {}).get("span_plan"),
+                    "span_plan": span_plan_for_results,
                 }
             elif record.method_name in overlay_methods | pymupdf_methods:
                 debug_capture.setdefault("overlay_layers", {})[record.method_name] = {
@@ -237,7 +342,10 @@ class PdfCreationService:
                 }
 
             record.file_size_bytes = int(metadata.get("file_size_bytes") or (destination.stat().st_size if destination.exists() else 0))
-            record.effectiveness_stats = {**(record.effectiveness_stats or {}), **metadata}
+            trimmed_stats = dict(metadata)
+            if span_plan_for_results is not None:
+                trimmed_stats.pop("span_plan", None)
+            record.effectiveness_stats = trimmed_stats
             record.visual_quality_score = 0.97 if record.method_name == "dual_layer" else 0.92
             db.session.add(record)
 
@@ -255,11 +363,14 @@ class PdfCreationService:
                 if artifact_rel_paths:
                     metadata["artifact_rel_paths"] = artifact_rel_paths
 
+        results["geometry_audit"] = audit_summary
+
         db.session.commit()
 
         structured = self.structured_manager.load(run_id)
         manipulation_results = structured.setdefault("manipulation_results", {})
         manipulation_results.setdefault("enhanced_pdfs", {})
+        manipulation_results["geometry_audit"] = audit_summary
         artifact_map = manipulation_results.setdefault("artifacts", {})
         for record in enhanced_records:
             stats = record.effectiveness_stats or {}
@@ -276,9 +387,8 @@ class PdfCreationService:
                 "file_size_bytes": record.file_size_bytes,
                 "visual_quality_score": record.visual_quality_score,
                 "effectiveness_score": stats.get("effectiveness_score"),
-                "overlay_applied": stats.get("overlay_applied"),
-                "overlay_targets": stats.get("overlay_targets"),
-                "overlay_area_pct": stats.get("overlay_area_pct"),
+                "scaled_spans": stats.get("scaled_spans"),
+                "span_plan_summary": stats.get("span_plan_summary"),
                 "render_stats": stats,
                 "created_at": isoformat(utc_now()),
             }
@@ -324,7 +434,12 @@ class PdfCreationService:
                 **comprehensive_metrics,
                 "dual_layer_architecture": {
                     "stream_layer": any(
-                        key in results for key in ("content_stream_overlay", "content_stream")
+                        key in results
+                        for key in (
+                            "content_stream_overlay",
+                            "content_stream",
+                            "content_stream_span_overlay",
+                        )
                     ),
                     "visual_layer": any(
                         key in results for key in ("pymupdf_overlay", "image_overlay")

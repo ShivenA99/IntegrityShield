@@ -57,7 +57,8 @@ def report_paths(run_id: str) -> Tuple[Path, Path, Path]:
 def method_stage_artifact_path(run_id: str, method_key: str, stage_name: str) -> Path:
     base = artifacts_root(run_id) / method_key
     base.mkdir(parents=True, exist_ok=True)
-    path = base / f"{stage_name}.pdf"
+    filename = stage_name if "." in stage_name else f"{stage_name}.pdf"
+    path = base / filename
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
 def artifacts_root(run_id: str) -> Path:

@@ -26,20 +26,11 @@ const ENHANCEMENT_OPTIONS = [
   {
     key: "rewrite" as const,
     label: "Stream Rewrite",
-    description: "Replace selectable text via PyMuPDF and reapply glyph overlays.",
-    method: "pymupdf_overlay",
+    description: "Replace selectable text using span-aware overlays for perfect fidelity.",
+    method: "content_stream_span_overlay",
     icon: "✍️",
   },
-  {
-    key: "overlay" as const,
-    label: "Stream Overlay",
-    description: "Rewrite streams with overlay snapshots for perfect fidelity.",
-    method: "content_stream_overlay",
-    icon: "🖼️",
-  },
 ];
-
-type EnhancementKey = (typeof ENHANCEMENT_OPTIONS)[number]["key"];
 
 const SmartReadingPanel: React.FC = () => {
   const { startPipeline, isLoading, error, status } = usePipeline();
@@ -47,10 +38,6 @@ const SmartReadingPanel: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedStage, setSelectedStage] = useState<PipelineStageName>("pdf_creation");
-  const [selectedEnhancements, setSelectedEnhancements] = useState<Record<EnhancementKey, boolean>>({
-    rewrite: true,
-    overlay: true,
-  });
 
   const previewUrl = useMemo(() => {
     if (!file) return null;
@@ -105,11 +92,7 @@ const SmartReadingPanel: React.FC = () => {
       return;
     }
 
-    const enhancementMethods = ENHANCEMENT_OPTIONS.filter((option) => selectedEnhancements[option.key]).map((option) => option.method);
-    if (enhancementMethods.length === 0) {
-      push({ title: "Select an enhancement", description: "Choose at least one stream method before starting.", intent: "warning" });
-      return;
-    }
+    const enhancementMethods = ENHANCEMENT_OPTIONS.map((option) => option.method);
 
     const runId = await startPipeline({
       file,
@@ -162,17 +145,17 @@ const SmartReadingPanel: React.FC = () => {
         </div>
 
         <div>
-          <h4 style={{ marginBottom: '0.5rem' }}>Enhancement Methods</h4>
+          <h4 style={{ marginBottom: '0.5rem' }}>Enhancement Method</h4>
           <div className="enhancement-toggle-row">
             {ENHANCEMENT_OPTIONS.map((option) => {
-              const isActive = selectedEnhancements[option.key];
+              const isActive = true;
               return (
                 <button
                   key={option.key}
                   type="button"
                   className={`enhancement-toggle ${isActive ? 'active' : ''}`}
-                  onClick={() => setSelectedEnhancements((prev) => ({ ...prev, [option.key]: !prev[option.key] }))}
                   title={option.description}
+                  disabled
                 >
                   <span aria-hidden="true">{option.icon}</span>
                   {option.label}
@@ -181,7 +164,7 @@ const SmartReadingPanel: React.FC = () => {
             })}
           </div>
           <p style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--muted)' }}>
-            Stream Rewrite focuses on editable text layers; Stream Overlay preserves perfect visuals by reapplying captured snapshots.
+            Stream Rewrite substitutes text with a Courier rewrite and restores the original appearance using span overlays.
           </p>
         </div>
       </section>

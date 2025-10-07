@@ -25,9 +25,7 @@ const stageComponentMap: Record<PipelineStageName, React.ComponentType> = {
 const PipelineContainer: React.FC = () => {
   const { status, isLoading } = usePipeline();
 
-  const activeStage = status?.status === "paused_for_mapping"
-    ? "smart_substitution"
-    : (status?.current_stage ?? "smart_reading");
+  const activeStage = status?.current_stage ?? "smart_reading";
   const [selectedStage, setSelectedStage] = useState<PipelineStageName>(activeStage as PipelineStageName);
   const [autoFollow, setAutoFollow] = useState(true);
 
@@ -56,16 +54,14 @@ const PipelineContainer: React.FC = () => {
   }, [status]);
 
   useEffect(() => {
-    const runStatus = status?.status;
-    if (!runStatus) {
+    if (!status) {
       return;
     }
-    if (runStatus === "paused_for_mapping") {
+    if (status.status === "completed" && status.current_stage === "results_generation") {
+      setSelectedStage("results_generation");
       setAutoFollow(false);
-    } else if (runStatus !== "paused_for_mapping") {
-      setAutoFollow(true);
     }
-  }, [status?.status]);
+  }, [status?.status, status?.current_stage]);
 
   const ActiveStageComponent = useMemo(() => {
     return stageComponentMap[selectedStage] ?? SmartReadingPanel;
