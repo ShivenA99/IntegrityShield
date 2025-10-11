@@ -1,0 +1,56 @@
+# macOS
+.DS_Store
+.AppleDouble
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+dist/
+.next/
+.nuxt/
+.parcel-cache/
+coverage/
+*.log
+.env
+.env.*
+
+# Generated assets and data dumps
+backend/data/fairtestai.db
+backend/data/pipeline_runs/
+backend/data/config/
+extracted/
+extracted_custom/
+orig_page*.png
+overlay_page*.png
+page_diff-*.png
+diff_visual.png
+*_preview.png
+demo_assets/**/*.pdf
+demo_assets/**/*.png
+demo_assets/**/*.json
+demo_assets/**/*.csv
+developer_screenshots/
+
+# Build artifacts and previews
+**/*_preview.json
+**/*_plan.json
+**/artifacts/
+**/debug.pdf
+
+# Misc tool outputs
+*.swp
+*.swo
+*~
+
+
