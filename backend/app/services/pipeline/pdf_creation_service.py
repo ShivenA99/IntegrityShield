@@ -26,18 +26,20 @@ class PdfCreationService:
     async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
         return self._generate_pdfs(run_id)
 
-    def _all_questions_have_mappings(self, run_id: str) -> bool:
-        """Ensure every question has at least one validated substring mapping."""
-        questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
-        if not questions:
-            return False
+    def _collect_question_mapping_gaps(
+        self,
+        questions: List[QuestionManipulation],
+    ) -> List[Dict[str, Any]]:
+        missing: List[Dict[str, Any]] = []
         for q in questions:
+            q_label = str(q.question_number or q.id)
             mappings = q.substring_mappings or []
             if not mappings:
-                return False
+                missing.append({"question": q_label, "reason": "no_mappings"})
+                continue
             if not any(bool(mapping.get("validated")) for mapping in mappings):
-                return False
-        return True
+                missing.append({"question": q_label, "reason": "no_validated_mappings"})
+        return missing
 
     def _prepare_methods_if_missing(self, run: PipelineRun) -> None:
         """Ensure EnhancedPDF rows exist for configured methods so pdf_creation can render.
@@ -109,12 +111,18 @@ class PdfCreationService:
             q_label = str(question.question_number or question.id)
             mappings = list(question.substring_mappings or [])
             for mapping in mappings:
-                original = base_renderer.strip_zero_width(str(mapping.get("original") or "")).strip()
-                replacement = base_renderer.strip_zero_width(str(mapping.get("replacement") or "")).strip()
+                original = base_renderer.strip_zero_width(
+                    str(mapping.get("original") or "")
+                ).strip()
+                replacement = base_renderer.strip_zero_width(
+                    str(mapping.get("replacement") or "")
+                ).strip()
                 if not original:
                     continue
 
-                span_ids = list(mapping.get("selection_span_ids") or mapping.get("span_ids") or [])
+                span_ids = list(
+                    mapping.get("selection_span_ids") or mapping.get("span_ids") or []
+                )
                 if not span_ids:
                     continue
 
@@ -122,16 +130,24 @@ class PdfCreationService:
                 normalized_span = base_renderer._normalize_for_compare(combined_text)
                 normalized_original = base_renderer._normalize_for_compare(original)
                 normalized_replacement = (
-                    base_renderer._normalize_for_compare(replacement) if replacement else ""
+                    base_renderer._normalize_for_compare(replacement)
+                    if replacement
+                    else ""
                 )
 
                 audited += 1
 
-                contains_original = bool(normalized_original) and normalized_original in normalized_span
-                replacement_collides = bool(normalized_replacement) and normalized_replacement in normalized_span
+                contains_original = (
+                    bool(normalized_original) and normalized_original in normalized_span
+                )
+                replacement_collides = (
+                    bool(normalized_replacement)
+                    and normalized_replacement in normalized_span
+                )
 
                 if not contains_original or (
-                    replacement_collides and normalized_replacement != normalized_original
+                    replacement_collides
+                    and normalized_replacement != normalized_original
                 ):
                     issues.append(
                         {
@@ -172,22 +188,37 @@ class PdfCreationService:
         if not run:
             raise ValueError("Pipeline run not found")
 
-        # Gate: require at least one mapping per question
         questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
         total_q = len(questions)
-        with_map = sum(1 for q in questions if (q.substring_mappings or []))
-        without_map = total_q - with_map
+        with_map = sum(1 for q in questions if q.substring_mappings)
+        with_validated = sum(
+            1
+            for q in questions
+            if any(
+                bool(mapping.get("validated"))
+                for mapping in (q.substring_mappings or [])
+            )
+        )
+        mapping_gaps = self._collect_question_mapping_gaps(questions)
         live_logging_service.emit(
             run_id,
             "pdf_creation",
             "INFO",
             "pdf_creation gating check",
-            context={"total_questions": total_q, "with_mappings": with_map, "without_mappings": without_map},
+            context={
+                "total_questions": total_q,
+                "with_mappings": with_map,
+                "with_validated": with_validated,
+                "skipped_questions": mapping_gaps[:5],
+            },
         )
-
-        if not self._all_questions_have_mappings(run_id):
-            raise ValueError(
-                "PDF creation blocked: All questions must have at least one mapping."
+        if mapping_gaps:
+            live_logging_service.emit(
+                run_id,
+                "pdf_creation",
+                "WARNING",
+                "Proceeding with pdf_creation despite missing/invalid mappings",
+                context={"skipped_count": len(mapping_gaps)},
             )
 
         base_renderer = BaseRenderer()
@@ -200,7 +231,7 @@ class PdfCreationService:
         original_pdf = Path(run.original_pdf_path)
         enhanced_records = EnhancedPDF.query.filter_by(pipeline_run_id=run_id).all()
 
-        results: Dict[str, Any] = {}
+        results: Dict[str, Any] = {"skipped_questions": mapping_gaps}
         debug_capture: Dict[str, Any] = {}
         performance_metrics: Dict[str, Any] = {}
 
@@ -213,7 +244,9 @@ class PdfCreationService:
             pdf_bytes = f.read()
 
         # Use a base renderer instance to get enhanced mapping
-        enhanced_mapping, discovered_tokens = base_renderer.build_enhanced_mapping_with_discovery(run_id, pdf_bytes)
+        enhanced_mapping, discovered_tokens = (
+            base_renderer.build_enhanced_mapping_with_discovery(run_id, pdf_bytes)
+        )
         mapping_build_time = time.time() - mapping_start_time
 
         # Calculate enhancement statistics
@@ -223,7 +256,8 @@ class PdfCreationService:
             "enhanced_mapping_size": len(enhanced_mapping),
             "discovered_tokens_count": len(discovered_tokens),
             "enhancement_ratio": len(enhanced_mapping) / max(len(base_mapping), 1),
-            "discovery_coverage": len(discovered_tokens) / max(len(enhanced_mapping), 1),
+            "discovery_coverage": len(discovered_tokens)
+            / max(len(enhanced_mapping), 1),
         }
 
         live_logging_service.emit(
@@ -241,21 +275,37 @@ class PdfCreationService:
 
         # Phase 4: Dual-layer architecture - process in optimal order
         # Stream layer first (content_stream), then visual layer (image_overlay)
-        stream_first_methods = {"content_stream_overlay", "content_stream", "content_stream_span_overlay"}
+        stream_first_methods = {
+            "content_stream_overlay",
+            "content_stream",
+            "content_stream_span_overlay",
+        }
         overlay_methods = {"image_overlay"}
         pymupdf_methods = {"pymupdf_overlay"}
 
-        content_stream_records = [r for r in enhanced_records if r.method_name in stream_first_methods]
-        pymupdf_records = [r for r in enhanced_records if r.method_name in pymupdf_methods]
-        image_overlay_records = [r for r in enhanced_records if r.method_name in overlay_methods]
+        content_stream_records = [
+            r for r in enhanced_records if r.method_name in stream_first_methods
+        ]
+        pymupdf_records = [
+            r for r in enhanced_records if r.method_name in pymupdf_methods
+        ]
+        image_overlay_records = [
+            r for r in enhanced_records if r.method_name in overlay_methods
+        ]
         other_records = [
             r
             for r in enhanced_records
-            if r.method_name not in stream_first_methods | overlay_methods | pymupdf_methods
+            if r.method_name
+            not in stream_first_methods | overlay_methods | pymupdf_methods
         ]
 
         # Process in coordinated order for dual-layer architecture
-        ordered_records = content_stream_records + pymupdf_records + image_overlay_records + other_records
+        ordered_records = (
+            content_stream_records
+            + pymupdf_records
+            + image_overlay_records
+            + other_records
+        )
 
         app = current_app._get_current_object()
 
@@ -278,9 +328,11 @@ class PdfCreationService:
                     "layer_type": (
                         "stream"
                         if record.method_name in stream_first_methods
-                        else "visual"
-                        if record.method_name in overlay_methods | pymupdf_methods
-                        else "other"
+                        else (
+                            "visual"
+                            if record.method_name in overlay_methods | pymupdf_methods
+                            else "other"
+                        )
                     ),
                 },
                 component=record.method_name,
@@ -289,11 +341,17 @@ class PdfCreationService:
             # Pass the enhanced mapping to the renderer (renderers now handle enhancement internally)
             try:
                 with app.app_context():
-                    metadata = renderer.render(run_id, original_pdf, destination, enhanced_mapping)
+                    metadata = renderer.render(
+                        run_id, original_pdf, destination, enhanced_mapping
+                    )
                 render_success = True
                 render_error = None
             except Exception as e:
-                metadata = {"error": str(e), "file_size_bytes": 0, "effectiveness_score": 0.0}
+                metadata = {
+                    "error": str(e),
+                    "file_size_bytes": 0,
+                    "effectiveness_score": 0.0,
+                }
                 render_success = False
                 render_error = str(e)
                 self.logger.exception(
@@ -331,22 +389,30 @@ class PdfCreationService:
                     },
                     "span_plan_summary": span_plan_summary,
                     "scaled_spans": metadata.get("scaled_spans"),
-                    "span_plan_path": metadata.get("artifact_rel_paths", {}).get("span_plan"),
+                    "span_plan_path": metadata.get("artifact_rel_paths", {}).get(
+                        "span_plan"
+                    ),
                     "span_plan": span_plan_for_results,
                 }
             elif record.method_name in overlay_methods | pymupdf_methods:
                 debug_capture.setdefault("overlay_layers", {})[record.method_name] = {
                     "effectiveness_score": metadata.get("effectiveness_score"),
                     "mapping_entries_used": metadata.get("mapping_entries"),
-                    "enhanced_mapping_boost": len(enhanced_mapping) - len(base_renderer.build_mapping_from_questions(run_id)),
+                    "enhanced_mapping_boost": len(enhanced_mapping)
+                    - len(base_renderer.build_mapping_from_questions(run_id)),
                 }
 
-            record.file_size_bytes = int(metadata.get("file_size_bytes") or (destination.stat().st_size if destination.exists() else 0))
+            record.file_size_bytes = int(
+                metadata.get("file_size_bytes")
+                or (destination.stat().st_size if destination.exists() else 0)
+            )
             trimmed_stats = dict(metadata)
             if span_plan_for_results is not None:
                 trimmed_stats.pop("span_plan", None)
             record.effectiveness_stats = trimmed_stats
-            record.visual_quality_score = 0.97 if record.method_name == "dual_layer" else 0.92
+            record.visual_quality_score = (
+                0.97 if record.method_name == "dual_layer" else 0.92
+            )
             db.session.add(record)
 
             results[record.method_name] = metadata
@@ -370,12 +436,15 @@ class PdfCreationService:
         structured = self.structured_manager.load(run_id)
         manipulation_results = structured.setdefault("manipulation_results", {})
         manipulation_results.setdefault("enhanced_pdfs", {})
+        manipulation_results["skipped_questions"] = mapping_gaps
         manipulation_results["geometry_audit"] = audit_summary
         artifact_map = manipulation_results.setdefault("artifacts", {})
         for record in enhanced_records:
             stats = record.effectiveness_stats or {}
             try:
-                relative_path = str(Path(record.file_path).resolve().relative_to(run_dir))
+                relative_path = str(
+                    Path(record.file_path).resolve().relative_to(run_dir)
+                )
             except Exception:
                 relative_path = None
             # Provide both legacy (path, size_bytes) and explicit (file_path, file_size_bytes) keys for UI compatibility
@@ -392,11 +461,17 @@ class PdfCreationService:
                 "render_stats": stats,
                 "created_at": isoformat(utc_now()),
             }
-            artifact_map[record.method_name] = stats.get("artifact_rel_paths", {}) or stats.get("artifacts", {})
+            artifact_map[record.method_name] = stats.get(
+                "artifact_rel_paths", {}
+            ) or stats.get("artifacts", {})
         # Phase 5: Comprehensive instrumentation - calculate final metrics
         overall_duration = time.time() - overall_start_time
-        total_output_size = sum(m.get("output_size_bytes", 0) for m in performance_metrics.values())
-        successful_renderers = sum(1 for m in performance_metrics.values() if m.get("success", False))
+        total_output_size = sum(
+            m.get("output_size_bytes", 0) for m in performance_metrics.values()
+        )
+        successful_renderers = sum(
+            1 for m in performance_metrics.values() if m.get("success", False)
+        )
         failed_renderers = len(performance_metrics) - successful_renderers
 
         comprehensive_metrics = {
@@ -417,10 +492,14 @@ class PdfCreationService:
         }
 
         if debug_capture:
-            structured.setdefault("manipulation_results", {}).setdefault("debug", {}).update(debug_capture)
+            structured.setdefault("manipulation_results", {}).setdefault(
+                "debug", {}
+            ).update(debug_capture)
 
         # Store comprehensive metrics in structured data
-        structured.setdefault("manipulation_results", {}).setdefault("comprehensive_metrics", {}).update(comprehensive_metrics)
+        structured.setdefault("manipulation_results", {}).setdefault(
+            "comprehensive_metrics", {}
+        ).update(comprehensive_metrics)
         self.structured_manager.save(run_id, structured)
 
         live_logging_service.emit(

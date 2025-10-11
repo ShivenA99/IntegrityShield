@@ -6,7 +6,7 @@ import os
 import re
 import uuid
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -26,12 +26,14 @@ from ...services.ai_clients.openai_vision_client import OpenAIVisionClient
 from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
 from ...services.pipeline.auto_mapping_strategy import (
+    TARGET_STRATEGY_TYPES,
+    SIGNAL_STRATEGY_TYPES,
+    StrategyDefinition,
     build_generation_prompt,
     build_index_reference,
     describe_strategy_for_validation,
     generate_heuristic_mappings,
     get_strategy,
-    StrategyDefinition,
 )
 from .enhancement_methods.base_renderer import BaseRenderer
 from .enhancement_methods.span_extractor import SpanRecord, collect_span_records
@@ -1062,10 +1064,39 @@ class SmartSubstitutionService:
 		provider: str,
 	) -> Tuple[Dict[str, Any], Dict[str, Any], ValidationResult, str]:
 		question_type = question_model.question_type or "mcq_single"
+		uses_signal_strategy = question_type in SIGNAL_STRATEGY_TYPES
+		uses_target_strategy = (
+			question_type in TARGET_STRATEGY_TYPES or not uses_signal_strategy
+		)
+
 		normalized_mapping = self._normalize_mapping_entry(mapping)
-		target_option_value = normalized_mapping.get("target_option")
-		target_option_letter = self._extract_option_letter(target_option_value)
-		gold_option_letter = self._extract_option_letter(question_model.gold_answer)
+		expected_target_letter: Optional[str] = None
+		expected_target_text: Optional[str] = None
+		missing_target_metadata = False
+
+		if uses_target_strategy:
+			expected_target_letter = self._extract_option_letter(normalized_mapping.get("target_option"))
+			if expected_target_letter:
+				expected_target_text = normalized_mapping.get("target_option_text")
+				if not expected_target_text:
+					expected_target_text = self._resolve_option_text(question_model, expected_target_letter)
+				if expected_target_text:
+					normalized_mapping["target_option_text"] = expected_target_text
+				normalized_mapping["target_option"] = expected_target_letter
+			else:
+				missing_target_metadata = True
+				normalized_mapping.pop("target_option", None)
+				normalized_mapping.pop("target_option_text", None)
+
+		signal_metadata: Optional[Dict[str, str]] = None
+		if uses_signal_strategy:
+			signal_metadata = self._sanitize_signal_metadata(normalized_mapping)
+			if signal_metadata:
+				normalized_mapping.update(signal_metadata)
+			else:
+				for key in ("signal_type", "signal_phrase", "signal_notes"):
+					normalized_mapping.pop(key, None)
+
 		ordered_entries = [normalized_mapping]
 		modified_question = self.substrings.apply_mappings_to_text(stem_text, ordered_entries)
 
@@ -1084,16 +1115,8 @@ class SmartSubstitutionService:
 		test_answer = (result or {}).get("response", "").strip() if isinstance(result, dict) else ""
 
 		if not test_answer or test_answer == "simulated-response":
-			if question_type in {"mcq_single", "mcq_multi", "true_false"} and isinstance(question_model.options_data, dict):
-				gold_clean = (question_model.gold_answer or "").strip().lower()
-				fallback_answer = None
-				for opt_key in question_model.options_data.keys():
-					key_clean = str(opt_key).strip().lower()
-					if key_clean != gold_clean:
-						fallback_answer = str(opt_key)
-						break
-				if fallback_answer is None and question_model.options_data:
-					fallback_answer = str(next(iter(question_model.options_data.keys())))
+			if uses_target_strategy and isinstance(question_model.options_data, dict):
+				fallback_answer = self._fallback_option_answer(question_model)
 				test_answer = fallback_answer or "B"
 			if not isinstance(result, dict):
 				result = {"provider": "offline", "response": test_answer}
@@ -1102,18 +1125,39 @@ class SmartSubstitutionService:
 		elif isinstance(result, dict) and result.get("response") != test_answer:
 			result = {**result, "response": test_answer}
 
-		validator = GPT5ValidationService()
 		options_data = question_model.options_data if isinstance(question_model.options_data, dict) else None
-		if validator.is_configured():
-			validation_result = validator.validate_answer_deviation(
-				question_text=f"{modified_question}\n\n[Manipulation focus: {strategy_validation_focus}]",
-				question_type=question_type,
-				gold_answer=question_model.gold_answer or "",
-				test_answer=test_answer,
-				options_data=options_data,
-				run_id=run_id,
+		validator = GPT5ValidationService()
+
+		test_option_letter = self._extract_option_letter(test_answer)
+		gold_option_letter = self._extract_option_letter(question_model.gold_answer)
+		target_matched: Optional[bool] = None
+		signal_detected: Optional[bool] = None
+		option_change_failed = False
+		failure_reason = ""
+
+		if uses_target_strategy:
+			if missing_target_metadata:
+				option_change_failed = True
+				failure_reason = "Target-based question requires a target_option."
+			elif not test_option_letter:
+				option_change_failed = True
+				failure_reason = "Model response did not include a recognizable option letter."
+			elif gold_option_letter and test_option_letter == gold_option_letter:
+				option_change_failed = True
+				failure_reason = "Model still selected the gold option."
+			elif expected_target_letter and test_option_letter != expected_target_letter:
+				option_change_failed = True
+				failure_reason = f"Model selected {test_option_letter or '?'} instead of target {expected_target_letter}."
+			target_matched = (
+				expected_target_letter is not None and test_option_letter == expected_target_letter
 			)
-		else:
+		elif uses_signal_strategy and signal_metadata:
+			signal_detected = self._detect_signal_in_answer(signal_metadata, test_answer)
+
+		if uses_signal_strategy and signal_metadata and signal_detected is None:
+			signal_detected = False
+
+		if not validator.is_configured():
 			deviation = 0.8 if (question_model.gold_answer or "").strip().lower() != test_answer.strip().lower() else 0.2
 			confidence = 0.65 if deviation >= 0.5 else 0.3
 			validation_result = ValidationResult(
@@ -1128,59 +1172,44 @@ class SmartSubstitutionService:
 				test_answer=test_answer,
 				model_used="offline-heuristic",
 			)
+		else:
+			validation_result = validator.validate_answer_deviation(
+				question_text=f"{modified_question}\n\n[Manipulation focus: {strategy_validation_focus}]",
+				question_type=question_type,
+				gold_answer=question_model.gold_answer or "",
+				test_answer=test_answer,
+				options_data=options_data,
+				target_option=expected_target_letter if uses_target_strategy else None,
+				target_option_text=expected_target_text if uses_target_strategy else None,
+				signal_metadata=signal_metadata if uses_signal_strategy else None,
+				run_id=run_id,
+			)
 
 		threshold = validator.get_validation_threshold(question_type) if hasattr(validator, "get_validation_threshold") else 0.0
-		test_option_letter = self._extract_option_letter(test_answer)
-		retargeted_from_option: Optional[str] = None
-		option_change_failed = False
-		failure_reason = ""
 
-		if not test_option_letter:
-			option_change_failed = True
-			failure_reason = "Model response did not include a recognizable option letter."
-		elif gold_option_letter and test_option_letter == gold_option_letter:
-			option_change_failed = True
-			failure_reason = "Model still selected the gold option."
+		if uses_target_strategy and option_change_failed:
+			validation_result.is_valid = False
+			validation_result.confidence = min(validation_result.confidence, 0.2)
+			validation_result.deviation_score = min(validation_result.deviation_score, 0.2)
+			validation_result.reasoning = failure_reason or validation_result.reasoning
 
-		if not option_change_failed:
-			if target_option_letter:
-				if target_option_letter != test_option_letter:
-					retargeted_from_option = target_option_letter
-					target_option_letter = test_option_letter
-			else:
-				target_option_letter = test_option_letter
-		else:
-			# If the target was unusable, drop it so downstream consumers do not rely on it.
-			target_option_letter = None
+		validation_result.target_matched = target_matched
+		validation_result.signal_detected = signal_detected
+		diagnostics_payload = {
+			"target_option": expected_target_letter,
+			"target_option_text": expected_target_text,
+			"target_matched": target_matched,
+			"signal_detected": signal_detected,
+			"signal_phrase": (signal_metadata or {}).get("signal_phrase") if signal_metadata else None,
+			"signal_type": (signal_metadata or {}).get("signal_type") if signal_metadata else None,
+			"failure_reason": failure_reason if option_change_failed else None,
+			"test_option": test_option_letter,
+		}
+		validation_result.diagnostics = {
+			key: value for key, value in diagnostics_payload.items() if value is not None
+		}
 
-		if option_change_failed:
-			validation_result = ValidationResult(
-				is_valid=False,
-				confidence=min(validation_result.confidence, 0.2),
-				deviation_score=min(validation_result.deviation_score, 0.2),
-				reasoning=failure_reason,
-				semantic_similarity=validation_result.semantic_similarity,
-				factual_accuracy=validation_result.factual_accuracy,
-				question_type_specific_notes=validation_result.question_type_specific_notes,
-				gold_answer=validation_result.gold_answer,
-				test_answer=validation_result.test_answer,
-				model_used=validation_result.model_used,
-			)
-
-		if target_option_letter:
-			normalized_mapping["target_option"] = target_option_letter
-		else:
-			normalized_mapping.pop("target_option", None)
-
-		if retargeted_from_option and not option_change_failed:
-			self.logger.info(
-				"auto_generate retargeted option",
-				run_id=run_id,
-				question_id=question_model.id,
-				from_option=retargeted_from_option,
-				to_option=target_option_letter,
-			)
-
+		diagnostics_snapshot = dict(validation_result.diagnostics) if validation_result.diagnostics else {}
 		validation_record = {
 			"model": provider,
 			"response": test_answer,
@@ -1199,16 +1228,9 @@ class SmartSubstitutionService:
 				"model_used": validation_result.model_used,
 				"threshold": threshold,
 			},
+			"diagnostics": diagnostics_snapshot,
+			"option_change_failed": option_change_failed,
 		}
-		validation_record["option_change_failed"] = option_change_failed
-		if failure_reason:
-			validation_record["failure_reason"] = failure_reason
-		if target_option_letter:
-			validation_record["target_option"] = target_option_letter
-		if test_option_letter:
-			validation_record["test_option"] = test_option_letter
-		if retargeted_from_option:
-			validation_record["retargeted_from_option"] = retargeted_from_option
 
 		augmented_mapping = dict(mapping)
 		augmented_mapping.update(
@@ -1217,6 +1239,7 @@ class SmartSubstitutionService:
 				"confidence": validation_result.confidence,
 				"deviation_score": validation_result.deviation_score,
 				"validation": validation_record,
+				"validation_diagnostics": validation_record.get("diagnostics"),
 				"auto_generated": True,
 				"generated_by": provider,
 				"test_answer": test_answer,
@@ -1224,16 +1247,20 @@ class SmartSubstitutionService:
 			}
 		)
 		augmented_mapping["option_change_failed"] = option_change_failed
-		if target_option_letter:
-			augmented_mapping["target_option"] = target_option_letter
+
+		if expected_target_letter:
+			augmented_mapping["target_option"] = expected_target_letter
+			if expected_target_text:
+				augmented_mapping["target_option_text"] = expected_target_text
 		else:
 			augmented_mapping.pop("target_option", None)
+			augmented_mapping.pop("target_option_text", None)
 		if test_option_letter:
 			augmented_mapping["test_option"] = test_option_letter
 		else:
 			augmented_mapping.pop("test_option", None)
-		if retargeted_from_option:
-			augmented_mapping["retargeted_from_option"] = retargeted_from_option
+		if signal_metadata:
+			augmented_mapping.update(signal_metadata)
 
 		return augmented_mapping, validation_record, validation_result, test_answer
 
@@ -1511,6 +1538,45 @@ class SmartSubstitutionService:
 				normalized.pop("target_option", None)
 
 		return normalized
+
+	def _resolve_option_text(self, question: QuestionManipulation, letter: Optional[str]) -> Optional[str]:
+		if not letter or not isinstance(question.options_data, dict):
+			return None
+		for key, value in question.options_data.items():
+			if self._extract_option_letter(key) == letter:
+				return str(value)
+		return None
+
+	def _sanitize_signal_metadata(self, entry: Dict[str, Any]) -> Optional[Dict[str, str]]:
+		signal_phrase = str(entry.get("signal_phrase") or "").strip()
+		signal_type = str(entry.get("signal_type") or "").strip().lower()
+		signal_notes = str(entry.get("signal_notes") or "").strip()
+		if not signal_phrase:
+			return None
+		metadata = {"signal_phrase": signal_phrase}
+		if signal_type:
+			metadata["signal_type"] = signal_type
+		if signal_notes:
+			metadata["signal_notes"] = signal_notes
+		return metadata
+
+	def _detect_signal_in_answer(self, signal_metadata: Dict[str, str], answer: str) -> Optional[bool]:
+		phrase = signal_metadata.get("signal_phrase")
+		if not phrase:
+			return None
+		return phrase.casefold() in (answer or "").casefold()
+
+	def _fallback_option_answer(self, question_model: QuestionManipulation) -> Optional[str]:
+		options = question_model.options_data if isinstance(question_model.options_data, dict) else None
+		if not options:
+			return None
+		gold_clean = (question_model.gold_answer or "").strip().lower()
+		for opt_key in options.keys():
+			key_clean = str(opt_key).strip().lower()
+			if key_clean != gold_clean:
+				return str(opt_key)
+		first = next(iter(options.keys()), None)
+		return str(first) if first is not None else None
 
 	def _safe_page_index(self, value: object) -> Optional[int]:
 		if value is None:
@@ -2479,6 +2545,24 @@ class SmartSubstitutionService:
 				current_list = enriched_list
 				changed = True
 
+			for entry in current_list:
+				letter = self._extract_option_letter(entry.get("target_option")) if isinstance(entry, dict) else None
+				if letter:
+					entry["target_option"] = letter
+					resolved_text = entry.get("target_option_text") or self._resolve_option_text(model, letter)
+					if resolved_text:
+						entry["target_option_text"] = resolved_text
+				else:
+					entry.pop("target_option", None)
+					entry.pop("target_option_text", None)
+				signal_meta = self._sanitize_signal_metadata(entry) if isinstance(entry, dict) else None
+				if signal_meta:
+					entry.update(signal_meta)
+				else:
+					if isinstance(entry, dict):
+						for key in ("signal_type", "signal_phrase", "signal_notes"):
+							entry.pop(key, None)
+
 			json_safe = json.loads(json.dumps(current_list))
 			manipulation = entry.get("manipulation") or {}
 			previous = manipulation.get("substring_mappings") or []
@@ -2721,6 +2805,9 @@ def _auto_generate_for_question_impl(
                         "original": candidate.get("original"),
                         "replacement": candidate.get("replacement"),
                         "target_option": candidate.get("target_option"),
+                        "target_option_text": candidate.get("target_option_text"),
+                        "signal_phrase": candidate.get("signal_phrase"),
+                        "signal_type": candidate.get("signal_type"),
                         "validated": False,
                         "reason": "geometry_unavailable",
                     }
@@ -2759,10 +2846,16 @@ def _auto_generate_for_question_impl(
                     "original": candidate.get("original"),
                     "replacement": candidate.get("replacement"),
                     "target_option": candidate.get("target_option"),
+                    "target_option_text": candidate.get("target_option_text"),
+                    "signal_phrase": candidate.get("signal_phrase"),
+                    "signal_type": candidate.get("signal_type"),
                     "validated": validation_result.is_valid,
                     "confidence": validation_result.confidence,
                     "reasoning": validation_result.reasoning,
                     "test_answer": test_answer,
+                    "target_matched": validation_result.target_matched,
+                    "signal_detected": validation_result.signal_detected,
+                    "diagnostics": validation_result.diagnostics,
                 }
             )
 

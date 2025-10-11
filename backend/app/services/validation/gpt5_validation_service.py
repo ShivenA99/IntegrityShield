@@ -28,6 +28,9 @@ class ValidationResult:
     gold_answer: str
     test_answer: str
     model_used: str
+    target_matched: Optional[bool] = None
+    signal_detected: Optional[bool] = None
+    diagnostics: Optional[Dict[str, Any]] = None
 
 
 class GPT5ValidationService:
@@ -65,7 +68,10 @@ class GPT5ValidationService:
         gold_answer: str,
         test_answer: str,
         options_data: Optional[Dict[str, str]] = None,
-        run_id: Optional[str] = None
+        target_option: Optional[str] = None,
+        target_option_text: Optional[str] = None,
+        signal_metadata: Optional[Dict[str, str]] = None,
+        run_id: Optional[str] = None,
     ) -> ValidationResult:
         """
         Use GPT-5 to intelligently validate if test answer deviates enough from gold answer
@@ -90,7 +96,14 @@ class GPT5ValidationService:
         try:
             # Create specialized validation prompt based on question type
             prompt = self._create_validation_prompt(
-                question_text, question_type, gold_answer, test_answer, options_data
+                question_text=question_text,
+                question_type=question_type,
+                gold_answer=gold_answer,
+                test_answer=test_answer,
+                options_data=options_data,
+                target_option=target_option,
+                target_option_text=target_option_text,
+                signal_metadata=signal_metadata,
             )
 
             client = self._get_openai_client()
@@ -121,13 +134,15 @@ class GPT5ValidationService:
 
             # Log the validation result
             self.logger.info(
-                f"GPT-5 validation completed",
+                "GPT-5 validation completed",
                 run_id=run_id,
                 question_type=question_type,
                 confidence=validation_result.confidence,
                 deviation_score=validation_result.deviation_score,
                 is_valid=validation_result.is_valid,
-                processing_time_ms=processing_time
+                target_option=target_option,
+                signal_phrase=(signal_metadata or {}).get("signal_phrase") if signal_metadata else None,
+                processing_time_ms=processing_time,
             )
 
             return validation_result
@@ -153,7 +168,10 @@ class GPT5ValidationService:
         question_type: str,
         gold_answer: str,
         test_answer: str,
-        options_data: Optional[Dict[str, str]] = None
+        options_data: Optional[Dict[str, str]] = None,
+        target_option: Optional[str] = None,
+        target_option_text: Optional[str] = None,
+        signal_metadata: Optional[Dict[str, str]] = None,
     ) -> str:
         """Create a specialized validation prompt based on question type."""
 
@@ -173,6 +191,21 @@ TEST ANSWER (After Manipulation): {test_answer}
             prompt += "\nQUESTION OPTIONS:\n"
             for key, value in options_data.items():
                 prompt += f"{key}. {value}\n"
+
+        if target_option:
+            target_summary = target_option_text or "unknown target text"
+            prompt += (
+                "\nEXPECTED TARGET OUTCOME:\n"
+                f"- Manipulated answer should now be option {target_option} ({target_summary}).\n"
+                "- Evaluate whether the test answer aligns with this target rather than the gold answer.\n"
+            )
+
+        if signal_metadata:
+            prompt += "\nSIGNAL METADATA (for diagnostic analysis):\n"
+            prompt += json.dumps(signal_metadata, indent=2)
+            prompt += (
+                "\nUse the signal phrase/notes alongside the gold answer when scoring deviation and confidence.\n"
+            )
 
         # Add question-type specific analysis instructions
         type_instructions = self._get_type_specific_instructions(question_type)
