@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import type { PipelineRunSummary, PipelineStageName } from "@services/types/pipeline";
 import { extractErrorMessage } from "@services/utils/errorHandling";
-import { saveRecentRun, loadRecentRuns, removeRecentRun } from "@services/utils/storage";
+import { saveRecentRun, removeRecentRun } from "@services/utils/storage";
 import * as pipelineApi from "@services/api/pipelineApi";
 
 interface PipelineContextValue {
@@ -16,7 +16,7 @@ interface PipelineContextValue {
     runId?: string,
     options?: { quiet?: boolean; retries?: number; retryDelayMs?: number }
   ) => Promise<void>;
-  startPipeline: (payload: { file: File; config?: Partial<StartPipelineConfig> }) => Promise<string | null>;
+  startPipeline: (payload: { file?: File; config?: Partial<StartPipelineConfig> }) => Promise<string | null>;
   resumeFromStage: (runId: string, stage: PipelineStageName) => Promise<void>;
   deleteRun: (runId: string) => Promise<void>;
   resetActiveRun: (options?: { softDelete?: boolean }) => Promise<void>;
@@ -88,12 +88,14 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
   );
 
   const startPipeline = useCallback(
-    async ({ file, config }: { file: File; config?: Partial<StartPipelineConfig> }) => {
+    async ({ file, config }: { file?: File; config?: Partial<StartPipelineConfig> }) => {
       setIsLoading(true);
       setError(null);
       try {
         const formData = new FormData();
-        formData.append("original_pdf", file);
+        if (file) {
+          formData.append("original_pdf", file);
+        }
         if (config?.targetStages) {
           config.targetStages.forEach((stage) => formData.append("target_stages", stage));
         }
@@ -166,13 +168,8 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
 
   // Bootstrap last active run from localStorage if none is set
   useEffect(() => {
-    if (activeRunId) return;
-    const recent = loadRecentRuns()[0];
-    if (recent) {
-      setActiveRunId(recent);
-      void refreshStatus(recent, { quiet: true });
-    }
-  }, [activeRunId, refreshStatus]);
+    // Intentionally no-op to avoid auto-loading previous runs
+  }, []);
 
   useEffect(() => {
     if (!activeRunId) return;

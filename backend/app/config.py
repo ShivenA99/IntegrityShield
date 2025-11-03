@@ -47,6 +47,12 @@ class BaseConfig:
     WEBSOCKET_URL_PREFIX = "/ws"
     POST_FUSER_MODEL = os.getenv("POST_FUSER_MODEL", "gpt-5")
     DEMO_ASSETS_PATH = os.getenv("FAIRTESTAI_DEMO_ASSETS_PATH")
+    MANUAL_INPUT_DIR = Path(
+        os.getenv(
+            "FAIRTESTAI_MANUAL_INPUT_DIR",
+            Path.cwd() / "data" / "manual_inputs" / "current",
+        )
+    )
 
 
 class TestConfig(BaseConfig):

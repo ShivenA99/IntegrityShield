@@ -20,6 +20,7 @@ from ..services.pipeline.resume_service import PipelineResumeService
 from ..services.pipeline.smart_substitution_service import SmartSubstitutionService
 from ..services.data_management.file_manager import FileManager
 from ..services.data_management.structured_data_manager import StructuredDataManager
+from ..services.pipeline.manual_input_loader import ManualInputLoader
 from ..utils.exceptions import ResourceNotFound
 from ..extensions import db
 from ..utils.storage_paths import (
@@ -41,9 +42,7 @@ def init_app(api_bp: Blueprint) -> None:
 def start_pipeline():
     orchestrator = PipelineOrchestrator()
     structured_manager = StructuredDataManager()
-    structured_manager = StructuredDataManager()
     file_manager = FileManager()
-    structured_manager = StructuredDataManager()
 
     resume_from_run_id = request.form.get("resume_from_run_id")
     target_stages = request.form.getlist("target_stages") or []
@@ -56,8 +55,114 @@ def start_pipeline():
     mapping_strategy = request.form.get("mapping_strategy", "unicode_steganography")
 
     uploaded_file: FileStorage | None = request.files.get("original_pdf")
-    if not resume_from_run_id and not uploaded_file:
-        return jsonify({"error": "original_pdf file required"}), HTTPStatus.BAD_REQUEST
+    manual_mode = not resume_from_run_id and not uploaded_file
+
+    if manual_mode:
+        manual_dir: Path = current_app.config.get("MANUAL_INPUT_DIR")
+        loader = ManualInputLoader(Path(manual_dir))
+        try:
+            payload = loader.build()
+        except (FileNotFoundError, FileExistsError, ValueError) as exc:
+            return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+
+        run_id = str(uuid.uuid4())
+        destination_pdf = file_manager.import_manual_pdf(run_id, payload.pdf_path)
+
+        structured = copy.deepcopy(payload.structured_data)
+        metadata = structured.setdefault("pipeline_metadata", {})
+        metadata.update(
+            {
+                "run_id": run_id,
+                "current_stage": PipelineStageEnum.RESULTS_GENERATION.value,
+                "stages_completed": [stage.value for stage in PipelineStageEnum],
+                "last_updated": isoformat(utc_now()),
+                "manual_input": True,
+            }
+        )
+        structured["document"]["source_path"] = str(destination_pdf)
+        structured["document"]["filename"] = destination_pdf.name
+
+        run = PipelineRun(
+            id=run_id,
+            original_pdf_path=str(destination_pdf),
+            original_filename=destination_pdf.name,
+            current_stage=PipelineStageEnum.RESULTS_GENERATION.value,
+            status="completed",
+            pipeline_config={
+                "ai_models": ai_models,
+                "enhancement_methods": enhancement_methods,
+                "skip_if_exists": skip_if_exists,
+                "parallel_processing": parallel_processing,
+                "mapping_strategy": mapping_strategy,
+                "manual_input": True,
+            },
+            processing_stats={
+                "manual_input": True,
+                "question_count": len(payload.questions),
+            },
+            structured_data=structured,
+        )
+
+        db.session.add(run)
+        db.session.flush()
+
+        now = utc_now()
+        stage_payload = {
+            "mode": "manual_seed",
+            "generated_at": isoformat(now),
+        }
+        for stage_enum in PipelineStageEnum:
+            stage_record = PipelineStage(
+                pipeline_run_id=run_id,
+                stage_name=stage_enum.value,
+                status="completed",
+                stage_data=stage_payload,
+                duration_ms=0,
+                started_at=now,
+                completed_at=now,
+            )
+            db.session.add(stage_record)
+
+        for question in payload.questions:
+            ai_results_meta = {
+                "manual_seed": {
+                    "marks": question.marks,
+                    "explanation": question.explanation,
+                    "source_dataset": question.source_dataset,
+                    "source_id": question.source_id,
+                }
+            }
+            question_model = QuestionManipulation(
+                pipeline_run_id=run_id,
+                question_number=str(question.number),
+                question_type=question.question_type,
+                original_text=question.stem_text,
+                options_data=question.options,
+                gold_answer=question.gold_answer,
+                gold_confidence=1.0 if question.gold_answer else None,
+                manipulation_method="manual_seed",
+                ai_model_results=ai_results_meta,
+                substring_mappings=[],
+            )
+            question_model.stem_position = {"page": None}
+            db.session.add(question_model)
+
+        db.session.commit()
+        structured_manager.save(run_id, structured)
+
+        return (
+            jsonify(
+                {
+                    "run_id": run_id,
+                    "status": "completed",
+                    "config": {
+                        "manual_input": True,
+                        "question_count": len(payload.questions),
+                    },
+                }
+            ),
+            HTTPStatus.ACCEPTED,
+        )
 
     if resume_from_run_id:
         run = PipelineRun.query.get(resume_from_run_id)

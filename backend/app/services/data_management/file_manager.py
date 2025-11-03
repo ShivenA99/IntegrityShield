@@ -15,6 +15,14 @@ class FileManager:
         file.save(destination)
         return destination
 
+    def import_manual_pdf(self, run_id: str, source_pdf: Path) -> Path:
+        if not source_pdf.exists():
+            raise FileNotFoundError(f"Manual input PDF not found at {source_pdf}")
+        destination = pdf_input_path(run_id, source_pdf.name)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_pdf, destination)
+        return destination
+
     def delete_run_artifacts(self, run_id: str) -> None:
         directory = run_directory(run_id)
         if directory.exists():
