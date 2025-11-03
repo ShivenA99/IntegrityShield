@@ -33,11 +33,12 @@ const ENHANCEMENT_OPTIONS = [
 ];
 
 const SmartReadingPanel: React.FC = () => {
-  const { startPipeline, isLoading, error, status } = usePipeline();
+  const { startPipeline, error, status } = usePipeline();
   const { push } = useNotifications();
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedStage, setSelectedStage] = useState<PipelineStageName>("pdf_creation");
+  const [isStarting, setIsStarting] = useState(false);
 
   const previewUrl = useMemo(() => {
     if (!file) return null;
@@ -87,15 +88,12 @@ const SmartReadingPanel: React.FC = () => {
   };
 
   const handleStart = async () => {
-    if (!file) {
-      push({ title: "No file selected", intent: "warning" });
-      return;
-    }
-
+    if (isStarting) return;
+    setIsStarting(true);
     const enhancementMethods = ENHANCEMENT_OPTIONS.map((option) => option.method);
 
     const runId = await startPipeline({
-      file,
+      file: file ?? undefined,
       config: {
         targetStages: computeTargetStages(selectedStage),
         aiModels: [],
@@ -107,6 +105,7 @@ const SmartReadingPanel: React.FC = () => {
     if (runId) {
       push({ title: "Pipeline started", description: `Run ${runId} is in progress`, intent: "success" });
     }
+    setIsStarting(false);
   };
 
   return (
@@ -203,8 +202,8 @@ const SmartReadingPanel: React.FC = () => {
       </section>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <button onClick={handleStart} disabled={isLoading || !file} className="pill-button" title="Begin processing the uploaded PDF">
-          {isLoading ? "Starting…" : "Start Pipeline"}
+        <button onClick={handleStart} disabled={isStarting} className="pill-button" title="Begin processing the uploaded PDF or use fixed inputs">
+          {isStarting ? "Starting…" : "Start Pipeline"}
         </button>
         {status?.run_id ? (
           <span className="badge tag-muted">Last run: {status.run_id}</span>

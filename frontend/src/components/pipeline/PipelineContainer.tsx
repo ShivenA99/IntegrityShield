@@ -48,7 +48,7 @@ const PipelineContainer: React.FC = () => {
 
   useEffect(() => {
     if (!status) {
-      setSelectedStage("content_discovery");
+      setSelectedStage("smart_reading");
       setAutoFollow(true);
     }
   }, [status]);
