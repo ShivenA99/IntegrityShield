@@ -46,9 +46,9 @@ const SmartSubstitutionPanel: React.FC = () => {
   }, [runId]);
 
   const spanPlanRelativePath = useMemo(() => {
-    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.content_stream_span_overlay?.render_stats ?? {};
+    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.latex_dual_layer?.render_stats ?? {};
     const artifacts = renderStats.artifact_rel_paths ?? renderStats.artifacts ?? {};
-    const rawPath: string | undefined = artifacts.span_plan ?? structuredData?.manipulation_results?.artifacts?.content_stream_span_overlay?.span_plan;
+    const rawPath: string | undefined = artifacts.span_plan ?? structuredData?.manipulation_results?.artifacts?.latex_dual_layer?.span_plan;
     return resolveRelativePath(rawPath);
   }, [resolveRelativePath, structuredData]);
 
@@ -56,8 +56,8 @@ const SmartSubstitutionPanel: React.FC = () => {
 
   const spanPlanStatsByQuestion = useMemo(() => {
     const stats: Record<string, { spans: number }> = {};
-    const debugPlan = structuredData?.manipulation_results?.debug?.content_stream_span_overlay?.span_plan ?? null;
-    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.content_stream_span_overlay?.render_stats ?? {};
+    const debugPlan = structuredData?.manipulation_results?.debug?.latex_dual_layer?.span_plan ?? null;
+    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.latex_dual_layer?.render_stats ?? {};
     const spanPlan = debugPlan || renderStats.span_plan || {};
     if (spanPlan && typeof spanPlan === "object") {
       Object.values(spanPlan).forEach((entryList: any) => {
@@ -80,7 +80,7 @@ const SmartSubstitutionPanel: React.FC = () => {
   }, [structuredData]);
 
   const spanSummary = useMemo(() => {
-    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.content_stream_span_overlay?.render_stats ?? {};
+    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.latex_dual_layer?.render_stats ?? {};
     const summary = renderStats.span_plan_summary || {};
     const totalEntries = typeof summary.entries === "number" ? summary.entries : null;
     const scaledEntries = typeof summary.scaled_entries === "number"
@@ -105,7 +105,7 @@ const SmartSubstitutionPanel: React.FC = () => {
     [questions]
   );
 
-  const handleQuestionUpdated = useCallback((updated: any) => {
+  const handleQuestionUpdated = useCallback((updated: any, options?: { revalidate?: boolean }) => {
     mutate((current) => {
       if (!current) return current;
       const next = { ...current } as any;
@@ -122,7 +122,9 @@ const SmartSubstitutionPanel: React.FC = () => {
       return next;
     }, { revalidate: false });
 
-    setTimeout(() => mutate(), 100);
+    if (options?.revalidate !== false) {
+      setTimeout(() => mutate(), 100);
+    }
   }, [mutate]);
 
   const handleValidateQuestionMappings = useCallback(async (questionId: number) => {
@@ -154,47 +156,6 @@ const SmartSubstitutionPanel: React.FC = () => {
       setValidatingQuestionId(null);
     }
   }, [activeRunId, handleQuestionUpdated, questions, refresh, refreshStatus]);
-
-  const DEFAULT_CANONICAL_MAPPINGS: Record<string, Array<{ original: string; replacement: string }>> = {
-    "1": [{ original: "the", replacement: "not" }],
-    "2": [{ original: "the", replacement: "not" }],
-    "3": [{ original: "LSTM", replacement: "CNN" }],
-    "4": [{ original: "LSTM", replacement: "RNN" }],
-    "5": [{ original: "LSTMs", replacement: "RNNs" }],
-    "6": [{ original: "RNNs", replacement: "CNNs" }],
-    "7": [{ original: "bidirectional", replacement: "unidirectional" }],
-    "8": [{ original: "RNN", replacement: "CNN" }],
-  };
-
-  const buildCanonicalMappings = (question: QuestionManipulation) => {
-    const questionText = question.stem_text || question.original_text || "";
-    const entries = DEFAULT_CANONICAL_MAPPINGS[question.question_number];
-    if (!entries || !questionText) return null;
-
-    const selectionPage = typeof question.positioning?.page === "number"
-      ? Math.max(0, question.positioning!.page - 1)
-      : undefined;
-    const selectionBbox = Array.isArray(question.positioning?.bbox) && question.positioning!.bbox.length === 4
-      ? question.positioning!.bbox
-      : undefined;
-
-    const result = entries.map((entry) => {
-      const start = questionText.indexOf(entry.original);
-      if (start === -1) return null;
-      return {
-        id: Math.random().toString(36).substr(2, 9),
-        original: entry.original,
-        replacement: entry.replacement,
-        start_pos: start,
-        end_pos: start + entry.original.length,
-        context: "question_stem",
-        selection_page: selectionPage,
-        selection_bbox: selectionBbox,
-      };
-    }).filter((val): val is SubstringMapping => Boolean(val));
-
-    return result.length ? result : null;
-  };
 
   const generateFallbackMapping = (question: QuestionManipulation) => {
     const questionText = question.stem_text || question.original_text || "";
@@ -245,11 +206,11 @@ const SmartSubstitutionPanel: React.FC = () => {
           continue;
         }
 
-        const canonicalMappings = buildCanonicalMappings(question);
-        const fallbackMappings = canonicalMappings ?? generateFallbackMapping(question);
+        const fallbackMappings = generateFallbackMapping(question);
 
         if (fallbackMappings && fallbackMappings.length) {
-          const mappings = fallbackMappings;
+          const mapping = { ...fallbackMappings[0], replacement: "not" };
+          const mappings = [mapping];
 
           // Save to backend
           const response = await updateQuestionManipulation(activeRunId, question.id, {
@@ -259,15 +220,19 @@ const SmartSubstitutionPanel: React.FC = () => {
 
           // Update local cache
           const serverMappings = response?.substring_mappings ?? mappings;
-          handleQuestionUpdated({ ...question, substring_mappings: serverMappings });
+          handleQuestionUpdated({ ...question, substring_mappings: serverMappings }, { revalidate: false });
         }
       }
     } catch (error) {
       console.error("Failed to add random mappings:", error);
     } finally {
       setIsAddingRandomMappings(false);
+      await refresh();
+      if (activeRunId) {
+        await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
+      }
     }
-  }, [activeRunId, questions, isAddingRandomMappings, handleQuestionUpdated]);
+  }, [activeRunId, questions, isAddingRandomMappings, handleQuestionUpdated, refresh, refreshStatus]);
 
   const canValidateAll = questions.length > 0 && questionsWithMappings === questions.length;
   const readyForPdf = questions.length > 0 && questionsWithMappings === questions.length;

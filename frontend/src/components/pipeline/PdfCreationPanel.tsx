@@ -50,7 +50,7 @@ const PdfCreationPanel: React.FC = () => {
   const allValidated = structuredQuestions.length > 0 && validatedCount === structuredQuestions.length;
 
   const entries = (Object.entries(enhanced) as [string, EnhancedPDF][])
-    .filter(([method]) => method === "content_stream_span_overlay");
+    .filter(([method]) => method === "latex_dual_layer");
 
   const formatFileSize = (bytes: number) => {
     if (!bytes) return "";

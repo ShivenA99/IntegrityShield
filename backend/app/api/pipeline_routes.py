@@ -79,9 +79,36 @@ def start_pipeline():
                 "manual_input": True,
             }
         )
+        metadata["manual_source_paths"] = payload.source_paths
+        metadata["manual_input_overrides"] = [
+            PipelineStageEnum.SMART_READING.value,
+            PipelineStageEnum.CONTENT_DISCOVERY.value,
+        ]
+
+        structured_document = structured.setdefault("document", {})
         structured["document"]["source_path"] = str(destination_pdf)
         structured["document"]["filename"] = destination_pdf.name
+        structured_document["pipeline_pdf_path"] = str(destination_pdf)
 
+        structured_manual = structured.setdefault("manual_input", {})
+        structured_manual["pipeline_pdf_path"] = str(destination_pdf)
+        structured_manual["source_paths"] = payload.source_paths
+
+        default_display_page = 1
+        for collection_name in ("ai_questions", "questions"):
+            for question_entry in structured.get(collection_name, []) or []:
+                positioning = question_entry.setdefault("positioning", {})
+                if positioning.get("page") is None:
+                    positioning["page"] = default_display_page
+
+        for index_entry in structured.get("question_index", []) or []:
+            if index_entry.get("page") is None:
+                index_entry["page"] = default_display_page
+            positioning = index_entry.get("positioning")
+            if isinstance(positioning, dict) and positioning.get("page") is None:
+                positioning["page"] = default_display_page
+
+        doc_meta = payload.doc_metadata
         run = PipelineRun(
             id=run_id,
             original_pdf_path=str(destination_pdf),
@@ -95,10 +122,15 @@ def start_pipeline():
                 "parallel_processing": parallel_processing,
                 "mapping_strategy": mapping_strategy,
                 "manual_input": True,
+                "manual_source_paths": payload.source_paths,
             },
             processing_stats={
                 "manual_input": True,
                 "question_count": len(payload.questions),
+                "document_name": doc_meta.get("document_name"),
+                "subjects": doc_meta.get("subjects"),
+                "domain": doc_meta.get("domain"),
+                "generated_at": doc_meta.get("generated_at"),
             },
             structured_data=structured,
         )
@@ -130,8 +162,26 @@ def start_pipeline():
                     "explanation": question.explanation,
                     "source_dataset": question.source_dataset,
                     "source_id": question.source_id,
+                    "question_id": question.question_id,
+                    "gold_confidence": question.gold_confidence,
+                    "has_image": question.has_image,
+                    "image_path": question.image_path,
                 }
             }
+            gold_confidence = (
+                question.gold_confidence
+                if question.gold_confidence is not None
+                else (1.0 if question.gold_answer else None)
+            )
+            visual_elements = None
+            if question.image_path:
+                visual_elements = [
+                    {
+                        "type": "image",
+                        "path": question.image_path,
+                        "source": "manual_input",
+                    }
+                ]
             question_model = QuestionManipulation(
                 pipeline_run_id=run_id,
                 question_number=str(question.number),
@@ -139,12 +189,13 @@ def start_pipeline():
                 original_text=question.stem_text,
                 options_data=question.options,
                 gold_answer=question.gold_answer,
-                gold_confidence=1.0 if question.gold_answer else None,
+                gold_confidence=gold_confidence,
                 manipulation_method="manual_seed",
                 ai_model_results=ai_results_meta,
                 substring_mappings=[],
+                visual_elements=visual_elements,
             )
-            question_model.stem_position = {"page": None}
+            question_model.stem_position = {"page": 0, "bbox": None}
             db.session.add(question_model)
 
         db.session.commit()
@@ -859,3 +910,4 @@ def delete_run(run_id: str):
     db.session.commit()
 
     return "", HTTPStatus.NO_CONTENT
+
