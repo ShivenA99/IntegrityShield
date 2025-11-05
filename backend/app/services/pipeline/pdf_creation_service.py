@@ -49,11 +49,11 @@ class PdfCreationService:
         from .enhancement_methods.base_renderer import BaseRenderer
 
         configured = run.pipeline_config.get("enhancement_methods") or [
-            "content_stream_span_overlay",
+            "latex_dual_layer",
             "pymupdf_overlay",
         ]
-        if "content_stream_span_overlay" not in configured:
-            configured.insert(0, "content_stream_span_overlay")
+        if "latex_dual_layer" not in configured:
+            configured.insert(0, "latex_dual_layer")
         if "pymupdf_overlay" not in configured:
             configured.append("pymupdf_overlay")
         # Deduplicate while preserving order

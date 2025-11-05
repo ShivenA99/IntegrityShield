@@ -42,7 +42,7 @@ class BaseConfig:
     ).split(",")
     PIPELINE_DEFAULT_METHODS = os.getenv(
         "FAIRTESTAI_DEFAULT_METHODS",
-        "content_stream_overlay,pymupdf_overlay",
+        "latex_dual_layer,pymupdf_overlay",
     ).split(",")
     WEBSOCKET_URL_PREFIX = "/ws"
     POST_FUSER_MODEL = os.getenv("POST_FUSER_MODEL", "gpt-5")

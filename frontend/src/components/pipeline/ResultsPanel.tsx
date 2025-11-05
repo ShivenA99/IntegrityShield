@@ -12,7 +12,7 @@ const ResultsPanel: React.FC = () => {
   const artifacts: Record<string, Record<string, string>> = manipulationResults.artifacts ?? {};
   const enhancedPdfs: Record<string, any> = manipulationResults.enhanced_pdfs ?? {};
   const filteredEnhancedEntries = Object.entries(enhancedPdfs).filter(
-    ([method]) => method === "content_stream_span_overlay",
+    ([method]) => method === "latex_dual_layer",
   );
 
   const reportPaths = (structured as any)?.pipeline_metadata?.report_paths || {};

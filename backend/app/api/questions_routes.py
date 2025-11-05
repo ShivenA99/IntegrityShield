@@ -90,10 +90,31 @@ def list_questions(run_id: str):
 					),
 					"gold_answer": question.gold_answer,
 					"gold_confidence": question.gold_confidence,
+                    "question_id": (
+                        ai_question_map.get(str(question.question_number), {}).get("question_id")
+                        or (question.ai_model_results or {}).get("manual_seed", {}).get("question_id")
+                    ),
+                    "marks": (
+                        (ai_question_map.get(str(question.question_number), {}).get("metadata") or {}).get("marks")
+                        or (question.ai_model_results or {}).get("manual_seed", {}).get("marks")
+                    ),
+                    "answer_explanation": (
+                        (ai_question_map.get(str(question.question_number), {}).get("metadata") or {}).get("explanation")
+                        or (question.ai_model_results or {}).get("manual_seed", {}).get("explanation")
+                    ),
+                    "has_image": (
+                        (ai_question_map.get(str(question.question_number), {}).get("metadata") or {}).get("has_image")
+                        or (question.ai_model_results or {}).get("manual_seed", {}).get("has_image")
+                    ),
+                    "image_path": (
+                        (ai_question_map.get(str(question.question_number), {}).get("metadata") or {}).get("image_path")
+                        or (question.ai_model_results or {}).get("manual_seed", {}).get("image_path")
+                    ),
 					"manipulation_method": question.manipulation_method,
 					"effectiveness_score": question.effectiveness_score,
 					"substring_mappings": question.substring_mappings or [],
 					"ai_model_results": question.ai_model_results or {},
+                    "visual_elements": question.visual_elements or [],
 					# Additional AI extraction metadata
 					"confidence": ai_question_map.get(str(question.question_number), {}).get("confidence"),
 					"positioning": ai_question_map.get(str(question.question_number), {}).get("positioning"),
@@ -127,7 +148,7 @@ def refresh_true_gold(run_id: str):
 	return jsonify({"updated": updated})
 
 
-@bp.put("/<run_id>/<question_id>/manipulation")
+@bp.put("/<run_id>/<int:question_id>/manipulation")
 def update_manipulation(run_id: str, question_id: int):
 	question = QuestionManipulation.query.filter_by(pipeline_run_id=run_id, id=question_id).first()
 	if not question:
@@ -177,7 +198,7 @@ def update_manipulation(run_id: str, question_id: int):
 	# response already returned above
 
 
-@bp.post("/<run_id>/<question_id>/validate")
+@bp.post("/<run_id>/<int:question_id>/validate")
 def validate_mapping(run_id: str, question_id: int):
 	"""Enhanced validation using GPT-5 intelligent answer comparison.
 	Applies mappings, gets model response, then uses GPT-5 to compare with gold answer.
@@ -363,7 +384,7 @@ def validate_mapping(run_id: str, question_id: int):
 	)
 
 
-@bp.post("/<run_id>/<question_id>/auto_generate")
+@bp.post("/<run_id>/<int:question_id>/auto_generate")
 def auto_generate_mappings(run_id: str, question_id: int):
 	"""Generate substring mappings via GPT-5 based on question context."""
 	question = QuestionManipulation.query.filter_by(pipeline_run_id=run_id, id=question_id).first()
@@ -462,7 +483,7 @@ def auto_generate_mappings(run_id: str, question_id: int):
 	)
 
 
-@bp.post("/<run_id>/<question_id>/test")
+@bp.post("/<run_id>/<int:question_id>/test")
 def test_question(run_id: str, question_id: int):
 	tester = MultiModelTester()
 	payload = request.json or {}
@@ -476,7 +497,7 @@ def test_question(run_id: str, question_id: int):
 	return jsonify(results)
 
 
-@bp.get("/<run_id>/<question_id>/history")
+@bp.get("/<run_id>/<int:question_id>/history")
 def question_history(run_id: str, question_id: int):
 	return jsonify({"run_id": run_id, "question_id": question_id, "history": []})
 

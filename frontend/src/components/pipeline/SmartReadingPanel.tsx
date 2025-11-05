@@ -24,11 +24,11 @@ const STAGE_OPTIONS: StageOption[] = [
 
 const ENHANCEMENT_OPTIONS = [
   {
-    key: "rewrite" as const,
-    label: "Stream Rewrite",
-    description: "Replace selectable text using span-aware overlays for perfect fidelity.",
-    method: "content_stream_span_overlay",
-    icon: "✍️",
+    key: "latex-dual-layer" as const,
+    label: "LaTeX Dual Layer",
+    description: "Replace LaTeX spans and overlay the original glyphs for layered attacks.",
+    method: "latex_dual_layer",
+    icon: "🧬",
   },
 ];
 

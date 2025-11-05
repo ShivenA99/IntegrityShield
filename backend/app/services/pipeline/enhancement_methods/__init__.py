@@ -8,6 +8,7 @@ from .dual_layer_renderer import DualLayerRenderer
 from .font_manipulation_renderer import FontManipulationRenderer
 from .image_overlay_renderer import ImageOverlayRenderer
 from .pymupdf_renderer import PyMuPDFRenderer
+from .latex_dual_layer_renderer import LatexDualLayerRenderer
 
 RENDERERS: Dict[str, Type[BaseRenderer]] = {
     "dual_layer": DualLayerRenderer,
@@ -17,6 +18,7 @@ RENDERERS: Dict[str, Type[BaseRenderer]] = {
     "content_stream": ContentStreamRenderer,
     "content_stream_span_overlay": ContentStreamRenderer,
     "pymupdf_overlay": PyMuPDFRenderer,
+    "latex_dual_layer": LatexDualLayerRenderer,
 }
 
 __all__ = ["RENDERERS", "BaseRenderer"]

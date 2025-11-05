@@ -38,15 +38,21 @@ export interface QuestionManipulation {
   id: number;
   question_number: string;
   question_type: string;
+  question_id?: string;
   original_text?: string;
   stem_text?: string; // Full question stem text from AI extraction
   options_data?: Record<string, unknown>;
   gold_answer?: string;
   gold_confidence?: number;
+  marks?: number;
+  answer_explanation?: string;
+  has_image?: boolean;
+  image_path?: string;
   manipulation_method?: string;
   effectiveness_score?: number;
   substring_mappings: SubstringMapping[];
   ai_model_results: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
   // Additional fields that might be available
   positioning?: {
     page: number;

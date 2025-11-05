@@ -23,6 +23,10 @@ class ManualQuestion:
     explanation: Optional[str]
     source_dataset: Optional[str]
     source_id: Optional[str]
+    question_id: Optional[str] = None
+    gold_confidence: Optional[float] = None
+    has_image: Optional[bool] = None
+    image_path: Optional[str] = None
 
 
 @dataclass
@@ -31,6 +35,10 @@ class ManualRunPayload:
     page_count: int
     questions: List[ManualQuestion]
     structured_data: Dict[str, Any]
+    doc_metadata: Dict[str, Any]
+    source_paths: Dict[str, Optional[str]]
+    doc_metadata: Dict[str, Any]
+    source_paths: Dict[str, Optional[str]]
 
 
 class ManualInputLoader:
@@ -48,6 +56,7 @@ class ManualInputLoader:
         page_count = self._resolve_page_count(pdf_path)
         tex_content = tex_path.read_text(encoding="utf-8")
 
+        json_path: Path | None = None
         if gold_path:
             metadata, questions = self._load_from_legacy_gold(tex_content, gold_path)
         else:
@@ -58,6 +67,9 @@ class ManualInputLoader:
 
         structured = self._build_structured_payload(
             pdf_path=pdf_path,
+            tex_path=tex_path,
+            json_path=json_path,
+            gold_path=gold_path,
             page_count=page_count,
             questions=questions,
             doc_meta=metadata,
@@ -68,6 +80,14 @@ class ManualInputLoader:
             page_count=page_count,
             questions=questions,
             structured_data=structured,
+            doc_metadata=metadata,
+            source_paths={
+                "directory": str(self.manual_dir),
+                "pdf": str(pdf_path),
+                "tex": str(tex_path),
+                "json": str(json_path) if json_path else None,
+                "gold": str(gold_path) if gold_path else None,
+            },
         )
 
     def _find_optional_file(self, suffix: str) -> Path | None:
@@ -101,6 +121,8 @@ class ManualInputLoader:
         absolute_index = 1
         for idx, entry in enumerate(mcq_questions):
             gold_entry = mcq_answers[idx]
+            question_id = self._clean_optional_text(gold_entry.get("question_id"))
+            gold_confidence = self._safe_float(gold_entry.get("gold_confidence"))
             questions.append(
                 ManualQuestion(
                     number=absolute_index,
@@ -113,12 +135,16 @@ class ManualInputLoader:
                     explanation=self._clean_optional_text(gold_entry.get("explanation")),
                     source_dataset=gold_entry.get("source_dataset"),
                     source_id=gold_entry.get("source_id"),
+                    question_id=question_id,
+                    gold_confidence=gold_confidence,
                 )
             )
             absolute_index += 1
 
         for idx, entry in enumerate(tf_questions):
             gold_entry = tf_answers[idx]
+            question_id = self._clean_optional_text(gold_entry.get("question_id"))
+            gold_confidence = self._safe_float(gold_entry.get("gold_confidence"))
             questions.append(
                 ManualQuestion(
                     number=absolute_index,
@@ -131,6 +157,8 @@ class ManualInputLoader:
                     explanation=self._clean_optional_text(gold_entry.get("explanation")),
                     source_dataset=gold_entry.get("source_dataset"),
                     source_id=gold_entry.get("source_id"),
+                    question_id=question_id,
+                    gold_confidence=gold_confidence,
                 )
             )
             absolute_index += 1
@@ -157,6 +185,10 @@ class ManualInputLoader:
             gold_answer = self._clean_optional_text(entry.get("gold_answer"))
             marks = self._safe_int(entry.get("marks"))
             explanation = self._clean_optional_text(entry.get("answer_explanation"))
+            question_id = self._clean_optional_text(entry.get("question_id"))
+            gold_confidence = self._safe_float(entry.get("gold_confidence"))
+            has_image = entry.get("has_image")
+            image_path = self._clean_optional_text(entry.get("image_path"))
 
             source_info = entry.get("source") or {}
             source_dataset = source_info.get("dataset")
@@ -174,6 +206,10 @@ class ManualInputLoader:
                     explanation=explanation,
                     source_dataset=source_dataset,
                     source_id=source_id,
+                    question_id=question_id,
+                    gold_confidence=gold_confidence,
+                    has_image=bool(has_image) if has_image is not None else None,
+                    image_path=image_path,
                 )
             )
 
@@ -330,10 +366,21 @@ class ManualInputLoader:
         except (TypeError, ValueError):
             return None
 
+    def _safe_float(self, value: Any) -> Optional[float]:
+        if value is None:
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
     def _build_structured_payload(
         self,
         *,
         pdf_path: Path,
+        tex_path: Path,
+        json_path: Optional[Path],
+        gold_path: Optional[Path],
         page_count: int,
         questions: List[ManualQuestion],
         doc_meta: Dict[str, Any],
@@ -341,9 +388,38 @@ class ManualInputLoader:
         ai_questions: List[Dict[str, Any]] = []
         question_index: List[Dict[str, Any]] = []
 
+        subjects = list(doc_meta.get("subjects") or [])
+        combination_used = list(doc_meta.get("combination_used") or [])
+        document_name = doc_meta.get("document_name")
+        generated_at = doc_meta.get("generated_at")
+        source_version = doc_meta.get("version")
+
+        total_marks_value = self._safe_int(doc_meta.get("total_marks"))
+        if total_marks_value is None:
+            total_marks_value = doc_meta.get("total_marks")
+
+        number_of_questions_value = self._safe_int(doc_meta.get("number_of_questions"))
+        if number_of_questions_value is None:
+            number_of_questions_value = doc_meta.get("number_of_questions") or len(questions)
+
+        number_of_pages_value = self._safe_int(doc_meta.get("number_of_pages"))
+        if number_of_pages_value is None:
+            number_of_pages_value = doc_meta.get("number_of_pages") or page_count
+
         for question in questions:
             q_number = str(question.number)
             options_payload = {key: value for key, value in (question.options or {}).items()}
+            metadata_payload = {
+                "marks": question.marks,
+                "explanation": question.explanation,
+                "source_dataset": question.source_dataset,
+                "source_id": question.source_id,
+                "gold_confidence": question.gold_confidence,
+                "has_image": question.has_image,
+                "image_path": question.image_path,
+            }
+            metadata_payload = {k: v for k, v in metadata_payload.items() if v is not None}
+
             ai_entry = {
                 "question_number": q_number,
                 "q_number": q_number,
@@ -352,12 +428,8 @@ class ManualInputLoader:
                 "stem_text": question.stem_text,
                 "options": options_payload,
                 "gold_answer": question.gold_answer,
-                "metadata": {
-                    "marks": question.marks,
-                    "explanation": question.explanation,
-                    "source_dataset": question.source_dataset,
-                    "source_id": question.source_id,
-                },
+                "question_id": question.question_id,
+                "metadata": metadata_payload,
                 "positioning": {"page": None},
                 "manipulation": {
                     "method": "manual_seed",
@@ -368,15 +440,25 @@ class ManualInputLoader:
             }
             ai_questions.append(ai_entry)
 
-            question_index.append(
-                {
-                    "q_number": q_number,
-                    "page": None,
-                    "stem": {"text": question.stem_text, "bbox": None},
-                    "options": {key: {"text": value} for key, value in options_payload.items()},
-                    "provenance": {"sources_detected": ["manual_input"]},
-                }
-            )
+            index_entry: Dict[str, Any] = {
+                "q_number": q_number,
+                "page": None,
+                "stem": {"text": question.stem_text, "bbox": None},
+                "options": {key: {"text": value} for key, value in options_payload.items()},
+                "provenance": {"sources_detected": ["manual_input"]},
+                "question_id": question.question_id,
+            }
+            if question.has_image is not None:
+                index_entry["has_image"] = question.has_image
+            if question.image_path:
+                index_entry["image_path"] = question.image_path
+            question_index.append(index_entry)
+
+        manual_snapshot = {
+            key: value
+            for key, value in doc_meta.items()
+            if key not in {"questions", "answers"}
+        }
 
         structured: Dict[str, Any] = {
             "pipeline_metadata": {
@@ -391,11 +473,22 @@ class ManualInputLoader:
                 "document_id": doc_meta.get("document_id") or doc_meta.get("docid"),
                 "domain": doc_meta.get("domain"),
                 "academic_level": doc_meta.get("academic_level"),
+                "document_name": document_name,
+                "subjects": subjects,
+                "combination_used": combination_used,
+                "generated_at": generated_at,
+                "source_version": source_version,
             },
             "document": {
                 "source_path": str(pdf_path),
                 "filename": pdf_path.name,
                 "pages": page_count,
+                "title": document_name,
+                "subjects": subjects,
+                "total_marks": total_marks_value,
+                "number_of_questions": number_of_questions_value,
+                "number_of_pages": number_of_pages_value,
+                "latex_path": str(tex_path),
             },
             "ai_extraction": {
                 "source": "manual_input",
@@ -422,9 +515,46 @@ class ManualInputLoader:
             "pymupdf_span_index": [],
             "manual_input": {
                 "source_directory": str(self.manual_dir),
+                "pdf_path": str(pdf_path),
+                "tex_path": str(tex_path),
+                "json_path": str(json_path) if json_path else None,
+                "gold_path": str(gold_path) if gold_path else None,
                 "generated_at": isoformat(utc_now()),
+                "document_name": document_name,
+                "snapshot": manual_snapshot,
             },
         }
+
+        file_paths = doc_meta.get("file_paths") or {}
+        if file_paths:
+            structured["document"]["source_files"] = file_paths
+
+        stats = doc_meta.get("question_statistics")
+        if isinstance(stats, dict) and stats:
+            structured["question_statistics"] = stats
+        else:
+            by_type: Dict[str, int] = {}
+            by_marks: Dict[str, int] = {}
+            total_marks_by_type: Dict[str, int] = {}
+            for question in questions:
+                type_key = (question.question_type or "").upper()
+                if type_key == "MCQ_SINGLE":
+                    type_key = "MCQ"
+                elif type_key == "TRUE_FALSE":
+                    type_key = "TF"
+                by_type[type_key] = by_type.get(type_key, 0) + 1
+
+                if question.marks is not None:
+                    mark_key = str(question.marks)
+                    by_marks[mark_key] = by_marks.get(mark_key, 0) + 1
+                    total_marks_by_type[type_key] = total_marks_by_type.get(type_key, 0) + question.marks
+
+            structured["question_statistics"] = {
+                "by_type": by_type,
+                "by_marks": by_marks,
+                "total_marks_by_type": total_marks_by_type,
+                "total_questions": len(questions),
+            }
 
         return structured
 
