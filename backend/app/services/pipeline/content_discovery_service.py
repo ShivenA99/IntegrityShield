@@ -36,13 +36,13 @@ class ContentDiscoveryService:
             # If smart substitution recorded completion but no mappings were stored, fall back to reset mode
             preserve_manipulations = False
 
-        # Prefer AI questions produced in smart_reading (vision/fusion results)
+        # Prefer AI questions produced in smart_reading (data_extraction pipeline results)
         ai_questions: List[Dict[str, Any]] = list(structured.get("ai_questions") or [])
 
         if ai_questions:
             # If ai_questions available, use them as the source of truth
             self.logger.info(
-                f"Using {len(ai_questions)} AI questions from smart_reading as source of truth",
+                f"Using {len(ai_questions)} AI questions from smart_reading (data_extraction pipeline) as source of truth",
                 run_id=run_id,
             )
             questions = ai_questions
@@ -55,11 +55,32 @@ class ContentDiscoveryService:
 
         # Normalize and ensure required fields
         for i, question in enumerate(questions):
-            question.setdefault("q_number", str(question.get("question_number") or i + 1))
+            # Handle both old format and data_extraction format
+            # data_extraction format: question_number is int, needs to be converted to string
+            q_number = question.get("q_number") or question.get("question_number")
+            if q_number is not None:
+                question["q_number"] = str(q_number)
+            else:
+                question["q_number"] = str(i + 1)
+            
+            # Ensure question_number is also set (for compatibility)
+            question.setdefault("question_number", question["q_number"])
+            
             question.setdefault("question_type", question.get("question_type") or "mcq_single")
             if not question.get("stem_text"):
                 question["stem_text"] = f"Question {i + 1}"
             question.setdefault("options", question.get("options") or {})
+            
+            # Normalize positioning data from data_extraction format
+            positioning = question.get("positioning", {})
+            if positioning:
+                # Ensure stem_bbox is set from positioning.bbox or positioning.stem_bbox
+                if not question.get("stem_bbox"):
+                    question["stem_bbox"] = positioning.get("stem_bbox") or positioning.get("bbox")
+                
+                # Ensure stem_spans is set from positioning.stem_spans
+                if not question.get("stem_spans"):
+                    question["stem_spans"] = positioning.get("stem_spans", [])
 
         # Persist question manipulations (replace all for this run)
         if preserve_manipulations:
@@ -153,6 +174,7 @@ class ContentDiscoveryService:
             pos_raw = q.get("positioning") or {}
             positioning = dict(pos_raw)
 
+            # Handle stem_spans from multiple sources (data_extraction format or old format)
             stem_spans_raw = (
                 q.get("stem_spans")
                 or positioning.get("stem_spans")
@@ -165,7 +187,11 @@ class ContentDiscoveryService:
             else:
                 stem_spans = []
 
+            # Handle stem_bbox from multiple sources
+            # data_extraction format may have stem_bbox directly on question or in positioning
             stem_bbox = normalize_bbox(q.get("stem_bbox"))
+            if stem_bbox is None:
+                stem_bbox = normalize_bbox(positioning.get("stem_bbox"))
             if stem_bbox is None:
                 stem_bbox = normalize_bbox(positioning.get("bbox"))
 

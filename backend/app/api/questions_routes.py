@@ -569,3 +569,135 @@ def bulk_save_mappings(run_id: str):
 		result["errors"] = errors
 
 	return jsonify(result)
+
+
+@bp.post("/<run_id>/generate-mappings")
+def generate_mappings_for_all(run_id: str):
+	"""Generate mappings for all questions asynchronously."""
+	from ..services.mapping.gpt5_mapping_generator import GPT5MappingGeneratorService
+	from ..services.mapping.gpt5_config import MAPPINGS_PER_QUESTION
+	
+	run = PipelineRun.query.get(run_id)
+	if not run:
+		return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
+	
+	payload = request.json or {}
+	k = payload.get("k", MAPPINGS_PER_QUESTION)
+	strategy_name = payload.get("strategy", "replacement")
+	
+	try:
+		service = GPT5MappingGeneratorService()
+		result = service.generate_mappings_for_all_questions(
+			run_id=run_id,
+			k=k,
+			strategy_name=strategy_name
+		)
+		return jsonify(result)
+	except Exception as e:
+		logger.error(f"Failed to generate mappings for run {run_id}: {e}")
+		return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@bp.post("/<run_id>/<int:question_id>/generate-mappings")
+def generate_mappings_for_question(run_id: str, question_id: int):
+	"""Generate mappings for a single question."""
+	from ..services.mapping.gpt5_mapping_generator import GPT5MappingGeneratorService
+	from ..services.mapping.gpt5_config import MAPPINGS_PER_QUESTION
+	
+	question = QuestionManipulation.query.filter_by(
+		pipeline_run_id=run_id,
+		id=question_id
+	).first()
+	if not question:
+		return jsonify({"error": "Question manipulation not found"}), HTTPStatus.NOT_FOUND
+	
+	payload = request.json or {}
+	k = payload.get("k", MAPPINGS_PER_QUESTION)
+	strategy_name = payload.get("strategy", "replacement")
+	
+	try:
+		service = GPT5MappingGeneratorService()
+		result = service.generate_mappings_for_question(
+			run_id=run_id,
+			question_id=question_id,
+			k=k,
+			strategy_name=strategy_name
+		)
+		return jsonify(result)
+	except Exception as e:
+		logger.error(f"Failed to generate mappings for question {question_id}: {e}")
+		return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@bp.get("/<run_id>/generation-status")
+def get_generation_status(run_id: str):
+	"""Get status of mapping generation."""
+	from ..services.mapping.mapping_generation_logger import get_mapping_logger
+	
+	run = PipelineRun.query.get(run_id)
+	if not run:
+		return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
+	
+	try:
+		logger_service = get_mapping_logger()
+		logs = logger_service.get_logs(run_id)
+		
+		# Calculate status summary
+		questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+		status_summary = {}
+		
+		for question in questions:
+			question_logs = logger_service.get_question_logs(run_id, question.id)
+			generation_log = next(
+				(log for log in question_logs if log.get("stage") == "generation"),
+				None
+			)
+			
+			if generation_log:
+				status_summary[question.id] = {
+					"question_number": question.question_number,
+					"status": generation_log.get("status", "pending"),
+					"mappings_generated": generation_log.get("mappings_generated", 0),
+					"mappings_validated": generation_log.get("mappings_validated", 0),
+					"first_valid_mapping_index": generation_log.get("first_valid_mapping_index")
+				}
+			else:
+				status_summary[question.id] = {
+					"question_number": question.question_number,
+					"status": "pending",
+					"mappings_generated": 0,
+					"mappings_validated": 0,
+					"first_valid_mapping_index": None
+				}
+		
+		return jsonify({
+			"run_id": run_id,
+			"total_questions": len(questions),
+			"status_summary": status_summary,
+			"logs": logs
+		})
+	except Exception as e:
+		logger.error(f"Failed to get generation status for run {run_id}: {e}")
+		return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@bp.get("/<run_id>/generation-logs")
+def get_generation_logs(run_id: str):
+	"""Get detailed logs for mapping generation."""
+	from ..services.mapping.mapping_generation_logger import get_mapping_logger
+	
+	run = PipelineRun.query.get(run_id)
+	if not run:
+		return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
+	
+	try:
+		logger_service = get_mapping_logger()
+		logs = logger_service.get_logs(run_id)
+		
+		return jsonify({
+			"run_id": run_id,
+			"logs": logs
+		})
+	except Exception as e:
+		logger.error(f"Failed to get generation logs for run {run_id}: {e}")
+		return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR

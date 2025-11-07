@@ -240,7 +240,40 @@ class LatexAttackService:
     # Replacement pipeline
     # ------------------------------------------------------------------
     def _load_questions(self, run_id: str) -> List[QuestionManipulation]:
-        return QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+        """Load questions from database, always using structured.json as source of truth for substring_mappings."""
+        questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+        
+        # Always load substring_mappings from structured.json as the source of truth
+        structured = self.structured_manager.load(run_id) or {}
+        structured_questions = structured.get("questions", [])
+        
+        # Create a mapping of question_number to structured question data
+        structured_map = {
+            str(q.get("question_number") or q.get("q_number", "")): q
+            for q in structured_questions
+        }
+        
+        # Merge substring_mappings from structured.json into database questions
+        # Use structured.json as source of truth - if mappings exist there, use them
+        for question in questions:
+            q_number = str(question.question_number or "")
+            structured_q = structured_map.get(q_number)
+            
+            if structured_q:
+                manipulation = structured_q.get("manipulation", {})
+                mappings = manipulation.get("substring_mappings", [])
+                
+                # Always use mappings from structured.json if they exist
+                if mappings:
+                    # Convert to JSON-safe format and assign to question
+                    json_safe_mappings = json.loads(json.dumps(mappings))
+                    question.substring_mappings = json_safe_mappings
+                    self.logger.info(
+                        f"Loaded {len(json_safe_mappings)} substring_mappings from structured.json for question {q_number}",
+                        extra={"run_id": run_id, "question_number": q_number}
+                    )
+        
+        return questions
 
     def _preprocess_source(self, tex_content: str) -> str:
         pattern = re.compile(r"\\usepackage\{enumitem\}\s*")
@@ -310,6 +343,7 @@ class LatexAttackService:
 
         base_line_offset = full_text.count("\n", 0, segment_start)
         mappings = list(getattr(question, "substring_mappings", []) or [])
+        occupied: List[Tuple[int, int]] = []
 
         for mapping in mappings:
             original_raw = str((mapping or {}).get("original") or "").strip()
@@ -327,7 +361,27 @@ class LatexAttackService:
                 notes=(mapping or {}).get("notes"),
             )
 
-            local_match = self._locate_fragment(updated_segment, original_raw, [])
+            # Try positional matching first if available
+            latex_stem_text = (mapping or {}).get("latex_stem_text")
+            start_pos = (mapping or {}).get("start_pos")
+            end_pos = (mapping or {}).get("end_pos")
+            
+            local_match = None
+            if latex_stem_text and start_pos is not None and end_pos is not None:
+                # Use positional information
+                local_match = self._locate_substring_by_position(
+                    tex_content=updated_segment,
+                    latex_stem_text=latex_stem_text,
+                    original=original_raw,
+                    start_pos=start_pos,
+                    end_pos=end_pos,
+                    occupied=occupied
+                )
+            
+            # Fallback to string search if positional matching fails
+            if not local_match:
+                local_match = self._locate_fragment(updated_segment, original_raw, occupied)
+            
             if not local_match:
                 diagnostic.status = "not_found"
                 diagnostics.append(diagnostic)
@@ -345,6 +399,9 @@ class LatexAttackService:
 
             absolute_start = segment_start + local_start
             absolute_end = segment_start + local_end
+            
+            # Add to occupied ranges
+            occupied.append((local_start, local_end))
 
             diagnostic.status = "replaced"
             diagnostic.matched_fragment = fragment
@@ -502,6 +559,96 @@ class LatexAttackService:
             if self._range_available(candidate, occupied):
                 return candidate
         return None
+    
+    def _locate_substring_by_position(
+        self,
+        tex_content: str,
+        latex_stem_text: str,
+        original: str,
+        start_pos: int,
+        end_pos: int,
+        occupied: List[Tuple[int, int]] = None
+    ) -> Optional[Tuple[int, int]]:
+        """
+        Locate substring in LaTeX using positional information.
+        
+        Args:
+            tex_content: LaTeX content to search in
+            latex_stem_text: Exact LaTeX stem text from mapping
+            original: Original substring to find
+            start_pos: Start position relative to latex_stem_text
+            end_pos: End position relative to latex_stem_text
+            occupied: List of occupied ranges to skip
+            
+        Returns:
+            (start_index, end_index) tuple or None if not found
+        """
+        if occupied is None:
+            occupied = []
+        
+        # Find latex_stem_text in tex_content
+        stem_start = tex_content.find(latex_stem_text)
+        if stem_start == -1:
+            # Try normalized search (remove LaTeX commands)
+            normalized_stem = self._normalize_latex_text(latex_stem_text)
+            normalized_content = self._normalize_latex_text(tex_content)
+            stem_start = normalized_content.find(normalized_stem)
+            if stem_start != -1:
+                # Map back to original positions (approximate)
+                # This is a fallback - ideally latex_stem_text should match exactly
+                stem_start = tex_content.find(latex_stem_text[:50])  # Try first 50 chars
+                if stem_start == -1:
+                    return None
+        
+        if stem_start == -1:
+            return None
+        
+        # Calculate absolute positions
+        absolute_start = stem_start + start_pos
+        absolute_end = stem_start + end_pos
+        
+        # Verify positions are valid
+        if absolute_start < 0 or absolute_end > len(tex_content) or absolute_start >= absolute_end:
+            return None
+        
+        # Verify substring matches
+        actual_substring = tex_content[absolute_start:absolute_end]
+        if actual_substring != original:
+            # Try to find original in the vicinity
+            search_start = max(0, absolute_start - 50)
+            search_end = min(len(tex_content), absolute_end + 50)
+            search_area = tex_content[search_start:search_end]
+            original_pos = search_area.find(original)
+            if original_pos != -1:
+                absolute_start = search_start + original_pos
+                absolute_end = absolute_start + len(original)
+            else:
+                return None
+        
+        # Check if range is occupied
+        candidate = (absolute_start, absolute_end)
+        if not self._range_available(candidate, occupied):
+            return None
+        
+        # Check if inside \duallayerbox{}
+        prefix_start = max(0, absolute_start - 20)
+        prefix = tex_content[prefix_start:absolute_start]
+        if "\\duallayerbox{" in prefix:
+            return None
+        
+        return candidate
+    
+    def _normalize_latex_text(self, text: str) -> str:
+        """Normalize LaTeX text for comparison (remove commands, normalize whitespace)."""
+        normalized = text
+        # Remove common LaTeX commands
+        normalized = re.sub(r"\\textbf\{([^}]*)\}", r"\1", normalized)
+        normalized = re.sub(r"\\textit\{([^}]*)\}", r"\1", normalized)
+        normalized = re.sub(r"\\emph\{([^}]*)\}", r"\1", normalized)
+        normalized = re.sub(r"\\text\{([^}]*)\}", r"\1", normalized)
+        # Normalize whitespace
+        normalized = re.sub(r"\s+", " ", normalized)
+        return normalized.strip()
 
     def _build_relaxed_pattern(self, text: str) -> re.Pattern[str]:
         tokens = re.split(r"(\\s+)", text)

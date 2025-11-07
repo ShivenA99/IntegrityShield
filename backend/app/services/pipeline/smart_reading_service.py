@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import sys
+import shutil
+import json
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -8,11 +11,29 @@ import fitz
 from ...models import PipelineRun
 from ...services.data_management.file_manager import FileManager
 from ...services.data_management.structured_data_manager import StructuredDataManager
-from ...services.ai_clients.ai_client_orchestrator import AIClientOrchestrator
 from ...services.developer.live_logging_service import live_logging_service
 from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
-from ...services.pipeline.enhancement_methods.span_extractor import collect_span_records
+from ...utils.storage_paths import run_directory
+
+# Add data_extraction to path
+data_extraction_path = Path(__file__).parent.parent.parent.parent / "data_extraction"
+if str(data_extraction_path) not in sys.path:
+    sys.path.insert(0, str(data_extraction_path))
+
+try:
+    from src.pipeline import QuestionExtractionPipeline
+except ImportError:
+    # Fallback: try relative import
+    import importlib.util
+    pipeline_path = data_extraction_path / "src" / "pipeline.py"
+    if pipeline_path.exists():
+        spec = importlib.util.spec_from_file_location("pipeline", pipeline_path)
+        pipeline_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(pipeline_module)
+        QuestionExtractionPipeline = pipeline_module.QuestionExtractionPipeline
+    else:
+        raise ImportError(f"Cannot import QuestionExtractionPipeline from {data_extraction_path}")
 
 
 class SmartReadingService:
@@ -20,7 +41,14 @@ class SmartReadingService:
         self.logger = get_logger(__name__)
         self.file_manager = FileManager()
         self.structured_manager = StructuredDataManager()
-        self.ai_orchestrator = AIClientOrchestrator()
+        # Initialize data extraction pipeline
+        self.data_extraction_pipeline = QuestionExtractionPipeline(
+            use_openai=True,
+            use_mistral=True,
+            enable_latex=True,  # Always enabled
+            latex_include_images=True,
+            latex_compile_pdf=True
+        )
 
     async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
         return await asyncio.to_thread(self._process_pdf, run_id)
@@ -36,162 +64,112 @@ class SmartReadingService:
             run_id,
             "smart_reading",
             "INFO",
-            "Starting enhanced multi-source PDF processing",
+            "Starting data extraction pipeline processing",
             context={"pdf_path": str(pdf_path)}
         )
 
-        # Step 1: Traditional PyMuPDF extraction (baseline)
-        pymupdf_data = self._extract_pymupdf_data(pdf_path, run_id)
-
-        # Step 2: AI-powered question extraction
-        ai_result = self.ai_orchestrator.extract_questions_comprehensive(
-            pdf_path, pymupdf_data, run_id, parallel=True
+        # Step 1: Process PDF through data_extraction pipeline
+        extraction_result = self.data_extraction_pipeline.process_document(
+            str(pdf_path),
+            output_path=None  # Let pipeline determine output path
         )
 
-        # Step 3: Build comprehensive structured data
-        structured = self._build_enhanced_structured_data(
-            run_id, pdf_path, pymupdf_data, ai_result
+        # Step 2: Copy output files (.tex, .pdf, .json) to pipeline_runs/run_id/
+        copied_files = self._copy_extraction_outputs(run_id, pdf_path, extraction_result)
+
+        # Step 3: Transform data_extraction JSON format to structured.json format
+        structured = self._transform_data_extraction_output(
+            run_id, pdf_path, extraction_result, copied_files
         )
 
+        # Step 4: Save structured data
         self.structured_manager.save(run_id, structured)
 
         live_logging_service.emit(
             run_id,
             "smart_reading",
             "INFO",
-            "Enhanced PDF processing completed",
+            "Data extraction pipeline processing completed",
             context={
-                "pymupdf_elements": len(pymupdf_data.get("content_elements", [])),
-                "ai_questions_found": len(ai_result.questions),
-                "ai_confidence": ai_result.confidence,
-                "ai_sources": ai_result.raw_response.get("orchestration", {}).get("clients_used", []) if ai_result.raw_response else []
+                "questions_found": len(extraction_result.get("questions", [])),
+                "pages": extraction_result.get("number_of_pages", 0),
+                "files_copied": len(copied_files),
             }
         )
 
         return {
-            "pages": pymupdf_data.get("document", {}).get("pages", 0),
-            "elements_extracted": len(pymupdf_data.get("content_elements", [])),
-            "images_extracted": len(pymupdf_data.get("assets", {}).get("images", [])),
-            "ai_questions_found": len(ai_result.questions),
-            "ai_confidence": ai_result.confidence,
-            "ai_processing_time_ms": ai_result.processing_time_ms,
+            "pages": int(extraction_result.get("number_of_pages", 0)) if isinstance(extraction_result.get("number_of_pages"), str) else extraction_result.get("number_of_pages", 0),
+            "questions_found": len(extraction_result.get("questions", [])),
+            "files_copied": len(copied_files),
         }
 
-    def _extract_pymupdf_data(self, pdf_path: Path, run_id: str) -> Dict[str, Any]:
-        """Extract baseline data using PyMuPDF."""
-        live_logging_service.emit(run_id, "smart_reading", "INFO", "Extracting PyMuPDF baseline data")
+    def _copy_extraction_outputs(
+        self, run_id: str, pdf_path: Path, extraction_result: Dict[str, Any]
+    ) -> Dict[str, str]:
+        """Copy .tex, .pdf, and .json files from data_extraction output to pipeline_runs/run_id/."""
+        run_dir = run_directory(run_id)
+        copied_files = {}
+        
+        # Find the output directory from data_extraction pipeline
+        # The pipeline outputs to Output/latex_reconstruction/ for LaTeX files
+        data_extraction_base = Path(__file__).parent.parent.parent.parent / "data_extraction"
+        latex_output_dir = data_extraction_base / "Output" / "latex_reconstruction"
+        api_output_dir = data_extraction_base / "Output" / "output_api"
+        
+        pdf_stem = pdf_path.stem
+        
+        # Find and copy .tex file
+        tex_file = latex_output_dir / f"{pdf_stem}.tex"
+        if tex_file.exists():
+            dest_tex = run_dir / f"{pdf_stem}.tex"
+            shutil.copy2(tex_file, dest_tex)
+            copied_files["tex"] = str(dest_tex)
+            self.logger.info(f"Copied .tex file to {dest_tex}", run_id=run_id)
+        else:
+            self.logger.warning(f".tex file not found at {tex_file}", run_id=run_id)
+        
+        # Find and copy .pdf file (compiled LaTeX PDF)
+        pdf_file = latex_output_dir / f"{pdf_stem}.pdf"
+        if pdf_file.exists():
+            dest_pdf = run_dir / f"{pdf_stem}_reconstructed.pdf"
+            shutil.copy2(pdf_file, dest_pdf)
+            copied_files["pdf"] = str(dest_pdf)
+            self.logger.info(f"Copied .pdf file to {dest_pdf}", run_id=run_id)
+        else:
+            self.logger.warning(f".pdf file not found at {pdf_file}", run_id=run_id)
+        
+        # Find and copy .json file
+        # Try output_api first (main extraction result)
+        json_file = api_output_dir / f"{pdf_stem}_extracted.json"
+        if not json_file.exists():
+            # Try latex_reconstruction directory for structured JSON
+            json_file = latex_output_dir / f"{pdf_stem}_structured.json"
+        if json_file.exists():
+            dest_json = run_dir / f"{pdf_stem}_extracted.json"
+            shutil.copy2(json_file, dest_json)
+            copied_files["json"] = str(dest_json)
+            self.logger.info(f"Copied .json file to {dest_json}", run_id=run_id)
+        else:
+            self.logger.warning(f".json file not found at {json_file}", run_id=run_id)
+            # Save the extraction_result as JSON if file not found
+            dest_json = run_dir / f"{pdf_stem}_extracted.json"
+            with open(dest_json, 'w', encoding='utf-8') as f:
+                json.dump(extraction_result, f, indent=2, ensure_ascii=False)
+            copied_files["json"] = str(dest_json)
+            self.logger.info(f"Saved extraction_result as JSON to {dest_json}", run_id=run_id)
+        
+        return copied_files
 
-        doc = fitz.open(pdf_path)
-        content_elements: List[Dict[str, Any]] = []
-        images: List[Dict[str, Any]] = []
-        span_index: List[Dict[str, Any]] = []
-        fonts = set()
-
-        page_count = doc.page_count
-
-        for page_index in range(page_count):
-            page = doc[page_index]
-            text_dict = page.get_text("dict")
-
-            for block in text_dict.get("blocks", []):
-                for line in block.get("lines", []):
-                    for span in line.get("spans", []):
-                        content_elements.append(
-                            {
-                                "type": "text",
-                                "content": span.get("text"),
-                                "page": page_index + 1,
-                                "bbox": span.get("bbox"),
-                                "font": span.get("font"),
-                                "size": span.get("size"),
-                            }
-                        )
-                        fonts.add(span.get("font"))
-
-            # Extract images
-            for image_index, (xref, *_rest) in enumerate(page.get_images(), start=1):
-                base_image = doc.extract_image(xref)
-                if not base_image:
-                    continue
-                image_bytes = base_image["image"]
-                ext = base_image.get("ext", "png")
-                filename = f"page{page_index+1}_img{image_index}.{ext}"
-                asset_path = self.file_manager.store_asset(run_id, filename, image_bytes)
-
-                images.append(
-                    {
-                        "filename": filename,
-                        "path": str(asset_path),
-                        "page": page_index + 1,
-                        "width": base_image.get("width"),
-                        "height": base_image.get("height"),
-                    }
-                )
-
-            # Collect detailed span metadata for downstream span selection
-            span_records = collect_span_records(page, page_index)
-            page_spans: List[Dict[str, Any]] = []
-            for record in span_records:
-                span_id = (
-                    f"page{page_index}:block{record.block_index}:"
-                    f"line{record.line_index}:span{record.span_index}"
-                )
-                raw_text = record.text or ""
-                prompt_text = raw_text.replace("\n", " ").strip()
-                if len(prompt_text) > 320:
-                    prompt_text = prompt_text[:317] + "..."
-                bbox = [float(record.bbox[0]), float(record.bbox[1]), float(record.bbox[2]), float(record.bbox[3])]
-                quad = [
-                    bbox[0], bbox[1],
-                    bbox[2], bbox[1],
-                    bbox[2], bbox[3],
-                    bbox[0], bbox[3],
-                ]
-                page_spans.append(
-                    {
-                        "id": span_id,
-                        "page": page_index + 1,
-                        "block": record.block_index,
-                        "line": record.line_index,
-                        "span": record.span_index,
-                        "text": raw_text,
-                        "prompt_text": prompt_text,
-                        "bbox": bbox,
-                        "quad": quad,
-                        "font": record.font,
-                        "size": record.font_size,
-                    }
-                )
-
-            span_index.append({"page": page_index + 1, "spans": page_spans})
-
-        doc.close()
-
-        return {
-            "document": {
-                "source_path": str(pdf_path),
-                "filename": pdf_path.name,
-                "pages": page_count,
-            },
-            "assets": {
-                "images": images,
-                "fonts": sorted(fonts),
-                "extracted_elements": len(content_elements),
-            },
-            "content_elements": content_elements,
-            "span_index": span_index,
-        }
-
-    def _build_enhanced_structured_data(
+    def _transform_data_extraction_output(
         self,
         run_id: str,
         pdf_path: Path,
-        pymupdf_data: Dict[str, Any],
-        ai_result
+        extraction_result: Dict[str, Any],
+        copied_files: Dict[str, str]
     ) -> Dict[str, Any]:
-        """Build comprehensive structured data combining all sources."""
+        """Transform data_extraction JSON format to structured.json format."""
         structured = self.structured_manager.load(run_id)
-
+        
         # Update pipeline metadata
         structured.setdefault("pipeline_metadata", {})
         structured["pipeline_metadata"].update(
@@ -200,28 +178,62 @@ class SmartReadingService:
                 "stages_completed": ["smart_reading"],
                 "last_updated": isoformat(utc_now()),
                 "ai_extraction_enabled": True,
-                "ai_sources_used": ai_result.raw_response.get("orchestration", {}).get("clients_used", []) if ai_result.raw_response else []
+                "ai_sources_used": ["data_extraction_pipeline"],
+                "data_extraction_outputs": copied_files
             }
         )
-
-        # Add PyMuPDF baseline data
-        structured["document"] = pymupdf_data["document"]
-        structured["assets"] = pymupdf_data["assets"]
-        structured["content_elements"] = pymupdf_data["content_elements"]
-        structured["pymupdf_span_index"] = pymupdf_data.get("span_index", [])
-
-        # Add AI extraction results
-        structured["ai_extraction"] = {
-            "source": ai_result.source,
-            "confidence": ai_result.confidence,
-            "questions_found": len(ai_result.questions),
-            "processing_time_ms": ai_result.processing_time_ms,
-            "cost_cents": ai_result.cost_cents,
-            "error": ai_result.error,
-            "raw_response": ai_result.raw_response
+        
+        # Transform document metadata
+        pages = int(extraction_result.get("number_of_pages", 0)) if isinstance(extraction_result.get("number_of_pages"), str) else extraction_result.get("number_of_pages", 0)
+        structured["document"] = {
+            "source_path": str(pdf_path),
+            "filename": pdf_path.name,
+            "pages": pages,
+            "latex_path": copied_files.get("tex") if copied_files.get("tex") else None,
         }
-
-        # Store AI-detected questions (will be processed by content discovery)
-        structured["ai_questions"] = ai_result.questions
-
+        
+        # Transform questions to ai_questions format
+        ai_questions = []
+        for question in extraction_result.get("questions", []):
+            # Map data_extraction format to existing format
+            transformed_question = {
+                "question_number": str(question.get("question_number", "")),
+                "q_number": str(question.get("question_number", "")),
+                "question_type": question.get("question_type", "mcq_single"),
+                "stem_text": question.get("stem_text", ""),
+                "options": question.get("options", {}),
+                "gold_answer": question.get("gold_answer"),
+                "gold_confidence": question.get("gold_confidence", 0.9),
+                "confidence": question.get("confidence", 0.95),
+                "positioning": question.get("positioning", {}),
+                "stem_bbox": question.get("positioning", {}).get("stem_bbox") or question.get("positioning", {}).get("bbox"),
+                "stem_spans": question.get("positioning", {}).get("stem_spans", []),
+                "metadata": question.get("metadata", {}),
+                "sources_detected": ["data_extraction_pipeline"]
+            }
+            ai_questions.append(transformed_question)
+        
+        structured["ai_questions"] = ai_questions
+        
+        # Add AI extraction metadata
+        structured["ai_extraction"] = {
+            "source": "data_extraction_pipeline",
+            "confidence": 0.95 if ai_questions else 0.0,
+            "questions_found": len(ai_questions),
+            "processing_time_ms": 0,  # Could track this if needed
+            "cost_cents": 0,  # Could track this if needed
+            "error": None,
+            "raw_response": extraction_result
+        }
+        
+        # Add assets section (empty for now, could extract from data_extraction if needed)
+        structured.setdefault("assets", {
+            "images": [],
+            "fonts": [],
+            "extracted_elements": 0
+        })
+        
+        # Add content_elements if available (could extract from data_extraction)
+        structured.setdefault("content_elements", [])
+        
         return structured

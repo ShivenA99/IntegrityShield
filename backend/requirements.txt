@@ -21,3 +21,7 @@ redis>=5.0
 python-json-logger>=2.0
 structlog>=24.1
 uvicorn>=0.30
+# Data extraction pipeline dependencies
+mistralai>=1.0.0
+docling>=1.0.0
+python-docx>=1.0.0
