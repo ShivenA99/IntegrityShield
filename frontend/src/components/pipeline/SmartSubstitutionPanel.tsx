@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 
 import { usePipeline } from "@hooks/usePipeline";
 import { useQuestions } from "@hooks/useQuestions";
-import { autoGenerateMappings, updateQuestionManipulation, validateQuestion } from "@services/api/questionApi";
+import { autoGenerateMappings, updateQuestionManipulation, validateQuestion, generateMappingsForAll, getGenerationStatus, getGenerationLogs } from "@services/api/questionApi";
 import type { QuestionManipulation, SubstringMapping } from "@services/types/questions";
 import { formatDuration } from "@services/utils/formatters";
 import EnhancedQuestionViewer from "@components/question-level/EnhancedQuestionViewer";
@@ -18,6 +18,10 @@ const SmartSubstitutionPanel: React.FC = () => {
   const [validatingQuestionId, setValidatingQuestionId] = useState<number | null>(null);
   const [bulkMessage, setBulkMessage] = useState<string | null>(null);
   const [bulkError, setBulkError] = useState<string | null>(null);
+  const [isGeneratingMappings, setIsGeneratingMappings] = useState(false);
+  const [generationStatus, setGenerationStatus] = useState<Record<number, any>>({});
+  const [generationLogs, setGenerationLogs] = useState<any[]>([]);
+  const [showLogs, setShowLogs] = useState(false);
   const stage = status?.stages.find((item) => item.name === "smart_substitution");
   const totalMappings = useMemo(() => questions.reduce((acc, q) => acc + (q.substring_mappings?.length ?? 0), 0), [questions]);
   const validatedMappings = useMemo(() => questions.reduce((acc, q) => acc + ((q.substring_mappings || []).filter((m) => m.validated === true).length ?? 0), 0), [questions]);
@@ -265,6 +269,60 @@ const SmartSubstitutionPanel: React.FC = () => {
     }
   }, [activeRunId, generatingQuestionId, handleQuestionUpdated, refresh, refreshStatus]);
 
+  const handleGenerateMappings = useCallback(async () => {
+    if (!activeRunId || isGeneratingMappings) return;
+    
+    setIsGeneratingMappings(true);
+    setBulkError(null);
+    setBulkMessage(null);
+    
+    try {
+      // Start generation
+      await generateMappingsForAll(activeRunId, { k: 5, strategy: "replacement" });
+      
+      // Poll for status updates
+      const pollStatus = async () => {
+        try {
+          const status = await getGenerationStatus(activeRunId);
+          setGenerationStatus(status.status_summary || {});
+          
+          const logs = await getGenerationLogs(activeRunId);
+          setGenerationLogs(logs.logs || []);
+          
+          // Check if all questions are done
+          const allDone = Object.values(status.status_summary || {}).every(
+            (s: any) => s.status === "success" || s.status === "failed"
+          );
+          
+          if (!allDone) {
+            // Continue polling
+            setTimeout(pollStatus, 2000);
+          } else {
+            setIsGeneratingMappings(false);
+            await refresh();
+            if (activeRunId) {
+              await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
+            }
+            setBulkMessage("Mapping generation completed for all questions.");
+            setTimeout(() => setBulkMessage(null), 5000);
+          }
+        } catch (err) {
+          console.error("Failed to poll generation status:", err);
+          setIsGeneratingMappings(false);
+        }
+      };
+      
+      // Start polling after a short delay
+      setTimeout(pollStatus, 1000);
+      
+    } catch (err: any) {
+      console.error("Failed to generate mappings:", err);
+      const message = err?.response?.data?.error || err?.message || String(err);
+      setBulkError(`Failed to generate mappings: ${message}`);
+      setIsGeneratingMappings(false);
+    }
+  }, [activeRunId, isGeneratingMappings, refresh, refreshStatus]);
+  
   const validateAll = useCallback(async () => {
     if (!activeRunId || isBulkValidating) return;
     setBulkError(null);
@@ -347,12 +405,29 @@ const SmartSubstitutionPanel: React.FC = () => {
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <button
             className="pill-button"
+            onClick={handleGenerateMappings}
+            disabled={!questions.length || isGeneratingMappings || generatingQuestionId !== null || isBulkValidating}
+            title="Generate mappings for all questions using GPT-5"
+          >
+            {isGeneratingMappings ? 'Generating…' : 'Generate Mappings'}
+          </button>
+          <button
+            className="pill-button"
             onClick={validateAll}
-            disabled={!questions.length || isBulkValidating || !canValidateAll || generatingQuestionId !== null}
+            disabled={!questions.length || isBulkValidating || !canValidateAll || generatingQuestionId !== null || isGeneratingMappings}
             title={!canValidateAll && !isBulkValidating ? 'Add mappings for every question before validating all.' : undefined}
           >
             {isBulkValidating ? 'Validating…' : 'Validate all'}
           </button>
+          {runId && (
+            <button
+              className="pill-button"
+              onClick={() => setShowLogs(!showLogs)}
+              disabled={isGeneratingMappings}
+            >
+              {showLogs ? 'Hide Logs' : 'Show Logs'}
+            </button>
+          )}
           {spanPlanUrl && (
             <a
               className="pill-button"
@@ -366,6 +441,100 @@ const SmartSubstitutionPanel: React.FC = () => {
         </div>
         {bulkMessage && <div style={{ color: 'var(--success)', fontSize: '0.9rem' }}>{bulkMessage}</div>}
         {bulkError && <div style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>{bulkError}</div>}
+
+        {/* Generation Status Indicators */}
+        {isGeneratingMappings && Object.keys(generationStatus).length > 0 && (
+          <div style={{ 
+            padding: '1rem', 
+            backgroundColor: 'var(--bg-secondary)', 
+            borderRadius: '8px',
+            border: '1px solid var(--border)'
+          }}>
+            <h3 style={{ fontSize: '16px', margin: '0 0 0.75rem 0' }}>Generation Progress</h3>
+            <div style={{ display: 'grid', gap: '0.5rem' }}>
+              {Object.entries(generationStatus).map(([questionId, status]: [string, any]) => {
+                const question = questions.find(q => q.id === parseInt(questionId));
+                if (!question) return null;
+                return (
+                  <div key={questionId} style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    padding: '0.5rem',
+                    backgroundColor: status.status === 'success' ? 'var(--success-bg)' : 
+                                     status.status === 'failed' ? 'var(--danger-bg)' : 'var(--bg)',
+                    borderRadius: '4px'
+                  }}>
+                    <span>Question {status.question_number || question.question_number}</span>
+                    <span style={{ 
+                      fontSize: '0.875rem',
+                      color: status.status === 'success' ? 'var(--success)' : 
+                             status.status === 'failed' ? 'var(--danger)' : 'var(--muted)'
+                    }}>
+                      {status.status === 'success' ? '✓' : status.status === 'failed' ? '✗' : '…'} 
+                      {' '}
+                      {status.mappings_generated || 0} generated, {status.mappings_validated || 0} validated
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Generation Logs Viewer */}
+        {showLogs && generationLogs.length > 0 && (
+          <div style={{ 
+            padding: '1rem', 
+            backgroundColor: 'var(--bg-secondary)', 
+            borderRadius: '8px',
+            border: '1px solid var(--border)',
+            maxHeight: '400px',
+            overflowY: 'auto'
+          }}>
+            <h3 style={{ fontSize: '16px', margin: '0 0 0.75rem 0' }}>Generation Logs</h3>
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {generationLogs.map((log, idx) => (
+                <div key={idx} style={{ 
+                  padding: '0.75rem',
+                  backgroundColor: 'var(--bg)',
+                  borderRadius: '4px',
+                  fontSize: '0.875rem'
+                }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>
+                    Question {log.question_number} - {log.stage} ({log.status})
+                  </div>
+                  {log.stage === 'generation' && (
+                    <div>
+                      <div>Mappings Generated: {log.mappings_generated || 0}</div>
+                      {log.details?.strategy && <div>Strategy: {log.details.strategy}</div>}
+                    </div>
+                  )}
+                  {log.stage === 'validation' && log.validation_logs && (
+                    <div>
+                      <div>Mappings Validated: {log.mappings_validated || 0}</div>
+                      {log.first_valid_mapping_index !== null && (
+                        <div>First Valid Mapping: Index {log.first_valid_mapping_index}</div>
+                      )}
+                      <div style={{ marginTop: '0.5rem', fontSize: '0.75rem' }}>
+                        {log.validation_logs.map((vlog: any, vidx: number) => (
+                          <div key={vidx} style={{ marginTop: '0.25rem' }}>
+                            Mapping {vlog.mapping_index}: {vlog.status}
+                            {vlog.validation_result && (
+                              <div style={{ marginLeft: '1rem', color: 'var(--muted)' }}>
+                                Confidence: {vlog.validation_result.confidence?.toFixed(2) || 'N/A'}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="info-grid">
           <div className="info-card">

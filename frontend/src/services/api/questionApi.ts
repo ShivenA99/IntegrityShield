@@ -74,3 +74,30 @@ export async function fetchQuestionHistory(runId: string, questionId: number) {
   const response = await client.get(`/${runId}/${questionId}/history`);
   return response.data;
 }
+
+export async function generateMappingsForAll(
+  runId: string,
+  payload: { k?: number; strategy?: string } = {}
+) {
+  const response = await client.post(`/${runId}/generate-mappings`, payload);
+  return response.data;
+}
+
+export async function generateMappingsForQuestion(
+  runId: string,
+  questionId: number,
+  payload: { k?: number; strategy?: string } = {}
+) {
+  const response = await client.post(`/${runId}/${questionId}/generate-mappings`, payload);
+  return response.data;
+}
+
+export async function getGenerationStatus(runId: string) {
+  const response = await client.get(`/${runId}/generation-status`);
+  return response.data;
+}
+
+export async function getGenerationLogs(runId: string) {
+  const response = await client.get(`/${runId}/generation-logs`);
+  return response.data;
+}
