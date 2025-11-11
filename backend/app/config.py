@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import Any
 
 
 def _parse_cors_origins() -> str | list[str]:
@@ -22,6 +23,12 @@ class BaseConfig:
         "FAIRTESTAI_DATABASE_URL",
         f"sqlite:///{(Path.cwd() / 'data' / 'fairtestai.db').resolve()}",
     )
+    SQLALCHEMY_ENGINE_OPTIONS: dict[str, Any] = {"pool_pre_ping": True}
+    if SQLALCHEMY_DATABASE_URI.startswith("sqlite"):
+        SQLALCHEMY_ENGINE_OPTIONS["connect_args"] = {
+            "check_same_thread": False,
+            "timeout": float(os.getenv("FAIRTESTAI_SQLITE_TIMEOUT_SECONDS", "30")),
+        }
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_SORT_KEYS = False
     MAX_CONTENT_LENGTH = 200 * 1024 * 1024  # 200 MB uploads
