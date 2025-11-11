@@ -24,23 +24,42 @@ class ContentDiscoveryService:
         elements = structured.get("content_elements", [])
         metadata = structured.get("pipeline_metadata", {}) or {}
 
-        existing_manipulations = {
-            str(manip.question_number): manip
-            for manip in QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
-        }
+        existing_rows = (
+            QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+            .order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+            .all()
+        )
+        existing_by_id = {row.id: row for row in existing_rows}
+        existing_by_source = {row.source_identifier: row for row in existing_rows if row.source_identifier}
+        existing_by_number = {str(row.question_number): row for row in existing_rows}
+
         smart_substitution_completed = "smart_substitution" in set(metadata.get("stages_completed", []) or [])
-        has_existing_mappings = any((manip.substring_mappings or []) for manip in existing_manipulations.values())
-        preserve_manipulations = bool(existing_manipulations) and smart_substitution_completed
+        has_existing_mappings = any((row.substring_mappings or []) for row in existing_rows)
+        preserve_manipulations = bool(existing_rows) and smart_substitution_completed and has_existing_mappings
 
-        if preserve_manipulations and not has_existing_mappings:
-            # If smart substitution recorded completion but no mappings were stored, fall back to reset mode
-            preserve_manipulations = False
+        def derive_source_identifier(question: Dict[str, Any], index: int) -> str:
+            candidates = [
+                question.get("source_identifier"),
+                question.get("question_id"),
+                question.get("source_id"),
+                question.get("uid"),
+            ]
+            for candidate in candidates:
+                if candidate:
+                    return str(candidate)
 
-        # Prefer AI questions produced in smart_reading (data_extraction pipeline results)
+            positioning = question.get("positioning") or {}
+            span_ids = positioning.get("span_ids") or positioning.get("stem_spans") or question.get("stem_spans")
+            if isinstance(span_ids, list) and span_ids:
+                return f"span-{span_ids[0]}"
+            if isinstance(span_ids, str):
+                return f"span-{span_ids}"
+
+            return f"auto-{index}"
+
         ai_questions: List[Dict[str, Any]] = list(structured.get("ai_questions") or [])
 
         if ai_questions:
-            # If ai_questions available, use them as the source of truth
             self.logger.info(
                 f"Using {len(ai_questions)} AI questions from smart_reading (data_extraction pipeline) as source of truth",
                 run_id=run_id,
@@ -53,113 +72,193 @@ class ContentDiscoveryService:
             )
             questions = self._fallback_question_detection(elements)
 
-        # Normalize and ensure required fields
         for i, question in enumerate(questions):
-            # Handle both old format and data_extraction format
-            # data_extraction format: question_number is int, needs to be converted to string
             q_number = question.get("q_number") or question.get("question_number")
             if q_number is not None:
                 question["q_number"] = str(q_number)
             else:
                 question["q_number"] = str(i + 1)
-            
-            # Ensure question_number is also set (for compatibility)
+
             question.setdefault("question_number", question["q_number"])
-            
             question.setdefault("question_type", question.get("question_type") or "mcq_single")
             if not question.get("stem_text"):
                 question["stem_text"] = f"Question {i + 1}"
             question.setdefault("options", question.get("options") or {})
-            
-            # Normalize positioning data from data_extraction format
+
             positioning = question.get("positioning", {})
             if positioning:
-                # Ensure stem_bbox is set from positioning.bbox or positioning.stem_bbox
                 if not question.get("stem_bbox"):
                     question["stem_bbox"] = positioning.get("stem_bbox") or positioning.get("bbox")
-                
-                # Ensure stem_spans is set from positioning.stem_spans
                 if not question.get("stem_spans"):
                     question["stem_spans"] = positioning.get("stem_spans", [])
 
-        # Persist question manipulations (replace all for this run)
+            question["sequence_index"] = i
+            question["source_identifier"] = derive_source_identifier(question, i)
+
         if preserve_manipulations:
             self.logger.info(
                 "Preserving existing manipulations during content discovery",
                 run_id=run_id,
-                questions=len(existing_manipulations),
+                questions=len(existing_rows),
             )
-            updated_manipulations = {}
-            new_question_numbers = set()
+            updated_rows: List[QuestionManipulation] = []
+            seen_ids: set[int] = set()
 
             for question in questions:
+                sequence_index = int(question.get("sequence_index", len(updated_rows)))
+                source_identifier = str(question.get("source_identifier") or f"auto-{sequence_index}")
                 q_number = str(question.get("q_number") or question.get("question_number") or "").strip()
-                if not q_number:
-                    continue
-                new_question_numbers.add(q_number)
-                existing = existing_manipulations.get(q_number)
+
+                existing = existing_by_source.get(source_identifier)
+                if existing is None:
+                    existing = existing_by_number.get(q_number)
 
                 if existing:
+                    existing.sequence_index = sequence_index
+                    if source_identifier and existing.source_identifier != source_identifier:
+                        existing.source_identifier = source_identifier
                     existing.question_type = str(question.get("question_type", existing.question_type or "mcq_single"))
                     existing.original_text = str(question.get("stem_text") or existing.original_text or "")
                     existing.options_data = question.get("options", existing.options_data or {})
                     positioning = question.get("positioning") or {}
                     if positioning:
                         existing.stem_position = positioning
-                    updated_manipulations[q_number] = existing
                     db.session.add(existing)
+
+                    substring_mappings = existing.substring_mappings or []
+                    if substring_mappings:
+                        manip_payload = {
+                            "method": existing.manipulation_method or "smart_substitution",
+                            "substring_mappings": substring_mappings,
+                            "effectiveness_score": existing.effectiveness_score,
+                            "auto_generate_status": "prefilled",
+                        }
+                    else:
+                        manip_payload = {
+                            "method": existing.manipulation_method or "smart_substitution",
+                            "substring_mappings": [],
+                            "effectiveness_score": existing.effectiveness_score,
+                            "auto_generate_status": "pending",
+                        }
+                    question["manipulation"] = manip_payload
+                    question["manipulation_id"] = existing.id
+                    question["sequence_index"] = existing.sequence_index
+                    question["source_identifier"] = existing.source_identifier
+
+                    if existing.source_identifier:
+                        existing_by_source[existing.source_identifier] = existing
+                    if q_number:
+                        existing_by_number[q_number] = existing
+
+                    stem_position = existing.stem_position or {}
+                    if stem_position:
+                        question.setdefault("positioning", {})
+                        for key, value in stem_position.items():
+                            if key not in question["positioning"] or question["positioning"][key] in (None, [], {}):
+                                question["positioning"][key] = value
+                        stem_bbox_existing = stem_position.get("bbox")
+                        if stem_bbox_existing and question.get("stem_bbox") is None:
+                            try:
+                                question["stem_bbox"] = [float(v) for v in stem_bbox_existing]
+                            except (TypeError, ValueError):
+                                question["stem_bbox"] = stem_bbox_existing
+                        stem_spans_existing = (
+                            stem_position.get("stem_spans")
+                            or stem_position.get("span_ids")
+                            or []
+                        )
+                        if stem_spans_existing and not question.get("stem_spans"):
+                            question["stem_spans"] = [str(span_id) for span_id in stem_spans_existing if span_id]
+
+                    updated_rows.append(existing)
+                    seen_ids.add(existing.id)
                 else:
                     manipulation = QuestionManipulation(
                         pipeline_run_id=run_id,
-                        question_number=q_number,
-                        question_type=str(question.get("question_type", "multiple_choice")),
-                        original_text=str(question.get("stem_text") or f"Question {q_number}"),
+                        question_number=q_number or str(sequence_index + 1),
+                        question_type=str(question.get("question_type", "mcq_single")),
+                        original_text=str(question.get("stem_text") or f"Question {sequence_index + 1}"),
                         options_data=question.get("options", {}),
                         ai_model_results={},
+                        sequence_index=sequence_index,
+                        source_identifier=source_identifier,
                     )
                     db.session.add(manipulation)
-                    updated_manipulations[q_number] = manipulation
+                    db.session.flush()
 
-            for q_number, manipulation in existing_manipulations.items():
-                if q_number not in new_question_numbers:
+                    question["manipulation"] = {
+                        "method": manipulation.manipulation_method or "smart_substitution",
+                        "substring_mappings": [],
+                        "effectiveness_score": manipulation.effectiveness_score,
+                        "auto_generate_status": "pending",
+                    }
+                    question["manipulation_id"] = manipulation.id
+                    question["sequence_index"] = manipulation.sequence_index
+                    question["source_identifier"] = manipulation.source_identifier
+
+                    if manipulation.source_identifier:
+                        existing_by_source[manipulation.source_identifier] = manipulation
+                    if q_number:
+                        existing_by_number[q_number] = manipulation
+
+                    updated_rows.append(manipulation)
+                    seen_ids.add(manipulation.id)
+
+            for row in existing_rows:
+                if row.id not in seen_ids:
                     self.logger.info(
                         "Removing stale manipulation after content discovery",
                         run_id=run_id,
-                        question_number=q_number,
+                        question_number=row.question_number,
                     )
-                    db.session.delete(manipulation)
+                    db.session.delete(row)
 
             db.session.commit()
-            existing_manipulations = updated_manipulations
+            existing_rows = updated_rows
+            existing_by_id = {row.id: row for row in existing_rows}
         else:
-            if existing_manipulations:
+            if existing_rows:
                 self.logger.info(
                     "Resetting manipulations for content discovery",
                     run_id=run_id,
-                    previous_questions=len(existing_manipulations),
+                    previous_questions=len(existing_rows),
                 )
             QuestionManipulation.query.filter_by(pipeline_run_id=run_id).delete()
             db.session.commit()
 
+            new_rows: List[QuestionManipulation] = []
             for question in questions:
+                sequence_index = int(question.get("sequence_index", len(new_rows)))
+                source_identifier = str(question.get("source_identifier") or f"auto-{sequence_index}")
                 manipulation = QuestionManipulation(
                     pipeline_run_id=run_id,
                     question_number=str(question["q_number"]),
-                    question_type=str(question.get("question_type", "multiple_choice")),
+                    question_type=str(question.get("question_type", "mcq_single")),
                     original_text=str(question["stem_text"]),
                     options_data=question.get("options", {}),
                     ai_model_results={},
+                    sequence_index=sequence_index,
+                    source_identifier=source_identifier,
                 )
                 db.session.add(manipulation)
+                db.session.flush()
+
+                question["manipulation"] = {
+                    "method": manipulation.manipulation_method or "smart_substitution",
+                    "substring_mappings": [],
+                    "effectiveness_score": manipulation.effectiveness_score,
+                    "auto_generate_status": "pending",
+                }
+                question["manipulation_id"] = manipulation.id
+                question["sequence_index"] = manipulation.sequence_index
+                question["source_identifier"] = manipulation.source_identifier
+
+                new_rows.append(manipulation)
 
             db.session.commit()
-            existing_manipulations = {
-                str(manip.question_number): manip
-                for manip in QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
-            }
+            existing_rows = new_rows
+            existing_by_id = {row.id: row for row in existing_rows}
 
-        # Build a minimal question_index to tie questions to geometry for later rendering
-        # Prefer positioning from AI extraction if available
         question_index: List[Dict[str, Any]] = []
         span_index_available = bool(structured.get("pymupdf_span_index"))
 
@@ -170,11 +269,11 @@ class ContentDiscoveryService:
                 except (TypeError, ValueError):
                     return None
             return None
+
         for q in questions:
             pos_raw = q.get("positioning") or {}
             positioning = dict(pos_raw)
 
-            # Handle stem_spans from multiple sources (data_extraction format or old format)
             stem_spans_raw = (
                 q.get("stem_spans")
                 or positioning.get("stem_spans")
@@ -187,8 +286,6 @@ class ContentDiscoveryService:
             else:
                 stem_spans = []
 
-            # Handle stem_bbox from multiple sources
-            # data_extraction format may have stem_bbox directly on question or in positioning
             stem_bbox = normalize_bbox(q.get("stem_bbox"))
             if stem_bbox is None:
                 stem_bbox = normalize_bbox(positioning.get("stem_bbox"))
@@ -212,49 +309,13 @@ class ContentDiscoveryService:
             q["stem_bbox"] = stem_bbox
             q["stem_spans"] = stem_spans
 
-            if preserve_manipulations:
-                q_number = str(q.get("q_number") or q.get("question_number") or "").strip()
-                existing = existing_manipulations.get(q_number)
-                if existing:
-                    substring_mappings = existing.substring_mappings or []
-                    if substring_mappings:
-                        manip_payload = {
-                            "method": existing.manipulation_method or "smart_substitution",
-                            "substring_mappings": substring_mappings,
-                            "effectiveness_score": existing.effectiveness_score,
-                            "auto_generate_status": "prefilled",
-                        }
-                    else:
-                        manip_payload = {
-                            "method": existing.manipulation_method or "smart_substitution",
-                            "substring_mappings": [],
-                            "effectiveness_score": existing.effectiveness_score,
-                            "auto_generate_status": "pending",
-                        }
-
-                    q["manipulation"] = manip_payload
-
-                    stem_position = existing.stem_position or {}
-                    if stem_position:
-                        q.setdefault("positioning", {})
-                        for key, value in stem_position.items():
-                            if key not in q["positioning"] or q["positioning"][key] in (None, [], {}):
-                                q["positioning"][key] = value
-                        stem_bbox_existing = stem_position.get("bbox")
-                        if stem_bbox_existing and q.get("stem_bbox") is None:
-                            try:
-                                q["stem_bbox"] = [float(v) for v in stem_bbox_existing]
-                            except (TypeError, ValueError):
-                                q["stem_bbox"] = stem_bbox_existing
-                        stem_spans_existing = (
-                            stem_position.get("stem_spans")
-                            or stem_position.get("span_ids")
-                            or []
-                        )
-                        if stem_spans_existing and not q.get("stem_spans"):
-                            q["stem_spans"] = [str(span_id) for span_id in stem_spans_existing if span_id]
+            manipulation_id = q.get("manipulation_id")
+            manipulation_model = existing_by_id.get(manipulation_id) if manipulation_id else None
 
             entry = {
+                "manipulation_id": manipulation_id,
+                "sequence_index": q.get("sequence_index"),
+                "source_identifier": q.get("source_identifier"),
                 "q_number": str(q.get("q_number")),
                 "page": positioning.get("page"),
                 "stem": {
@@ -273,6 +334,9 @@ class ContentDiscoveryService:
                 "positioning": positioning,
             }
 
+            if manipulation_model is not None:
+                entry["question_number"] = str(manipulation_model.question_number)
+
             if stem_spans:
                 entry["stem"]["spans"] = stem_spans
                 entry["stem_spans"] = stem_spans
@@ -282,7 +346,6 @@ class ContentDiscoveryService:
 
             question_index.append(entry)
 
-        # Update structured data
         structured["questions"] = questions
         structured["question_index"] = question_index
         metadata = structured.setdefault("pipeline_metadata", {})

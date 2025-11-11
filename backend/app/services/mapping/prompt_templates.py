@@ -32,6 +32,8 @@ IMPORTANT:
 - The original_substring MUST be an exact substring of latex_stem_text
 - The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)
 - The target_wrong_answer MUST be different from the gold answer
+- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.
+- The latex_stem_text may include \item tokens from enumerate environments. Keep the \item token intact and operate on the descriptive text that follows it whenever possible.
 - The replacement should be natural and semantically meaningful
 
 Return as JSON array:
@@ -82,6 +84,8 @@ IMPORTANT:
 - The original_substring MUST be an exact substring of latex_stem_text
 - The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)
 - The target_wrong_answer MUST be the opposite of the gold answer
+- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.
+- The latex_stem_text may include \item tokens from enumerate environments. Keep the \item token intact and operate on the descriptive text that follows it whenever possible.
 - The replacement should be natural and semantically meaningful
 
 Return as JSON array:
@@ -132,6 +136,8 @@ IMPORTANT:
 - The original_substring MUST be an exact substring of latex_stem_text
 - The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)
 - The replacement should cause a verifiable deviation in the answer
+- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.
+- The latex_stem_text may include \item tokens from enumerate environments. Keep the \item token intact and operate on the descriptive text that follows it whenever possible.
 - The replacement should be natural and semantically meaningful
 
 Return as JSON array:

@@ -20,6 +20,10 @@ from ..services.pipeline.auto_mapping_strategy import (
     get_strategy,
 )
 from ..utils.exceptions import ResourceNotFound
+from ..services.mapping.gpt5_config import MAPPINGS_PER_QUESTION
+from ..services.mapping.mapping_generation_coordinator import get_mapping_generation_coordinator
+from ..services.mapping.mapping_generation_logger import get_mapping_logger
+from ..services.mapping.mapping_staging_service import MappingStagingService
 
 
 bp = Blueprint("questions", __name__, url_prefix="/questions")
@@ -48,6 +52,31 @@ def _has_overlaps(mappings: List[Dict[str, Any]]) -> bool:
 	return False
 
 
+def _canonicalize_mappings_for_compare(mappings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+	canonical: List[Dict[str, Any]] = []
+	for entry in mappings:
+		start_pos = entry.get("start_pos")
+		end_pos = entry.get("end_pos")
+		if start_pos is None or end_pos is None:
+			continue
+		try:
+			start_pos_int = int(start_pos)
+			end_pos_int = int(end_pos)
+		except (TypeError, ValueError):
+			continue
+		canonical.append(
+			{
+				"original": entry.get("original"),
+				"replacement": entry.get("replacement"),
+				"start_pos": start_pos_int,
+				"end_pos": end_pos_int,
+				"context": entry.get("context", "question_stem"),
+			}
+		)
+	canonical.sort(key=lambda item: (item["start_pos"], item["end_pos"], item["original"] or ""))
+	return canonical
+
+
 def init_app(api_bp: Blueprint) -> None:
 	api_bp.register_blueprint(bp)
 
@@ -60,7 +89,11 @@ def list_questions(run_id: str):
 	if not run:
 		return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
 
-	questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+	questions = (
+		QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+		.order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+		.all()
+	)
 
 	# Load structured data to get rich question content
 	structured_manager = StructuredDataManager()
@@ -77,7 +110,9 @@ def list_questions(run_id: str):
 				{
 					"id": question.id,
 					"question_number": question.question_number,
+					"sequence_index": question.sequence_index,
 					"question_type": question.question_type,
+					"source_identifier": question.source_identifier,
 					"original_text": question.original_text,
 					# Use rich AI extraction data if available, fallback to original_text
 					"stem_text": (
@@ -181,7 +216,7 @@ def update_manipulation(run_id: str, question_id: int):
 	db.session.commit()
 
 	if payload.get("regenerate_mappings"):
-		service.refresh_question_mapping(run_id, question.question_number)
+		service.refresh_question_mapping(run_id, str(question.id))
 
 	service.sync_structured_mappings(run_id)
 
@@ -228,6 +263,29 @@ def validate_mapping(run_id: str, question_id: int):
 		if _has_overlaps(normalized_entries):
 			return jsonify({"error": "Mappings must not overlap"}), HTTPStatus.BAD_REQUEST
 		ordered_entries = sorted(normalized_entries, key=lambda item: int(item.get("start_pos", 0)))
+
+		existing_mappings = question.substring_mappings or []
+		if existing_mappings:
+			existing_normalized = [
+				service._normalize_mapping_entry(entry)
+				for entry in existing_mappings
+				if entry.get("start_pos") is not None and entry.get("end_pos") is not None
+			]
+			existing_canonical = _canonicalize_mappings_for_compare(existing_normalized)
+			requested_canonical = _canonicalize_mappings_for_compare(ordered_entries)
+			if (
+				existing_canonical == requested_canonical
+				and all(bool(entry.get("validated")) for entry in existing_mappings)
+			):
+				last_validation = (question.ai_model_results or {}).get("last_validation")
+				return jsonify(
+					{
+						"status": "already_validated",
+						"substring_mappings": existing_mappings,
+						"last_validation": last_validation,
+					}
+				)
+
 		modified = manipulator.apply_mappings_to_text(source_text, ordered_entries)
 	except ValueError as exc:
 		return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
@@ -574,9 +632,6 @@ def bulk_save_mappings(run_id: str):
 @bp.post("/<run_id>/generate-mappings")
 def generate_mappings_for_all(run_id: str):
 	"""Generate mappings for all questions asynchronously."""
-	from ..services.mapping.gpt5_mapping_generator import GPT5MappingGeneratorService
-	from ..services.mapping.gpt5_config import MAPPINGS_PER_QUESTION
-	
 	run = PipelineRun.query.get(run_id)
 	if not run:
 		return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
@@ -584,48 +639,48 @@ def generate_mappings_for_all(run_id: str):
 	payload = request.json or {}
 	k = payload.get("k", MAPPINGS_PER_QUESTION)
 	strategy_name = payload.get("strategy", "replacement")
+	try:
+		k = int(k)
+	except (TypeError, ValueError):
+		k = MAPPINGS_PER_QUESTION
 	
 	try:
-		service = GPT5MappingGeneratorService()
-		result = service.generate_mappings_for_all_questions(
-			run_id=run_id,
+		coordinator = get_mapping_generation_coordinator()
+		job_id = coordinator.submit_bulk_generation(
+			run_id,
 			k=k,
-			strategy_name=strategy_name
+			strategy_name=strategy_name,
 		)
-		return jsonify(result)
-	except Exception as e:
-		logger.error(f"Failed to generate mappings for run {run_id}: {e}")
+		return jsonify({"run_id": run_id, "job_id": job_id}), HTTPStatus.ACCEPTED
+	except Exception as e:  # pragma: no cover - defensive
+		logger.error(f"Failed to queue mapping generation for run {run_id}: {e}")
 		return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 @bp.post("/<run_id>/<int:question_id>/generate-mappings")
 def generate_mappings_for_question(run_id: str, question_id: int):
 	"""Generate mappings for a single question."""
-	from ..services.mapping.gpt5_mapping_generator import GPT5MappingGeneratorService
-	from ..services.mapping.gpt5_config import MAPPINGS_PER_QUESTION
-	
-	question = QuestionManipulation.query.filter_by(
-		pipeline_run_id=run_id,
-		id=question_id
-	).first()
-	if not question:
-		return jsonify({"error": "Question manipulation not found"}), HTTPStatus.NOT_FOUND
-	
 	payload = request.json or {}
 	k = payload.get("k", MAPPINGS_PER_QUESTION)
 	strategy_name = payload.get("strategy", "replacement")
+	try:
+		k = int(k)
+	except (TypeError, ValueError):
+		k = MAPPINGS_PER_QUESTION
 	
 	try:
-		service = GPT5MappingGeneratorService()
-		result = service.generate_mappings_for_question(
-			run_id=run_id,
-			question_id=question_id,
+		coordinator = get_mapping_generation_coordinator()
+		job_id = coordinator.submit_question_generation(
+			run_id,
+			question_id,
 			k=k,
-			strategy_name=strategy_name
+			strategy_name=strategy_name,
 		)
-		return jsonify(result)
-	except Exception as e:
-		logger.error(f"Failed to generate mappings for question {question_id}: {e}")
+		return jsonify({"run_id": run_id, "job_id": job_id, "question_id": question_id}), HTTPStatus.ACCEPTED
+	except ValueError as e:
+		return jsonify({"error": str(e)}), HTTPStatus.NOT_FOUND
+	except Exception as e:  # pragma: no cover - defensive
+		logger.error(f"Failed to queue mapping generation for question {question_id}: {e}")
 		return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
@@ -640,10 +695,18 @@ def get_generation_status(run_id: str):
 	
 	try:
 		logger_service = get_mapping_logger()
+		logger_service.load_logs(run_id)
 		logs = logger_service.get_logs(run_id)
-		
+		coordinator = get_mapping_generation_coordinator()
+		staging_service = MappingStagingService()
+		staged_snapshot = staging_service.load(run_id)
+
 		# Calculate status summary
-		questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+		questions = (
+			QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+			.order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+			.all()
+		)
 		status_summary = {}
 		
 		for question in questions:
@@ -653,28 +716,36 @@ def get_generation_status(run_id: str):
 				None
 			)
 			
+			key = str(question.id)
 			if generation_log:
-				status_summary[question.id] = {
+				details = generation_log.get("details") or {}
+				status_summary[key] = {
 					"question_number": question.question_number,
+					"sequence_index": question.sequence_index,
 					"status": generation_log.get("status", "pending"),
 					"mappings_generated": generation_log.get("mappings_generated", 0),
 					"mappings_validated": generation_log.get("mappings_validated", 0),
-					"first_valid_mapping_index": generation_log.get("first_valid_mapping_index")
+					"first_valid_mapping_index": generation_log.get("first_valid_mapping_index"),
+					"job_id": details.get("job_id"),
 				}
 			else:
-				status_summary[question.id] = {
+				status_summary[key] = {
 					"question_number": question.question_number,
+					"sequence_index": question.sequence_index,
 					"status": "pending",
 					"mappings_generated": 0,
 					"mappings_validated": 0,
-					"first_valid_mapping_index": None
+					"first_valid_mapping_index": None,
+					"job_id": None,
 				}
 		
 		return jsonify({
 			"run_id": run_id,
 			"total_questions": len(questions),
 			"status_summary": status_summary,
-			"logs": logs
+			"logs": logs,
+			"job": coordinator.get_latest_job_snapshot_for_run(run_id),
+			"staged": staged_snapshot.get("questions", {}),
 		})
 	except Exception as e:
 		logger.error(f"Failed to get generation status for run {run_id}: {e}")
@@ -684,19 +755,21 @@ def get_generation_status(run_id: str):
 @bp.get("/<run_id>/generation-logs")
 def get_generation_logs(run_id: str):
 	"""Get detailed logs for mapping generation."""
-	from ..services.mapping.mapping_generation_logger import get_mapping_logger
-	
 	run = PipelineRun.query.get(run_id)
 	if not run:
 		return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
 	
 	try:
 		logger_service = get_mapping_logger()
+		staging_service = MappingStagingService()
+		logger_service.load_logs(run_id)
 		logs = logger_service.get_logs(run_id)
+		staged_snapshot = staging_service.load(run_id)
 		
 		return jsonify({
 			"run_id": run_id,
-			"logs": logs
+			"logs": logs,
+			"staged": staged_snapshot.get("questions", {}),
 		})
 	except Exception as e:
 		logger.error(f"Failed to get generation logs for run {run_id}: {e}")

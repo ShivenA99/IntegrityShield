@@ -102,7 +102,14 @@ class LatexAttackService:
 % --- end latex-dual-layer macros ---
 """.strip()
 
-    PACKAGE_DEPENDENCIES: Tuple[str, ...] = ("graphicx", "calc")
+    PACKAGE_DEPENDENCIES: Tuple[str, ...] = ("graphicx", "calc", "xcolor")
+
+    _BLANK_PNG = (
+        b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01"
+        b"\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0c"
+        b"IDATx\x9cc\xf8\xff\xff?\x00\x05\xfe\x02\xfe\r\xefF\xb8\x00\x00\x00"
+        b"\x00IEND\xaeB`\x82"
+    )
 
     def __init__(self) -> None:
         self.logger = get_logger(self.__class__.__name__)
@@ -125,24 +132,30 @@ class LatexAttackService:
         artifacts_dir.mkdir(parents=True, exist_ok=True)
         metadata_path = artifacts_dir / "metadata.json"
 
+        questions = self._load_questions(run_id)
+        mapping_signature = self._build_mapping_signature(questions)
+
         if metadata_path.exists() and not force:
             cached = json.loads(metadata_path.read_text(encoding="utf-8"))
-            cached["cached"] = True
-            cached.setdefault("artifacts", {})
-            return cached
+            cached_signature = cached.get("mapping_signature") or []
+            if cached_signature == mapping_signature:
+                cached["cached"] = True
+                cached.setdefault("artifacts", {})
+                return cached
 
         try:
             original_tex = tex_path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             original_tex = tex_path.read_text(encoding="latin-1")
 
-        questions = self._load_questions(run_id)
         base_tex = self._preprocess_source(original_tex)
         mutated_tex, diagnostics = self._apply_mappings(base_tex, questions)
         mutated_tex = self._apply_enumerate_fallbacks(mutated_tex)
+        mutated_tex = self._ensure_macros(mutated_tex)
 
         attacked_tex_path = artifacts_dir / "latex_dual_layer_attacked.tex"
         attacked_tex_path.write_text(mutated_tex, encoding="utf-8")
+        self._prepare_graphics_assets(tex_path, artifacts_dir, mutated_tex)
 
         diagnostics_payload = {
             "run_id": run_id,
@@ -230,6 +243,7 @@ class LatexAttackService:
             },
             "question_diagnostics": diagnostics_payload["replacements"],
             "renderer_metadata": render_metadata,
+            "mapping_signature": mapping_signature,
         }
 
         metadata_path.write_text(json.dumps(result_payload, indent=2), encoding="utf-8")
@@ -241,23 +255,34 @@ class LatexAttackService:
     # ------------------------------------------------------------------
     def _load_questions(self, run_id: str) -> List[QuestionManipulation]:
         """Load questions from database, always using structured.json as source of truth for substring_mappings."""
-        questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+        questions = (
+            QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+            .order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+            .all()
+        )
         
         # Always load substring_mappings from structured.json as the source of truth
         structured = self.structured_manager.load(run_id) or {}
         structured_questions = structured.get("questions", [])
         
-        # Create a mapping of question_number to structured question data
-        structured_map = {
-            str(q.get("question_number") or q.get("q_number", "")): q
-            for q in structured_questions
+        structured_map_by_id = {
+            entry.get("manipulation_id"): entry for entry in structured_questions if entry.get("manipulation_id") is not None
+        }
+        structured_map_by_seq = {
+            entry.get("sequence_index"): entry for entry in structured_questions if entry.get("sequence_index") is not None
+        }
+        structured_map_by_number = {
+            str(entry.get("question_number") or entry.get("q_number") or ""): entry for entry in structured_questions
         }
         
         # Merge substring_mappings from structured.json into database questions
         # Use structured.json as source of truth - if mappings exist there, use them
         for question in questions:
-            q_number = str(question.question_number or "")
-            structured_q = structured_map.get(q_number)
+            structured_q = (
+                structured_map_by_id.get(question.id)
+                or structured_map_by_seq.get(getattr(question, "sequence_index", None))
+                or structured_map_by_number.get(str(question.question_number or ""))
+            )
             
             if structured_q:
                 manipulation = structured_q.get("manipulation", {})
@@ -269,8 +294,12 @@ class LatexAttackService:
                     json_safe_mappings = json.loads(json.dumps(mappings))
                     question.substring_mappings = json_safe_mappings
                     self.logger.info(
-                        f"Loaded {len(json_safe_mappings)} substring_mappings from structured.json for question {q_number}",
-                        extra={"run_id": run_id, "question_number": q_number}
+                        f"Loaded {len(json_safe_mappings)} substring_mappings from structured.json for question {question.id}",
+                        extra={
+                            "run_id": run_id,
+                            "question_id": question.id,
+                            "question_number": question.question_number,
+                        },
                     )
         
         return questions
@@ -289,7 +318,7 @@ class LatexAttackService:
         segments = self._build_question_segments(tex_content)
         sorted_questions = sorted(
             questions,
-            key=lambda q: (self._safe_int(q.question_number), q.id or 0),
+            key=lambda q: (getattr(q, "sequence_index", 0), q.id or 0),
         )
 
         if not segments or len(segments) != len(sorted_questions):
@@ -324,7 +353,6 @@ class LatexAttackService:
             new_content_parts.append(tex_content[last_index:])
 
         mutated = "".join(new_content_parts)
-        mutated = self._ensure_macros(mutated)
         return mutated, diagnostics
 
     def _apply_mappings_for_segment(
@@ -339,11 +367,27 @@ class LatexAttackService:
 
         metadata = (getattr(question, "ai_model_results", {}) or {}).get("manual_seed", {}) if hasattr(question, "ai_model_results") else {}
         question_id = metadata.get("question_id") if isinstance(metadata, dict) else None
+        if not question_id:
+            question_id = getattr(question, "id", None)
         q_number = str(getattr(question, "question_number", None) or getattr(question, "id", ""))
 
         base_line_offset = full_text.count("\n", 0, segment_start)
         mappings = list(getattr(question, "substring_mappings", []) or [])
         occupied: List[Tuple[int, int]] = []
+
+        if not mappings:
+            diagnostics.append(
+                MappingDiagnostic(
+                    question_number=q_number,
+                    question_id=question_id,
+                    mapping_id=None,
+                    original="",
+                    replacement="",
+                    status="no_mapping",
+                    notes="No validated mapping available for this question",
+                )
+            )
+            return segment_text, diagnostics
 
         for mapping in mappings:
             original_raw = str((mapping or {}).get("original") or "").strip()
@@ -471,51 +515,45 @@ class LatexAttackService:
             mutated = mutated[:start_idx] + replacement_fragment + mutated[end_idx:]
             diagnostics.append(diagnostic)
 
-        mutated = self._ensure_macros(mutated)
         return mutated, diagnostics
 
     def _build_question_segments(self, content: str) -> List[Tuple[int, int]]:
+        return self._compute_top_level_item_spans(content)
+
+    def _compute_top_level_item_spans(self, content: str) -> List[Tuple[int, int]]:
+        if not content:
+            return []
+
+        token_pattern = re.compile(
+            r"\\begin\{(?:dlEnumerateAlpha|dlEnumerateArabic|enumerate)\}(?:\[[^\]]*\])?"
+            r"|\\end\{(?:dlEnumerateAlpha|dlEnumerateArabic|enumerate)\}"
+            r"|\\item\b"
+        )
+
+        level = 0
         segments: List[Tuple[int, int]] = []
-        begin_token = "\\begin{dlEnumerateArabic}"
-        end_token = "\\end{dlEnumerateArabic}"
-        search_pos = 0
+        current_start: Optional[int] = None
 
-        while True:
-            begin_idx = content.find(begin_token, search_pos)
-            if begin_idx == -1:
-                break
-            block_start = begin_idx + len(begin_token)
-            end_idx = content.find(end_token, block_start)
-            if end_idx == -1:
-                break
+        for match in token_pattern.finditer(content):
+            token = match.group()
+            if token.startswith("\\begin"):
+                level += 1
+                continue
 
-            block_content = content[block_start:end_idx]
-            absolute_offset = block_start
-            alpha_depth = 0
-            question_start: Optional[int] = None
+            if token.startswith("\\end"):
+                if level == 1 and current_start is not None:
+                    segments.append((current_start, match.start()))
+                    current_start = None
+                level = max(0, level - 1)
+                continue
 
-            token_pattern = re.compile(
-                r"\\begin{dlEnumerateAlpha}|\\end{dlEnumerateAlpha}|\\item"
-            )
+            if level == 1:
+                if current_start is not None:
+                    segments.append((current_start, match.start()))
+                current_start = match.start()
 
-            for token_match in token_pattern.finditer(block_content):
-                token = token_match.group()
-                token_pos = absolute_offset + token_match.start()
-                if token == "\\begin{dlEnumerateAlpha}":
-                    alpha_depth += 1
-                    continue
-                if token == "\\end{dlEnumerateAlpha}":
-                    alpha_depth = max(alpha_depth - 1, 0)
-                    continue
-                if token == "\\item" and alpha_depth == 0:
-                    if question_start is not None:
-                        segments.append((question_start, token_pos))
-                    question_start = token_pos
-
-            if question_start is not None:
-                segments.append((question_start, end_idx))
-
-            search_pos = end_idx + len(end_token)
+        if current_start is not None:
+            segments.append((current_start, len(content)))
 
         segments.sort(key=lambda pair: pair[0])
         return segments
@@ -539,9 +577,67 @@ class LatexAttackService:
                     break
             return text
 
-        content = substitute(pattern_alpha, "\\begin{dlEnumerateAlpha}", "\\end{dlEnumerateAlpha}", content)
-        content = substitute(pattern_arabic, "\\begin{dlEnumerateArabic}", "\\end{dlEnumerateArabic}", content)
-        return content
+        converted = substitute(pattern_alpha, "\\begin{dlEnumerateAlpha}", "\\end{dlEnumerateAlpha}", content)
+        converted = substitute(pattern_arabic, "\\begin{dlEnumerateArabic}", "\\end{dlEnumerateArabic}", converted)
+        converted = self._rewrite_plain_enumerates(converted)
+        return converted
+
+    def _rewrite_plain_enumerates(self, content: str) -> str:
+        """
+        Replace bare enumerate environments with dual-layer aware variants.
+        Top-level enumerate blocks become dlEnumerateArabic; nested blocks become dlEnumerateAlpha.
+        """
+        token_pattern = re.compile(
+            r"\\begin\{([^\}]+)\}(?:\[[^\]]*\])?"
+            r"|\\end\{([^\}]+)\}"
+        )
+
+        enumerate_envs = {"enumerate", "dlEnumerateAlpha", "dlEnumerateArabic"}
+        replacements: List[Tuple[int, int, str]] = []
+        conversion_stack: List[str] = []
+
+        for match in token_pattern.finditer(content):
+            begin_env, end_env = match.groups()
+            if begin_env:
+                env_name = begin_env
+                if env_name not in enumerate_envs:
+                    continue
+
+                if env_name == "enumerate":
+                    depth = len(conversion_stack)
+                    replacement_env = "dlEnumerateArabic" if depth == 0 else "dlEnumerateAlpha"
+                    replacements.append(
+                        (match.start(), match.end(), f"\\begin{{{replacement_env}}}")
+                    )
+                    conversion_stack.append(replacement_env)
+                else:
+                    conversion_stack.append(env_name)
+            else:
+                env_name = end_env or ""
+                if env_name not in enumerate_envs:
+                    continue
+
+                if env_name == "enumerate":
+                    replacement_env = conversion_stack.pop() if conversion_stack else "dlEnumerateAlpha"
+                    replacements.append(
+                        (match.start(), match.end(), f"\\end{{{replacement_env}}}")
+                    )
+                else:
+                    if conversion_stack:
+                        conversion_stack.pop()
+
+        if not replacements:
+            return content
+
+        parts: List[str] = []
+        last_index = 0
+        for start, end, replacement in sorted(replacements, key=lambda item: item[0]):
+            parts.append(content[last_index:start])
+            parts.append(replacement)
+            last_index = end
+
+        parts.append(content[last_index:])
+        return "".join(parts)
 
     def _locate_fragment(
         self,
@@ -650,6 +746,133 @@ class LatexAttackService:
         normalized = re.sub(r"\s+", " ", normalized)
         return normalized.strip()
 
+    def _build_mapping_signature(
+        self, questions: Iterable[QuestionManipulation]
+    ) -> List[str]:
+        signature: List[str] = []
+        for question in questions:
+            label = str(getattr(question, "question_number", question.id))
+            for mapping in list(question.substring_mappings or []):
+                start = mapping.get("start_pos")
+                end = mapping.get("end_pos")
+                signature.append(
+                    "|".join(
+                        [
+                            label,
+                            str(mapping.get("original") or "").strip(),
+                            str(mapping.get("replacement") or "").strip(),
+                            str(start) if start is not None else "",
+                            str(end) if end is not None else "",
+                        ]
+                    )
+                )
+        signature.sort()
+        return signature
+
+    def _prepare_graphics_assets(self, tex_path: Path, artifacts_dir: Path, latex_content: str) -> None:
+        asset_directories = self._extract_graphic_paths(latex_content)
+        filenames = self._extract_graphic_filenames(latex_content)
+        if not asset_directories:
+            asset_directories = [""]
+
+        tex_root = tex_path.parent.resolve()
+
+        for asset_dir in asset_directories:
+            normalized_dir = self._normalize_graphic_path(asset_dir)
+            if normalized_dir is None:
+                continue
+            root_target_dir = (
+                (tex_root / normalized_dir).resolve()
+                if normalized_dir != Path(".")
+                else tex_root
+            )
+            artifact_target_dir = (
+                (artifacts_dir / normalized_dir).resolve()
+                if normalized_dir != Path(".")
+                else artifacts_dir
+            )
+            root_target_dir.mkdir(parents=True, exist_ok=True)
+            artifact_target_dir.mkdir(parents=True, exist_ok=True)
+
+        for filename in filenames:
+            for asset_dir in asset_directories or [""]:
+                normalized_dir = self._normalize_graphic_path(asset_dir)
+                if normalized_dir is None:
+                    continue
+
+                root_target = (
+                    (tex_root / normalized_dir / filename).resolve()
+                    if normalized_dir != Path(".")
+                    else (tex_root / filename).resolve()
+                )
+                artifact_target = (
+                    (artifacts_dir / normalized_dir / filename).resolve()
+                    if normalized_dir != Path(".")
+                    else (artifacts_dir / filename).resolve()
+                )
+
+                root_target.parent.mkdir(parents=True, exist_ok=True)
+
+                needs_placeholder = True
+                if root_target.exists():
+                    try:
+                        if root_target.stat().st_size > len(self._BLANK_PNG):
+                            needs_placeholder = False
+                    except OSError:
+                        needs_placeholder = True
+
+                if needs_placeholder:
+                    if filename.lower().endswith(".png"):
+                        root_target.write_bytes(self._BLANK_PNG)
+                    else:
+                        root_target.write_bytes(b"")
+
+                if artifact_target != root_target:
+                    artifact_target.parent.mkdir(parents=True, exist_ok=True)
+                    copy_required = True
+                    if artifact_target.exists():
+                        try:
+                            if artifact_target.stat().st_size > len(self._BLANK_PNG):
+                                copy_required = False
+                        except OSError:
+                            copy_required = True
+                    if copy_required:
+                        try:
+                            shutil.copy2(root_target, artifact_target)
+                        except Exception:
+                            if filename.lower().endswith(".png"):
+                                artifact_target.write_bytes(self._BLANK_PNG)
+                            else:
+                                artifact_target.write_bytes(b"")
+
+    def _extract_graphic_paths(self, latex_content: str) -> List[str]:
+        pattern = re.compile(r"\\graphicspath\{\{([^}]*)\}\}")
+        matches = pattern.findall(latex_content)
+        paths: List[str] = []
+        for match in matches:
+            for candidate in match.split("}{"):
+                cleaned = candidate.strip()
+                if cleaned:
+                    paths.append(cleaned)
+        return paths
+
+    def _extract_graphic_filenames(self, latex_content: str) -> List[str]:
+        pattern = re.compile(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}")
+        files = pattern.findall(latex_content)
+        unique = {entry.strip() for entry in files if entry.strip()}
+        return sorted(unique)
+
+    def _normalize_graphic_path(self, path_str: str) -> Optional[Path]:
+        normalized = (path_str or "").strip()
+        if not normalized:
+            return Path(".")
+        normalized = normalized.replace("\\", "/")
+        while normalized.startswith("./"):
+            normalized = normalized[2:]
+        if normalized.startswith("/"):
+            return None
+        return Path(normalized.rstrip("/"))
+
     def _build_relaxed_pattern(self, text: str) -> re.Pattern[str]:
         tokens = re.split(r"(\\s+)", text)
         pieces: List[str] = []
@@ -741,6 +964,19 @@ class LatexAttackService:
             shutil.copytree(tex_source_path.parent, work_dir, dirs_exist_ok=True)
             temp_tex = work_dir / tex_source_path.name
             temp_tex.write_text(mutated_tex_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+            for artifact_item in mutated_tex_path.parent.iterdir():
+                if artifact_item.name == mutated_tex_path.name:
+                    continue
+                target_item = work_dir / artifact_item.name
+                try:
+                    if artifact_item.is_dir():
+                        shutil.copytree(artifact_item, target_item, dirs_exist_ok=True)
+                    elif artifact_item.is_file():
+                        target_item.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(artifact_item, target_item)
+                except Exception:
+                    continue
 
             command = ["pdflatex", "-interaction=nonstopmode", temp_tex.name]
 
@@ -948,10 +1184,12 @@ class LatexAttackService:
         total = len(diagnostics)
         replaced = sum(1 for entry in diagnostics if entry.status == "replaced")
         not_found = sum(1 for entry in diagnostics if entry.status == "not_found")
+        no_mapping = sum(1 for entry in diagnostics if entry.status == "no_mapping")
         return {
             "total": total,
             "replaced": replaced,
             "not_found": not_found,
+            "no_mapping": no_mapping,
         }
 
     def _resolve_original_pdf_path(

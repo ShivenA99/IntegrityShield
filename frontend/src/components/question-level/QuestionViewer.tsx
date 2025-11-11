@@ -3,6 +3,7 @@ import { useMemo, useState, useRef } from "react";
 
 import type { QuestionManipulation, SubstringMapping } from "@services/types/questions";
 import { updateQuestionManipulation, validateQuestion, autoGenerateMappings } from "@services/api/questionApi";
+import { resolveHighlightRanges } from "../../utils/mappingHighlight";
 
 interface QuestionViewerProps {
   runId: string;
@@ -105,46 +106,54 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
   const fullQuestionText = question.stem_text || question.original_text || "";
 
   const renderPreview = useMemo(() => {
-    const buf = fullQuestionText;
-    const sorted = [...mappings].sort((a, b) => a.start_pos - b.start_pos);
-    let offset = 0;
+    if (!fullQuestionText) return fullQuestionText;
+
+    const ranges = resolveHighlightRanges(fullQuestionText, mappings);
+    if (!ranges.length) {
+      return fullQuestionText;
+    }
+
     const parts: React.ReactNode[] = [];
     let cursor = 0;
-    sorted.forEach((m, i) => {
-      parts.push(<span key={`t-${i}-a`}>{buf.slice(cursor, m.start_pos + offset)}</span>);
 
-      // Determine validation status styling
+    ranges.forEach((range, index) => {
+      if (cursor < range.start) {
+        parts.push(<span key={`t-${index}-a`}>{fullQuestionText.slice(cursor, range.start)}</span>);
+      }
+
+      const mapping = range.mapping;
       let markStyle: React.CSSProperties = {};
-      let badge = '';
-      let title = `${m.original} → ${m.replacement}`;
+      let badge = "";
+      let title = `${mapping.original} → ${mapping.replacement}`;
 
-      if (m.validated === true) {
-        markStyle = { backgroundColor: '#d4edda', borderLeft: '3px solid #28a745' };
-        badge = ' ✓';
-        title += ` (Validated: ${m.validation?.response || 'N/A'})`;
-      } else if (m.validated === false) {
-        markStyle = { backgroundColor: '#fff3cd', borderLeft: '3px solid #ffc107' };
-        badge = ' ⚠';
-        title += ` (Invalid: ${m.validation?.response || 'N/A'})`;
+      if (mapping.validated === true) {
+        markStyle = { backgroundColor: "#d4edda", borderLeft: "3px solid #28a745" };
+        badge = " ✓";
+        title += ` (Validated: ${mapping.validation?.response || "N/A"})`;
+      } else if (mapping.validated === false) {
+        markStyle = { backgroundColor: "#fff3cd", borderLeft: "3px solid #ffc107" };
+        badge = " ⚠";
+        title += ` (Invalid: ${mapping.validation?.response || "N/A"})`;
       } else {
-        markStyle = { backgroundColor: '#f8f9fa', borderLeft: '3px solid #6c757d' };
-        badge = ' ⏳';
-        title += ' (Pending validation)';
+        markStyle = { backgroundColor: "#f8f9fa", borderLeft: "3px solid #6c757d" };
+        badge = " ⏳";
+        title += " (Pending validation)";
       }
 
       parts.push(
-        <mark
-          key={`t-${i}-b`}
-          style={markStyle}
-          title={title}
-        >
-          {m.replacement}{badge}
+        <mark key={`t-${index}-b`} style={markStyle} title={title}>
+          {mapping.replacement}
+          {badge}
         </mark>
       );
-      cursor = m.end_pos + offset;
-      offset += m.replacement.length - (m.end_pos - m.start_pos);
+
+      cursor = range.end;
     });
-    parts.push(<span key="t-end">{buf.slice(cursor)}</span>);
+
+    if (cursor < fullQuestionText.length) {
+      parts.push(<span key="t-end">{fullQuestionText.slice(cursor)}</span>);
+    }
+
     return parts;
   }, [mappings, fullQuestionText]);
 

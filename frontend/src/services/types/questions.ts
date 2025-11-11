@@ -37,6 +37,7 @@ export interface SubstringMapping {
 export interface QuestionManipulation {
   id: number;
   question_number: string;
+  sequence_index: number;
   question_type: string;
   question_id?: string;
   original_text?: string;
@@ -53,6 +54,7 @@ export interface QuestionManipulation {
   substring_mappings: SubstringMapping[];
   ai_model_results: Record<string, unknown>;
   metadata?: Record<string, unknown>;
+  source_identifier?: string | null;
   // Additional fields that might be available
   positioning?: {
     page: number;

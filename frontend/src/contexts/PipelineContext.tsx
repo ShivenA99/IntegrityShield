@@ -129,10 +129,12 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
 
   const resumeFromStage = useCallback(async (runId: string, stage: PipelineStageName) => {
     try {
-      await pipelineApi.resumePipeline(runId, stage);
+      const result = await pipelineApi.resumePipeline(runId, stage);
       await refreshStatus(runId);
+      return result;
     } catch (err) {
       setError(extractErrorMessage(err));
+      throw err;
     }
   }, [refreshStatus]);
 

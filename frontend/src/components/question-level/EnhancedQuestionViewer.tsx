@@ -3,6 +3,7 @@ import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 
 import type { QuestionManipulation, SubstringMapping } from "@services/types/questions";
 import { updateQuestionManipulation } from "@services/api/questionApi";
+import { resolveHighlightRanges } from "../../utils/mappingHighlight";
 
 interface EnhancedQuestionViewerProps {
   runId: string;
@@ -193,69 +194,72 @@ const EnhancedQuestionViewer: React.FC<EnhancedQuestionViewerProps> = ({
   const renderQuestionWithHighlights = useMemo(() => {
     if (!fullQuestionText) return "No question text available";
 
-    const sorted = [...mappings].sort((a, b) => a.start_pos - b.start_pos);
+    const ranges = resolveHighlightRanges(fullQuestionText, mappings);
+    if (!ranges.length) {
+      return fullQuestionText;
+    }
+
     const parts: React.ReactNode[] = [];
     let cursor = 0;
 
-    sorted.forEach((mapping, index) => {
-      // Add text before this mapping
-      if (cursor < mapping.start_pos) {
+    ranges.forEach((range, index) => {
+      if (cursor < range.start) {
         parts.push(
           <span key={`text-${index}`}>
-            {fullQuestionText.slice(cursor, mapping.start_pos)}
+            {fullQuestionText.slice(cursor, range.start)}
           </span>
         );
       }
 
-      // Add highlighted mapping
-      const isActive = activeMappingIndex === mappings.indexOf(mapping);
-      let bgColor = '#f8f9fa';
-      let borderColor = '#dee2e6';
-      let textColor = '#495057';
+      const mapping = range.mapping;
+      const mappingIndex = mappings.indexOf(mapping);
+      const isActive = activeMappingIndex === mappingIndex;
+      let bgColor = "#f8f9fa";
+      let borderColor = "#dee2e6";
+      let textColor = "#495057";
 
       if (mapping.validated === true) {
-        bgColor = '#d4edda';
-        borderColor = '#28a745';
-        textColor = '#155724';
+        bgColor = "#d4edda";
+        borderColor = "#28a745";
+        textColor = "#155724";
       } else if (mapping.validated === false) {
-        bgColor = '#fff3cd';
-        borderColor = '#ffc107';
-        textColor = '#856404';
+        bgColor = "#fff3cd";
+        borderColor = "#ffc107";
+        textColor = "#856404";
       }
 
       if (isActive) {
-        bgColor = '#e3f2fd';
-        borderColor = '#2196f3';
+        bgColor = "#e3f2fd";
+        borderColor = "#2196f3";
       }
 
       parts.push(
         <mark
-          key={`mapping-${index}`}
-          onClick={() => setActiveMappingIndex(mappings.indexOf(mapping))}
+          key={`mapping-${mapping.id || index}`}
+          onClick={() => setActiveMappingIndex(mappingIndex)}
           style={{
             backgroundColor: bgColor,
             border: `2px solid ${borderColor}`,
-            borderRadius: '4px',
-            padding: '2px 4px',
-            margin: '0 1px',
-            cursor: 'pointer',
+            borderRadius: "4px",
+            padding: "2px 4px",
+            margin: "0 1px",
+            cursor: "pointer",
             color: textColor,
-            fontWeight: 'bold',
-            transition: 'all 0.2s ease'
+            fontWeight: "bold",
+            transition: "all 0.2s ease",
           }}
           title={`${mapping.original} → ${mapping.replacement}`}
         >
           {mapping.replacement}
-          {mapping.validated === true && ' ✓'}
-          {mapping.validated === false && ' ⚠'}
-          {mapping.validated === undefined && ' ⏳'}
+          {mapping.validated === true && " ✓"}
+          {mapping.validated === false && " ⚠"}
+          {mapping.validated === undefined && " ⏳"}
         </mark>
       );
 
-      cursor = mapping.end_pos;
+      cursor = range.end;
     });
 
-    // Add remaining text
     if (cursor < fullQuestionText.length) {
       parts.push(
         <span key="text-end">

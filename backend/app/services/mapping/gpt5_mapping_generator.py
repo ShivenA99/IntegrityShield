@@ -18,6 +18,7 @@ from ...services.data_management.structured_data_manager import StructuredDataMa
 from ...services.integration.external_api_client import ExternalAIClient
 from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
+from sqlalchemy import text
 
 from .gpt5_config import (
     GPT5_MODEL,
@@ -29,6 +30,7 @@ from .gpt5_config import (
 )
 from .mapping_generation_logger import get_mapping_logger
 from .mapping_strategies import get_strategy_registry
+from .mapping_staging_service import MappingStagingService
 from .mapping_validator import MappingValidator
 
 
@@ -42,13 +44,15 @@ class GPT5MappingGeneratorService:
         self.validator = MappingValidator()
         self.strategy_registry = get_strategy_registry()
         self.mapping_logger = get_mapping_logger()
+        self.staging_service = MappingStagingService()
     
     def generate_mappings_for_question(
         self,
         run_id: str,
         question_id: int,
         k: int = MAPPINGS_PER_QUESTION,
-        strategy_name: str = "replacement"
+        strategy_name: str = "replacement",
+        log_context: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Generate k mappings for a single question.
@@ -56,6 +60,11 @@ class GPT5MappingGeneratorService:
         Returns:
             Dictionary with generation results and validated mapping
         """
+        # Prepare context metadata for logging/staging
+        context_metadata: Dict[str, Any] = {"strategy": strategy_name}
+        if log_context:
+            context_metadata.update(log_context)
+
         # Load question data
         question = QuestionManipulation.query.filter_by(
             pipeline_run_id=run_id,
@@ -101,17 +110,21 @@ class GPT5MappingGeneratorService:
                 run_id=run_id
             )
             
+            generation_details = {
+                "mappings_generated": len(mappings),
+                "strategy": strategy_name,
+                "prompt_used": self.strategy_registry.build_prompt(strategy, question_data, k),
+            }
+            if log_context:
+                generation_details.update(log_context)
+
             self.mapping_logger.log_generation(
                 run_id=run_id,
                 question_id=question_id,
                 question_number=question.question_number,
                 status="success",
-                details={
-                    "mappings_generated": len(mappings),
-                    "strategy": strategy_name,
-                    "prompt_used": self.strategy_registry.build_prompt(strategy, question_data, k)
-                },
-                mappings_generated=len(mappings)
+                details=generation_details,
+                mappings_generated=len(mappings),
             )
             
             # Validate mappings
@@ -128,20 +141,62 @@ class GPT5MappingGeneratorService:
             
             # Log validations
             for idx, validation_log in enumerate(validation_logs):
+                enriched_validation_log = dict(validation_log)
+                if log_context and "job_id" in log_context:
+                    enriched_validation_log.setdefault("job_id", log_context["job_id"])
+
                 self.mapping_logger.log_validation(
                     run_id=run_id,
                     question_id=question_id,
                     question_number=question.question_number,
                     mapping_index=validation_log.get("mapping_index", idx),
                     status=validation_log.get("status", "unknown"),
-                    details=validation_log
+                    details=enriched_validation_log,
                 )
             
             # Save first valid mapping if found
             if first_valid_mapping:
-                self._save_mapping_to_question(question, first_valid_mapping)
-                # Sync to structured.json
-                self._sync_mapping_to_structured(run_id, question, first_valid_mapping)
+                substring_mapping = self._build_substring_mapping(question, first_valid_mapping)
+                validation_summary = self._extract_validation_summary_from_logs(validation_logs)
+                enriched_mapping = json.loads(json.dumps(substring_mapping))
+                enriched_mapping.setdefault("validated", True)
+                if validation_summary:
+                    if "confidence" in validation_summary and validation_summary.get("confidence") is not None:
+                        enriched_mapping.setdefault("confidence", validation_summary.get("confidence"))
+                    if "deviation_score" in validation_summary and validation_summary.get("deviation_score") is not None:
+                        enriched_mapping.setdefault("deviation_score", validation_summary.get("deviation_score"))
+                    if "reasoning" in validation_summary and validation_summary.get("reasoning"):
+                        enriched_mapping.setdefault("validation_reasoning", validation_summary.get("reasoning"))
+                    enriched_mapping.setdefault("validation", validation_summary)
+
+                persistence_errors: List[str] = []
+                try:
+                    self._persist_valid_mapping(
+                        run_id=run_id,
+                        question=question,
+                        mapping=enriched_mapping,
+                        validation_logs=validation_logs,
+                        strategy=context_metadata.get("strategy"),
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    self.logger.exception(
+                        "Failed to persist validated mapping",
+                        extra={
+                            "run_id": run_id,
+                            "question_id": question.id,
+                            "question_number": question.question_number,
+                        },
+                    )
+                    persistence_errors.append(str(exc))
+
+                self.staging_service.stage_valid_mapping(
+                    run_id=run_id,
+                    question=question,
+                    substring_mapping=enriched_mapping,
+                    generated_count=len(mappings),
+                    validation_logs=validation_logs,
+                    metadata=context_metadata,
+                )
                 return {
                     "status": "success",
                     "mappings_generated": len(mappings),
@@ -149,28 +204,55 @@ class GPT5MappingGeneratorService:
                     "first_valid_mapping_index": validation_logs.index(
                         next(log for log in validation_logs if log.get("status") == "success")
                     ) if any(log.get("status") == "success" for log in validation_logs) else None,
-                    "mapping": first_valid_mapping,
-                    "validation_logs": validation_logs
+                    "mapping": enriched_mapping,
+                    "validation_logs": validation_logs,
+                    "staged": True,
+                    "persistence_errors": persistence_errors or None,
                 }
             else:
+                self.staging_service.stage_no_valid_mapping(
+                    run_id=run_id,
+                    question=question,
+                    generated_count=len(mappings),
+                    validation_logs=validation_logs,
+                    metadata=context_metadata,
+                )
+                self.mapping_logger.log_generation(
+                    run_id=run_id,
+                    question_id=question_id,
+                    question_number=question.question_number,
+                    status="no_valid_mapping",
+                    details={**context_metadata, "mappings_generated": len(mappings)},
+                    mappings_generated=len(mappings),
+                )
                 return {
                     "status": "no_valid_mapping",
                     "mappings_generated": len(mappings),
                     "mappings_validated": len(validation_logs),
                     "first_valid_mapping_index": None,
                     "mapping": None,
-                    "validation_logs": validation_logs
+                    "validation_logs": validation_logs,
+                    "staged": True,
                 }
         
         except Exception as e:
             self.logger.error(f"Failed to generate mappings for question {question_id}: {e}", run_id=run_id)
+            failure_details: Dict[str, Any] = {"error": str(e)}
+            failure_details.update(context_metadata)
+
             self.mapping_logger.log_generation(
                 run_id=run_id,
                 question_id=question_id,
                 question_number=question.question_number,
                 status="failed",
-                details={"error": str(e)},
-                mappings_generated=0
+                details=failure_details,
+                mappings_generated=0,
+            )
+            self.staging_service.stage_failure(
+                run_id=run_id,
+                question=question,
+                error=str(e),
+                metadata=context_metadata,
             )
             raise
     
@@ -280,8 +362,32 @@ class GPT5MappingGeneratorService:
                 response_obj = client.chat.completions.create(**request_args)
                 
                 # Extract response
-                content = response_obj.choices[0].message.content
+                choice = response_obj.choices[0]
+                content = getattr(choice.message, "content", None)
+
+                if isinstance(content, list):
+                    content = "".join(
+                        part.get("text", "")
+                        for part in content
+                        if isinstance(part, dict) and part.get("type") in (None, "text")
+                    )
+
                 if not content:
+                    parsed_payload = getattr(choice.message, "parsed", None)
+                    if parsed_payload is not None:
+                        content = json.dumps(parsed_payload)
+                    else:
+                        raw_message = choice.message.model_dump()
+                        if isinstance(raw_message, dict):
+                            raw_content = raw_message.get("content")
+                            if isinstance(raw_content, list):
+                                content = "".join(
+                                    part.get("text", "")
+                                    for part in raw_content
+                                    if isinstance(part, dict) and part.get("type") in (None, "text")
+                                )
+
+                if not content or not content.strip():
                     raise ValueError("Empty response from GPT-5 API")
                 
                 response = {
@@ -402,11 +508,26 @@ class GPT5MappingGeneratorService:
         # Verify original substring matches
         actual_substring = latex_stem[start_pos:end_pos]
         if actual_substring != original:
-            self.logger.warning(
-                f"Original substring mismatch: expected '{original}', got '{actual_substring}' "
-                f"at position {start_pos}-{end_pos}"
-            )
-            return False
+            # Try to realign by searching for the original substring within the stem text.
+            real_start = latex_stem.find(original)
+            if real_start != -1:
+                real_end = real_start + len(original)
+                mapping["start_pos"] = real_start
+                mapping["end_pos"] = real_end
+                self.logger.info(
+                    "Adjusted mapping positions to real substring location",
+                    extra={
+                        "original": original,
+                        "previous_start": start_pos,
+                        "adjusted_start": real_start,
+                    },
+                )
+            else:
+                self.logger.warning(
+                    f"Original substring mismatch: expected '{original}', got '{actual_substring}' "
+                    f"at position {start_pos}-{end_pos}"
+                )
+                return False
         
         return True
     
@@ -439,11 +560,38 @@ class GPT5MappingGeneratorService:
         """Get question data for mapping generation."""
         # Get AI question data if available
         ai_questions = structured.get("ai_questions", [])
+        structured_questions = structured.get("questions", [])
         ai_question = None
         for aq in ai_questions:
+            if aq.get("manipulation_id") == question.id:
+                ai_question = aq
+                break
+            if question.source_identifier and str(aq.get("source_identifier") or aq.get("question_id") or "") == str(question.source_identifier):
+                ai_question = aq
+                break
             if str(aq.get("question_number", "")) == str(question.question_number):
                 ai_question = aq
                 break
+        
+        structured_entry = next((entry for entry in structured_questions if entry.get("manipulation_id") == question.id), None)
+        if structured_entry is None and question.sequence_index is not None:
+            structured_entry = next(
+                (
+                    entry
+                    for entry in structured_questions
+                    if entry.get("sequence_index") == question.sequence_index
+                ),
+                None,
+            )
+        if structured_entry is None:
+            structured_entry = next(
+                (
+                    entry
+                    for entry in structured_questions
+                    if str(entry.get("q_number") or entry.get("question_number") or "") == str(question.question_number)
+                ),
+                None,
+            )
         
         # Get options and normalize keys
         options = (
@@ -459,10 +607,17 @@ class GPT5MappingGeneratorService:
         # Build question data
         question_data = {
             "question_number": question.question_number,
+            "sequence_index": question.sequence_index,
+            "source_identifier": question.source_identifier,
             "question_type": question.question_type or "mcq_single",
             "stem_text": (
-                ai_question.get("stem_text") if ai_question
-                else question.original_text
+                ai_question.get("stem_text")
+                if ai_question and ai_question.get("stem_text")
+                else (
+                    structured_entry.get("stem", {}).get("text")
+                    if structured_entry and structured_entry.get("stem")
+                    else question.original_text
+                )
             ),
             "gold_answer": question.gold_answer or "",
             "options": options,
@@ -478,82 +633,146 @@ class GPT5MappingGeneratorService:
         structured: Dict[str, Any]
     ) -> Optional[str]:
         """Extract LaTeX stem text for a question."""
-        # Get LaTeX file path
         document_meta = structured.get("document", {})
         latex_path = document_meta.get("latex_path")
-        
+
         if not latex_path:
             self.logger.warning(f"No LaTeX path found for run {run_id}")
             return None
-        
+
         latex_file = Path(latex_path)
         if not latex_file.exists():
             self.logger.warning(f"LaTeX file not found: {latex_path}")
             return None
-        
-        # Read LaTeX content
+
         try:
             latex_content = latex_file.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             latex_content = latex_file.read_text(encoding="latin-1")
-        
-        # Find question segment
-        question_segment = self._find_question_segment_in_latex(
-            latex_content,
-            question.question_number
-        )
-        
-        if not question_segment:
+
+        segments = self._compute_top_level_item_spans(latex_content)
+        segment_bounds: Optional[Tuple[int, int]] = None
+
+        sequence_index = getattr(question, "sequence_index", None)
+        if isinstance(sequence_index, int) and 0 <= sequence_index < len(segments):
+            segment_bounds = segments[sequence_index]
+        else:
+            index = self._safe_question_index(question.question_number, len(segments))
+            if index is not None:
+                segment_bounds = segments[index]
+            else:
+                segment_bounds = self._find_question_segment_in_latex(
+                    latex_content,
+                    question.question_number,
+                    precomputed_segments=segments,
+                )
+
+        if segment_bounds is None:
+            # Best-effort fallback: attempt to locate by numeric portion of question number
+            try:
+                numeric_index = int(re.sub(r"[^0-9]", "", str(question.question_number) or "")) - 1
+                if 0 <= numeric_index < len(segments):
+                    segment_bounds = segments[numeric_index]
+            except ValueError:
+                segment_bounds = None
+
+        if segment_bounds is None:
             self.logger.warning(
-                f"Could not find question segment for question {question.question_number} in LaTeX"
+                "Could not find question segment in LaTeX",
+                extra={
+                    "run_id": run_id,
+                    "question_number": question.question_number,
+                    "segments_found": len(segments),
+                },
             )
             return None
-        
-        # Extract stem text from segment (raw LaTeX for exact matching)
-        segment_text = latex_content[question_segment[0]:question_segment[1]]
-        # Return raw LaTeX text for exact matching
-        # GPT-5 will generate mappings with positions relative to this exact text
+
+        segment_text = latex_content[segment_bounds[0]:segment_bounds[1]]
         return segment_text.strip()
     
     def _find_question_segment_in_latex(
         self,
         latex_content: str,
-        question_number: str
+        question_number: str,
+        *,
+        precomputed_segments: Optional[List[Tuple[int, int]]] = None,
     ) -> Optional[Tuple[int, int]]:
-        """Find question segment in LaTeX content."""
-        # Try to find question using \item pattern
-        # Look for \item followed by question number
-        pattern = re.compile(
-            rf"\\item\s+{re.escape(question_number)}\.",
-            re.IGNORECASE
-        )
-        
-        match = pattern.search(latex_content)
-        if not match:
-            # Try without period
-            pattern = re.compile(
-                rf"\\item\s+{re.escape(question_number)}\s",
-                re.IGNORECASE
-            )
-            match = pattern.search(latex_content)
-        
-        if not match:
+        """Find a question segment in LaTeX content using pattern fallbacks."""
+        segments = precomputed_segments or self._compute_top_level_item_spans(latex_content)
+        if not segments:
             return None
-        
-        # Find start of question (after \item)
-        start_pos = match.end()
-        
-        # Find end of question (next \item or \end{enumerate})
-        end_pattern = re.compile(r"\\item|\\end\{enumerate\}")
-        end_match = end_pattern.search(latex_content, start_pos)
-        
-        if end_match:
-            end_pos = end_match.start()
-        else:
-            # Use end of document
-            end_pos = len(latex_content)
-        
-        return (start_pos, end_pos)
+
+        search_patterns = [
+            re.compile(rf"\\item\s+{re.escape(str(question_number))}\.\s", re.IGNORECASE),
+            re.compile(rf"\\item\s+{re.escape(str(question_number))}\s", re.IGNORECASE),
+        ]
+
+        for pattern in search_patterns:
+            match = pattern.search(latex_content)
+            if not match:
+                continue
+
+            position = match.start()
+            for start, end in segments:
+                if start <= position < end:
+                    return (start, end)
+
+            for start, end in segments:
+                if start > position:
+                    return (position, start)
+
+            return (position, len(latex_content))
+
+        fallback_idx = self._safe_question_index(question_number, len(segments))
+        if fallback_idx is not None:
+            return segments[fallback_idx]
+
+        return None
+
+    def _compute_top_level_item_spans(self, content: str) -> List[Tuple[int, int]]:
+        """Compute spans for top-level enumerate items (questions)."""
+        if not content:
+            return []
+
+        token_pattern = re.compile(
+            r"\\begin\{(?:dlEnumerateAlpha|dlEnumerateArabic|enumerate)\}(?:\[[^\]]*\])?"
+            r"|\\end\{(?:dlEnumerateAlpha|dlEnumerateArabic|enumerate)\}"
+            r"|\\item\b"
+        )
+
+        level = 0
+        segments: List[Tuple[int, int]] = []
+        current_start: Optional[int] = None
+
+        for match in token_pattern.finditer(content):
+            token = match.group()
+            if token.startswith("\\begin"):
+                level += 1
+                continue
+
+            if token.startswith("\\end"):
+                if level == 1 and current_start is not None:
+                    segments.append((current_start, match.start()))
+                    current_start = None
+                level = max(0, level - 1)
+                continue
+
+            if level == 1:
+                if current_start is not None:
+                    segments.append((current_start, match.start()))
+                current_start = match.start()
+
+        if current_start is not None:
+            segments.append((current_start, len(content)))
+
+        return segments
+
+    def _safe_question_index(self, question_number: Any, total_segments: int) -> Optional[int]:
+        try:
+            idx = int(str(question_number).strip()) - 1
+        except (TypeError, ValueError):
+            return None
+        return idx if 0 <= idx < total_segments else None
     
     def _extract_stem_from_segment(self, segment_text: str) -> str:
         """Extract stem text from LaTeX segment."""
@@ -576,32 +795,130 @@ class GPT5MappingGeneratorService:
         
         return stem
     
+    def _build_substring_mapping(
+        self,
+        question: QuestionManipulation,
+        mapping: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Construct a substring mapping payload from GPT output."""
+        substring_mapping = {
+            "id": mapping.get("id") or str(uuid.uuid4()),
+            "original": mapping.get("original_substring", mapping.get("original", "")),
+            "replacement": mapping.get("replacement_substring", mapping.get("replacement", "")),
+            "start_pos": mapping.get("start_pos", 0),
+            "end_pos": mapping.get("end_pos", 0),
+            "context": mapping.get("context", "question_stem"),
+            "target_wrong_answer": mapping.get("target_wrong_answer"),
+            "reasoning": mapping.get("reasoning", ""),
+            "latex_stem_text": mapping.get("latex_stem_text", ""),
+            "question_index": mapping.get(
+                "question_index",
+                question.sequence_index if question.sequence_index is not None else question.question_number,
+            ),
+        }
+        if question.source_identifier:
+            substring_mapping.setdefault("source_identifier", question.source_identifier)
+        return substring_mapping
+
+    def _extract_validation_summary_from_logs(
+        self,
+        validation_logs: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        for log in validation_logs:
+            if log.get("status") == "success":
+                result = log.get("validation_result")
+                if isinstance(result, dict):
+                    return result
+        return {}
+
+    def _persist_valid_mapping(
+        self,
+        *,
+        run_id: str,
+        question: QuestionManipulation,
+        mapping: Dict[str, Any],
+        validation_logs: List[Dict[str, Any]],
+        strategy: Optional[str] = None,
+    ) -> None:
+        validation_summary = self._extract_validation_summary_from_logs(validation_logs)
+        validation_record: Optional[Dict[str, Any]] = None
+        if validation_summary:
+            validation_record = {
+                "gpt5_validation": {
+                    "is_valid": validation_summary.get("is_valid"),
+                    "confidence": validation_summary.get("confidence"),
+                    "deviation_score": validation_summary.get("deviation_score"),
+                    "reasoning": validation_summary.get("reasoning"),
+                    "target_matched": validation_summary.get("target_matched"),
+                },
+                "status": "auto_validated",
+                "strategy": strategy,
+                "timestamp": isoformat(utc_now()),
+            }
+
+        self._save_mapping_to_question(
+            question,
+            mapping,
+            method=strategy or "gpt5_generated",
+            effectiveness=validation_summary.get("confidence") if validation_summary else None,
+            validation_record=validation_record,
+        )
+        self._sync_mapping_to_structured(run_id, question, mapping)
+
     def _save_mapping_to_question(
         self,
         question: QuestionManipulation,
-        mapping: Dict[str, Any]
-    ):
+        mapping: Dict[str, Any],
+        *,
+        method: Optional[str] = None,
+        effectiveness: Optional[float] = None,
+        validation_record: Optional[Dict[str, Any]] = None,
+    ) -> None:
         """Save mapping to question in database."""
-        # Convert mapping to substring_mapping format
-        substring_mapping = {
-            "id": str(uuid.uuid4()),
-            "original": mapping.get("original_substring", ""),
-            "replacement": mapping.get("replacement_substring", ""),
-            "start_pos": mapping.get("start_pos", 0),
-            "end_pos": mapping.get("end_pos", 0),
-            "context": "question_stem",
-            "target_wrong_answer": mapping.get("target_wrong_answer"),
-            "reasoning": mapping.get("reasoning", ""),
-            # Add positional information for LaTeX matching
-            "latex_stem_text": mapping.get("latex_stem_text", ""),
-            "question_index": mapping.get("question_index", question.question_number)
-        }
-        
-        # Update question
-        question.substring_mappings = [substring_mapping]
-        question.manipulation_method = "gpt5_generated"
-        
+        if "original_substring" in mapping or "replacement_substring" in mapping:
+            substring_mapping = self._build_substring_mapping(question, mapping)
+        else:
+            substring_mapping = dict(mapping)
+            substring_mapping.setdefault("id", str(uuid.uuid4()))
+
+        substring_mapping.setdefault("validated", True)
+
+        json_safe_mappings = json.loads(json.dumps([substring_mapping]))
+        question.substring_mappings = json_safe_mappings
+        if method:
+            question.manipulation_method = method
+        else:
+            question.manipulation_method = question.manipulation_method or "gpt5_generated"
+        if effectiveness is not None:
+            try:
+                question.effectiveness_score = float(effectiveness)
+            except (TypeError, ValueError):
+                question.effectiveness_score = question.effectiveness_score
+        if validation_record:
+            question.ai_model_results = question.ai_model_results or {}
+            question.ai_model_results["last_validation"] = validation_record
+            auto_generated = question.ai_model_results.setdefault("auto_generated", {})
+            auto_generated["strategy"] = method or auto_generated.get("strategy")
+            auto_generated["last_mapping_id"] = substring_mapping.get("id")
+
         db.session.add(question)
+        db.session.execute(
+            text(
+                "UPDATE question_manipulations "
+                "SET substring_mappings = :mappings, "
+                "manipulation_method = :method, "
+                "effectiveness_score = :effectiveness, "
+                "ai_model_results = :ai_results "
+                "WHERE id = :id"
+            ),
+            {
+                "mappings": json.dumps(json_safe_mappings),
+                "method": question.manipulation_method,
+                "effectiveness": question.effectiveness_score,
+                "ai_results": json.dumps(question.ai_model_results or {}),
+                "id": question.id,
+            },
+        )
         db.session.commit()
         
         self.logger.info(

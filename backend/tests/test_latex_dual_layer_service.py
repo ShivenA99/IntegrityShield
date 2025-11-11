@@ -60,6 +60,8 @@ def test_latex_attack_service_generates_artifacts(tmp_path):
             question_number="1",
             question_type="mcq_single",
             original_text="Mercury is the smallest planet.",
+            sequence_index=0,
+            source_identifier="test-q1",
             options_data={"A": "Mercury", "B": "Mars"},
             substring_mappings=[
                 {
@@ -132,3 +134,104 @@ def test_latex_attack_service_generates_artifacts(tmp_path):
         db.session.remove()
         db.drop_all()
 
+
+def test_latex_attack_service_skips_questions_without_mappings(tmp_path):
+    app = create_app("testing")
+    app.config["PIPELINE_STORAGE_ROOT"] = tmp_path / "runs"
+
+    with app.app_context():
+        db.create_all()
+
+        run_id = "run-no-map"
+        manual_dir = tmp_path / "manual-no-map"
+        manual_dir.mkdir()
+
+        tex_path = manual_dir / "doc.tex"
+        tex_path.write_text(
+            r"""
+            \documentclass{article}
+            \begin{document}
+            Mercury is the smallest planet.
+            \end{document}
+            """,
+            encoding="utf-8",
+        )
+
+        pdf_path = manual_dir / "doc.pdf"
+        pdf_path.write_bytes(b"%PDF-1.4\n%EOF")
+
+        structured = {
+            "document": {
+                "source_path": str(pdf_path),
+                "latex_path": str(tex_path),
+            },
+            "manual_input": {
+                "tex_path": str(tex_path),
+                "pdf_path": str(pdf_path),
+            },
+            "pipeline_metadata": {},
+        }
+
+        StructuredDataManager().save(run_id, structured)
+
+        question = QuestionManipulation(
+            pipeline_run_id=run_id,
+            question_number="1",
+            question_type="mcq_single",
+            original_text="Mercury is the smallest planet.",
+            options_data={"A": "Mercury", "B": "Mars"},
+            substring_mappings=[],
+            ai_model_results={"manual_seed": {"question_id": "q1"}},
+        )
+
+        db.session.add(question)
+        db.session.commit()
+
+        service = LatexAttackService()
+
+        def fake_compile(tex_source_path, mutated_tex_path, output_pdf_path, log_path):
+            output_pdf_path.write_bytes(b"%PDF-1.4\n%%no map\n%EOF")
+            log_path.write_text("pdflatex log", encoding="utf-8")
+            return CompileSummary(
+                success=True,
+                duration_ms=5.0,
+                passes=[CompilePass(number=1, return_code=0, duration_ms=2.5, log_length=10)],
+            )
+
+        def fake_overlay(original_pdf_path, compiled_pdf_path, final_pdf_path):
+            final_pdf_path.write_bytes(b"%PDF-1.4\n%%overlay\n%EOF")
+            return OverlaySummary(success=True, overlays=0, pages_processed=0, per_page=[])
+
+        with patch.object(service, "_compile_latex", side_effect=fake_compile), patch.object(
+            service, "_overlay_pdfs", side_effect=fake_overlay
+        ):
+            summary = service.execute(run_id, force=True)
+
+        artifacts_dir = artifacts_root(run_id) / "latex-dual-layer"
+        log_path = artifacts_dir / "latex_dual_layer_log.json"
+        payload = json.loads(log_path.read_text(encoding="utf-8"))
+        assert payload["replacement_summary"]["no_mapping"] == 1
+        assert payload["replacements"][0]["status"] == "no_mapping"
+        assert summary["renderer_metadata"]["replacement_summary"]["no_mapping"] == 1
+
+        db.session.remove()
+        db.drop_all()
+
+
+def test_compute_top_level_item_spans_handles_plain_enumerate():
+    service = LatexAttackService()
+    content = (
+        r"\begin{enumerate}"
+        r"\item First question?\n"
+        r"    \begin{enumerate}\n        \item Option A\n        \item Option B\n    \end{enumerate}"
+        r"\item Second question?\n"
+        r"\end{enumerate}"
+    )
+
+    spans = service._compute_top_level_item_spans(content)
+    assert len(spans) == 2
+
+    first_segment = content[spans[0][0]:spans[0][1]]
+    second_segment = content[spans[1][0]:spans[1][1]]
+    assert "\\item First question?" in first_segment
+    assert "\\item Second question?" in second_segment

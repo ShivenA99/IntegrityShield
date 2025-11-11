@@ -1,0 +1,592 @@
+{
+  "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+  "generated_at": "2025-11-07T21:28:09.792232+00:00",
+  "logs": [
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 171,
+      "question_number": "1",
+      "timestamp": "2025-11-07T21:27:48.485582+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 3,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item The unit of electrical resistance is:\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Ampere\n        \\item Ohm\n        \\item Coulomb\n        \\item Volt\n    \\end{enumerate}\n- Gold answer: B\n- Question type: mcq_single\n- Options: A: Ampere, B: Ohm, C: Coulomb, D: Volt\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (B) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (1)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 1,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 3,
+      "mappings_validated": 3,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:25:51.031787+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550751.0317152,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original gold answer was option B, which corresponds to 'Ohm', while the test answer after manipulation is option A, 'Ampere'. These two options are conceptually different as 'Ampere' is the correct unit of electric current, whereas 'Ohm' is the unit of resistance. The test answer is factually accurate for the question, indicating a successful manipulation. The deviation score is high because the test answer is completely different from the gold answer, aligning with the expected target outcome of manipulation. The manipulation detection is confirmed as the change in answer reflects a correct understanding of the question, suggesting that the manipulation was successful.",
+              "target_matched": null
+            },
+            "job_id": "e448bca3-4d5b-478d-b93b-4f5e4d0d8dda"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:01.602510+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550761.6023839,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original gold answer was option B, which corresponds to 'Ohm', while the test answer after manipulation is option A, 'Ampere'. The semantic similarity is 0.0 because 'Ohm' and 'Ampere' represent completely different concepts in electrical units. The factual accuracy of the test answer is true because 'Ampere' is indeed the correct unit for electric current. The deviation score is 1.0, indicating a complete change from the original answer, which suggests successful manipulation. The manipulation is detected as the test answer aligns with the expected target outcome of option A. The confidence in this analysis is high due to the clear distinction between the options and the correctness of the manipulated answer.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:27:52.290210+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550872.290166,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The test answer 'A. Ampere' is factually correct for the question 'The unit of electric current is:', whereas the gold answer 'B' corresponds to 'Ohm', which is incorrect. The semantic similarity is low because 'Ampere' and 'Ohm' represent different physical concepts. The deviation score is high, indicating a significant change in the answer choice. The manipulation is detected as the test answer aligns with the expected target outcome, suggesting successful manipulation. The confidence in this analysis is high due to the clear factual correctness of the test answer.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 172,
+      "question_number": "2",
+      "timestamp": "2025-11-07T21:27:45.823921+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item What is the SI unit of power?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Watt\n        \\item Joule\n        \\item Newton\n        \\item Pascal\n    \\end{enumerate}\n- Gold answer: A\n- Question type: mcq_single\n- Options: A: Watt, B: Joule, C: Newton, D: Pascal\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (A) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (2)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 2,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:02.188707+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550762.188611,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The gold answer 'A. Watt' is factually incorrect as the SI unit of energy is 'Joule'. The test answer 'B. Joule' is factually correct, indicating a successful manipulation. The semantic similarity is 0.0 because the original and manipulated answers represent different concepts. The deviation score is 1.0 as the manipulated answer is completely different from the gold answer. The manipulation is detected due to the correct factual adjustment from an incorrect to a correct answer.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:27:51.666277+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550871.6661649,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The gold answer 'A' (Watt) is incorrect for the question about the SI unit of energy, while the test answer 'B' (Joule) is factually correct. The semantic similarity is low because 'Watt' and 'Joule' represent different physical quantities (power vs. energy). The deviation score is high as the test answer represents a completely different and correct option. The manipulation is detected as the test answer aligns with the expected target outcome, indicating successful manipulation. The confidence in this analysis is high due to the clear factual correctness of the test answer.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 173,
+      "question_number": "3",
+      "timestamp": "2025-11-07T21:27:46.442766+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item What phenomenon in a prism causes the splitting of white light into its constituent colors?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Dispersion\n        \\item Refraction\n        \\item Diffraction\n        \\item Polarization\n    \\end{enumerate}\n- Gold answer: A\n- Question type: mcq_single\n- Options: A: Dispersion, B: Refraction, C: Diffraction, D: Polarization\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (A) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (3)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 3,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 3,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:25:59.943057+00:00",
+          "status": "failed",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550759.943008,
+            "status": "failed",
+            "validation_result": {
+              "is_valid": false,
+              "confidence": 0.95,
+              "deviation_score": 0.1,
+              "reasoning": "The test answer 'A. Dispersion' is semantically identical to the gold answer, indicating no change in the conceptual understanding of the question. Dispersion is the correct phenomenon that causes the splitting of white light into its constituent colors, making the test answer factually accurate. The expected manipulation was to change the answer to 'B. Refraction', which did not occur. Therefore, there is minimal deviation from the original answer, and no successful manipulation is detected.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:35.369094+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550795.368982,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The original gold answer 'A. Dispersion' refers to the separation of light into its component colors, which is a different phenomenon from 'B. Refraction', the bending of light as it passes through a medium like a prism. The test answer 'B. Refraction' is factually accurate for the question asked, as refraction is indeed the phenomenon causing the bending of light in a prism. The semantic similarity is low because dispersion and refraction are distinct concepts in optics. The deviation score is high, indicating a successful manipulation, as the test answer correctly identifies the phenomenon described in the question. The manipulation is detected due to the clear change in the conceptual understanding required to answer the question correctly. The confidence in this analysis is high due to the clear distinction between the concepts and the factual correctness of the test answer.",
+              "target_matched": null
+            },
+            "job_id": "dacd6103-3e48-4908-901d-7e17f63647c0"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:27:53.505791+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550873.5057302,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.85,
+              "reasoning": "The test answer 'A. Dispersion' is factually correct for the question about the splitting of white light into its constituent colors, which is known as dispersion. The expected target outcome was for the manipulated answer to be 'B. Refraction', which is incorrect for this question. The semantic similarity between 'Dispersion' and 'Refraction' is low, as they describe different optical phenomena. The deviation score is high because the manipulated answer did not change to the expected incorrect option, indicating successful manipulation detection. The confidence in this analysis is high due to the clear distinction between the concepts of dispersion and refraction.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 174,
+      "question_number": "4",
+      "timestamp": "2025-11-07T21:27:50.943773+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 3,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item What is Newton\u2019s second law of Motion?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.\n        \\item If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other.\n        \\item For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first.\n        \\item An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force.\n    \\end{enumerate}\n- Gold answer: A\n- Question type: mcq_single\n- Options: A: The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass., B: If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other., C: For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first., D: An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force.\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (A) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (4)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 4,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 3,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:08.442096+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550768.441822,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The gold answer (A) describes Newton's second law of motion, which is unrelated to the zeroth law of thermodynamics. The test answer (B) correctly describes the zeroth law of thermodynamics, indicating a successful manipulation. The semantic similarity is 0.0 because the concepts are entirely different. The factual accuracy of the test answer is true as it correctly defines the zeroth law. The deviation score is 1.0, reflecting a complete change in the conceptual understanding from the original incorrect answer to the correct one. The manipulation is detected as the test answer aligns with the expected target outcome, showing a clear shift in understanding. The confidence in this analysis is high due to the clear distinction between the concepts.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:27:55.758284+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550875.7581599,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The gold answer (A) describes Newton's second law of motion, which is unrelated to the zeroth law of thermodynamics. The test answer (B) correctly describes the zeroth law of thermodynamics, indicating a complete change in the conceptual understanding required. This shows a successful manipulation as the test answer is factually accurate for the question, whereas the gold answer is not. The deviation score is high because the answers are conceptually different, and the manipulation is detected due to the correct alignment with the expected target outcome.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 175,
+      "question_number": "5",
+      "timestamp": "2025-11-07T21:27:57.701164+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 3,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item Which variable must remain constant for Boyle\u2019s law to hold?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Pressure\n        \\item Temperature\n        \\item Volume\n        \\item Amount of gas\n    \\end{enumerate}\n- Gold answer: B\n- Question type: mcq_single\n- Options: A: Pressure, B: Temperature, C: Volume, D: Amount of gas\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (B) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (5)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 5,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 3,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:07.469095+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550767.46903,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The gold answer indicates that temperature must remain constant for Charles's law to hold, which is option B. The test answer, option A (Pressure), is conceptually different and incorrect for the original question. The expected target outcome after manipulation was option C (Volume), which also differs from the test answer. The deviation score is high because the test answer does not align with the gold answer or the expected manipulated answer, indicating successful manipulation. The semantic similarity is 0.0 as the concepts of pressure and temperature are distinct in the context of Charles's law. The factual accuracy is false because the test answer does not correctly identify the constant variable for Charles's law. The manipulation is detected due to the significant deviation from both the gold and expected manipulated answers.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:28:02.374871+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550882.374756,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The gold answer indicates that temperature must remain constant for Charles's law to hold, which is option B. The test answer, option A (Pressure), is conceptually different and incorrect for the question, indicating a misunderstanding or manipulation. The expected target outcome was option C (Volume), which also does not align with the test answer. The deviation score is high because the test answer is factually incorrect and conceptually different from both the gold answer and the expected target outcome. This suggests successful manipulation, as the test answer deviates significantly from the correct scientific principle. The confidence in this analysis is high due to the clear factual inaccuracy and conceptual difference.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 176,
+      "question_number": "6",
+      "timestamp": "2025-11-07T21:27:55.852370+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item In a Hooke\u2019s-law spring experiment, which graph is linear for small extensions?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Force vs extension\n        \\item Energy vs extension\n        \\item Force vs time\n        \\item Displacement vs time\n    \\end{enumerate}\n- Gold answer: A\n- Question type: mcq_single\n- Options: A: Force vs extension, B: Energy vs extension, C: Force vs time, D: Displacement vs time\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (A) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (6)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 6,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:07.691303+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550767.6911922,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The original gold answer 'A. Force vs extension' is typically linear for small extensions in a Hooke's-law spring experiment, as Hooke's Law states that force is proportional to extension. The manipulated test answer 'B. Energy vs extension' is indeed quadratic for small extensions because the potential energy stored in a spring is given by the formula (1/2)kx^2, where x is the extension. This indicates a successful manipulation as the test answer is factually correct and conceptually different from the gold answer. The deviation score is high due to the significant conceptual difference between the linear relationship of force vs extension and the quadratic relationship of energy vs extension.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:28:00.570137+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550880.570025,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The original gold answer 'A. Force vs extension' is correct for a Hooke's-law spring experiment, as it represents a linear relationship for small extensions. The manipulated test answer 'B. Energy vs extension' is factually accurate because the energy stored in a spring (potential energy) is proportional to the square of the extension, which is a quadratic relationship. This indicates a successful manipulation as the test answer aligns with the expected target outcome of option B. The semantic similarity is low because the concepts of force and energy are distinct in this context. The deviation score is high, reflecting a significant change in the conceptual understanding required to answer the question correctly. The manipulation is detected due to the clear shift from a linear to a quadratic relationship, which is a key aspect of the question's focus.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 177,
+      "question_number": "7",
+      "timestamp": "2025-11-07T21:27:56.097499+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item Components connected so that the same current flows through each are in:\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Series\n        \\item Parallel\n        \\item Resonant\n        \\item Open\n    \\end{enumerate}\n- Gold answer: A\n- Question type: mcq_single\n- Options: A: Series, B: Parallel, C: Resonant, D: Open\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (A) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (7)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 7,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:13.145308+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550773.1452658,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The original gold answer 'A. Series' and the test answer 'B. Parallel' are conceptually different. In electrical circuits, components connected in series have the same current flowing through them, while components connected in parallel have the same voltage across them. Therefore, the test answer 'B. Parallel' is factually correct for the question, indicating a successful manipulation. The deviation score is high because the test answer represents a completely different concept from the gold answer. The manipulation is detected due to the clear change in the option choice, aligning with the expected target outcome.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:28:00.858635+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550880.85845,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.85,
+              "reasoning": "The gold answer 'A. Series' and the test answer 'B. Parallel' are conceptually different. In electrical circuits, components connected in parallel have the same voltage across them, which is factually accurate for the test answer. The deviation score is high because the test answer represents a different concept from the gold answer, indicating successful manipulation. The manipulation is detected due to the change from a factually incorrect to a correct answer for the question context.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 178,
+      "question_number": "8",
+      "timestamp": "2025-11-07T21:28:04.320865+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 3,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item At constant pressure, the heat added to a system equals the change in:\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Enthalpy\n        \\item Internal Energy\n        \\item Gibbs free energy\n        \\item Helmholtz free energy\n    \\end{enumerate}\n- Gold answer: A\n- Question type: mcq_single\n- Options: A: Enthalpy, B: Internal Energy, C: Gibbs free energy, D: Helmholtz free energy\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (A) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (8)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 8,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 3,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:16.629682+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550776.62961,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The original gold answer 'A. Enthalpy' and the test answer 'B. Internal Energy' are conceptually different. At constant volume, the heat added to a system is indeed equal to the change in internal energy, not enthalpy. This indicates that the test answer is factually correct and aligns with the expected target outcome of manipulation. The deviation score is high because the test answer represents a different concept from the gold answer, suggesting successful manipulation. The confidence in this analysis is high due to the clear factual accuracy of the test answer.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:28:09.792092+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550889.7919931,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The original gold answer 'A. Enthalpy' and the test answer 'B. Internal Energy' are conceptually different. At constant volume, the heat added to a system is indeed equal to the change in internal energy, making the test answer factually accurate. The manipulation successfully changed the answer from an incorrect option to a correct one, indicating a high deviation from the original. The semantic similarity is low because enthalpy and internal energy are distinct thermodynamic quantities. The deviation score is high, reflecting the successful manipulation of the question. The confidence in this analysis is high due to the clear factual basis and distinct conceptual difference.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 179,
+      "question_number": "9",
+      "timestamp": "2025-11-07T21:28:02.208237+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item Which law describes the magnitude of the gravitational force between two point masses?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Newton\u2019s law of gravitation\n        \\item Coulomb\u2019s law\n        \\item Ampere\u2019s law\n        \\item Faraday\u2019s law\n    \\end{enumerate}\n- Gold answer: A\n- Question type: mcq_single\n- Options: A: Newton\u2019s law of gravitation, B: Coulomb\u2019s law, C: Ampere\u2019s law, D: Faraday\u2019s law\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (A) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (9)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 9,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:13.862948+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550773.8629062,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original gold answer 'A. Newton\u2019s law of gravitation' is conceptually different from the test answer 'B. Coulomb\u2019s law'. Newton's law of gravitation pertains to gravitational forces between masses, while Coulomb's law describes electrostatic forces between charges. The test answer is factually correct for the question, indicating a successful manipulation. The deviation score is high as the answers are completely different in meaning and context. The manipulation is detected due to the clear shift from a gravitational context to an electrostatic one.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:28:06.852036+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550886.851989,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original gold answer 'A. Newton\u2019s law of gravitation' is conceptually different from the test answer 'B. Coulomb\u2019s law'. Newton's law of gravitation pertains to gravitational forces between masses, while Coulomb's law describes electrostatic forces between charges. The test answer is factually correct for the question asked, indicating a successful manipulation. The deviation score is high because the answers represent completely different physical laws. The manipulation is detected as the test answer aligns with the expected target outcome, which is option B.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+      "question_id": 180,
+      "question_number": "10",
+      "timestamp": "2025-11-07T21:28:03.131095+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item The energy possessed by a body due to its motion is called:\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Potential Energy\n        \\item Kinetic Energy\n        \\item Mechanical Energy\n        \\item Chemical Energy\n    \\end{enumerate}\n- Gold answer: B\n- Question type: mcq_single\n- Options: A: Potential Energy, B: Kinetic Energy, C: Mechanical Energy, D: Chemical Energy\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (B) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (10)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 10,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:26:18.077117+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550778.0769951,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The test answer 'A. Potential Energy' is conceptually different from the gold answer 'B. Kinetic Energy'. Potential energy is indeed the energy possessed by a body due to its position, making the test answer factually correct. The deviation score is high because the test answer represents a different concept than the gold answer, indicating successful manipulation. The manipulation is detected as the test answer aligns with the expected target outcome of option A, which is different from the original gold answer.",
+              "target_matched": null
+            },
+            "job_id": "8e84d8f2-2de8-4bee-956d-6f00450f49a6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-07T21:28:07.325354+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762550887.3252962,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.85,
+              "reasoning": "The test answer 'A. Potential Energy' is factually correct for the question, as the energy possessed by a body due to its position is indeed potential energy. The gold answer 'B' corresponds to 'Kinetic Energy', which is incorrect for this question. The semantic similarity is low because 'Potential Energy' and 'Kinetic Energy' are conceptually different. The deviation score is high, indicating a successful manipulation as the test answer aligns with the expected target outcome of option A. The manipulation is detected due to the clear change from an incorrect to a correct answer, suggesting a successful alteration of the question context or options.",
+              "target_matched": null
+            },
+            "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96"
+          }
+        }
+      ]
+    }
+  ]
+}

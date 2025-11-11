@@ -40,14 +40,24 @@ const PdfCreationPanel: React.FC = () => {
 
   // Derive gating from presence-only mappings per question
   const structuredQuestions = (status?.structured_data as any)?.questions || [];
-  const validatedCount = React.useMemo(() => {
-    return structuredQuestions.reduce((acc: number, q: any) => {
-      const mappings = (q?.manipulation?.substring_mappings) || (q?.substring_mappings) || [];
-      const hasMapping = Array.isArray(mappings) && mappings.length > 0;
-      return acc + (hasMapping ? 1 : 0);
-    }, 0);
+  const mappingSummary = React.useMemo(() => {
+    return structuredQuestions.reduce(
+      (acc: { ready: number; missing: number }, q: any) => {
+        const mappings = (q?.manipulation?.substring_mappings) || (q?.substring_mappings) || [];
+        const hasMapping = Array.isArray(mappings) && mappings.length > 0;
+        if (hasMapping) {
+          acc.ready += 1;
+        } else {
+          acc.missing += 1;
+        }
+        return acc;
+      },
+      { ready: 0, missing: 0 }
+    );
   }, [structuredQuestions]);
-  const allValidated = structuredQuestions.length > 0 && validatedCount === structuredQuestions.length;
+  const readyCount = mappingSummary.ready;
+  const hasReadyMappings = readyCount > 0;
+  const allReady = structuredQuestions.length > 0 && readyCount === structuredQuestions.length;
 
   const entries = (Object.entries(enhanced) as [string, EnhancedPDF][])
     .filter(([method]) => method === "latex_dual_layer");
@@ -134,13 +144,13 @@ const PdfCreationPanel: React.FC = () => {
   }, [activeRunId, methodLabel, resolveRelativePath]);
 
   const handleCreatePdf = useCallback(async () => {
-    if (!activeRunId || !allValidated) return;
+    if (!activeRunId || !hasReadyMappings) return;
     try {
       await resumeFromStage(activeRunId, 'pdf_creation');
     } catch (error) {
       console.error('Failed to trigger PDF creation:', error);
     }
-  }, [activeRunId, resumeFromStage, allValidated]);
+  }, [activeRunId, resumeFromStage, hasReadyMappings]);
 
   const onEvaluate = () => {
     if (activeRunId) {
@@ -158,7 +168,7 @@ const PdfCreationPanel: React.FC = () => {
       }}>
         <h2 style={{ margin: 0 }}>📑 Enhanced PDF Creation</h2>
 
-        {stage?.status === 'pending' && allValidated && (
+        {stage?.status === 'pending' && hasReadyMappings && (
           <button
             onClick={handleCreatePdf}
             className="pill-button"
@@ -182,7 +192,7 @@ const PdfCreationPanel: React.FC = () => {
         </div>
         <div className="info-card">
           <span className="info-label">Questions ready</span>
-          <span className="info-value">{validatedCount}/{structuredQuestions.length}</span>
+          <span className="info-value">{readyCount}/{structuredQuestions.length}</span>
         </div>
         <div className="info-card">
           <span className="info-label">Enhanced PDFs</span>
@@ -194,10 +204,19 @@ const PdfCreationPanel: React.FC = () => {
         </div>
       </div>
 
-      {stage?.status === 'pending' && !allValidated && (
+      {stage?.status === 'pending' && hasReadyMappings && !allReady && (
+        <div style={{ marginBottom: 16 }}>
+          <p style={{ color: '#facc15', fontSize: '0.9em', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span role="img" aria-label="warning">⚠️</span>
+            {mappingSummary.missing} question{mappingSummary.missing === 1 ? '' : 's'} have no validated mapping and will be skipped in the dual-layer attack.
+          </p>
+        </div>
+      )}
+
+      {stage?.status === 'pending' && !hasReadyMappings && (
         <div style={{ marginBottom: 16 }}>
           <p style={{ color: 'var(--muted)', fontSize: '0.9em' }}>
-            Add at least one mapping per question to enable PDF creation.
+            Generate mappings with GPT-5 and validate at least one question before creating the enhanced PDF.
           </p>
         </div>
       )}

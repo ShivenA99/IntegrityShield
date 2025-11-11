@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass, field
+import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -33,6 +34,7 @@ class MappingGenerationLogger:
     
     def __init__(self):
         self.logger = get_logger(__name__)
+        self._lock = threading.RLock()
         self._logs: Dict[str, List[GenerationLog]] = {}
     
     def log_generation(
@@ -45,18 +47,34 @@ class MappingGenerationLogger:
         mappings_generated: int = 0
     ):
         """Log a generation event."""
-        log = GenerationLog(
-            run_id=run_id,
-            question_id=question_id,
-            question_number=question_number,
-            timestamp=isoformat(utc_now()),
-            stage="generation",
-            status=status,
-            details=details,
-            mappings_generated=mappings_generated
-        )
-        self._add_log(run_id, log)
-        self._save_logs(run_id)
+        with self._lock:
+            logs = self._ensure_loaded_locked(run_id)
+            existing = next(
+                (log for log in logs if log.question_id == question_id and log.stage == "generation"),
+                None,
+            )
+
+            timestamp = isoformat(utc_now())
+
+            if existing:
+                existing.timestamp = timestamp
+                existing.status = status
+                existing.details = details
+                existing.mappings_generated = mappings_generated
+            else:
+                log = GenerationLog(
+                    run_id=run_id,
+                    question_id=question_id,
+                    question_number=question_number,
+                    timestamp=timestamp,
+                    stage="generation",
+                    status=status,
+                    details=details,
+                    mappings_generated=mappings_generated,
+                )
+                logs.append(log)
+
+            self._save_logs_locked(run_id)
     
     def log_validation(
         self,
@@ -68,70 +86,77 @@ class MappingGenerationLogger:
         details: Dict[str, Any]
     ):
         """Log a validation event."""
-        # Find or create generation log
-        logs = self._get_logs(run_id)
-        generation_log = None
-        for log in logs:
-            if log.question_id == question_id and log.stage == "generation":
-                generation_log = log
-                break
-        
-        if generation_log:
-            generation_log.mappings_validated += 1
-            generation_log.validation_logs.append({
-                "mapping_index": mapping_index,
-                "timestamp": isoformat(utc_now()),
-                "status": status,
-                "details": details
-            })
-            if status == "success" and generation_log.first_valid_mapping_index is None:
-                generation_log.first_valid_mapping_index = mapping_index
-        else:
-            # Create new validation log
-            log = GenerationLog(
-                run_id=run_id,
-                question_id=question_id,
-                question_number=question_number,
-                timestamp=isoformat(utc_now()),
-                stage="validation",
-                status=status,
-                details=details,
-                mappings_validated=1,
-                first_valid_mapping_index=mapping_index if status == "success" else None,
-                validation_logs=[{
-                    "mapping_index": mapping_index,
-                    "timestamp": isoformat(utc_now()),
-                    "status": status,
-                    "details": details
-                }]
+        with self._lock:
+            logs = self._ensure_loaded_locked(run_id)
+            generation_log = next(
+                (log for log in logs if log.question_id == question_id and log.stage == "generation"),
+                None,
             )
-            self._add_log(run_id, log)
-        
-        self._save_logs(run_id)
-    
-    def _add_log(self, run_id: str, log: GenerationLog):
-        """Add log to in-memory storage."""
-        if run_id not in self._logs:
-            self._logs[run_id] = []
-        self._logs[run_id].append(log)
-    
-    def _get_logs(self, run_id: str) -> List[GenerationLog]:
-        """Get logs for a run."""
-        return self._logs.get(run_id, [])
-    
-    def _save_logs(self, run_id: str):
-        """Save logs to disk."""
+
+            timestamp = isoformat(utc_now())
+
+            entry = {
+                "mapping_index": mapping_index,
+                "timestamp": timestamp,
+                "status": status,
+                "details": details,
+            }
+
+            if generation_log:
+                generation_log.mappings_validated += 1
+                generation_log.validation_logs.append(entry)
+                if status == "success" and generation_log.first_valid_mapping_index is None:
+                    generation_log.first_valid_mapping_index = mapping_index
+            else:
+                log = GenerationLog(
+                    run_id=run_id,
+                    question_id=question_id,
+                    question_number=question_number,
+                    timestamp=timestamp,
+                    stage="validation",
+                    status=status,
+                    details=details,
+                    mappings_validated=1,
+                    first_valid_mapping_index=mapping_index if status == "success" else None,
+                    validation_logs=[entry],
+                )
+                logs.append(log)
+
+            self._save_logs_locked(run_id)
+
+    def _ensure_loaded_locked(self, run_id: str) -> List[GenerationLog]:
+        if run_id in self._logs:
+            return self._logs[run_id]
+
         try:
             run_dir = run_directory(run_id)
             log_file = run_dir / "mapping_generation_logs.json"
-            
-            logs = self._get_logs(run_id)
+
+            if not log_file.exists():
+                self._logs[run_id] = []
+                return self._logs[run_id]
+
+            log_data = json.loads(log_file.read_text(encoding="utf-8"))
+            logs = [GenerationLog(**log_dict) for log_dict in log_data.get("logs", [])]
+            self._logs[run_id] = logs
+            return logs
+        except Exception as e:
+            self.logger.warning(f"Failed to load mapping generation logs: {e}")
+            self._logs[run_id] = []
+            return self._logs[run_id]
+
+    def _save_logs_locked(self, run_id: str) -> None:
+        try:
+            run_dir = run_directory(run_id)
+            log_file = run_dir / "mapping_generation_logs.json"
+
+            logs = self._logs.get(run_id, [])
             log_data = {
                 "run_id": run_id,
                 "generated_at": isoformat(utc_now()),
-                "logs": [asdict(log) for log in logs]
+                "logs": [asdict(log) for log in logs],
             }
-            
+
             log_file.parent.mkdir(parents=True, exist_ok=True)
             log_file.write_text(json.dumps(log_data, indent=2), encoding="utf-8")
         except Exception as e:
@@ -139,35 +164,23 @@ class MappingGenerationLogger:
     
     def get_logs(self, run_id: str) -> List[Dict[str, Any]]:
         """Get logs for a run as dictionaries."""
-        logs = self._get_logs(run_id)
-        return [asdict(log) for log in logs]
+        with self._lock:
+            logs = self._ensure_loaded_locked(run_id)
+            return [asdict(log) for log in logs]
     
     def get_question_logs(self, run_id: str, question_id: int) -> List[Dict[str, Any]]:
         """Get logs for a specific question."""
-        logs = self._get_logs(run_id)
-        question_logs = [log for log in logs if log.question_id == question_id]
-        return [asdict(log) for log in question_logs]
-    
-    def load_logs(self, run_id: str) -> List[GenerationLog]:
-        """Load logs from disk."""
-        try:
-            run_dir = run_directory(run_id)
-            log_file = run_dir / "mapping_generation_logs.json"
-            
-            if not log_file.exists():
-                return []
-            
-            log_data = json.loads(log_file.read_text(encoding="utf-8"))
-            logs = []
-            for log_dict in log_data.get("logs", []):
-                log = GenerationLog(**log_dict)
-                logs.append(log)
-            
-            self._logs[run_id] = logs
-            return logs
-        except Exception as e:
-            self.logger.warning(f"Failed to load mapping generation logs: {e}")
-            return []
+        with self._lock:
+            logs = self._ensure_loaded_locked(run_id)
+            question_logs = [log for log in logs if log.question_id == question_id]
+            return [asdict(log) for log in question_logs]
+
+    def load_logs(self, run_id: str, *, force: bool = False) -> List[GenerationLog]:
+        """Public loader that optionally forces a refresh from disk."""
+        with self._lock:
+            if force and run_id in self._logs:
+                del self._logs[run_id]
+            return list(self._ensure_loaded_locked(run_id))
 
 
 # Global logger instance

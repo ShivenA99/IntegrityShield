@@ -125,6 +125,23 @@ class SmartReadingService:
             shutil.copy2(tex_file, dest_tex)
             copied_files["tex"] = str(dest_tex)
             self.logger.info(f"Copied .tex file to {dest_tex}", run_id=run_id)
+
+            # Copy associated asset directory (e.g., extracted images referenced in LaTeX)
+            asset_dir = latex_output_dir / f"{pdf_stem}_assets"
+            if asset_dir.exists() and asset_dir.is_dir():
+                dest_asset_dir = run_dir / asset_dir.name
+                try:
+                    shutil.copytree(asset_dir, dest_asset_dir, dirs_exist_ok=True)
+                    copied_files["assets"] = str(dest_asset_dir)
+                    self.logger.info(
+                        f"Copied LaTeX asset directory to {dest_asset_dir}",
+                        run_id=run_id,
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    self.logger.warning(
+                        f"Failed to copy asset directory {asset_dir}: {exc}",
+                        run_id=run_id,
+                    )
         else:
             self.logger.warning(f".tex file not found at {tex_file}", run_id=run_id)
         
@@ -191,6 +208,8 @@ class SmartReadingService:
             "pages": pages,
             "latex_path": copied_files.get("tex") if copied_files.get("tex") else None,
         }
+        if copied_files.get("assets"):
+            structured["document"]["assets_path"] = copied_files["assets"]
         
         # Transform questions to ai_questions format
         ai_questions = []

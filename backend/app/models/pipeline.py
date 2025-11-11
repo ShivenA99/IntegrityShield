@@ -91,6 +91,8 @@ class QuestionManipulation(db.Model, TimestampMixin):
     effectiveness_score: Mapped[Optional[float]] = mapped_column(db.Float)
     ai_model_results: Mapped[dict] = mapped_column(json_type, default=dict)
     visual_elements: Mapped[Optional[list]] = mapped_column(json_type, nullable=True)
+    sequence_index: Mapped[int] = mapped_column(db.Integer, nullable=False, server_default="0")
+    source_identifier: Mapped[Optional[str]] = mapped_column(db.String(255))
 
     run: Mapped[PipelineRun] = relationship(back_populates="questions")
     ai_results: Mapped[list["AIModelResult"]] = relationship(

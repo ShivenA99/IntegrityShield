@@ -1,0 +1,832 @@
+{
+  "run_id": "033e719d-8956-4ef4-b8e7-e9ba008d3900",
+  "questions": {
+    "191": {
+      "question_id": 191,
+      "question_number": "1",
+      "sequence_index": 0,
+      "source_identifier": "span-page0:block2:line0:span0",
+      "status": "no_valid_mapping",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554381.509421,
+          "status": "error",
+          "error": "Original substring 'removing water from the soil and returning it to the atmosphere' not found in question text"
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-07T22:26:21.509627+00:00"
+    },
+    "195": {
+      "question_id": 195,
+      "question_number": "5",
+      "sequence_index": 4,
+      "source_identifier": "span-page0:block22:line0:span0",
+      "status": "no_valid_mapping",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554383.783998,
+          "status": "error",
+          "error": "Original substring 'makes contact with the floor' not found in question text"
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-07T22:26:23.784333+00:00"
+    },
+    "192": {
+      "question_id": 192,
+      "question_number": "2",
+      "sequence_index": 1,
+      "source_identifier": "span-page0:block7:line0:span0",
+      "status": "no_valid_mapping",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554386.205009,
+          "status": "failed",
+          "validation_result": {
+            "is_valid": false,
+            "confidence": 0.95,
+            "deviation_score": 0.0,
+            "reasoning": "The test answer 'C. They contain evidence showing changes in the atmospheric composition over time.' is identical to the gold standard answer. This indicates no change in the option choice, meaning the manipulation was not successful. The semantic similarity is 1.0 as both answers convey the same concept and understanding. The factual accuracy is true because the answer correctly describes the importance of ice cores in paleontological studies. The deviation score is 0.0, reflecting no difference between the test and gold answers. Therefore, manipulation was not detected.",
+            "target_matched": null
+          }
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-07T22:26:26.206481+00:00"
+    },
+    "193": {
+      "question_id": 193,
+      "question_number": "3",
+      "sequence_index": 2,
+      "source_identifier": "span-page0:block12:line0:span0",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "c48c4268-a304-4049-8a78-fd9a80fe7375",
+        "original": "Earth and the moon",
+        "replacement": "Earth and Venus",
+        "start_pos": 50,
+        "end_pos": 68,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "By changing the celestial body from 'the moon' to 'Venus', the presence of a 'Thick atmosphere' becomes a plausible answer, as Venus has a thick atmosphere unlike the moon.",
+        "latex_stem_text": "\\item Which of the following can be found on both Earth and the moon?\n    \\begin{enumerate}\n        \\item Hills\n        \\item Thick atmosphere\n        \\item Thunderstorms\n        \\item Oceans\n    \\end{enumerate}",
+        "question_index": 3,
+        "source_identifier": "span-page0:block12:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "validation_reasoning": "The test answer 'A. Hills' is factually correct as both Earth and Venus have hills. However, the expected target outcome was option B (Thick atmosphere), which is also correct. The semantic similarity between 'Hills' and 'Thick atmosphere' is low, indicating a significant conceptual difference. The deviation score is high because the test answer does not align with the expected manipulated answer, suggesting successful manipulation. The manipulation likely involved altering the question or options, leading to a different correct answer being selected.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.8,
+          "reasoning": "The test answer 'A. Hills' is factually correct as both Earth and Venus have hills. However, the expected target outcome was option B (Thick atmosphere), which is also correct. The semantic similarity between 'Hills' and 'Thick atmosphere' is low, indicating a significant conceptual difference. The deviation score is high because the test answer does not align with the expected manipulated answer, suggesting successful manipulation. The manipulation likely involved altering the question or options, leading to a different correct answer being selected.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554385.342946,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.8,
+            "reasoning": "The test answer 'A. Hills' is factually correct as both Earth and Venus have hills. However, the expected target outcome was option B (Thick atmosphere), which is also correct. The semantic similarity between 'Hills' and 'Thick atmosphere' is low, indicating a significant conceptual difference. The deviation score is high because the test answer does not align with the expected manipulated answer, suggesting successful manipulation. The manipulation likely involved altering the question or options, leading to a different correct answer being selected.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "reasoning": "The test answer 'A. Hills' is factually correct as both Earth and Venus have hills. However, the expected target outcome was option B (Thick atmosphere), which is also correct. The semantic similarity between 'Hills' and 'Thick atmosphere' is low, indicating a significant conceptual difference. The deviation score is high because the test answer does not align with the expected manipulated answer, suggesting successful manipulation. The manipulation likely involved altering the question or options, leading to a different correct answer being selected.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:26:29.118662+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107668+00:00"
+    },
+    "194": {
+      "question_id": 194,
+      "question_number": "4",
+      "sequence_index": 3,
+      "source_identifier": "auto-3",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 3,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "011ea535-2659-42db-9d45-9b59485be720",
+        "original": "succeed at physical activities",
+        "replacement": "maintain mental focus during activities",
+        "start_pos": 102,
+        "end_pos": 132,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "By changing the focus from physical activities to mental focus, the impact of smoking on decision-making becomes more relevant, shifting the answer to option B.",
+        "latex_stem_text": "\\item How would smoking tobacco most likely have a negative impact on the ability of an individual to succeed at physical activities?",
+        "question_index": 4,
+        "source_identifier": "auto-3",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "validation_reasoning": "The gold answer (C) suggests that smoking decreases stamina and cardiovascular efficiency, which is directly related to maintaining mental focus during activities due to reduced oxygen supply to the brain. The test answer (B), however, suggests a decrease in decision-making ability, which is a different cognitive function and not directly related to stamina or cardiovascular efficiency. This indicates a significant conceptual shift, suggesting successful manipulation. The factual accuracy of the test answer is questionable as the primary impact of smoking on mental focus is more closely related to stamina and cardiovascular efficiency rather than decision-making speed. The deviation score is high due to the clear difference in the conceptual focus of the answers.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.8,
+          "reasoning": "The gold answer (C) suggests that smoking decreases stamina and cardiovascular efficiency, which is directly related to maintaining mental focus during activities due to reduced oxygen supply to the brain. The test answer (B), however, suggests a decrease in decision-making ability, which is a different cognitive function and not directly related to stamina or cardiovascular efficiency. This indicates a significant conceptual shift, suggesting successful manipulation. The factual accuracy of the test answer is questionable as the primary impact of smoking on mental focus is more closely related to stamina and cardiovascular efficiency rather than decision-making speed. The deviation score is high due to the clear difference in the conceptual focus of the answers.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554388.514623,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.8,
+            "reasoning": "The gold answer (C) suggests that smoking decreases stamina and cardiovascular efficiency, which is directly related to maintaining mental focus during activities due to reduced oxygen supply to the brain. The test answer (B), however, suggests a decrease in decision-making ability, which is a different cognitive function and not directly related to stamina or cardiovascular efficiency. This indicates a significant conceptual shift, suggesting successful manipulation. The factual accuracy of the test answer is questionable as the primary impact of smoking on mental focus is more closely related to stamina and cardiovascular efficiency rather than decision-making speed. The deviation score is high due to the clear difference in the conceptual focus of the answers.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "reasoning": "The gold answer (C) suggests that smoking decreases stamina and cardiovascular efficiency, which is directly related to maintaining mental focus during activities due to reduced oxygen supply to the brain. The test answer (B), however, suggests a decrease in decision-making ability, which is a different cognitive function and not directly related to stamina or cardiovascular efficiency. This indicates a significant conceptual shift, suggesting successful manipulation. The factual accuracy of the test answer is questionable as the primary impact of smoking on mental focus is more closely related to stamina and cardiovascular efficiency rather than decision-making speed. The deviation score is high due to the clear difference in the conceptual focus of the answers.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:26:35.065941+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107692+00:00"
+    },
+    "198": {
+      "question_id": 198,
+      "question_number": "8",
+      "sequence_index": 7,
+      "source_identifier": "auto-7",
+      "status": "no_valid_mapping",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554396.9353049,
+          "status": "failed",
+          "validation_result": {
+            "is_valid": false,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The test answer 'D. It decreased the volume of the lake.' is factually accurate and aligns with the gold answer, indicating no change in the understanding of the question. However, the expected target outcome was option A, which is conceptually different from option D. The manipulation was intended to change the answer to a different option that does not align with the original understanding. The high deviation score reflects the significant difference between the expected manipulated answer and the test answer. The semantic similarity is low because the concepts of 'decreased volume' and 'decreased salt content' are unrelated. The manipulation detection is confirmed as the test answer did not align with the expected manipulated outcome.",
+            "target_matched": null
+          }
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-07T22:26:36.936940+00:00"
+    },
+    "196": {
+      "question_id": 196,
+      "question_number": "6",
+      "sequence_index": 5,
+      "source_identifier": "auto-5",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "0a3a6602-0eaf-48b5-b507-b9f7e8aef642",
+        "original": "22 pairs of autosomes",
+        "replacement": "23 pairs of chromosomes",
+        "start_pos": 113,
+        "end_pos": 134,
+        "context": "question_stem",
+        "target_wrong_answer": "C",
+        "reasoning": "By changing '22 pairs of autosomes' to '23 pairs of chromosomes', the total count of chromosomes is altered, leading to confusion with the total number of chromosomes (46), thus making option C (23) seem plausible.",
+        "latex_stem_text": "\\item Mr. Jenkins\u2019s class is studying sex chromosomes. He tells his students that the nuclei of human cells have 22 pairs of autosomes. How many sex chromosomes...",
+        "question_index": 6,
+        "source_identifier": "auto-5",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "validation_reasoning": "The gold answer 'B' corresponds to 2 sex chromosomes, which is factually correct for the question about human sex chromosomes. The test answer 'A' corresponds to 1 sex chromosome, which is factually incorrect. The expected manipulated answer was 'C' (23), which is also incorrect but represents a significant deviation from the correct answer. The test answer 'A' does not align with the expected manipulated answer 'C', but it still represents a deviation from the correct answer 'B'. The deviation score is high because the test answer is conceptually different from the gold answer, indicating successful manipulation. The manipulation detection is confirmed by the incorrect factual accuracy and the deviation from the expected answer.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.9,
+          "reasoning": "The gold answer 'B' corresponds to 2 sex chromosomes, which is factually correct for the question about human sex chromosomes. The test answer 'A' corresponds to 1 sex chromosome, which is factually incorrect. The expected manipulated answer was 'C' (23), which is also incorrect but represents a significant deviation from the correct answer. The test answer 'A' does not align with the expected manipulated answer 'C', but it still represents a deviation from the correct answer 'B'. The deviation score is high because the test answer is conceptually different from the gold answer, indicating successful manipulation. The manipulation detection is confirmed by the incorrect factual accuracy and the deviation from the expected answer.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554390.527508,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The gold answer 'B' corresponds to 2 sex chromosomes, which is factually correct for the question about human sex chromosomes. The test answer 'A' corresponds to 1 sex chromosome, which is factually incorrect. The expected manipulated answer was 'C' (23), which is also incorrect but represents a significant deviation from the correct answer. The test answer 'A' does not align with the expected manipulated answer 'C', but it still represents a deviation from the correct answer 'B'. The deviation score is high because the test answer is conceptually different from the gold answer, indicating successful manipulation. The manipulation detection is confirmed by the incorrect factual accuracy and the deviation from the expected answer.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "reasoning": "The gold answer 'B' corresponds to 2 sex chromosomes, which is factually correct for the question about human sex chromosomes. The test answer 'A' corresponds to 1 sex chromosome, which is factually incorrect. The expected manipulated answer was 'C' (23), which is also incorrect but represents a significant deviation from the correct answer. The test answer 'A' does not align with the expected manipulated answer 'C', but it still represents a deviation from the correct answer 'B'. The deviation score is high because the test answer is conceptually different from the gold answer, indicating successful manipulation. The manipulation detection is confirmed by the incorrect factual accuracy and the deviation from the expected answer.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:26:41.455133+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107694+00:00"
+    },
+    "197": {
+      "question_id": 197,
+      "question_number": "7",
+      "sequence_index": 6,
+      "source_identifier": "span-page1:block4:line0:span0",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "3006152b-d8dc-4a85-91f0-93744d56197e",
+        "original": "humans have changed the natural environment",
+        "replacement": "natural forces affect the environment",
+        "start_pos": 43,
+        "end_pos": 86,
+        "context": "question_stem",
+        "target_wrong_answer": "A",
+        "reasoning": "By changing the focus from human-induced changes to natural forces, the correct answer shifts from C to A, as wind and rain are natural forces.",
+        "latex_stem_text": "\\item Which statement is an example of how humans have changed the natural environment?\n    \\begin{enumerate}\n        \\item Wind and rain destroy wheat plants.\n        \\item The Sun\u2019s energy helps a wheat plant grow.\n        \\item A forest is cleared to make space to plant wheat.\n        \\item A wheat plant\u2019s seeds are scattered by the wind.\n    \\end{enumerate}",
+        "question_index": 7,
+        "source_identifier": "span-page1:block4:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "validation_reasoning": "The gold answer (C) refers to human activity affecting the environment, while the test answer (A) refers to natural forces (wind and rain) affecting the environment. These are conceptually different, as one involves human intervention and the other involves natural phenomena. The test answer is factually correct as it accurately describes how natural forces can impact the environment, aligning with the question's focus. The deviation score is high due to the clear difference in the nature of the forces described. The manipulation is detected as the test answer shifts the focus from human to natural forces, indicating a successful manipulation. The confidence in this analysis is high due to the clear distinction between the options.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.8,
+          "reasoning": "The gold answer (C) refers to human activity affecting the environment, while the test answer (A) refers to natural forces (wind and rain) affecting the environment. These are conceptually different, as one involves human intervention and the other involves natural phenomena. The test answer is factually correct as it accurately describes how natural forces can impact the environment, aligning with the question's focus. The deviation score is high due to the clear difference in the nature of the forces described. The manipulation is detected as the test answer shifts the focus from human to natural forces, indicating a successful manipulation. The confidence in this analysis is high due to the clear distinction between the options.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554394.753396,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.8,
+            "reasoning": "The gold answer (C) refers to human activity affecting the environment, while the test answer (A) refers to natural forces (wind and rain) affecting the environment. These are conceptually different, as one involves human intervention and the other involves natural phenomena. The test answer is factually correct as it accurately describes how natural forces can impact the environment, aligning with the question's focus. The deviation score is high due to the clear difference in the nature of the forces described. The manipulation is detected as the test answer shifts the focus from human to natural forces, indicating a successful manipulation. The confidence in this analysis is high due to the clear distinction between the options.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "reasoning": "The gold answer (C) refers to human activity affecting the environment, while the test answer (A) refers to natural forces (wind and rain) affecting the environment. These are conceptually different, as one involves human intervention and the other involves natural phenomena. The test answer is factually correct as it accurately describes how natural forces can impact the environment, aligning with the question's focus. The deviation score is high due to the clear difference in the nature of the forces described. The manipulation is detected as the test answer shifts the focus from human to natural forces, indicating a successful manipulation. The confidence in this analysis is high due to the clear distinction between the options.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:26:49.984869+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107695+00:00"
+    },
+    "200": {
+      "question_id": 200,
+      "question_number": "10",
+      "sequence_index": 9,
+      "source_identifier": "auto-9",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "ddd2b40b-074b-4757-87ec-bd4f51b2b7ed",
+        "original": "forces are unbalanced",
+        "replacement": "forces are balanced",
+        "start_pos": 85,
+        "end_pos": 106,
+        "context": "question_stem",
+        "target_wrong_answer": "A",
+        "reasoning": "Changing 'unbalanced' to 'balanced' implies the block will not move, leading to option A as the correct answer.",
+        "latex_stem_text": "\\item Two forces act in opposite directions on a wood block. What will happen if the forces are unbalanced?\n    \\begin{enumerate}\n        \\item The block will balance the forces.\n        \\item The forces will reverse direction.\n        \\item The mass of the block will change.\n        \\item The position of the block will change.\n    \\end{enumerate}",
+        "question_index": 10,
+        "source_identifier": "auto-9",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "validation_reasoning": "The gold answer 'D. The position of the block will change.' implies that the block will not move if the forces are balanced, which is the correct understanding of balanced forces. The test answer 'A. The block will balance the forces.' suggests that the block itself is actively balancing the forces, which is conceptually different and factually incorrect. This indicates a misunderstanding of the concept of balanced forces. The deviation score is high because the test answer represents a different conceptual understanding. The manipulation is detected due to the significant change in meaning and the incorrect factual basis of the test answer.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.9,
+          "reasoning": "The gold answer 'D. The position of the block will change.' implies that the block will not move if the forces are balanced, which is the correct understanding of balanced forces. The test answer 'A. The block will balance the forces.' suggests that the block itself is actively balancing the forces, which is conceptually different and factually incorrect. This indicates a misunderstanding of the concept of balanced forces. The deviation score is high because the test answer represents a different conceptual understanding. The manipulation is detected due to the significant change in meaning and the incorrect factual basis of the test answer.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554403.527067,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The gold answer 'D. The position of the block will change.' implies that the block will not move if the forces are balanced, which is the correct understanding of balanced forces. The test answer 'A. The block will balance the forces.' suggests that the block itself is actively balancing the forces, which is conceptually different and factually incorrect. This indicates a misunderstanding of the concept of balanced forces. The deviation score is high because the test answer represents a different conceptual understanding. The manipulation is detected due to the significant change in meaning and the incorrect factual basis of the test answer.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "reasoning": "The gold answer 'D. The position of the block will change.' implies that the block will not move if the forces are balanced, which is the correct understanding of balanced forces. The test answer 'A. The block will balance the forces.' suggests that the block itself is actively balancing the forces, which is conceptually different and factually incorrect. This indicates a misunderstanding of the concept of balanced forces. The deviation score is high because the test answer represents a different conceptual understanding. The manipulation is detected due to the significant change in meaning and the incorrect factual basis of the test answer.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:27:08.021098+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107705+00:00"
+    },
+    "203": {
+      "question_id": 203,
+      "question_number": "13",
+      "sequence_index": 12,
+      "source_identifier": "auto-12",
+      "status": "no_valid_mapping",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554435.7304451,
+          "status": "failed",
+          "validation_result": {
+            "is_valid": false,
+            "confidence": 0.95,
+            "deviation_score": 0.1,
+            "reasoning": "The test answer 'A. recycle materials' is semantically identical to the gold answer and represents the same understanding of the question. The factual accuracy is high as recycling materials is a correct method to increase the amount of trash recycled daily. There is minimal deviation between the gold and test answers, indicating no successful manipulation. The expected target outcome was option D, but the test answer remained as option A, showing no change in the option choice.",
+            "target_matched": null
+          }
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-07T22:27:15.732184+00:00"
+    },
+    "201": {
+      "question_id": 201,
+      "question_number": "11",
+      "sequence_index": 10,
+      "source_identifier": "span-page1:block24:line0:span0",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "63f9b051-ae86-41e3-aeea-78fcbe1d7b75",
+        "original": "heart, blood vessels, kidneys, and bladder",
+        "replacement": "muscle fibers",
+        "start_pos": 10,
+        "end_pos": 52,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "Replacing 'heart, blood vessels, kidneys, and bladder' with 'muscle fibers' changes the context to a group of similar cells, which is best described as a tissue.",
+        "latex_stem_text": "\\item The heart, blood vessels, kidneys, and bladder working together are best described as\n    \\begin{enumerate}\n        \\item a cell.\n        \\item a tissue.\n        \\item an organism.\n        \\item a system.\n    \\end{enumerate}",
+        "question_index": 11,
+        "source_identifier": "span-page1:block24:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "validation_reasoning": "The original gold answer 'D. a system.' refers to a group of muscle fibers working together as part of a larger system, such as the muscular system. The manipulated test answer 'B. a tissue.' is factually accurate because muscle fibers collectively form muscle tissue. The semantic similarity is low (0.2) because 'a system' and 'a tissue' represent different biological concepts. The deviation score is high (0.8) due to the significant conceptual difference between the two options. The manipulation is detected as successful because the test answer aligns with the expected target outcome of option B, indicating a clear change from the original gold answer.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.8,
+          "reasoning": "The original gold answer 'D. a system.' refers to a group of muscle fibers working together as part of a larger system, such as the muscular system. The manipulated test answer 'B. a tissue.' is factually accurate because muscle fibers collectively form muscle tissue. The semantic similarity is low (0.2) because 'a system' and 'a tissue' represent different biological concepts. The deviation score is high (0.8) due to the significant conceptual difference between the two options. The manipulation is detected as successful because the test answer aligns with the expected target outcome of option B, indicating a clear change from the original gold answer.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554409.4807072,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.8,
+            "reasoning": "The original gold answer 'D. a system.' refers to a group of muscle fibers working together as part of a larger system, such as the muscular system. The manipulated test answer 'B. a tissue.' is factually accurate because muscle fibers collectively form muscle tissue. The semantic similarity is low (0.2) because 'a system' and 'a tissue' represent different biological concepts. The deviation score is high (0.8) due to the significant conceptual difference between the two options. The manipulation is detected as successful because the test answer aligns with the expected target outcome of option B, indicating a clear change from the original gold answer.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "reasoning": "The original gold answer 'D. a system.' refers to a group of muscle fibers working together as part of a larger system, such as the muscular system. The manipulated test answer 'B. a tissue.' is factually accurate because muscle fibers collectively form muscle tissue. The semantic similarity is low (0.2) because 'a system' and 'a tissue' represent different biological concepts. The deviation score is high (0.8) due to the significant conceptual difference between the two options. The manipulation is detected as successful because the test answer aligns with the expected target outcome of option B, indicating a clear change from the original gold answer.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:27:21.243803+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107706+00:00"
+    },
+    "199": {
+      "question_id": 199,
+      "question_number": "9",
+      "sequence_index": 8,
+      "source_identifier": "span-page1:block14:line0:span0",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "550138f0-7bdc-4b0c-9596-d1fafb117928",
+        "original": "gain energy",
+        "replacement": "stay hydrated",
+        "start_pos": 27,
+        "end_pos": 38,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "By changing 'gain energy' to 'stay hydrated', the most logical choice becomes 'drinking water', thus shifting the correct answer to option B.",
+        "latex_stem_text": "\\item A chicken is able to gain energy that came from the Sun by\n    \\begin{enumerate}\n        \\item eating seeds.\n        \\item drinking water.\n        \\item laying eggs.\n        \\item breathing oxygen.\n    \\end{enumerate}",
+        "question_index": 9,
+        "source_identifier": "span-page1:block14:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "validation_reasoning": "The original gold answer 'A. eating seeds.' and the manipulated test answer 'B. drinking water.' are conceptually different, as they refer to distinct methods of hydration. The test answer is factually accurate because chickens stay hydrated by drinking water, which aligns with the manipulated target outcome. The deviation score is high due to the clear difference in options, indicating successful manipulation. The confidence in this analysis is high given the clarity of the question and the distinct nature of the options.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.9,
+          "reasoning": "The original gold answer 'A. eating seeds.' and the manipulated test answer 'B. drinking water.' are conceptually different, as they refer to distinct methods of hydration. The test answer is factually accurate because chickens stay hydrated by drinking water, which aligns with the manipulated target outcome. The deviation score is high due to the clear difference in options, indicating successful manipulation. The confidence in this analysis is high given the clarity of the question and the distinct nature of the options.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554402.7441459,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The original gold answer 'A. eating seeds.' and the manipulated test answer 'B. drinking water.' are conceptually different, as they refer to distinct methods of hydration. The test answer is factually accurate because chickens stay hydrated by drinking water, which aligns with the manipulated target outcome. The deviation score is high due to the clear difference in options, indicating successful manipulation. The confidence in this analysis is high given the clarity of the question and the distinct nature of the options.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "reasoning": "The original gold answer 'A. eating seeds.' and the manipulated test answer 'B. drinking water.' are conceptually different, as they refer to distinct methods of hydration. The test answer is factually accurate because chickens stay hydrated by drinking water, which aligns with the manipulated target outcome. The deviation score is high due to the clear difference in options, indicating successful manipulation. The confidence in this analysis is high given the clarity of the question and the distinct nature of the options.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:27:24.593021+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107707+00:00"
+    },
+    "202": {
+      "question_id": 202,
+      "question_number": "12",
+      "sequence_index": 11,
+      "source_identifier": "span-page2:block0:line0:span0",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "5926ba88-3a10-4664-87fd-d03625a4416e",
+        "original": "conduction",
+        "replacement": "radiation",
+        "start_pos": 29,
+        "end_pos": 39,
+        "context": "question_stem",
+        "target_wrong_answer": "C",
+        "reasoning": "By changing 'conduction' to 'radiation', the correct answer shifts from the metal spoon warming in a pot of hot soup to sunlight shining through the window, which is an example of radiation.",
+        "latex_stem_text": "\\item Which is an example of conduction?\n    \\begin{enumerate}\n        \\item a space heater turned on\n        \\item water boiling on the stove\n        \\item sunlight shining through the window\n        \\item a metal spoon warming in a pot of hot soup\n    \\end{enumerate}",
+        "question_index": 12,
+        "source_identifier": "span-page2:block0:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "validation_reasoning": "The gold answer (D) refers to conduction, as a metal spoon warming in a pot of hot soup involves heat transfer through direct contact. The test answer (C), sunlight shining through the window, correctly represents radiation, which is the transfer of energy through electromagnetic waves. This indicates a successful manipulation as the test answer aligns with the expected target outcome of identifying radiation. The semantic similarity is low because the concepts of conduction and radiation are distinct. The factual accuracy of the test answer is high, as it correctly identifies an example of radiation. The deviation score is high, indicating a significant change from the original answer, and manipulation is detected due to the clear shift in the type of heat transfer being identified. The confidence in this analysis is high due to the clear distinction between the concepts and the correct identification of the target outcome.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.8,
+          "reasoning": "The gold answer (D) refers to conduction, as a metal spoon warming in a pot of hot soup involves heat transfer through direct contact. The test answer (C), sunlight shining through the window, correctly represents radiation, which is the transfer of energy through electromagnetic waves. This indicates a successful manipulation as the test answer aligns with the expected target outcome of identifying radiation. The semantic similarity is low because the concepts of conduction and radiation are distinct. The factual accuracy of the test answer is high, as it correctly identifies an example of radiation. The deviation score is high, indicating a significant change from the original answer, and manipulation is detected due to the clear shift in the type of heat transfer being identified. The confidence in this analysis is high due to the clear distinction between the concepts and the correct identification of the target outcome.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554424.0710568,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.8,
+            "reasoning": "The gold answer (D) refers to conduction, as a metal spoon warming in a pot of hot soup involves heat transfer through direct contact. The test answer (C), sunlight shining through the window, correctly represents radiation, which is the transfer of energy through electromagnetic waves. This indicates a successful manipulation as the test answer aligns with the expected target outcome of identifying radiation. The semantic similarity is low because the concepts of conduction and radiation are distinct. The factual accuracy of the test answer is high, as it correctly identifies an example of radiation. The deviation score is high, indicating a significant change from the original answer, and manipulation is detected due to the clear shift in the type of heat transfer being identified. The confidence in this analysis is high due to the clear distinction between the concepts and the correct identification of the target outcome.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "reasoning": "The gold answer (D) refers to conduction, as a metal spoon warming in a pot of hot soup involves heat transfer through direct contact. The test answer (C), sunlight shining through the window, correctly represents radiation, which is the transfer of energy through electromagnetic waves. This indicates a successful manipulation as the test answer aligns with the expected target outcome of identifying radiation. The semantic similarity is low because the concepts of conduction and radiation are distinct. The factual accuracy of the test answer is high, as it correctly identifies an example of radiation. The deviation score is high, indicating a significant change from the original answer, and manipulation is detected due to the clear shift in the type of heat transfer being identified. The confidence in this analysis is high due to the clear distinction between the concepts and the correct identification of the target outcome.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:27:33.947795+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107708+00:00"
+    },
+    "207": {
+      "question_id": 207,
+      "question_number": "17",
+      "sequence_index": 16,
+      "source_identifier": "auto-16",
+      "status": "no_valid_mapping",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554456.0555341,
+          "status": "error",
+          "error": "Original substring 'reduce' not found in question text"
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-07T22:27:36.055888+00:00"
+    },
+    "208": {
+      "question_id": 208,
+      "question_number": "18",
+      "sequence_index": 17,
+      "source_identifier": "auto-17",
+      "status": "no_valid_mapping",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554459.756317,
+          "status": "error",
+          "error": "Original substring 'increased number of trees cut down' not found in question text"
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-07T22:27:39.756792+00:00"
+    },
+    "209": {
+      "question_id": 209,
+      "question_number": "19",
+      "sequence_index": 18,
+      "source_identifier": "auto-18",
+      "status": "no_valid_mapping",
+      "job_id": "14f33fe7-5916-4257-8e11-19604abd7bc6",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554484.0550568,
+          "status": "error",
+          "error": "Original substring 'to capture sunlight' not found in question text"
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-07T22:28:04.056164+00:00"
+    },
+    "210": {
+      "question_id": 210,
+      "question_number": "20",
+      "sequence_index": 19,
+      "source_identifier": "auto-19",
+      "status": "failed",
+      "job_id": "d0ec7539-e279-4330-9f27-788bd804c2a1",
+      "error": "Failed to generate mappings after 3 attempts",
+      "updated_at": "2025-11-07T22:28:22.358430+00:00"
+    },
+    "204": {
+      "question_id": 204,
+      "question_number": "14",
+      "sequence_index": 13,
+      "source_identifier": "span-page2:block10:line0:span0",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "15d3d079-ef37-4ce1-8aa1-48ff90500357",
+        "original": "the greatest effect",
+        "replacement": "a significant impact",
+        "start_pos": 29,
+        "end_pos": 48,
+        "context": "question_stem",
+        "target_wrong_answer": "A",
+        "reasoning": "Changing 'the greatest effect' to 'a significant impact' could lead to interpreting the question as focusing on broader environmental factors, making 'type of soil and salinity' seem more relevant.",
+        "latex_stem_text": "\\item Which factors can have the greatest effect on the health of a river system?\n    \\begin{enumerate}\n        \\item type of soil and salinity\n        \\item nitrate levels and turbidity\n        \\item human consumption and pH\n        \\item natural disasters and tidal changes\n    \\end{enumerate}",
+        "question_index": 14,
+        "source_identifier": "span-page2:block10:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "validation_reasoning": "The test answer 'B. nitrate levels and turbidity' is factually accurate and aligns with the gold standard answer, indicating a correct understanding of factors impacting river health. However, the expected manipulation target was option A, which suggests a significant deviation from the intended manipulation. The semantic similarity between the gold answer and the test answer is low, as they represent different concepts. The deviation score is high, indicating successful manipulation detection. The confidence in this analysis is high due to the clear distinction between the expected and actual answers.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.8,
+          "reasoning": "The test answer 'B. nitrate levels and turbidity' is factually accurate and aligns with the gold standard answer, indicating a correct understanding of factors impacting river health. However, the expected manipulation target was option A, which suggests a significant deviation from the intended manipulation. The semantic similarity between the gold answer and the test answer is low, as they represent different concepts. The deviation score is high, indicating successful manipulation detection. The confidence in this analysis is high due to the clear distinction between the expected and actual answers.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554445.488986,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.8,
+            "reasoning": "The test answer 'B. nitrate levels and turbidity' is factually accurate and aligns with the gold standard answer, indicating a correct understanding of factors impacting river health. However, the expected manipulation target was option A, which suggests a significant deviation from the intended manipulation. The semantic similarity between the gold answer and the test answer is low, as they represent different concepts. The deviation score is high, indicating successful manipulation detection. The confidence in this analysis is high due to the clear distinction between the expected and actual answers.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.8,
+        "reasoning": "The test answer 'B. nitrate levels and turbidity' is factually accurate and aligns with the gold standard answer, indicating a correct understanding of factors impacting river health. However, the expected manipulation target was option A, which suggests a significant deviation from the intended manipulation. The semantic similarity between the gold answer and the test answer is low, as they represent different concepts. The deviation score is high, indicating successful manipulation detection. The confidence in this analysis is high due to the clear distinction between the expected and actual answers.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:27:56.740211+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107709+00:00"
+    },
+    "205": {
+      "question_id": 205,
+      "question_number": "15",
+      "sequence_index": 14,
+      "source_identifier": "auto-14",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "22a578c7-b5a1-45d1-a7ec-84cdb58341e5",
+        "original": "release oxygen",
+        "replacement": "absorb water",
+        "start_pos": 126,
+        "end_pos": 140,
+        "context": "question_stem",
+        "target_wrong_answer": "False",
+        "reasoning": "Replacing 'release oxygen' with 'absorb water' changes the biological process described, which flips the truth value of the statement.",
+        "latex_stem_text": "\\item True or False: The correct answer to \u2019A cell that is low in water will most likely immediately lose the ability to\u2019 is \u2019release oxygen.\u2019.",
+        "question_index": 15,
+        "source_identifier": "auto-14",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "validation_reasoning": "The original question implies that a cell low in water would lose the ability to absorb water, which is factually incorrect. A cell low in water would actually have an increased ability to absorb water due to osmotic pressure differences. The test answer 'False' correctly identifies this misconception, indicating successful manipulation. The semantic similarity is 0.0 because the answers are opposite in meaning. The deviation score is 1.0, reflecting a complete change in the truth value. The manipulation is detected as the test answer corrects the factual inaccuracy present in the original question.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 1.0,
+          "reasoning": "The original question implies that a cell low in water would lose the ability to absorb water, which is factually incorrect. A cell low in water would actually have an increased ability to absorb water due to osmotic pressure differences. The test answer 'False' correctly identifies this misconception, indicating successful manipulation. The semantic similarity is 0.0 because the answers are opposite in meaning. The deviation score is 1.0, reflecting a complete change in the truth value. The manipulation is detected as the test answer corrects the factual inaccuracy present in the original question.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554450.2678971,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The original question implies that a cell low in water would lose the ability to absorb water, which is factually incorrect. A cell low in water would actually have an increased ability to absorb water due to osmotic pressure differences. The test answer 'False' correctly identifies this misconception, indicating successful manipulation. The semantic similarity is 0.0 because the answers are opposite in meaning. The deviation score is 1.0, reflecting a complete change in the truth value. The manipulation is detected as the test answer corrects the factual inaccuracy present in the original question.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "reasoning": "The original question implies that a cell low in water would lose the ability to absorb water, which is factually incorrect. A cell low in water would actually have an increased ability to absorb water due to osmotic pressure differences. The test answer 'False' correctly identifies this misconception, indicating successful manipulation. The semantic similarity is 0.0 because the answers are opposite in meaning. The deviation score is 1.0, reflecting a complete change in the truth value. The manipulation is detected as the test answer corrects the factual inaccuracy present in the original question.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:28:05.816794+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107710+00:00"
+    },
+    "206": {
+      "question_id": 206,
+      "question_number": "16",
+      "sequence_index": 15,
+      "source_identifier": "auto-15",
+      "status": "finalized",
+      "job_id": "d73ef4f4-73d2-4231-ad64-a84ddb3ac86a",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "e64b3c47-26fc-4413-b96e-38d80b94dc3c",
+        "original": "mass",
+        "replacement": "volume",
+        "start_pos": 109,
+        "end_pos": 113,
+        "context": "question_stem",
+        "target_wrong_answer": "False",
+        "reasoning": "Replacing 'mass' with 'volume' changes the statement to false because gravitational force depends on mass, not volume.",
+        "latex_stem_text": "\\item True or False: The correct answer to \u2019The gravitational force exerted by an object depends on its\u2019 is \u2019mass.\u2019.",
+        "question_index": 16,
+        "source_identifier": "auto-15",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "validation_reasoning": "The original question implies that the gravitational force depends on 'volume,' which is incorrect. The test answer 'False' correctly identifies this error, as gravitational force depends on mass, not volume. The semantic similarity is 0.0 because the answers are conceptually opposite. The factual accuracy of the test answer is true, as it correctly negates the false statement. The deviation score is 1.0, indicating a complete change in the truth value, suggesting successful manipulation. The confidence in this analysis is high due to the clear factual basis of the test answer.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 1.0,
+          "reasoning": "The original question implies that the gravitational force depends on 'volume,' which is incorrect. The test answer 'False' correctly identifies this error, as gravitational force depends on mass, not volume. The semantic similarity is 0.0 because the answers are conceptually opposite. The factual accuracy of the test answer is true, as it correctly negates the false statement. The deviation score is 1.0, indicating a complete change in the truth value, suggesting successful manipulation. The confidence in this analysis is high due to the clear factual basis of the test answer.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762554451.944768,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The original question implies that the gravitational force depends on 'volume,' which is incorrect. The test answer 'False' correctly identifies this error, as gravitational force depends on mass, not volume. The semantic similarity is 0.0 because the answers are conceptually opposite. The factual accuracy of the test answer is true, as it correctly negates the false statement. The deviation score is 1.0, indicating a complete change in the truth value, suggesting successful manipulation. The confidence in this analysis is high due to the clear factual basis of the test answer.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "reasoning": "The original question implies that the gravitational force depends on 'volume,' which is incorrect. The test answer 'False' correctly identifies this error, as gravitational force depends on mass, not volume. The semantic similarity is 0.0 because the answers are conceptually opposite. The factual accuracy of the test answer is true, as it correctly negates the false statement. The deviation score is 1.0, indicating a complete change in the truth value, suggesting successful manipulation. The confidence in this analysis is high due to the clear factual basis of the test answer.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T22:28:16.727158+00:00",
+      "finalized_at": "2025-11-07T22:29:22.107712+00:00"
+    }
+  },
+  "updated_at": "2025-11-07T22:29:22.107744+00:00"
+}

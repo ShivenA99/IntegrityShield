@@ -38,6 +38,7 @@ from ...services.pipeline.auto_mapping_strategy import (
 from .enhancement_methods.base_renderer import BaseRenderer
 from .enhancement_methods.span_extractor import SpanRecord, collect_span_records
 from ...services.validation.gpt5_validation_service import GPT5ValidationService, ValidationResult
+from ...services.mapping.mapping_staging_service import MappingStagingService
 
 
 @dataclass
@@ -80,6 +81,7 @@ class SmartSubstitutionService:
 		self.substrings = SubstringManipulator()
 		self.validator = VisualFidelityValidator()
 		self.context_processor = ContextAwareProcessor()
+		self.staging_service = MappingStagingService()
 		self.ai_client = ExternalAIClient()
 		self.vision_client = OpenAIVisionClient()
 		self._vision_geometry_scale = self._resolve_float_env("VISION_GEOMETRY_SCALE", 2.0, minimum=0.5)
@@ -94,7 +96,11 @@ class SmartSubstitutionService:
 		if not structured:
 			return 0
 
-		questions_models = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+		questions_models = (
+			QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+			.order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+			.all()
+		)
 		if not questions_models:
 			return 0
 
@@ -106,7 +112,18 @@ class SmartSubstitutionService:
 			try:
 				structured_question = self._get_structured_question(run_id, model.question_number, structured)
 				normalized = [self._normalize_mapping_entry(entry) for entry in list(model.substring_mappings or [])]
-				enriched = self._enrich_selection_geometry(run_id, model, normalized, force_refresh=True)
+				if not normalized:
+					continue
+				has_geometry = all(
+					entry.get("selection_page") is not None
+					and entry.get("selection_bbox")
+					for entry in normalized
+				)
+				is_validated = all(bool(entry.get("validated")) for entry in model.substring_mappings or [])
+				if has_geometry and is_validated:
+					continue
+
+				enriched = self._enrich_selection_geometry(run_id, model, normalized, force_refresh=False)
 				if enriched != model.substring_mappings:
 					model.substring_mappings = enriched
 					updated += 1
@@ -143,7 +160,10 @@ class SmartSubstitutionService:
 			if not labels:
 				return 0
 
-		query = QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+		query = (
+			QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+			.order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+		)
 		if labels:
 			query = query.filter(QuestionManipulation.question_number.in_(labels))
 
@@ -326,7 +346,10 @@ class SmartSubstitutionService:
 			if not labels:
 				return 0
 
-		question_query = QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+		question_query = (
+			QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+			.order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+		)
 		if labels:
 			question_query = question_query.filter(QuestionManipulation.question_number.in_(labels))
 
@@ -1291,7 +1314,11 @@ class SmartSubstitutionService:
 	def _apply_mappings(self, run_id: str, strategy: str) -> Dict[str, Any]:
 		structured = self.structured_manager.load(run_id)
 		questions_data = structured.setdefault("questions", [])
-		questions_models = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+		questions_models = (
+			QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+			.order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+			.all()
+		)
 
 		# Ensure we have a stable mapping between DB records and structured entries
 		structured_by_qnum = {}
@@ -1402,6 +1429,11 @@ class SmartSubstitutionService:
 
 	def _merge_question_payload(self, question_dict: Dict[str, Any], question_model: QuestionManipulation) -> None:
 		"""Ensure structured question entry mirrors the database payload for deterministic renders."""
+		question_dict["manipulation_id"] = question_model.id
+		question_dict["sequence_index"] = question_model.sequence_index
+		if question_model.source_identifier:
+			question_dict["source_identifier"] = question_model.source_identifier
+
 		number = str(question_model.question_number).strip()
 		if number:
 			question_dict.setdefault("q_number", number)
@@ -1538,6 +1570,34 @@ class SmartSubstitutionService:
 				normalized.pop("target_option", None)
 
 		return normalized
+
+	def _canonicalize_mappings_for_compare(
+		self,
+		mappings: Iterable[Dict[str, Any]],
+	) -> List[Dict[str, Any]]:
+		canonical: List[Dict[str, Any]] = []
+		for entry in mappings or []:
+			norm = self._normalize_mapping_entry(entry)
+			start_pos = norm.get("start_pos")
+			end_pos = norm.get("end_pos")
+			if start_pos is None or end_pos is None:
+				continue
+			try:
+				start_pos_int = int(start_pos)
+				end_pos_int = int(end_pos)
+			except (TypeError, ValueError):
+				continue
+			canonical.append(
+				{
+					"original": norm.get("original"),
+					"replacement": norm.get("replacement"),
+					"start_pos": start_pos_int,
+					"end_pos": end_pos_int,
+					"context": norm.get("context", "question_stem"),
+				}
+			)
+		canonical.sort(key=lambda item: (item["start_pos"], item["end_pos"], item["original"] or ""))
+		return canonical
 
 	def _resolve_option_text(self, question: QuestionManipulation, letter: Optional[str]) -> Optional[str]:
 		if not letter or not isinstance(question.options_data, dict):
@@ -2456,21 +2516,37 @@ class SmartSubstitutionService:
 			parsed = maximum
 		return parsed
 
-	def refresh_question_mapping(self, run_id: str, question_number: str) -> Dict[str, Any]:
+	def refresh_question_mapping(self, run_id: str, question_identifier: str) -> Dict[str, Any]:
 		structured = self.structured_manager.load(run_id)
 		strategy = structured.get("global_mappings", {}).get("character_strategy", "unicode_steganography")
 		mapping_result = self.mapper.create_mapping(strategy)
 
 		questions = structured.get("questions", [])
-		question_dict = next((q for q in questions if q.get("q_number") == question_number), None)
-		if not question_dict:
-			raise ValueError("Question not found in structured data")
+		question_model = None
+		try:
+			question_model = QuestionManipulation.query.filter_by(
+				pipeline_run_id=run_id, id=int(question_identifier)
+			).first()
+		except (TypeError, ValueError):
+			question_model = None
 
-		question_model = (
-			QuestionManipulation.query.filter_by(pipeline_run_id=run_id, question_number=question_number).first()
-		)
+		if question_model is None:
+			question_model = QuestionManipulation.query.filter_by(
+				pipeline_run_id=run_id, question_number=str(question_identifier)
+			).first()
+
 		if not question_model:
 			raise ValueError("Question manipulation entry missing")
+
+		question_dict = next((q for q in questions if q.get("manipulation_id") == question_model.id), None)
+		if question_dict is None:
+			question_dict = next(
+				(q for q in questions if str(q.get("q_number") or q.get("question_number")) == str(question_model.question_number)),
+				None,
+			)
+
+		if not question_dict:
+			raise ValueError("Question not found in structured data")
 
 		# Ensure list exists and is JSON-safe - use mutation-only approach
 		current_list: List[Dict[str, Any]] = list(question_model.substring_mappings or [])
@@ -2509,22 +2585,32 @@ class SmartSubstitutionService:
 		if not questions:
 			return
 
-		question_map = {
-			str(entry.get("q_number") or entry.get("question_number")): entry for entry in questions
-		}
-		if not question_map:
-			return
-
 		strategy = structured.get("global_mappings", {}).get("character_strategy", "unicode_steganography")
 
 		changed = False
-		for model in QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all():
-			q_label = str(model.question_number or model.id)
-			entry = question_map.get(q_label)
-			if not entry:
-				entry = {"q_number": q_label, "question_number": q_label}
+		for model in (
+			QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+			.order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+			.all()
+		):
+			question_map_by_id = {
+				entry.get("manipulation_id"): entry for entry in questions if entry.get("manipulation_id") is not None
+			}
+			question_map_by_seq = {
+				entry.get("sequence_index"): entry for entry in questions if entry.get("sequence_index") is not None
+			}
+			question_map_by_label = {
+				str(entry.get("q_number") or entry.get("question_number") or ""): entry for entry in questions
+			}
+
+			entry = question_map_by_id.get(model.id)
+			if entry is None:
+				entry = question_map_by_seq.get(model.sequence_index)
+			if entry is None:
+				entry = question_map_by_label.get(str(model.question_number or ""))
+			if entry is None:
+				entry = {}
 				questions.append(entry)
-				question_map[q_label] = entry
 				changed = True
 
 			self._merge_question_payload(entry, model)
@@ -2579,8 +2665,179 @@ class SmartSubstitutionService:
 			)
 			entry["manipulation"] = manipulation
 
+		questions.sort(
+			key=lambda entry: (
+				entry.get("sequence_index") if isinstance(entry.get("sequence_index"), int) else 0,
+				str(entry.get("manipulation_id") or entry.get("q_number") or entry.get("question_number") or ""),
+			)
+		)
+
 		# Always save to ensure mappings are persisted
 		self.structured_manager.save(run_id, structured)
+
+	def promote_staged_mappings(self, run_id: str) -> Dict[str, Any]:
+		"""Promote staged mappings into the canonical question store."""
+		staged = self.staging_service.load(run_id)
+		entries = (staged or {}).get("questions", {}) if staged else {}
+		if not entries:
+			return {"promoted": [], "skipped": [], "total_promoted": 0}
+
+		questions = (
+			QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
+			.order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
+			.all()
+		)
+		questions_by_id = {str(q.id): q for q in questions}
+
+		promoted_ids: List[int] = []
+		promoted_numbers: List[str] = []
+		promoted_payloads: List[Tuple[int, str, List[Dict[str, Any]]]] = []
+		skipped: List[Dict[str, Any]] = []
+
+		for question_id_str, entry in entries.items():
+			question = questions_by_id.get(question_id_str)
+			if not question:
+				continue
+
+			status = entry.get("status")
+			if status == "validated":
+				mapping_payload = entry.get("staged_mapping")
+				if not mapping_payload:
+					skipped.append(
+						{
+							"question_number": str(question.question_number),
+							"status": "validated",
+							"reason": "staged mapping missing",
+						}
+					)
+					continue
+
+				json_safe = json.loads(json.dumps([mapping_payload]))
+				question.substring_mappings = json_safe
+				question.manipulation_method = entry.get("method") or "gpt5_generated"
+
+				summary = entry.get("validation_summary") or {}
+				effectiveness = summary.get("confidence")
+				if isinstance(effectiveness, (int, float)):
+					question.effectiveness_score = float(effectiveness)
+				else:
+					question.effectiveness_score = None
+
+				db.session.add(question)
+				db.session.execute(
+					text("UPDATE question_manipulations SET substring_mappings = :mappings WHERE id = :id"),
+					{"mappings": json.dumps(json_safe), "id": question.id},
+				)
+				promoted_ids.append(question.id)
+				promoted_numbers.append(str(question.question_number))
+				promoted_payloads.append((question.id, str(question.question_number), json_safe))
+			else:
+				reason = entry.get("skip_reason") or entry.get("error") or status or "unknown"
+				skipped.append(
+					{
+						"question_number": str(question.question_number),
+						"status": status or "unknown",
+						"reason": reason,
+					}
+				)
+
+		db.session.commit()
+
+		if promoted_ids:
+			self.sync_structured_mappings(run_id)
+			consistency_issues = self._verify_promotion_consistency(run_id, promoted_payloads)
+			if consistency_issues:
+				self.logger.error(
+					"Promotion consistency check failed",
+					extra={
+						"run_id": run_id,
+						"issues": consistency_issues,
+					},
+				)
+				raise RuntimeError(
+					"Validated mappings could not be synchronized to the database and structured data. "
+					"Please retry after resolving the reported issues."
+				)
+			self.staging_service.mark_promoted(run_id, promoted_ids)
+
+		structured = self.structured_manager.load(run_id) or {}
+		manipulation_results = structured.setdefault("manipulation_results", {})
+		manipulation_results["staged_promoted_questions"] = promoted_numbers
+		manipulation_results["staged_skipped_questions"] = skipped
+		self.structured_manager.save(run_id, structured)
+
+		self.logger.info(
+			"Promoted staged mappings",
+			extra={
+				"run_id": run_id,
+				"promoted": promoted_numbers,
+				"skipped": skipped,
+			},
+		)
+
+		return {
+			"promoted": promoted_numbers,
+			"skipped": skipped,
+			"total_promoted": len(promoted_numbers),
+		}
+
+	def _verify_promotion_consistency(
+		self,
+		run_id: str,
+		promoted_payloads: List[Tuple[int, str, List[Dict[str, Any]]]],
+	) -> List[Dict[str, Any]]:
+		if not promoted_payloads:
+			return []
+
+		id_list = [question_id for question_id, _, _ in promoted_payloads]
+		db_models = {
+			model.id: json.loads(json.dumps(model.substring_mappings or []))
+			for model in QuestionManipulation.query.filter(QuestionManipulation.id.in_(id_list)).all()
+		}
+
+		structured = self.structured_manager.load(run_id) or {}
+		structured_questions = structured.get("questions") or []
+		structured_index: Dict[str, Dict[str, Any]] = {}
+
+		for entry in structured_questions:
+			key = str(entry.get("q_number") or entry.get("question_number") or "").strip()
+			if not key:
+				continue
+			mappings = (entry.get("manipulation") or {}).get("substring_mappings") or []
+			existing = structured_index.get(key)
+			if not existing or not ((existing.get("manipulation") or {}).get("substring_mappings")):
+				structured_index[key] = entry
+
+		issues: List[Dict[str, Any]] = []
+		for question_id, question_number, expected in promoted_payloads:
+			actual_db = db_models.get(question_id, [])
+			if self._canonicalize_mappings_for_compare(actual_db) != self._canonicalize_mappings_for_compare(expected):
+				issues.append(
+					{
+						"type": "database_mismatch",
+						"question_id": question_id,
+						"question_number": question_number,
+					}
+				)
+
+			structured_entry = structured_index.get(question_number)
+			structured_mappings: List[Dict[str, Any]] = []
+			if structured_entry:
+				structured_mappings = json.loads(
+					json.dumps(
+						(structured_entry.get("manipulation") or {}).get("substring_mappings") or []
+					)
+				)
+			if self._canonicalize_mappings_for_compare(structured_mappings) != self._canonicalize_mappings_for_compare(expected):
+				issues.append(
+					{
+						"type": "structured_mismatch",
+						"question_id": question_id,
+						"question_number": question_number,
+					}
+				)
+
+		return issues
 
 	def _compute_true_gold(self, question: QuestionManipulation) -> tuple[str | None, float | None]:
 		options = question.options_data or {}

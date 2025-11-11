@@ -1,0 +1,1424 @@
+{
+  "docid": "a7a04716-7c8b-4d0b-9040-4aba909767b0",
+  "document_name": "ASU_Physics Quiz",
+  "institution_name": "ASU",
+  "domain": "Physics",
+  "topic": "General Physics Concepts",
+  "number_of_pages": "2",
+  "total_questions": "10",
+  "questions": [
+    {
+      "question_number": 1,
+      "question_type": "mcq_single",
+      "stem_text": "The unit of electrical resistance is:",
+      "options": {
+        "A": "Ampere",
+        "B": "Ohm",
+        "C": "Coulomb",
+        "D": "Volt"
+      },
+      "sub_questions": null,
+      "gold_answer": "B",
+      "gold_confidence": 1.0,
+      "answer_explanation": "The Ohm is the SI unit of electrical resistance.",
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          282.59002685546875,
+          275.92999267578125,
+          296.0420227050781
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          282.59002685546875,
+          275.92999267578125,
+          296.0420227050781
+        ],
+        "stem_spans": [
+          "page0:block4:line1:span0",
+          "page0:block4:line1:span1",
+          "page0:block4:line1:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            297.469970703125,
+            167.66000366210938,
+            310.9219665527344
+          ],
+          "B": [
+            108.0199966430664,
+            312.3499755859375,
+            153.02000427246094,
+            325.8019714355469
+          ],
+          "C": [
+            108.0199966430664,
+            327.2300109863281,
+            173.66000366210938,
+            340.6820068359375
+          ],
+          "D": [
+            108.0199966430664,
+            342.1099853515625,
+            148.82000732421875,
+            355.5619812011719
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "electrical resistance",
+          "context": "stem",
+          "alternatives": [
+            "conductance",
+            "capacitance"
+          ],
+          "importance": "critical",
+          "bbox": [
+            90.02400207519531,
+            282.59002685546875,
+            275.92999267578125,
+            296.0420227050781
+          ],
+          "span_ids": [
+            "page0:block4:line1:span0",
+            "page0:block4:line1:span1",
+            "page0:block4:line1:span2"
+          ],
+          "char_start": 15,
+          "char_end": 36
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "remember",
+        "topic": "Electricity",
+        "subtopic": "Units of Measurement",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": 1
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "1. The unit of electrical resistance is: a. Ampere b. Ohm c. Coulomb d. Volt",
+      "page_number": 1,
+      "source_page": "page_1"
+    },
+    {
+      "question_number": 2,
+      "question_type": "mcq_single",
+      "stem_text": "What is the SI unit of power?",
+      "options": {
+        "A": "Watt",
+        "B": "Joule",
+        "C": "Newton",
+        "D": "Pascal"
+      },
+      "sub_questions": null,
+      "gold_answer": "A",
+      "gold_confidence": 1.0,
+      "answer_explanation": "The Watt is the SI unit of power.",
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          371.8699951171875,
+          252.2899932861328,
+          385.3219909667969
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          371.8699951171875,
+          252.2899932861328,
+          385.3219909667969
+        ],
+        "stem_spans": [
+          "page0:block6:line0:span0",
+          "page0:block6:line0:span1",
+          "page0:block6:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            386.75,
+            151.33999633789062,
+            400.2019958496094
+          ],
+          "B": [
+            108.0199966430664,
+            401.6300048828125,
+            154.33999633789062,
+            415.0820007324219
+          ],
+          "C": [
+            108.0199966430664,
+            416.6300048828125,
+            167.05999755859375,
+            430.0820007324219
+          ],
+          "D": [
+            108.0199966430664,
+            431.5299987792969,
+            159.6199951171875,
+            444.98199462890625
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "SI unit",
+          "context": "stem",
+          "alternatives": [
+            "metric unit",
+            "imperial unit"
+          ],
+          "importance": "high",
+          "bbox": [
+            90.02400207519531,
+            371.8699951171875,
+            252.2899932861328,
+            385.3219909667969
+          ],
+          "span_ids": [
+            "page0:block6:line0:span0",
+            "page0:block6:line0:span1",
+            "page0:block6:line0:span2"
+          ],
+          "char_start": 15,
+          "char_end": 22
+        },
+        {
+          "term": "power",
+          "context": "stem",
+          "alternatives": [
+            "energy",
+            "force"
+          ],
+          "importance": "critical",
+          "bbox": [
+            90.02400207519531,
+            371.8699951171875,
+            252.2899932861328,
+            385.3219909667969
+          ],
+          "span_ids": [
+            "page0:block6:line0:span0",
+            "page0:block6:line0:span1",
+            "page0:block6:line0:span2"
+          ],
+          "char_start": 26,
+          "char_end": 31
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "remember",
+        "topic": "Energy",
+        "subtopic": "Units of Measurement",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": 1
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "2. What is the SI unit of power? a. Watt b. Joule c. Newton d. Pascal",
+      "page_number": 1,
+      "source_page": "page_1"
+    },
+    {
+      "question_number": 3,
+      "question_type": "mcq_single",
+      "stem_text": "What phenomenon in a prism causes the splitting of white light into its constituent colors?",
+      "options": {
+        "A": "Dispersion",
+        "B": "Refraction",
+        "C": "Diffraction",
+        "D": "Polarization"
+      },
+      "sub_questions": null,
+      "gold_answer": "A",
+      "gold_confidence": 1.0,
+      "answer_explanation": "Dispersion occurs when different wavelengths of light are refracted by different amounts, causing the splitting of white light into its constituent colors.",
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            491.04998779296875,
+            180.97999572753906,
+            504.5019836425781
+          ],
+          "B": [
+            108.0199966430664,
+            505.92999267578125,
+            179.66000366210938,
+            519.3819580078125
+          ],
+          "C": [
+            108.0199966430664,
+            520.8099975585938,
+            182.05999755859375,
+            534.261962890625
+          ],
+          "D": [
+            108.0199966430664,
+            535.6900024414062,
+            186.97999572753906,
+            549.1419677734375
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "dispersion",
+          "context": "option_A",
+          "alternatives": [
+            "refraction",
+            "diffraction",
+            "polarization"
+          ],
+          "importance": "critical",
+          "bbox": [
+            108.0199966430664,
+            491.04998779296875,
+            180.97999572753906,
+            504.5019836425781
+          ],
+          "span_ids": [
+            "page0:block9:line1:span0",
+            "page0:block9:line1:span1",
+            "page0:block9:line1:span2"
+          ],
+          "char_start": 98,
+          "char_end": 108
+        },
+        {
+          "term": "prism",
+          "context": "stem",
+          "alternatives": [
+            "lens",
+            "mirror"
+          ],
+          "importance": "high",
+          "bbox": [
+            90.02400207519531,
+            461.2900085449219,
+            506.5400390625,
+            474.74200439453125
+          ],
+          "span_ids": [
+            "page0:block8:line0:span0",
+            "page0:block8:line0:span1",
+            "page0:block8:line0:span2"
+          ],
+          "char_start": 24,
+          "char_end": 29
+        },
+        {
+          "term": "white light",
+          "context": "stem",
+          "alternatives": [
+            "monochromatic light",
+            "colored light"
+          ],
+          "importance": "medium",
+          "bbox": [
+            90.02400207519531,
+            461.2900085449219,
+            506.5400390625,
+            474.74200439453125
+          ],
+          "span_ids": [
+            "page0:block8:line0:span0",
+            "page0:block8:line0:span1",
+            "page0:block8:line0:span2"
+          ],
+          "char_start": 54,
+          "char_end": 65
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Optics",
+        "subtopic": "Light Dispersion",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "3. What phenomenon in a prism causes the splitting of white light into its constituent colors? a. Dispersion b. Refraction c. Diffraction d. Polarization",
+      "page_number": 1,
+      "source_page": "page_1"
+    },
+    {
+      "question_number": 4,
+      "question_type": "mcq_single",
+      "stem_text": "What is Newton’s second law of Motion?",
+      "options": {
+        "A": "The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.",
+        "B": "If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other.",
+        "C": "For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first.",
+        "D": "An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force."
+      },
+      "sub_questions": null,
+      "gold_answer": "A",
+      "gold_confidence": 1.0,
+      "answer_explanation": "Newton's second law states that the acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.",
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          565.4500122070312,
+          311.0899963378906,
+          578.9019775390625
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          565.4500122070312,
+          311.0899963378906,
+          578.9019775390625
+        ],
+        "stem_spans": [
+          "page0:block10:line0:span0",
+          "page0:block10:line0:span1",
+          "page0:block10:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            580.4500122070312,
+            513.4400634765625,
+            593.9019775390625
+          ],
+          "B": [
+            108.0199966430664,
+            610.239990234375,
+            524.8519897460938,
+            623.6919555664062
+          ],
+          "C": [
+            108.0199966430664,
+            640.0,
+            524.5280151367188,
+            653.4519653320312
+          ],
+          "D": [
+            108.0199966430664,
+            684.6400146484375,
+            521.1400146484375,
+            698.0919799804688
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "acceleration",
+          "context": "option_A",
+          "alternatives": [
+            "velocity",
+            "speed"
+          ],
+          "importance": "critical",
+          "bbox": [
+            108.0199966430664,
+            580.4500122070312,
+            513.4400634765625,
+            593.9019775390625
+          ],
+          "span_ids": [
+            "page0:block11:line0:span0",
+            "page0:block11:line0:span1",
+            "page0:block11:line0:span2"
+          ],
+          "char_start": 49,
+          "char_end": 61
+        },
+        {
+          "term": "net force",
+          "context": "option_A",
+          "alternatives": [
+            "frictional force",
+            "gravitational force"
+          ],
+          "importance": "high",
+          "bbox": [
+            108.0199966430664,
+            580.4500122070312,
+            513.4400634765625,
+            593.9019775390625
+          ],
+          "span_ids": [
+            "page0:block11:line0:span0",
+            "page0:block11:line0:span1",
+            "page0:block11:line0:span2"
+          ],
+          "char_start": 107,
+          "char_end": 116
+        },
+        {
+          "term": "mass",
+          "context": "option_A",
+          "alternatives": [
+            "weight",
+            "volume"
+          ],
+          "importance": "medium",
+          "bbox": [
+            126.0199966430664,
+            595.4979858398438,
+            315.30999755859375,
+            608.781982421875
+          ],
+          "span_ids": [
+            "page0:block12:line0:span0"
+          ],
+          "char_start": 164,
+          "char_end": 168
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Mechanics",
+        "subtopic": "Newton's Laws of Motion",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 90,
+        "points": null
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "4. What is Newton’s second law of Motion? a. The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass. b. If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other. c. For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first. d. An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force.",
+      "page_number": 1,
+      "source_page": "page_1"
+    },
+    {
+      "question_number": 5,
+      "question_type": "mcq_single",
+      "stem_text": "Which variable must remain constant for Boyle’s law to hold?",
+      "options": {
+        "A": "Pressure",
+        "B": "Temperature",
+        "C": "Volume",
+        "D": "Amount of gas"
+      },
+      "sub_questions": null,
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "answer_explanation": "Boyle's law states that the pressure and volume of a gas are inversely proportional at constant temperature.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          72.05998229980469,
+          410.1099853515625,
+          85.5119857788086
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          72.05998229980469,
+          410.1099853515625,
+          85.5119857788086
+        ],
+        "stem_spans": [
+          "page1:block0:line0:span0",
+          "page1:block0:line0:span1",
+          "page1:block0:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            86.96000671386719,
+            169.6999969482422,
+            100.4120101928711
+          ],
+          "B": [
+            108.0199966430664,
+            101.84001159667969,
+            189.52999877929688,
+            115.2920150756836
+          ],
+          "C": [
+            108.0199966430664,
+            116.71995544433594,
+            166.10000610351562,
+            130.1719512939453
+          ],
+          "D": [
+            108.0199966430664,
+            131.59996032714844,
+            200.3300018310547,
+            145.0519561767578
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "Boyle’s law",
+          "context": "stem",
+          "alternatives": [
+            "Charles's law",
+            "Avogadro's law"
+          ],
+          "importance": "critical",
+          "bbox": [
+            90.02400207519531,
+            72.05998229980469,
+            410.1099853515625,
+            85.5119857788086
+          ],
+          "span_ids": [
+            "page1:block0:line0:span0",
+            "page1:block0:line0:span1",
+            "page1:block0:line0:span2"
+          ],
+          "char_start": 43,
+          "char_end": 54
+        },
+        {
+          "term": "constant",
+          "context": "stem",
+          "alternatives": [
+            "variable",
+            "changing"
+          ],
+          "importance": "high",
+          "bbox": [
+            90.02400207519531,
+            72.05998229980469,
+            410.1099853515625,
+            85.5119857788086
+          ],
+          "span_ids": [
+            "page1:block0:line0:span0",
+            "page1:block0:line0:span1",
+            "page1:block0:line0:span2"
+          ],
+          "char_start": 30,
+          "char_end": 38
+        },
+        {
+          "term": "Temperature",
+          "context": "option_B",
+          "alternatives": [
+            "Pressure",
+            "Volume"
+          ],
+          "importance": "high",
+          "bbox": [
+            108.0199966430664,
+            101.84001159667969,
+            189.52999877929688,
+            115.2920150756836
+          ],
+          "span_ids": [
+            "page1:block1:line1:span0",
+            "page1:block1:line1:span1",
+            "page1:block1:line1:span2"
+          ],
+          "char_start": 81,
+          "char_end": 92
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Gas Laws",
+        "subtopic": "Boyle's Law",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "5. Which variable must remain constant for Boyle’s law to hold? \na. Pressure \nb. Temperature \nc. Volume \nd. Amount of gas",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 6,
+      "question_type": "mcq_single",
+      "stem_text": "In a Hooke’s-law spring experiment, which graph is linear for small extensions?",
+      "options": {
+        "A": "Force vs extension",
+        "B": "Energy vs extension",
+        "C": "Force vs time",
+        "D": "Displacement vs time"
+      },
+      "sub_questions": null,
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "answer_explanation": "Hooke's law states that the force exerted by a spring is proportional to its extension, resulting in a linear Force vs extension graph.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          167.59996032714844,
+          496.29998779296875,
+          181.0519561767578
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          167.59996032714844,
+          496.29998779296875,
+          181.0519561767578
+        ],
+        "stem_spans": [
+          "page1:block2:line1:span0",
+          "page1:block2:line1:span1",
+          "page1:block2:line1:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            182.47996520996094,
+            219.0500030517578,
+            195.9319610595703
+          ],
+          "B": [
+            108.0199966430664,
+            197.35997009277344,
+            229.1300048828125,
+            210.8119659423828
+          ],
+          "C": [
+            108.0199966430664,
+            212.23997497558594,
+            194.3300018310547,
+            225.6919708251953
+          ],
+          "D": [
+            108.0199966430664,
+            227.11997985839844,
+            233.08999633789062,
+            240.5719757080078
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "Hooke’s-law",
+          "context": "stem",
+          "alternatives": [
+            "Newton's law",
+            "Boyle's law"
+          ],
+          "importance": "critical",
+          "bbox": [
+            90.02400207519531,
+            167.59996032714844,
+            496.29998779296875,
+            181.0519561767578
+          ],
+          "span_ids": [
+            "page1:block2:line1:span0",
+            "page1:block2:line1:span1",
+            "page1:block2:line1:span2"
+          ],
+          "char_start": 8,
+          "char_end": 19
+        },
+        {
+          "term": "linear",
+          "context": "stem",
+          "alternatives": [
+            "non-linear",
+            "exponential"
+          ],
+          "importance": "high",
+          "bbox": [
+            90.02400207519531,
+            167.59996032714844,
+            496.29998779296875,
+            181.0519561767578
+          ],
+          "span_ids": [
+            "page1:block2:line1:span0",
+            "page1:block2:line1:span1",
+            "page1:block2:line1:span2"
+          ],
+          "char_start": 54,
+          "char_end": 60
+        },
+        {
+          "term": "Force vs extension",
+          "context": "option_A",
+          "alternatives": [
+            "Energy vs extension",
+            "Force vs time"
+          ],
+          "importance": "high",
+          "bbox": [
+            108.0199966430664,
+            182.47996520996094,
+            219.0500030517578,
+            195.9319610595703
+          ],
+          "span_ids": [
+            "page1:block3:line0:span0",
+            "page1:block3:line0:span1",
+            "page1:block3:line0:span2"
+          ],
+          "char_start": 87,
+          "char_end": 105
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Mechanics",
+        "subtopic": "Hooke's Law",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "6. In a Hooke’s-law spring experiment, which graph is linear for small extensions? \na. Force vs extension \nb. Energy vs extension  \nc. Force vs time \nd. Displacement vs time",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 7,
+      "question_type": "mcq_single",
+      "stem_text": "Components connected so that the same current flows through each are in:",
+      "options": {
+        "A": "Series",
+        "B": "Parallel",
+        "C": "Resonant",
+        "D": "Open"
+      },
+      "sub_questions": null,
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "answer_explanation": "In a series circuit, the same current flows through all components.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          257.02996826171875,
+          468.70001220703125,
+          270.4819641113281
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          257.02996826171875,
+          468.70001220703125,
+          270.4819641113281
+        ],
+        "stem_spans": [
+          "page1:block4:line0:span0",
+          "page1:block4:line0:span1",
+          "page1:block4:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            271.90997314453125,
+            158.3000030517578,
+            285.3619689941406
+          ],
+          "B": [
+            108.0199966430664,
+            286.78997802734375,
+            165.6199951171875,
+            300.2419738769531
+          ],
+          "C": [
+            108.0199966430664,
+            301.66998291015625,
+            173.66000366210938,
+            315.1219787597656
+          ],
+          "D": [
+            108.0199966430664,
+            316.54998779296875,
+            155.05999755859375,
+            330.0019836425781
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "current",
+          "context": "stem",
+          "alternatives": [
+            "voltage",
+            "resistance"
+          ],
+          "importance": "critical",
+          "bbox": [
+            90.02400207519531,
+            257.02996826171875,
+            468.70001220703125,
+            270.4819641113281
+          ],
+          "span_ids": [
+            "page1:block4:line0:span0",
+            "page1:block4:line0:span1",
+            "page1:block4:line0:span2"
+          ],
+          "char_start": 41,
+          "char_end": 48
+        },
+        {
+          "term": "series",
+          "context": "option_A",
+          "alternatives": [
+            "parallel",
+            "resonant"
+          ],
+          "importance": "high",
+          "bbox": [
+            108.0199966430664,
+            271.90997314453125,
+            158.3000030517578,
+            285.3619689941406
+          ],
+          "span_ids": [
+            "page1:block5:line0:span0",
+            "page1:block5:line0:span1",
+            "page1:block5:line0:span2"
+          ],
+          "char_start": 79,
+          "char_end": 85
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Electric Circuits",
+        "subtopic": "Series and Parallel Circuits",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": 1
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "7. Components connected so that the same current flows through each are in: a. Series b. Parallel c. Resonant d. Open",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 8,
+      "question_type": "mcq_single",
+      "stem_text": "At constant pressure, the heat added to a system equals the change in:",
+      "options": {
+        "A": "Enthalpy",
+        "B": "Internal Energy",
+        "C": "Gibbs free energy",
+        "D": "Helmholtz free energy"
+      },
+      "sub_questions": null,
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "answer_explanation": "At constant pressure, the heat added to a system is equal to the change in enthalpy.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          346.30999755859375,
+          445.4200134277344,
+          359.7619934082031
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          346.30999755859375,
+          445.4200134277344,
+          359.7619934082031
+        ],
+        "stem_spans": [
+          "page1:block6:line0:span0",
+          "page1:block6:line0:span1",
+          "page1:block6:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            361.19000244140625,
+            172.33999633789062,
+            374.6419982910156
+          ],
+          "B": [
+            108.0199966430664,
+            376.07000732421875,
+            203.80999755859375,
+            389.5220031738281
+          ],
+          "C": [
+            108.0199966430664,
+            391.07000732421875,
+            214.85000610351562,
+            404.5220031738281
+          ],
+          "D": [
+            108.0199966430664,
+            405.95001220703125,
+            236.80999755859375,
+            419.4020080566406
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "enthalpy",
+          "context": "option_A",
+          "alternatives": [
+            "internal energy",
+            "Gibbs free energy"
+          ],
+          "importance": "critical",
+          "bbox": [
+            108.0199966430664,
+            361.19000244140625,
+            172.33999633789062,
+            374.6419982910156
+          ],
+          "span_ids": [
+            "page1:block7:line0:span0",
+            "page1:block7:line0:span1",
+            "page1:block7:line0:span2"
+          ],
+          "char_start": 77,
+          "char_end": 85
+        },
+        {
+          "term": "constant pressure",
+          "context": "stem",
+          "alternatives": [
+            "constant volume",
+            "constant temperature"
+          ],
+          "importance": "high",
+          "bbox": [
+            90.02400207519531,
+            346.30999755859375,
+            445.4200134277344,
+            359.7619934082031
+          ],
+          "span_ids": [
+            "page1:block6:line0:span0",
+            "page1:block6:line0:span1",
+            "page1:block6:line0:span2"
+          ],
+          "char_start": 6,
+          "char_end": 23
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Thermodynamics",
+        "subtopic": "Enthalpy",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 90,
+        "points": 1
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "8. At constant pressure, the heat added to a system equals the change in: a. Enthalpy b. Internal Energy c. Gibbs free energy d. Helmholtz free energy",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 9,
+      "question_type": "mcq_single",
+      "stem_text": "Which law describes the magnitude of the gravitational force between two point masses?",
+      "options": {
+        "A": "Newton’s law of gravitation",
+        "B": "Coulomb’s law",
+        "C": "Ampere’s law",
+        "D": "Faraday’s law"
+      },
+      "sub_questions": null,
+      "gold_answer": "A",
+      "gold_confidence": 1.0,
+      "answer_explanation": "Newton’s law of gravitation describes the gravitational force between two masses.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            465.489990234375,
+            264.04998779296875,
+            478.9419860839844
+          ],
+          "B": [
+            108.0199966430664,
+            480.3699951171875,
+            202.72999572753906,
+            493.8219909667969
+          ],
+          "C": [
+            108.0199966430664,
+            495.25,
+            196.72999572753906,
+            508.7019958496094
+          ],
+          "D": [
+            108.0199966430664,
+            510.1300048828125,
+            196.72999572753906,
+            523.5819702148438
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "gravitational force",
+          "context": "stem",
+          "alternatives": [
+            "electromagnetic force",
+            "nuclear force"
+          ],
+          "importance": "critical",
+          "bbox": [
+            90.02400207519531,
+            435.7300109863281,
+            496.05999755859375,
+            449.1820068359375
+          ],
+          "span_ids": [
+            "page1:block8:line0:span0",
+            "page1:block8:line0:span1",
+            "page1:block8:line0:span2"
+          ],
+          "char_start": 44,
+          "char_end": 63
+        },
+        {
+          "term": "point masses",
+          "context": "stem",
+          "alternatives": [
+            "extended bodies",
+            "charged particles"
+          ],
+          "importance": "high",
+          "bbox": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "span_ids": [],
+          "char_start": 76,
+          "char_end": 88
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Gravitation",
+        "subtopic": "Newton's Law of Gravitation",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "9. Which law describes the magnitude of the gravitational force between two point masses? \na. Newton’s law of gravitation \nb. Coulomb’s law \nc. Ampere’s law \nd. Faraday’s law",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 10,
+      "question_type": "mcq_single",
+      "stem_text": "The energy possessed by a body due to its motion is called:",
+      "options": {
+        "A": "Potential Energy",
+        "B": "Kinetic Energy",
+        "C": "Mechanical Energy",
+        "D": "Chemical Energy"
+      },
+      "sub_questions": null,
+      "gold_answer": "B",
+      "gold_confidence": 1.0,
+      "answer_explanation": "Kinetic energy is the energy possessed by an object due to its motion.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          539.8900146484375,
+          395.7099914550781,
+          553.3419799804688
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          539.8900146484375,
+          395.7099914550781,
+          553.3419799804688
+        ],
+        "stem_spans": [
+          "page1:block10:line0:span0",
+          "page1:block10:line0:span1",
+          "page1:block10:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            554.8900146484375,
+            209.2100067138672,
+            568.3419799804688
+          ],
+          "B": [
+            108.0199966430664,
+            569.77001953125,
+            201.77000427246094,
+            583.2219848632812
+          ],
+          "C": [
+            108.0199966430664,
+            584.6500244140625,
+            222.41000366210938,
+            598.1019897460938
+          ],
+          "D": [
+            108.0199966430664,
+            599.530029296875,
+            212.4499969482422,
+            612.9819946289062
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "energy",
+          "context": "stem",
+          "alternatives": [
+            "power",
+            "force"
+          ],
+          "importance": "critical",
+          "bbox": [
+            108.0199966430664,
+            197.35997009277344,
+            229.1300048828125,
+            210.8119659423828
+          ],
+          "span_ids": [
+            "page1:block3:line1:span0",
+            "page1:block3:line1:span1",
+            "page1:block3:line1:span2"
+          ],
+          "char_start": 8,
+          "char_end": 14
+        },
+        {
+          "term": "motion",
+          "context": "stem",
+          "alternatives": [
+            "rest",
+            "equilibrium"
+          ],
+          "importance": "high",
+          "bbox": [
+            90.02400207519531,
+            539.8900146484375,
+            395.7099914550781,
+            553.3419799804688
+          ],
+          "span_ids": [
+            "page1:block10:line0:span0",
+            "page1:block10:line0:span1",
+            "page1:block10:line0:span2"
+          ],
+          "char_start": 46,
+          "char_end": 52
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Energy",
+        "subtopic": "Kinetic Energy",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "10. The energy possessed by a body due to its motion is called: \na. Potential Energy \nb. Kinetic Energy \nc. Mechanical Energy \nd. Chemical Energy",
+      "page_number": 2,
+      "source_page": "page_2"
+    }
+  ]
+}

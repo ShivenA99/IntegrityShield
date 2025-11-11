@@ -155,7 +155,7 @@ def start_pipeline():
             )
             db.session.add(stage_record)
 
-        for question in payload.questions:
+        for idx, question in enumerate(payload.questions):
             ai_results_meta = {
                 "manual_seed": {
                     "marks": question.marks,
@@ -190,6 +190,13 @@ def start_pipeline():
                 options_data=question.options,
                 gold_answer=question.gold_answer,
                 gold_confidence=gold_confidence,
+                sequence_index=idx,
+                source_identifier=str(
+                    question.source_id
+                    or question.question_id
+                    or question.number
+                    or f"manual-{idx}"
+                ),
                 manipulation_method="manual_seed",
                 ai_model_results=ai_results_meta,
                 substring_mappings=[],
@@ -435,28 +442,25 @@ def resume_pipeline(run_id: str, stage_name: str):
         return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
 
     target_stages = [stage_name]
+    promotion_summary: Dict[str, Any] = {"promoted": [], "skipped": [], "total_promoted": 0}
     if stage_name == PipelineStageEnum.PDF_CREATION.value:
         questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
         if not questions:
             return jsonify({"error": "No questions available for PDF creation"}), HTTPStatus.BAD_REQUEST
-        missing = [q.question_number for q in questions if not (q.substring_mappings or [])]
-        if missing:
-            return (
-                jsonify(
-                    {
-                        "error": "All questions must have mappings before PDF creation",
-                        "questions_missing_mappings": missing,
-                    }
-                ),
-                HTTPStatus.BAD_REQUEST,
-            )
 
         smart_service = SmartSubstitutionService()
-        refreshed = smart_service.refresh_geometry_for_run(run_id)
+        try:
+            promotion_summary = smart_service.promote_staged_mappings(run_id)
+        except RuntimeError as exc:
+            return jsonify({"error": str(exc)}), HTTPStatus.CONFLICT
         smart_service.sync_structured_mappings(run_id)
         current_app.logger.info(
-            "Pre-PDF geometry refresh completed",
-            extra={"run_id": run_id, "questions_refreshed": refreshed},
+            "Pre-PDF staging sync completed",
+            extra={
+                "run_id": run_id,
+                "promoted_mappings": promotion_summary.get("promoted"),
+                "skipped_mappings": promotion_summary.get("skipped"),
+            },
         )
         target_stages.append(PipelineStageEnum.RESULTS_GENERATION.value)
 
@@ -473,7 +477,14 @@ def resume_pipeline(run_id: str, stage_name: str):
     orchestrator = PipelineOrchestrator()
     orchestrator.start_background(run.id, config)
 
-    return jsonify({"run_id": run.id, "resumed_from": stage_name, "status": "resumed"})
+    return jsonify(
+        {
+            "run_id": run.id,
+            "resumed_from": stage_name,
+            "status": "resumed",
+            "promotion_summary": promotion_summary,
+        }
+    )
 
 
 @bp.post("/<run_id>/continue")
@@ -528,11 +539,10 @@ def continue_pipeline(run_id: str):
         )
 
     smart_service = SmartSubstitutionService()
-    refreshed = smart_service.refresh_geometry_for_run(run_id)
     smart_service.sync_structured_mappings(run_id)
     current_app.logger.info(
-        "Geometry refresh before downstream pipeline trigger",
-        extra={"run_id": run_id, "questions_refreshed": refreshed},
+        "Structured mappings synchronized before downstream pipeline trigger",
+        extra={"run_id": run_id},
     )
 
     orchestrator = PipelineOrchestrator()
@@ -597,6 +607,8 @@ def fork_run():
         clone = QuestionManipulation(
             pipeline_run_id=new_id,
             question_number=q.question_number,
+			sequence_index=q.sequence_index,
+			source_identifier=q.source_identifier,
             question_type=q.question_type,
             original_text=q.original_text,
             stem_position=q.stem_position,
@@ -783,6 +795,8 @@ def rerun_run():
                 clone = QuestionManipulation(
                     pipeline_run_id=new_id,
                     question_number=q.question_number,
+					sequence_index=q.sequence_index,
+					source_identifier=q.source_identifier,
                     question_type=q.question_type,
                     original_text=q.original_text,
                     stem_position=q.stem_position,

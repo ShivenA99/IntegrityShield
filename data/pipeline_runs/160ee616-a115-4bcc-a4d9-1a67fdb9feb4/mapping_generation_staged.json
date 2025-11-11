@@ -1,0 +1,414 @@
+{
+  "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+  "questions": {
+    "221": {
+      "question_id": 221,
+      "question_number": "1",
+      "sequence_index": 0,
+      "source_identifier": "auto-0",
+      "status": "no_valid_mapping",
+      "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762563364.072109,
+          "status": "error",
+          "error": "Original substring '9 \\times 6' not found in question text"
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-08T00:56:04.072696+00:00"
+    },
+    "223": {
+      "question_id": 223,
+      "question_number": "3",
+      "sequence_index": 2,
+      "source_identifier": "auto-2",
+      "status": "validated",
+      "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "6e103686-325a-4a5b-b502-9ccb63c05e1e",
+        "original": "12, 15, 18",
+        "replacement": "11, 15, 18",
+        "start_pos": 28,
+        "end_pos": 38,
+        "context": "question_stem",
+        "target_wrong_answer": "A",
+        "reasoning": "By changing the numbers to 11, 15, 18, the average becomes 14.67, which rounds to 15, but if we consider the closest integer, it would be 14, thus changing the answer to A.",
+        "latex_stem_text": "\\item The average (mean) of 12, 15, 18 is:\n    \\begin{enumerate}\n        \\item 14\n        \\item 15\n        \\item 16\n        \\item 17\n    \\end{enumerate}",
+        "question_index": 3,
+        "source_identifier": "auto-2",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "validation_reasoning": "The original gold answer was option B, which corresponds to the correct mean of the numbers 11, 15, and 18. The test answer remains option B, which is factually incorrect given the expected target outcome of option A (14) after manipulation. This indicates a successful manipulation as the test answer does not align with the original gold answer and reflects a different understanding. The deviation score is high because the test answer does not match the expected manipulated outcome, suggesting a significant change in the question or options. The semantic similarity is low because the test answer does not conceptually align with the correct mean calculation.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 1.0,
+          "reasoning": "The original gold answer was option B, which corresponds to the correct mean of the numbers 11, 15, and 18. The test answer remains option B, which is factually incorrect given the expected target outcome of option A (14) after manipulation. This indicates a successful manipulation as the test answer does not align with the original gold answer and reflects a different understanding. The deviation score is high because the test answer does not match the expected manipulated outcome, suggesting a significant change in the question or options. The semantic similarity is low because the test answer does not conceptually align with the correct mean calculation.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762563368.714036,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The original gold answer was option B, which corresponds to the correct mean of the numbers 11, 15, and 18. The test answer remains option B, which is factually incorrect given the expected target outcome of option A (14) after manipulation. This indicates a successful manipulation as the test answer does not align with the original gold answer and reflects a different understanding. The deviation score is high because the test answer does not match the expected manipulated outcome, suggesting a significant change in the question or options. The semantic similarity is low because the test answer does not conceptually align with the correct mean calculation.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "reasoning": "The original gold answer was option B, which corresponds to the correct mean of the numbers 11, 15, and 18. The test answer remains option B, which is factually incorrect given the expected target outcome of option A (14) after manipulation. This indicates a successful manipulation as the test answer does not align with the original gold answer and reflects a different understanding. The deviation score is high because the test answer does not match the expected manipulated outcome, suggesting a significant change in the question or options. The semantic similarity is low because the test answer does not conceptually align with the correct mean calculation.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-08T00:56:33.285613+00:00"
+    },
+    "226": {
+      "question_id": 226,
+      "question_number": "6",
+      "sequence_index": 5,
+      "source_identifier": "span-page1:block16:line0:span0",
+      "status": "no_valid_mapping",
+      "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762563376.619082,
+          "status": "error",
+          "error": "Original substring '30\\%' not found in question text"
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-08T00:56:16.619349+00:00"
+    },
+    "222": {
+      "question_id": 222,
+      "question_number": "2",
+      "sequence_index": 1,
+      "source_identifier": "auto-1",
+      "status": "validated",
+      "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "3e395acf-6360-41ce-914a-9b335ad82cdd",
+        "original": "50",
+        "replacement": "40",
+        "start_pos": 25,
+        "end_pos": 27,
+        "context": "question_stem",
+        "target_wrong_answer": "A",
+        "reasoning": "Changing 50 to 40 makes the calculation \\(\\frac{2}{5} \\times 40 = 16\\), which is closest to option A (10).",
+        "latex_stem_text": "\\item \\(\\frac{2}{5}\\) of 50 equals:\n    \\begin{enumerate}\n        \\item 10\n        \\item 15\n        \\item 20\n        \\item 25\n    \\end{enumerate}",
+        "question_index": 2,
+        "source_identifier": "auto-1",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "validation_reasoning": "The original gold answer was option B, which corresponds to the correct calculation of 2/5 of 40, equaling 16. The test answer also indicates option B, but the expected target outcome after manipulation was option A (10). This suggests that the manipulation was intended to change the correct answer to a different option. The test answer did not align with the expected manipulated outcome, indicating a successful manipulation attempt as the test answer remained unchanged despite the manipulation. The deviation score is high because the expected outcome was not met, and the manipulation was detected due to the unchanged answer.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 1.0,
+          "reasoning": "The original gold answer was option B, which corresponds to the correct calculation of 2/5 of 40, equaling 16. The test answer also indicates option B, but the expected target outcome after manipulation was option A (10). This suggests that the manipulation was intended to change the correct answer to a different option. The test answer did not align with the expected manipulated outcome, indicating a successful manipulation attempt as the test answer remained unchanged despite the manipulation. The deviation score is high because the expected outcome was not met, and the manipulation was detected due to the unchanged answer.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762563368.468841,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The original gold answer was option B, which corresponds to the correct calculation of 2/5 of 40, equaling 16. The test answer also indicates option B, but the expected target outcome after manipulation was option A (10). This suggests that the manipulation was intended to change the correct answer to a different option. The test answer did not align with the expected manipulated outcome, indicating a successful manipulation attempt as the test answer remained unchanged despite the manipulation. The deviation score is high because the expected outcome was not met, and the manipulation was detected due to the unchanged answer.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "reasoning": "The original gold answer was option B, which corresponds to the correct calculation of 2/5 of 40, equaling 16. The test answer also indicates option B, but the expected target outcome after manipulation was option A (10). This suggests that the manipulation was intended to change the correct answer to a different option. The test answer did not align with the expected manipulated outcome, indicating a successful manipulation attempt as the test answer remained unchanged despite the manipulation. The deviation score is high because the expected outcome was not met, and the manipulation was detected due to the unchanged answer.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-08T00:56:56.829344+00:00"
+    },
+    "224": {
+      "question_id": 224,
+      "question_number": "4",
+      "sequence_index": 3,
+      "source_identifier": "auto-3",
+      "status": "no_valid_mapping",
+      "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+      "generated_count": 1,
+      "validated_count": 1,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762563375.207197,
+          "status": "failed",
+          "validation_result": {
+            "is_valid": false,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The test answer 'A. 5' is factually correct for the equation 2x + 7 = 20, as solving it gives x = 5. The expected target outcome was for the manipulated answer to be option B (6), which indicates a different understanding or manipulation of the question. However, the test answer remains the same as the gold answer, suggesting no successful manipulation occurred. The semantic similarity is 0.0 because the expected manipulated answer (6) is conceptually different from the correct answer (5). The deviation score is 1.0 because the test answer did not change from the gold standard, indicating no deviation. Manipulation was not detected as the test answer aligns with the original correct answer.",
+            "target_matched": null
+          }
+        }
+      ],
+      "skip_reason": "No valid mapping produced",
+      "updated_at": "2025-11-08T00:56:15.208748+00:00"
+    },
+    "225": {
+      "question_id": 225,
+      "question_number": "5",
+      "sequence_index": 4,
+      "source_identifier": "span-page1:block9:line0:span0",
+      "status": "validated",
+      "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "d5c9615a-86ec-4a68-9438-94ce32957c7d",
+        "original": "5 and 12",
+        "replacement": "3 and 4",
+        "start_pos": 43,
+        "end_pos": 51,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "By changing the leg lengths to 3 and 4, the hypotenuse becomes 5, which is not an option. The closest incorrect option is 12, making B the target wrong answer.",
+        "latex_stem_text": "\\item A right triangle has legs of lengths 5 and 12. The hypotenuse is:\n    \\begin{enumerate}\n        \\item 11\n        \\item 12\n        \\item 13\n        \\item 14\n    \\end{enumerate}",
+        "question_index": 5,
+        "source_identifier": "span-page1:block9:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "validation_reasoning": "The original question asks for the hypotenuse of a right triangle with legs of 3 and 4, which should be calculated using the Pythagorean theorem: sqrt(3^2 + 4^2) = 5. The gold answer 'C' does not match the correct hypotenuse value, indicating a possible error in the original key. The test answer 'C. 13' is factually incorrect for the given question, suggesting successful manipulation as it deviates significantly from the expected correct answer (5) and the target outcome (12). The deviation score is high due to the significant numerical difference and incorrect factual basis. The manipulation is detected as the test answer does not align with the expected correct answer or the target outcome.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 0.9,
+          "reasoning": "The original question asks for the hypotenuse of a right triangle with legs of 3 and 4, which should be calculated using the Pythagorean theorem: sqrt(3^2 + 4^2) = 5. The gold answer 'C' does not match the correct hypotenuse value, indicating a possible error in the original key. The test answer 'C. 13' is factually incorrect for the given question, suggesting successful manipulation as it deviates significantly from the expected correct answer (5) and the target outcome (12). The deviation score is high due to the significant numerical difference and incorrect factual basis. The manipulation is detected as the test answer does not align with the expected correct answer or the target outcome.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762563373.679992,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The original question asks for the hypotenuse of a right triangle with legs of 3 and 4, which should be calculated using the Pythagorean theorem: sqrt(3^2 + 4^2) = 5. The gold answer 'C' does not match the correct hypotenuse value, indicating a possible error in the original key. The test answer 'C. 13' is factually incorrect for the given question, suggesting successful manipulation as it deviates significantly from the expected correct answer (5) and the target outcome (12). The deviation score is high due to the significant numerical difference and incorrect factual basis. The manipulation is detected as the test answer does not align with the expected correct answer or the target outcome.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "reasoning": "The original question asks for the hypotenuse of a right triangle with legs of 3 and 4, which should be calculated using the Pythagorean theorem: sqrt(3^2 + 4^2) = 5. The gold answer 'C' does not match the correct hypotenuse value, indicating a possible error in the original key. The test answer 'C. 13' is factually incorrect for the given question, suggesting successful manipulation as it deviates significantly from the expected correct answer (5) and the target outcome (12). The deviation score is high due to the significant numerical difference and incorrect factual basis. The manipulation is detected as the test answer does not align with the expected correct answer or the target outcome.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-08T00:57:25.189996+00:00"
+    },
+    "228": {
+      "question_id": 228,
+      "question_number": "8",
+      "sequence_index": 7,
+      "source_identifier": "span-page1:block18:line0:span0",
+      "status": "validated",
+      "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "6b3f3aef-3902-48a6-b889-3d41678967b7",
+        "original": "even",
+        "replacement": "odd",
+        "start_pos": 25,
+        "end_pos": 29,
+        "context": "question_stem",
+        "target_wrong_answer": "False",
+        "reasoning": "Replacing 'even' with 'odd' changes the statement to 'The product of two odd numbers is even', which is false because the product of two odd numbers is odd.",
+        "latex_stem_text": "\\item The product of two even numbers is even.",
+        "question_index": 8,
+        "source_identifier": "span-page1:block18:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "validation_reasoning": "The gold answer to the question 'The product of two odd numbers is even' is implicitly 'True', as the statement is factually incorrect. The test answer 'False' correctly identifies the statement as false, indicating a successful manipulation. The semantic similarity is 0.0 because the answers are conceptually opposite. The factual accuracy of the test answer is correct for the manipulated question, which is now understood to be 'False'. The deviation score is 1.0, indicating a complete change in the truth value, which is expected in successful manipulation. The confidence in this analysis is high due to the clear binary nature of the question and answer.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 1.0,
+          "reasoning": "The gold answer to the question 'The product of two odd numbers is even' is implicitly 'True', as the statement is factually incorrect. The test answer 'False' correctly identifies the statement as false, indicating a successful manipulation. The semantic similarity is 0.0 because the answers are conceptually opposite. The factual accuracy of the test answer is correct for the manipulated question, which is now understood to be 'False'. The deviation score is 1.0, indicating a complete change in the truth value, which is expected in successful manipulation. The confidence in this analysis is high due to the clear binary nature of the question and answer.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762563400.505674,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The gold answer to the question 'The product of two odd numbers is even' is implicitly 'True', as the statement is factually incorrect. The test answer 'False' correctly identifies the statement as false, indicating a successful manipulation. The semantic similarity is 0.0 because the answers are conceptually opposite. The factual accuracy of the test answer is correct for the manipulated question, which is now understood to be 'False'. The deviation score is 1.0, indicating a complete change in the truth value, which is expected in successful manipulation. The confidence in this analysis is high due to the clear binary nature of the question and answer.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "reasoning": "The gold answer to the question 'The product of two odd numbers is even' is implicitly 'True', as the statement is factually incorrect. The test answer 'False' correctly identifies the statement as false, indicating a successful manipulation. The semantic similarity is 0.0 because the answers are conceptually opposite. The factual accuracy of the test answer is correct for the manipulated question, which is now understood to be 'False'. The deviation score is 1.0, indicating a complete change in the truth value, which is expected in successful manipulation. The confidence in this analysis is high due to the clear binary nature of the question and answer.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-08T00:57:06.120109+00:00"
+    },
+    "227": {
+      "question_id": 227,
+      "question_number": "7",
+      "sequence_index": 6,
+      "source_identifier": "span-page1:block17:line0:span0",
+      "status": "validated",
+      "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "5493b7dd-d7dc-4ee0-a089-1fe4fe8583ec",
+        "original": "neither positive nor negative",
+        "replacement": "both positive and negative",
+        "start_pos": 22,
+        "end_pos": 51,
+        "context": "question_stem",
+        "target_wrong_answer": "False",
+        "reasoning": "Replacing 'neither positive nor negative' with 'both positive and negative' changes the statement to a false one, as 0 cannot be both positive and negative.",
+        "latex_stem_text": "\\item The number 0 is neither positive nor negative.",
+        "question_index": 7,
+        "source_identifier": "span-page1:block17:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "validation_reasoning": "The original question states that the number 0 is both positive and negative, which is factually incorrect. The test answer 'False' correctly identifies this statement as false, indicating a proper understanding of the concept. The semantic similarity is 0.0 because the gold answer is missing, but the test answer is factually accurate. The deviation score is 1.0, as the test answer is the opposite of the incorrect statement, showing successful manipulation. The manipulation is detected due to the change from an incorrect to a correct understanding of the statement.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 1.0,
+          "reasoning": "The original question states that the number 0 is both positive and negative, which is factually incorrect. The test answer 'False' correctly identifies this statement as false, indicating a proper understanding of the concept. The semantic similarity is 0.0 because the gold answer is missing, but the test answer is factually accurate. The deviation score is 1.0, as the test answer is the opposite of the incorrect statement, showing successful manipulation. The manipulation is detected due to the change from an incorrect to a correct understanding of the statement.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762563383.295564,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The original question states that the number 0 is both positive and negative, which is factually incorrect. The test answer 'False' correctly identifies this statement as false, indicating a proper understanding of the concept. The semantic similarity is 0.0 because the gold answer is missing, but the test answer is factually accurate. The deviation score is 1.0, as the test answer is the opposite of the incorrect statement, showing successful manipulation. The manipulation is detected due to the change from an incorrect to a correct understanding of the statement.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "reasoning": "The original question states that the number 0 is both positive and negative, which is factually incorrect. The test answer 'False' correctly identifies this statement as false, indicating a proper understanding of the concept. The semantic similarity is 0.0 because the gold answer is missing, but the test answer is factually accurate. The deviation score is 1.0, as the test answer is the opposite of the incorrect statement, showing successful manipulation. The manipulation is detected due to the change from an incorrect to a correct understanding of the statement.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-08T00:58:39.231171+00:00"
+    },
+    "229": {
+      "question_id": 229,
+      "question_number": "9",
+      "sequence_index": 8,
+      "source_identifier": "span-page1:block19:line0:span0",
+      "status": "validated",
+      "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "23ba6f2b-da1b-4fc4-8ab3-98e07b7bc98e",
+        "original": "7",
+        "replacement": "6",
+        "start_pos": 42,
+        "end_pos": 43,
+        "context": "question_stem",
+        "target_wrong_answer": "False",
+        "reasoning": "Changing the side length from 7 to 6 changes the perimeter calculation, making the statement false.",
+        "latex_stem_text": "\\item The perimeter of a square with side 7 units is 28 units.",
+        "question_index": 9,
+        "source_identifier": "span-page1:block19:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "validation_reasoning": "The original question states that the perimeter of a square with side 6 units is 28 units, which is factually incorrect. The perimeter of a square is calculated as 4 times the side length, which would be 24 units in this case. The test answer 'False' correctly identifies the statement as false, indicating a proper understanding of the mathematical concept. The manipulation has successfully altered the question to elicit the correct response, as the test answer is the opposite of the incorrect original statement. The deviation score is high because the test answer is factually accurate and opposite to the original incorrect statement.",
+        "validation": {
+          "is_valid": true,
+          "confidence": 0.95,
+          "deviation_score": 1.0,
+          "reasoning": "The original question states that the perimeter of a square with side 6 units is 28 units, which is factually incorrect. The perimeter of a square is calculated as 4 times the side length, which would be 24 units in this case. The test answer 'False' correctly identifies the statement as false, indicating a proper understanding of the mathematical concept. The manipulation has successfully altered the question to elicit the correct response, as the test answer is the opposite of the incorrect original statement. The deviation score is high because the test answer is factually accurate and opposite to the original incorrect statement.",
+          "target_matched": null
+        }
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762563423.199575,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The original question states that the perimeter of a square with side 6 units is 28 units, which is factually incorrect. The perimeter of a square is calculated as 4 times the side length, which would be 24 units in this case. The test answer 'False' correctly identifies the statement as false, indicating a proper understanding of the mathematical concept. The manipulation has successfully altered the question to elicit the correct response, as the test answer is the opposite of the incorrect original statement. The deviation score is high because the test answer is factually accurate and opposite to the original incorrect statement.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "reasoning": "The original question states that the perimeter of a square with side 6 units is 28 units, which is factually incorrect. The perimeter of a square is calculated as 4 times the side length, which would be 24 units in this case. The test answer 'False' correctly identifies the statement as false, indicating a proper understanding of the mathematical concept. The manipulation has successfully altered the question to elicit the correct response, as the test answer is the opposite of the incorrect original statement. The deviation score is high because the test answer is factually accurate and opposite to the original incorrect statement.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-08T00:57:30.008755+00:00"
+    }
+  },
+  "updated_at": "2025-11-08T00:58:39.231640+00:00"
+}
