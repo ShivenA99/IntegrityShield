@@ -3,6 +3,7 @@ from __future__ import annotations
 from ...extensions import db
 from ...models import PipelineRun, PipelineStage
 from ...utils.exceptions import ResourceNotFound
+from ...utils.time import isoformat, utc_now
 
 
 class PipelineResumeService:
@@ -24,8 +25,11 @@ class PipelineResumeService:
             stage.started_at = None
             stage.completed_at = None
 
-        run.status = "pending"
-        run.current_stage = stage_name
+        run.status = "paused"
+        stats = dict(run.processing_stats or {})
+        stats["resume_target"] = stage_name
+        stats["resume_requested_at"] = isoformat(utc_now())
+        run.processing_stats = stats
         db.session.add(run)
         db.session.add(stage)
         db.session.commit()

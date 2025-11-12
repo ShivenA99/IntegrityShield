@@ -7,44 +7,53 @@ import ProgressTracker from "@components/shared/ProgressTracker";
 import SmartReadingPanel from "./SmartReadingPanel";
 import ContentDiscoveryPanel from "./ContentDiscoveryPanel";
 import SmartSubstitutionPanel from "./SmartSubstitutionPanel";
-import EffectivenessTestPanel from "./EffectivenessTestPanel";
-import EnhancementMethodPanel from "./EnhancementMethodPanel";
 import PdfCreationPanel from "./PdfCreationPanel";
-import ResultsPanel from "./ResultsPanel";
 
-const stageComponentMap: Record<PipelineStageName, React.ComponentType> = {
+const stageComponentMap: Partial<Record<PipelineStageName, React.ComponentType>> = {
   smart_reading: SmartReadingPanel,
   content_discovery: ContentDiscoveryPanel,
   smart_substitution: SmartSubstitutionPanel,
-  effectiveness_testing: EffectivenessTestPanel,
-  document_enhancement: EnhancementMethodPanel,
   pdf_creation: PdfCreationPanel,
-  results_generation: ResultsPanel,
 };
 
 const PipelineContainer: React.FC = () => {
   const { status, isLoading } = usePipeline();
 
-  const activeStage = status?.current_stage ?? "smart_reading";
-  const [selectedStage, setSelectedStage] = useState<PipelineStageName>(activeStage as PipelineStageName);
+  const [selectedStage, setSelectedStage] = useState<PipelineStageName>("smart_reading");
   const [autoFollow, setAutoFollow] = useState(true);
 
   useEffect(() => {
-    // Only auto-follow if stage is actively running, not when completed
-    const currentStageData = status?.stages.find(s => s.name === activeStage);
-    const isRunning = currentStageData?.status === 'running';
-    const isPending = status?.status === 'pending';
-
-    // Auto-navigate to the active stage when running OR when freshly created (pending)
-    if (autoFollow && (isRunning || isPending)) {
-      setSelectedStage(activeStage as PipelineStageName);
+    if (!status) {
+      setSelectedStage("smart_reading");
+      setAutoFollow(true);
+      return;
     }
 
-    // Disable autoFollow when stage completes to prevent auto-advance
-    if (currentStageData?.status === 'completed') {
-      setAutoFollow(false);
+    if (!autoFollow) {
+      return;
     }
-  }, [activeStage, autoFollow, status?.stages, status?.status]);
+
+    const runningStage = status.stages.find(
+      (stage) => stage.status === "running" && stageComponentMap[stage.name as PipelineStageName]
+    );
+    if (runningStage) {
+      setSelectedStage(runningStage.name as PipelineStageName);
+      return;
+    }
+
+    const currentStage = status.current_stage as PipelineStageName | undefined;
+    if (currentStage && stageComponentMap[currentStage]) {
+      setSelectedStage(currentStage);
+      return;
+    }
+    // Keep focus on the most recent completed stage that the UI can render.
+    const latestCompleted = [...status.stages]
+      .reverse()
+      .find((stage) => stage.status === "completed" && stageComponentMap[stage.name as PipelineStageName]);
+    if (latestCompleted) {
+      setSelectedStage(latestCompleted.name as PipelineStageName);
+    }
+  }, [status, autoFollow, selectedStage]);
 
   useEffect(() => {
     if (!status) {
@@ -58,13 +67,13 @@ const PipelineContainer: React.FC = () => {
       return;
     }
     if (status.status === "completed" && status.current_stage === "results_generation") {
-      setSelectedStage("results_generation");
+      setSelectedStage("pdf_creation");
       setAutoFollow(false);
     }
   }, [status?.status, status?.current_stage]);
 
   const ActiveStageComponent = useMemo(() => {
-    return stageComponentMap[selectedStage] ?? SmartReadingPanel;
+    return (stageComponentMap[selectedStage] as React.ComponentType) ?? SmartReadingPanel;
   }, [selectedStage]);
 
   return (

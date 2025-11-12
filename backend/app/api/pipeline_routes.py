@@ -374,7 +374,9 @@ def list_runs():
                 "run_id": run_id,
                 "filename": filename,
                 "status": status_val,
+                "parent_run_id": processing_stats.get("parent_run_id"),
                 "current_stage": current_stage,
+                "resume_target": processing_stats.get("resume_target"),
                 "created_at": created_at.isoformat() if created_at else None,
                 "updated_at": updated_at.isoformat() if updated_at else None,
                 "completed_at": completed_at.isoformat() if completed_at else None,
@@ -406,11 +408,15 @@ def get_status(run_id: str):
 
     stages = PipelineStage.query.filter_by(pipeline_run_id=run_id).order_by(PipelineStage.id).all()
 
+    processing_stats = run.processing_stats or {}
+
     return jsonify(
         {
             "run_id": run.id,
             "status": run.status,
             "current_stage": run.current_stage,
+            "parent_run_id": processing_stats.get("parent_run_id"),
+            "resume_target": processing_stats.get("resume_target"),
             "stages": [
                 {
                     "id": stage.id,
@@ -421,7 +427,7 @@ def get_status(run_id: str):
                 }
                 for stage in stages
             ],
-            "processing_stats": run.processing_stats,
+            "processing_stats": processing_stats,
             "pipeline_config": run.pipeline_config,
             "structured_data": run.structured_data,
             "updated_at": run.updated_at.isoformat() if run.updated_at else None,
@@ -435,15 +441,37 @@ def resume_pipeline(run_id: str, stage_name: str):
     if not run:
         return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
 
+    payload = request.get_json(silent=True) or {}
+    override_targets = payload.get("target_stages")
+
     resume_service = PipelineResumeService()
     try:
         resume_service.mark_for_resume(run_id, stage_name)
     except ResourceNotFound as exc:
         return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
 
-    target_stages = [stage_name]
+    target_stages: list[str] = []
+    if override_targets:
+        for candidate in override_targets:
+            try:
+                stage_value = PipelineStageEnum(candidate).value
+            except ValueError:
+                current_app.logger.warning("Ignoring unknown stage override '%s' for resume", candidate)
+                continue
+            if stage_value not in target_stages:
+                target_stages.append(stage_value)
+    if not target_stages:
+        target_stages = [stage_name]
+    elif stage_name not in target_stages:
+        target_stages.insert(0, stage_name)
+
     promotion_summary: Dict[str, Any] = {"promoted": [], "skipped": [], "total_promoted": 0}
-    if stage_name == PipelineStageEnum.PDF_CREATION.value:
+    target_stage_set = set(target_stages)
+    wants_pdf_creation = PipelineStageEnum.PDF_CREATION.value in target_stage_set
+    if wants_pdf_creation and PipelineStageEnum.RESULTS_GENERATION.value not in target_stage_set:
+        target_stages.append(PipelineStageEnum.RESULTS_GENERATION.value)
+
+    if wants_pdf_creation:
         questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
         if not questions:
             return jsonify({"error": "No questions available for PDF creation"}), HTTPStatus.BAD_REQUEST
@@ -483,6 +511,7 @@ def resume_pipeline(run_id: str, stage_name: str):
             "resumed_from": stage_name,
             "status": "resumed",
             "promotion_summary": promotion_summary,
+            "target_stages": target_stages,
         }
     )
 
@@ -649,21 +678,14 @@ def fork_run():
     return jsonify({"run_id": new_run.id, "forked_from": source_run_id, "status": "started"}), HTTPStatus.ACCEPTED
 
 
+
 @bp.post("/rerun")
 def rerun_run():
-    """Re-run from a previous run.
-
-    Behavior:
-    - If the source run has content discovery resources (questions/structured data), clone them and start at smart_substitution only.
-    - Otherwise, create a fresh run that starts from the beginning (smart_reading..end).
-
-    JSON body:
-      - source_run_id: str
-      - target_stages: optional override list
-    """
+    """Clone a previous run and restart from smart_substitution (stage 3)."""
     data = request.get_json(silent=True) or {}
     source_run_id = data.get("source_run_id")
-    target_stages = data.get("target_stages") or None
+    target_stages = data.get("target_stages")
+    auto_start = data.get("auto_start", True)
 
     if not source_run_id:
         return jsonify({"error": "source_run_id required"}), HTTPStatus.BAD_REQUEST
@@ -672,220 +694,162 @@ def rerun_run():
     if not source:
         return jsonify({"error": "Source run not found"}), HTTPStatus.NOT_FOUND
 
-    orchestrator = PipelineOrchestrator()
-    structured_manager = StructuredDataManager()
-
-    # Determine readiness: consider either DB questions, structured questions, or AI questions
     structured = source.structured_data or {}
-    s_questions = structured.get("questions") or []
-    s_ai_questions = structured.get("ai_questions") or []
-    has_db_questions = bool(QuestionManipulation.query.filter_by(pipeline_run_id=source_run_id).first())
-    ready_for_clone = bool(s_questions) or bool(s_ai_questions) or has_db_questions
-
-    if ready_for_clone:
-        # Clone as a new run prepped for smart_substitution
-        new_id = str(uuid.uuid4())
-
-        # Prepare run directory and replicate upstream assets
-        run_directory(new_id)
-        source_run_dir = run_directory(source_run_id)
-
-        # Copy original PDF into the new run directory if available
-        dest_pdf_path: Path | None = None
-        source_pdf_path = Path(source.original_pdf_path) if source.original_pdf_path else None
-        if source_pdf_path and source_pdf_path.exists():
-            dest_pdf_path = pdf_input_path(new_id, source_pdf_path.name)
-            dest_pdf_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source_pdf_path, dest_pdf_path)
-
-        # Copy assets (images, fonts, etc.) for downstream renderers
-        source_assets_dir = source_run_dir / "assets"
-        if source_assets_dir.exists():
-            dest_assets_dir = assets_directory(new_id)
-            shutil.rmtree(dest_assets_dir, ignore_errors=True)
-            shutil.copytree(source_assets_dir, dest_assets_dir, dirs_exist_ok=True)
-
-        # Preserve previously generated artifacts (span plans, debug captures, etc.)
-        source_artifacts_dir = source_run_dir / "artifacts"
-        if source_artifacts_dir.exists():
-            dest_artifacts_dir = run_directory(new_id) / "artifacts"
-            shutil.rmtree(dest_artifacts_dir, ignore_errors=True)
-            shutil.copytree(source_artifacts_dir, dest_artifacts_dir, dirs_exist_ok=True)
-
-        structured_copy = copy.deepcopy(structured or {})
-
-        def _rewrite_run_references(value: object) -> object:
-            if isinstance(value, dict):
-                return {key: _rewrite_run_references(inner) for key, inner in value.items()}
-            if isinstance(value, list):
-                return [_rewrite_run_references(item) for item in value]
-            if isinstance(value, str) and source_run_id in value:
-                return value.replace(source_run_id, new_id)
-            return value
-
-        document_info = structured_copy.setdefault("document", {})
-        if dest_pdf_path:
-            document_info["source_path"] = str(dest_pdf_path)
-            document_info.setdefault("filename", dest_pdf_path.name)
-        elif source_pdf_path:
-            document_info.setdefault("source_path", str(source_pdf_path))
-            document_info.setdefault("filename", source_pdf_path.name)
-
-        metadata = structured_copy.setdefault("pipeline_metadata", {})
-        metadata["run_id"] = new_id
-        metadata["rerun_from"] = source_run_id
-        metadata["current_stage"] = "smart_substitution"
-        metadata["stages_completed"] = ["smart_reading", "content_discovery"]
-        metadata["last_updated"] = isoformat(utc_now())
-        metadata.pop("completed_at", None)
-        metadata.pop("completion_summary", None)
-        metadata.pop("final_summary", None)
-        metadata.pop("result_digest", None)
-
-        # Reset downstream stage artefacts so the re-run generates fresh outputs
-        original_manip_results = structured_copy.get("manipulation_results") or {}
-        preserved_artifacts = copy.deepcopy(original_manip_results.get("artifacts") or {})
-        preserved_debug = copy.deepcopy(original_manip_results.get("debug") or {})
-
-        for entry in preserved_debug.values():
-            if not isinstance(entry, dict):
-                continue
-            entry.pop("span_plan_summary", None)
-            entry.pop("span_plan", None)
-            entry.pop("scaled_spans", None)
-            overlay_layers = entry.get("overlay_layers")
-            if isinstance(overlay_layers, dict):
-                for overlay_entry in overlay_layers.values():
-                    if isinstance(overlay_entry, dict):
-                        overlay_entry.pop("span_plan_summary", None)
-                        overlay_entry.pop("span_plan", None)
-                        overlay_entry.pop("scaled_spans", None)
-
-        structured_copy["manipulation_results"] = {"enhanced_pdfs": {}}
-        if preserved_artifacts:
-            structured_copy["manipulation_results"]["artifacts"] = preserved_artifacts
-        if preserved_debug:
-            structured_copy["manipulation_results"]["debug"] = preserved_debug
-        structured_copy.pop("performance_metrics", None)
-        structured_copy.pop("global_mappings", None)
-
-        structured_copy = _rewrite_run_references(structured_copy)
-
-        # Persist structured copy on disk for the cloned run
-        structured_manager.save(new_id, structured_copy)
-
-        pdf_path_for_run = dest_pdf_path or source_pdf_path
-
-        new_run = PipelineRun(
-            id=new_id,
-            original_pdf_path=str(pdf_path_for_run) if pdf_path_for_run else source.original_pdf_path,
-            original_filename=(pdf_path_for_run.name if pdf_path_for_run else source.original_filename),
-            current_stage="smart_substitution",
-            status="pending",
-            pipeline_config=copy.deepcopy(source.pipeline_config or {}),
-            structured_data=structured_copy,
+    has_questions = bool(QuestionManipulation.query.filter_by(pipeline_run_id=source_run_id).first())
+    if not (structured.get("questions") or structured.get("ai_questions") or has_questions):
+        return (
+            jsonify({"error": "Source run missing discovery data; cannot rerun from stage 3"}),
+            HTTPStatus.CONFLICT,
         )
-        db.session.add(new_run)
-        db.session.flush()
 
-        # Duplicate questions if present in DB; otherwise synthesize from AI questions
-        source_questions = QuestionManipulation.query.filter_by(pipeline_run_id=source_run_id).all()
-        if source_questions:
-            for q in source_questions:
-                clone = QuestionManipulation(
-                    pipeline_run_id=new_id,
-                    question_number=q.question_number,
-					sequence_index=q.sequence_index,
-					source_identifier=q.source_identifier,
-                    question_type=q.question_type,
-                    original_text=q.original_text,
-                    stem_position=q.stem_position,
-                    options_data=q.options_data,
-                    gold_answer=q.gold_answer,
-                    gold_confidence=q.gold_confidence,
-                    manipulation_method=q.manipulation_method or "smart_substitution",
-                    # Do not assign substring_mappings here to avoid MutableList coercion; UI/API will manage
-                    effectiveness_score=q.effectiveness_score,
-                    ai_model_results=q.ai_model_results or {},
-                    visual_elements=q.visual_elements,
-                )
-                mappings_copy = json.loads(json.dumps(q.substring_mappings or []))
-                clone.substring_mappings = mappings_copy
-                db.session.add(clone)
-        else:
-            # Seed minimal QuestionManipulation rows from structured AI questions
-            for aq in (s_ai_questions or []):
-                qnum = str(aq.get("question_number") or aq.get("q_number") or "")
-                if not qnum:
-                    continue
-                clone = QuestionManipulation(
-                    pipeline_run_id=new_id,
-                    question_number=qnum,
-                    question_type=str(aq.get("question_type") or "multiple_choice"),
-                    original_text=str(aq.get("stem_text") or ""),
-                    options_data=aq.get("options") or {},
-                    manipulation_method="smart_substitution",
-                    # Do not assign substring_mappings here to avoid MutableList coercion; UI/API will manage
-                    ai_model_results={},
-                )
-                db.session.add(clone)
+    new_run_id = str(uuid.uuid4())
+    run_directory(new_run_id)
+    file_manager = FileManager()
 
-        db.session.commit()
+    source_pdf_path = Path(source.original_pdf_path) if source.original_pdf_path else None
+    dest_pdf_path = None
+    if source_pdf_path and source_pdf_path.exists():
+        dest_pdf_path = file_manager.import_manual_pdf(new_run_id, source_pdf_path)
 
-        # Verify mappings were copied correctly
-        cloned_count = QuestionManipulation.query.filter_by(pipeline_run_id=new_id).count()
-        cloned_with_mappings = db.session.query(QuestionManipulation).filter(
-            QuestionManipulation.pipeline_run_id == new_id,
-            QuestionManipulation.substring_mappings != None,
-            QuestionManipulation.substring_mappings != '[]'
-        ).count()
+    source_assets_dir = assets_directory(source_run_id)
+    dest_assets_dir = assets_directory(new_run_id)
+    if source_assets_dir.exists():
+        shutil.copytree(source_assets_dir, dest_assets_dir, dirs_exist_ok=True)
 
-        # Ensure structured data mirrors the cloned DB rows (including substring mappings)
-        SmartSubstitutionService().sync_structured_mappings(new_id)
-        new_run.structured_data = structured_manager.load(new_id)
-        db.session.commit()
+    source_artifacts_dir = run_directory(source_run_id) / "artifacts"
+    dest_artifacts_dir = run_directory(new_run_id) / "artifacts"
+    if source_artifacts_dir.exists():
+        shutil.copytree(source_artifacts_dir, dest_artifacts_dir, dirs_exist_ok=True)
 
-        # Default to only smart_substitution (UI will carry forward after mappings are validated)
-        default_stages = ["smart_substitution"]
-        stages = target_stages if target_stages else default_stages
-        config = PipelineConfig(
-            target_stages=stages,
-            ai_models=new_run.pipeline_config.get("ai_models", current_app.config["PIPELINE_DEFAULT_MODELS"]),
-            enhancement_methods=new_run.pipeline_config.get(
-                "enhancement_methods", current_app.config["PIPELINE_DEFAULT_METHODS"]
-            ),
-            skip_if_exists=False,
-            parallel_processing=True,
-        )
-        orchestrator.start_background(new_run.id, config)
+    structured_copy = copy.deepcopy(structured)
 
-        return jsonify({"run_id": new_run.id, "rerun_from": source_run_id, "mode": "clone_ready", "status": "started"}), HTTPStatus.ACCEPTED
+    def _rewrite(value: object) -> object:
+        if isinstance(value, dict):
+            return {k: _rewrite(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [_rewrite(v) for v in value]
+        if isinstance(value, str) and source_run_id in value:
+            return value.replace(source_run_id, new_run_id)
+        return value
 
-    # Otherwise, start a fresh run from the beginning using the same PDF
-    new_id = str(uuid.uuid4())
-    source_pdf = Path(source.original_pdf_path)
-    dest_pdf = pdf_input_path(new_id, source_pdf.name)
-    dest_pdf.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(source_pdf, dest_pdf)
+    structured_copy = _rewrite(structured_copy)
+
+    document_info = structured_copy.setdefault("document", {})
+    if dest_pdf_path:
+        document_info["source_path"] = str(dest_pdf_path)
+        document_info["filename"] = dest_pdf_path.name
+    elif source_pdf_path:
+        document_info.setdefault("source_path", str(source_pdf_path))
+        document_info.setdefault("filename", source_pdf_path.name)
+
+    metadata = structured_copy.setdefault("pipeline_metadata", {})
+    metadata.update(
+        {
+            "run_id": new_run_id,
+            "parent_run_id": source_run_id,
+            "stages_completed": [
+                PipelineStageEnum.SMART_READING.value,
+                PipelineStageEnum.CONTENT_DISCOVERY.value,
+            ],
+            "current_stage": PipelineStageEnum.CONTENT_DISCOVERY.value,
+            "last_updated": isoformat(utc_now()),
+        }
+    )
+    metadata.pop("completed_at", None)
+    metadata.pop("result_digest", None)
+    metadata.pop("completion_summary", None)
+    metadata.pop("final_summary", None)
+
+    previous_results = structured_copy.pop("manipulation_results", None)
+    if previous_results:
+        structured_copy["previous_manipulation_results"] = previous_results
+    structured_copy["manipulation_results"] = {}
+
+    structured_manager = StructuredDataManager()
+    structured_manager.save(new_run_id, structured_copy)
+
+    new_stats = copy.deepcopy(source.processing_stats or {})
+    new_stats["parent_run_id"] = source_run_id
+    new_stats["cloned_at"] = isoformat(utc_now())
+    new_stats["cloned_from_stage"] = PipelineStageEnum.SMART_SUBSTITUTION.value
 
     new_run = PipelineRun(
-        id=new_id,
-        original_pdf_path=str(dest_pdf),
-        original_filename=source_pdf.name,
-        current_stage="smart_reading",
-        status="pending",
-        pipeline_config=source.pipeline_config or {},
-        structured_data={},
+        id=new_run_id,
+        original_pdf_path=str(dest_pdf_path) if dest_pdf_path else source.original_pdf_path,
+        original_filename=dest_pdf_path.name if dest_pdf_path else source.original_filename,
+        current_stage=PipelineStageEnum.CONTENT_DISCOVERY.value,
+        status="paused",
+        pipeline_config=copy.deepcopy(source.pipeline_config or {}),
+        structured_data=structured_copy,
+        processing_stats=new_stats,
     )
     db.session.add(new_run)
+    db.session.flush()
+
+    source_questions = QuestionManipulation.query.filter_by(pipeline_run_id=source_run_id).all()
+    if source_questions:
+        for question in source_questions:
+            clone = QuestionManipulation(
+                pipeline_run_id=new_run_id,
+                question_number=question.question_number,
+                sequence_index=question.sequence_index,
+                source_identifier=question.source_identifier,
+                question_type=question.question_type,
+                original_text=question.original_text,
+                stem_position=question.stem_position,
+                options_data=question.options_data,
+                gold_answer=question.gold_answer,
+                gold_confidence=question.gold_confidence,
+                manipulation_method=question.manipulation_method or "smart_substitution",
+                effectiveness_score=question.effectiveness_score,
+                ai_model_results=question.ai_model_results or {},
+                visual_elements=question.visual_elements,
+            )
+            clone.substring_mappings = json.loads(json.dumps(question.substring_mappings or []))
+            db.session.add(clone)
+    else:
+        for aq in structured.get("ai_questions") or []:
+            qnum = str(aq.get("question_number") or aq.get("q_number") or "")
+            if not qnum:
+                continue
+            clone = QuestionManipulation(
+                pipeline_run_id=new_run_id,
+                question_number=qnum,
+                question_type=str(aq.get("question_type") or "multiple_choice"),
+                original_text=str(aq.get("stem_text") or ""),
+                options_data=aq.get("options") or {},
+                manipulation_method="smart_substitution",
+            )
+            db.session.add(clone)
+
+    completed_stages = {
+        PipelineStageEnum.SMART_READING,
+        PipelineStageEnum.CONTENT_DISCOVERY,
+    }
+    for stage in PipelineStageEnum:
+        stage_record = PipelineStage(
+            pipeline_run_id=new_run_id,
+            stage_name=stage.value,
+            status="completed" if stage in completed_stages else "pending",
+        )
+        stage_record.started_at = None
+        stage_record.completed_at = None
+        stage_record.error_details = None
+        db.session.add(stage_record)
+
     db.session.commit()
 
-    # Initialize structured data file with the input PDF (now copied into new run dir)
-    StructuredDataManager().initialize(new_run.id, dest_pdf)
+    default_targets = [
+        PipelineStageEnum.SMART_SUBSTITUTION.value,
+        PipelineStageEnum.EFFECTIVENESS_TESTING.value,
+        PipelineStageEnum.DOCUMENT_ENHANCEMENT.value,
+        PipelineStageEnum.PDF_CREATION.value,
+        PipelineStageEnum.RESULTS_GENERATION.value,
+    ]
+    selected_targets = target_stages or default_targets
 
-    # Run full pipeline by default
     config = PipelineConfig(
-        target_stages=[stage.value for stage in orchestrator.pipeline_order],
+        target_stages=selected_targets,
         ai_models=new_run.pipeline_config.get("ai_models", current_app.config["PIPELINE_DEFAULT_MODELS"]),
         enhancement_methods=new_run.pipeline_config.get(
             "enhancement_methods", current_app.config["PIPELINE_DEFAULT_METHODS"]
@@ -893,9 +857,30 @@ def rerun_run():
         skip_if_exists=False,
         parallel_processing=True,
     )
-    orchestrator.start_background(new_run.id, config)
 
-    return jsonify({"run_id": new_run.id, "rerun_from": source_run_id, "mode": "fresh_start", "status": "started"}), HTTPStatus.ACCEPTED
+    if auto_start:
+        orchestrator = PipelineOrchestrator()
+        orchestrator.start_background(new_run_id, config)
+        status_value = "started"
+    else:
+        stats = dict(new_run.processing_stats or {})
+        stats["pending_resume_targets"] = selected_targets
+        new_run.processing_stats = stats
+        db.session.add(new_run)
+        db.session.commit()
+        status_value = "paused"
+
+    return (
+        jsonify(
+            {
+                "run_id": new_run_id,
+                "parent_run_id": source_run_id,
+                "status": status_value,
+                "target_stages": selected_targets,
+            }
+        ),
+        HTTPStatus.ACCEPTED,
+    )
 
 
 @bp.post("/<run_id>/soft_delete")
@@ -924,4 +909,3 @@ def delete_run(run_id: str):
     db.session.commit()
 
     return "", HTTPStatus.NO_CONTENT
-

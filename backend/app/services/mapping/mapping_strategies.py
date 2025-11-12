@@ -122,6 +122,11 @@ class StrategyRegistry:
         k: int = 5
     ) -> str:
         """Build prompt from strategy and question data."""
+        copyable_text = question_data.get("copyable_text") or question_data.get("latex_stem_text", "")
+        prefix_note = question_data.get("prompt_prefix_note") or ""
+        answer_guidance = question_data.get("answer_guidance") or ""
+        retry_instructions = question_data.get("retry_instructions") or ""
+
         return strategy.prompt_template.format(
             question_index=question_data.get("question_number", ""),
             latex_stem_text=question_data.get("latex_stem_text", ""),
@@ -129,7 +134,11 @@ class StrategyRegistry:
             question_type=question_data.get("question_type", ""),
             options=self._format_options(question_data.get("options")),
             k=k,
-            reasoning_steps="\n".join(f"- {step}" for step in strategy.reasoning_steps)
+            reasoning_steps="\n".join(f"- {step}" for step in strategy.reasoning_steps),
+            copyable_text=copyable_text,
+            prefix_note=prefix_note,
+            answer_guidance=answer_guidance,
+            retry_instructions=retry_instructions,
         )
 
 
@@ -143,4 +152,3 @@ def get_strategy_registry() -> StrategyRegistry:
     if _strategy_registry is None:
         _strategy_registry = StrategyRegistry()
     return _strategy_registry
-

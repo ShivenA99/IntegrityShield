@@ -11,6 +11,8 @@ interface RunRow {
   filename: string;
   status: string;
   current_stage: string;
+  parent_run_id?: string | null;
+  resume_target?: string | null;
   created_at?: string;
   updated_at?: string;
   completed_at?: string;
@@ -27,7 +29,7 @@ const PreviousRuns: React.FC = () => {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string[]>([]);
   const [includeDeleted, setIncludeDeleted] = useState(false);
-  const [sortBy, setSortBy] = useState<string>("created_at");
+  const [sortBy, setSortBy] = useState<string>("updated_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +51,7 @@ const PreviousRuns: React.FC = () => {
     void load();
   }, [load]);
 
-  const statusOptions = useMemo(() => ["pending", "running", "completed", "failed"], []);
+  const statusOptions = useMemo(() => ["pending", "running", "paused", "completed", "failed"], []);
 
   const onSoftDelete = async (runId: string) => {
     await pipelineApi.softDeleteRun(runId);
@@ -70,12 +72,12 @@ const PreviousRuns: React.FC = () => {
 
   const onReRun = async (runId: string) => {
     const result = await pipelineApi.rerunRun({ source_run_id: runId });
-    const newId = (result as any).run_id;
+    const newId = result.run_id;
     setActiveRunId(newId);
     saveRecentRun(newId);
-    // give backend a brief moment to hydrate the rerun record
     await new Promise((resolve) => setTimeout(resolve, 300));
     await refreshStatus(newId, { retries: 5, retryDelayMs: 400 });
+    await load();
     navigate("/dashboard");
   };
 
@@ -155,6 +157,7 @@ const PreviousRuns: React.FC = () => {
               <th>Filename</th>
               <th>Status</th>
               <th>Stage</th>
+              <th>Parent</th>
               <th>Validated</th>
               <th>Created</th>
               <th>Actions</th>
@@ -169,6 +172,9 @@ const PreviousRuns: React.FC = () => {
                   <span className="badge" style={{ background: 'rgba(56,189,248,0.18)', color: '#bae6fd' }}>{r.status}</span>
                 </td>
                 <td>{r.current_stage}</td>
+                <td style={{ fontFamily: 'monospace', color: 'var(--muted)' }}>
+                  {r.parent_run_id ? r.parent_run_id.slice(0, 8) : "—"}
+                </td>
                 <td>{r.validated_count}/{r.total_questions}</td>
                 <td>{r.created_at ? new Date(r.created_at).toLocaleString() : '-'}</td>
                 <td>

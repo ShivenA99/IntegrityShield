@@ -36,6 +36,13 @@ smart_reading → content_discovery → smart_substitution
 - **Performance Metrics:** `record_metric` persists stage durations & custom KPIs per stage.
 - **Validation:** Renderers raise exceptions if validations fail (e.g., original string detected post-render); pipeline orchestration marks the run `failed`.
 
+## Pause & Resume Semantics
+
+- Each orchestrator invocation now exits in a `paused` state unless `results_generation` runs. The final stage still marks the run `completed`.
+- `PipelineStage.status` continues to reflect per-stage progress; `PipelineRun.current_stage` records the last stage that finished, while `processing_stats.resume_target` captures the next requested stage (if any).
+- `POST /api/pipeline/<run_id>/resume/<stage>` accepts an optional JSON body `{ "target_stages": [...] }` and returns the resolved list. Including `pdf_creation` automatically schedules `results_generation`.
+- `POST /api/pipeline/rerun` clones a source run through `smart_substitution`, copies existing mappings, records `processing_stats.parent_run_id`, and immediately queues the downstream stages (`smart_substitution` → `results_generation`). Assets, structured JSON, and `question_manipulations` rows are duplicated under the new run id to preserve history.
+
 ## Extensibility
 
 - Add new stages by updating `PipelineStageEnum`, mapping the stage to a new service, and adjusting UI stage order.

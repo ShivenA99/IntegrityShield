@@ -14,10 +14,7 @@ const baseStageOrder: PipelineStageName[] = [
   "smart_reading",
   "content_discovery",
   "smart_substitution",
-  "effectiveness_testing",
-  "document_enhancement",
   "pdf_creation",
-  "results_generation",
 ];
 
 const stageLabels: Record<PipelineStageName, string> = {
@@ -32,12 +29,16 @@ const stageLabels: Record<PipelineStageName, string> = {
 
 const ProgressTracker: React.FC<ProgressTrackerProps> = ({ stages, isLoading, selectedStage, onStageSelect, currentStage }) => {
   const stageMap = new Map(stages.map((stage) => [stage.name, stage]));
+  const hiddenStages: PipelineStageName[] = ["effectiveness_testing", "document_enhancement", "results_generation"];
+
   const extraStages = stages
     .map((stage) => stage.name)
-    .filter((name) => !baseStageOrder.includes(name));
+    .filter((name) => !baseStageOrder.includes(name) && !hiddenStages.includes(name as PipelineStageName));
 
   const orderedUnique = [...baseStageOrder, ...extraStages];
-  const visibleStages: PipelineStageName[] = orderedUnique.filter((name, index) => orderedUnique.indexOf(name) === index);
+  const visibleStages: PipelineStageName[] = orderedUnique.filter(
+    (name, index) => orderedUnique.indexOf(name) === index
+  );
 
   return (
     <div className="progress-tracker">

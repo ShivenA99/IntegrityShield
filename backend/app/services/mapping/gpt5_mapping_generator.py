@@ -6,6 +6,7 @@ import asyncio
 import json
 import re
 import time
+import unicodedata
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -53,6 +54,7 @@ class GPT5MappingGeneratorService:
         k: int = MAPPINGS_PER_QUESTION,
         strategy_name: str = "replacement",
         log_context: Optional[Dict[str, Any]] = None,
+        retry_hint: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Generate k mappings for a single question.
@@ -64,6 +66,9 @@ class GPT5MappingGeneratorService:
         context_metadata: Dict[str, Any] = {"strategy": strategy_name}
         if log_context:
             context_metadata.update(log_context)
+        if retry_hint:
+            context_metadata["retry"] = True
+            context_metadata["retry_hint"] = retry_hint
 
         # Load question data
         question = QuestionManipulation.query.filter_by(
@@ -89,6 +94,7 @@ class GPT5MappingGeneratorService:
             raise ValueError(f"Could not extract LaTeX stem text for question {question_id}")
         
         question_data["latex_stem_text"] = latex_stem_text
+        self._prepare_prompt_context(question_data, retry_hint=retry_hint)
         
         # Get strategy
         strategy = self.strategy_registry.get_strategy(
@@ -136,7 +142,7 @@ class GPT5MappingGeneratorService:
                 gold_answer=question_data.get("gold_answer", ""),
                 options_data=question_data.get("options", {}),
                 mappings=mappings,
-                run_id=run_id
+                run_id=run_id,
             )
             
             # Log validations
@@ -210,6 +216,15 @@ class GPT5MappingGeneratorService:
                     "persistence_errors": persistence_errors or None,
                 }
             else:
+                retry_hint_payload = self._build_retry_hint(
+                    question_data,
+                    mappings,
+                    validation_logs,
+                    prior_hint=retry_hint,
+                )
+                if retry_hint_payload:
+                    context_metadata.setdefault("retry_hint", retry_hint_payload)
+
                 self.staging_service.stage_no_valid_mapping(
                     run_id=run_id,
                     question=question,
@@ -225,7 +240,7 @@ class GPT5MappingGeneratorService:
                     details={**context_metadata, "mappings_generated": len(mappings)},
                     mappings_generated=len(mappings),
                 )
-                return {
+                response_payload: Dict[str, Any] = {
                     "status": "no_valid_mapping",
                     "mappings_generated": len(mappings),
                     "mappings_validated": len(validation_logs),
@@ -234,6 +249,9 @@ class GPT5MappingGeneratorService:
                     "validation_logs": validation_logs,
                     "staged": True,
                 }
+                if retry_hint_payload:
+                    response_payload["retry_hint"] = retry_hint_payload
+                return response_payload
         
         except Exception as e:
             self.logger.error(f"Failed to generate mappings for question {question_id}: {e}", run_id=run_id)
@@ -279,6 +297,16 @@ class GPT5MappingGeneratorService:
                     k=k,
                     strategy_name=strategy_name
                 )
+                if result and result.get("status") == "no_valid_mapping" and result.get("retry_hint"):
+                    retry_result = self.generate_mappings_for_question(
+                        run_id=run_id,
+                        question_id=question.id,
+                        k=k,
+                        strategy_name=strategy_name,
+                        retry_hint=result.get("retry_hint"),
+                    )
+                    if retry_result:
+                        result = retry_result
                 # Convert question.id to string for JSON serialization
                 results[str(question.id)] = result
             except Exception as e:
@@ -550,6 +578,138 @@ class GPT5MappingGeneratorService:
         else:
             # Return primitive types as-is
             return obj
+
+    def _prepare_prompt_context(
+        self,
+        question_data: Dict[str, Any],
+        retry_hint: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Populate helper fields used in prompt templates."""
+        latex_text = question_data.get("latex_stem_text") or ""
+        normalized_text = self._normalize_copyable_text(latex_text)
+        question_type = (question_data.get("question_type") or "").lower()
+
+        prefix_note = ""
+        stripped = latex_text.lstrip()
+        for prefix in ("True or False:", "True/False:", "True or False –", "True or False —"):
+            if stripped.startswith(prefix):
+                prefix_note = f"- Keep the leading \"{prefix}\" exactly as shown; modify only the clause that follows it.\n"
+                break
+
+        answer_guidance = ""
+        answer_phrase = self._extract_answer_phrase(latex_text)
+        if question_type == "true_false" and answer_phrase:
+            answer_guidance = (
+                f"- The current quoted answer text is '{answer_phrase}'. Copy that substring exactly from the copyable block before substituting a new incorrect statement.\n"
+            )
+
+        retry_instructions = ""
+        if retry_hint and retry_hint.get("instructions"):
+            retry_instructions = f"Previous attempt feedback: {retry_hint['instructions']}\n"
+            suggested_substring = retry_hint.get("suggested_substring")
+            if suggested_substring and not answer_guidance:
+                answer_guidance = (
+                    f"- Suggested substring to edit: '{suggested_substring}'. Copy it exactly from the copyable block before replacing it.\n"
+                )
+
+        question_data["copyable_text"] = normalized_text
+        if prefix_note:
+            question_data["prompt_prefix_note"] = prefix_note
+        if answer_guidance:
+            question_data["answer_guidance"] = answer_guidance
+        if retry_instructions:
+            question_data["retry_instructions"] = retry_instructions
+
+    def _normalize_copyable_text(self, text: str) -> str:
+        """Normalise text for the copyable block."""
+        if not text:
+            return ""
+        normalized = unicodedata.normalize("NFKC", text)
+        normalized = normalized.replace("’", "'").replace("‘", "'")
+        normalized = normalized.replace("“", '"').replace("”", '"')
+        return normalized
+
+    def _extract_answer_phrase(self, text: str) -> Optional[str]:
+        """Extract the last quoted phrase from the text, if present."""
+        if not text:
+            return None
+        matches = re.findall(r"'([^']+)'", text)
+        return matches[-1] if matches else None
+
+    def _build_retry_hint(
+        self,
+        question_data: Dict[str, Any],
+        mappings: List[Dict[str, Any]],
+        validation_logs: List[Dict[str, Any]],
+        *,
+        prior_hint: Optional[Dict[str, Any]] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Build a retry hint from validation feedback."""
+        if prior_hint:
+            # Allow a single retry only.
+            return None
+
+        for log in validation_logs:
+            status = log.get("status")
+            if status not in {"error", "failed"}:
+                continue
+
+            error_message = log.get("error") or ""
+            suggestion_payload = dict(log.get("suggestion") or {})
+
+            explicit_instructions = (suggestion_payload.get("instructions") or "").strip()
+            if explicit_instructions:
+                hint: Dict[str, Any] = {"instructions": explicit_instructions}
+                for key in ("missing_substring", "suggested_substring", "target_option", "target_option_text", "reason", "observed_answer"):
+                    if suggestion_payload.get(key):
+                        hint[key] = suggestion_payload[key]
+                return hint
+
+            missing_substring = None
+            match = re.search(r"Original substring '(.+?)' not found", error_message)
+            if match:
+                missing_substring = match.group(1)
+
+            suggested_substring = suggestion_payload.get("suggested_substring")
+            if not suggested_substring:
+                suggested_substring = self._extract_answer_phrase(question_data.get("latex_stem_text", ""))
+
+            if not (missing_substring or suggested_substring):
+                continue
+
+            instructions = self._compose_retry_instructions(
+                missing_substring=missing_substring,
+                suggested_substring=suggested_substring,
+                error_message=error_message,
+            )
+            if not instructions:
+                continue
+
+            hint: Dict[str, Any] = {"instructions": instructions}
+            if missing_substring:
+                hint["missing_substring"] = missing_substring
+            if suggested_substring:
+                hint["suggested_substring"] = suggested_substring
+            return hint
+
+        return None
+
+    def _compose_retry_instructions(
+        self,
+        *,
+        missing_substring: Optional[str],
+        suggested_substring: Optional[str],
+        error_message: Optional[str],
+    ) -> str:
+        """Compose user-facing retry instructions."""
+        parts: List[str] = []
+        if missing_substring:
+            parts.append(f"The previous attempt referenced '{missing_substring}', which does not appear in the stem.")
+        if suggested_substring:
+            parts.append(f"Use the exact substring '{suggested_substring}' from the copyable block when crafting the next mapping.")
+        if error_message and not parts:
+            parts.append(error_message)
+        return " ".join(parts).strip()
     
     def _get_question_data(
         self,
@@ -946,4 +1106,3 @@ class GPT5MappingGeneratorService:
                 f"Failed to sync mapping to structured.json: {e}",
                 run_id=run_id
             )
-

@@ -85,35 +85,41 @@ class PipelineOrchestrator:
             self.logger.error("Pipeline run %s not found", run_id)
             return
 
-        target_stage_values = set(config.target_stages)
-        if not target_stage_values or "all" in target_stage_values:
+        raw_targets = list(config.target_stages or [])
+        if not raw_targets or "all" in raw_targets:
             target_stage_sequence = [stage for stage in self.pipeline_order]
         else:
             target_stage_sequence = []
-            for stage_name in target_stage_values:
+            seen: set[PipelineStageEnum] = set()
+            for stage in self.pipeline_order:
+                if stage.value in raw_targets and stage not in seen:
+                    target_stage_sequence.append(stage)
+                    seen.add(stage)
+            # capture any explicit targets that are not part of the canonical order
+            for stage_name in raw_targets:
                 try:
                     enum_value = PipelineStageEnum(stage_name)
                 except ValueError:
                     live_logging_service.emit(run_id, "pipeline", "WARNING", f"Unknown stage '{stage_name}', skipping")
                     continue
-                if enum_value not in target_stage_sequence:
+                if enum_value not in seen:
                     target_stage_sequence.append(enum_value)
-        target_stage_set = set(target_stage_sequence)
+                    seen.add(enum_value)
 
         run.status = "running"
         db.session.add(run)
         db.session.commit()
 
-        for stage in self.pipeline_order:
-            if stage not in target_stage_set:
-                continue
+        executed_stages: list[PipelineStageEnum] = []
 
+        for stage in target_stage_sequence:
             if config.skip_if_exists and self._stage_already_completed(run_id, stage.value):
                 live_logging_service.emit(run_id, stage.value, "INFO", "Stage already completed, skipping")
                 continue
 
             try:
                 await self._execute_stage(run_id, stage, config)
+                executed_stages.append(stage)
 
             except Exception as exc:
                 # ensure session is clean before emitting error or updating run
@@ -128,12 +134,24 @@ class PipelineOrchestrator:
                 db.session.commit()
                 raise
 
-        run.status = "completed"
-        run.completed_at = utc_now()
-        run.current_stage = PipelineStageEnum.RESULTS_GENERATION.value
-        db.session.add(run)
-        db.session.commit()
-        live_logging_service.emit(run_id, "pipeline", "INFO", "Pipeline completed successfully")
+        if executed_stages and executed_stages[-1] == PipelineStageEnum.RESULTS_GENERATION:
+            run.status = "completed"
+            run.completed_at = utc_now()
+            run.current_stage = PipelineStageEnum.RESULTS_GENERATION.value
+            db.session.add(run)
+            db.session.commit()
+            live_logging_service.emit(run_id, "pipeline", "INFO", "Pipeline completed successfully")
+        else:
+            run.status = "paused"
+            run.completed_at = None
+            if executed_stages:
+                run.current_stage = executed_stages[-1].value
+            db.session.add(run)
+            db.session.commit()
+            live_logging_service.emit(run_id, "pipeline", "INFO", "Pipeline paused", context={
+                "last_stage": executed_stages[-1].value if executed_stages else None,
+                "remaining_targets": [stage.value for stage in target_stage_sequence if stage not in executed_stages],
+            })
 
     async def _execute_stage(self, run_id: str, stage: PipelineStageEnum, config: PipelineConfig) -> None:
         live_logging_service.emit(run_id, stage.value, "INFO", "Starting stage")

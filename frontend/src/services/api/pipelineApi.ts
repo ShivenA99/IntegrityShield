@@ -42,8 +42,9 @@ export async function getPipelineStatus(runId: string) {
   return response.data;
 }
 
-export async function resumePipeline(runId: string, stage: string) {
-  const response = await client.post(`/${runId}/resume/${stage}`);
+export async function resumePipeline(runId: string, stage: string, options?: { targetStages?: string[] }) {
+  const payload = options?.targetStages ? { target_stages: options.targetStages } : undefined;
+  const response = await client.post(`/${runId}/resume/${stage}`, payload);
   return response.data;
 }
 
@@ -51,7 +52,17 @@ export async function deletePipelineRun(runId: string) {
   await client.delete(`/${runId}`);
 }
 
-export async function listRuns(params: { q?: string; status?: string[]; includeDeleted?: boolean; sortBy?: string; sortDir?: "asc" | "desc"; limit?: number; offset?: number }) {
+export interface ListRunsParams {
+  q?: string;
+  status?: string[];
+  includeDeleted?: boolean;
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+  limit?: number;
+  offset?: number;
+}
+
+export async function listRuns(params: ListRunsParams) {
   const search = new URLSearchParams();
   if (params.q) search.set("q", params.q);
   if (params.status && params.status.length) search.set("status", params.status.join(","));
@@ -76,5 +87,10 @@ export async function forkRun(payload: { source_run_id: string; target_stages?: 
 
 export async function rerunRun(payload: { source_run_id: string; target_stages?: string[] }) {
   const response = await client.post(`/rerun`, payload);
-  return response.data as { run_id: string; rerun_from: string; status: string; mode: string };
+  return response.data as {
+    run_id: string;
+    parent_run_id: string;
+    status: string;
+    target_stages: string[];
+  };
 }

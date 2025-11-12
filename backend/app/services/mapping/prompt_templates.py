@@ -10,6 +10,11 @@ Given:
 - Strategy: replacement
 - Reasoning steps:
 {reasoning_steps}
+- Copyable text (use this exact text when selecting substrings):
+<<<COPY
+{copyable_text}
+>>>
+{prefix_note}{answer_guidance}{retry_instructions}
 
 Your task:
 Generate {k} valid mappings that satisfy the replacement strategy. Each mapping should:
@@ -62,6 +67,11 @@ Given:
 - Strategy: replacement
 - Reasoning steps:
 {reasoning_steps}
+- Copyable text (use this exact text when selecting substrings):
+<<<COPY
+{copyable_text}
+>>>
+{prefix_note}{answer_guidance}{retry_instructions}
 
 Your task:
 Generate {k} valid mappings that satisfy the replacement strategy. Each mapping should:
@@ -114,6 +124,11 @@ Given:
 - Strategy: replacement
 - Reasoning steps:
 {reasoning_steps}
+- Copyable text (use this exact text when selecting substrings):
+<<<COPY
+{copyable_text}
+>>>
+{prefix_note}{answer_guidance}{retry_instructions}
 
 Your task:
 Generate {k} valid mappings that satisfy the replacement strategy. Each mapping should:
@@ -156,4 +171,3 @@ Return as JSON array:
 ]
 
 Return ONLY valid JSON, no markdown or additional text."""
-

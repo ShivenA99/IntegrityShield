@@ -330,7 +330,9 @@ const SmartSubstitutionPanel: React.FC = () => {
     if (!activeRunId || !readyForPdf) return;
     setBulkError(null);
     try {
-      const result = await resumeFromStage(activeRunId, "pdf_creation");
+      const result = await resumeFromStage(activeRunId, "pdf_creation", {
+        targetStages: ["document_enhancement", "pdf_creation", "results_generation"],
+      });
       await refresh();
       await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
 
@@ -357,7 +359,7 @@ const SmartSubstitutionPanel: React.FC = () => {
     setBulkMessage(null);
     setGeneratingQuestionId(question.id);
     try {
-      await generateMappingsForQuestion(activeRunId, question.id, { k: 3, strategy: "replacement" });
+      await generateMappingsForQuestion(activeRunId, question.id, { k: 1, strategy: "replacement" });
 
       pollGenerationStatus({
         questionId: question.id,
@@ -387,7 +389,7 @@ const SmartSubstitutionPanel: React.FC = () => {
     setBulkMessage(null);
     
     try {
-      await generateMappingsForAll(activeRunId, { k: 3, strategy: "replacement" });
+      await generateMappingsForAll(activeRunId, { k: 1, strategy: "replacement" });
 
       pollGenerationStatus({
         onComplete: async () => {

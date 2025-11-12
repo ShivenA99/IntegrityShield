@@ -181,6 +181,7 @@ class MappingGenerationCoordinator:
                 )
 
                 service = GPT5MappingGeneratorService()
+                final_result: Optional[Dict[str, Any]] = None
                 try:
                     result = service.generate_mappings_for_question(
                         run_id=run_id,
@@ -189,6 +190,40 @@ class MappingGenerationCoordinator:
                         strategy_name=strategy_name,
                         log_context=log_context,
                     )
+                    final_result = result
+                    if result and result.get("status") == "no_valid_mapping" and result.get("retry_hint"):
+                        retry_context = {**log_context, "retry": True}
+                        try:
+                            retry_result = service.generate_mappings_for_question(
+                                run_id=run_id,
+                                question_id=question_id,
+                                k=k,
+                                strategy_name=strategy_name,
+                                log_context=retry_context,
+                                retry_hint=result.get("retry_hint"),
+                            )
+                            if retry_result:
+                                final_result = retry_result
+                        except Exception as retry_exc:  # pragma: no cover - defensive
+                            logger_service.log_generation(
+                                run_id=run_id,
+                                question_id=question_id,
+                                question_number=question_number,
+                                status="failed",
+                                details={**retry_context, "error": str(retry_exc)},
+                                mappings_generated=0,
+                            )
+                            self.logger.warning(
+                                "Retry mapping generation failed",
+                                extra={
+                                    "job_id": job_id,
+                                    "run_id": run_id,
+                                    "question_id": question_id,
+                                    "error": str(retry_exc),
+                                },
+                            )
+                            self._record_job_error(job_id)
+                            final_result = final_result or result
                 except Exception as exc:  # pragma: no cover - defensive
                     logger_service.log_generation(
                         run_id=run_id,
@@ -204,14 +239,18 @@ class MappingGenerationCoordinator:
                     )
                     self._record_job_error(job_id)
                 else:
-                    if (result or {}).get("status") == "no_valid_mapping":
+                    if (final_result or {}).get("status") == "no_valid_mapping":
                         logger_service.log_generation(
                             run_id=run_id,
                             question_id=question_id,
                             question_number=question_number,
                             status="no_valid_mapping",
-                            details={**log_context, "mappings_generated": result.get("mappings_generated", 0)},
-                            mappings_generated=result.get("mappings_generated", 0),
+                            details={
+                                **log_context,
+                                "mappings_generated": final_result.get("mappings_generated", 0),
+                                "retry_hint": final_result.get("retry_hint"),
+                            },
+                            mappings_generated=final_result.get("mappings_generated", 0),
                         )
                 finally:
                     db.session.remove()
@@ -271,5 +310,4 @@ def get_mapping_generation_coordinator() -> MappingGenerationCoordinator:
     if _coordinator is None:
         _coordinator = MappingGenerationCoordinator()
     return _coordinator
-
 

@@ -17,7 +17,7 @@ interface PipelineContextValue {
     options?: { quiet?: boolean; retries?: number; retryDelayMs?: number }
   ) => Promise<void>;
   startPipeline: (payload: { file?: File; config?: Partial<StartPipelineConfig> }) => Promise<string | null>;
-  resumeFromStage: (runId: string, stage: PipelineStageName) => Promise<void>;
+  resumeFromStage: (runId: string, stage: PipelineStageName, options?: { targetStages?: PipelineStageName[] }) => Promise<void>;
   deleteRun: (runId: string) => Promise<void>;
   resetActiveRun: (options?: { softDelete?: boolean }) => Promise<void>;
 }
@@ -127,9 +127,11 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
     [refreshStatus]
   );
 
-  const resumeFromStage = useCallback(async (runId: string, stage: PipelineStageName) => {
+  const resumeFromStage = useCallback(async (runId: string, stage: PipelineStageName, options?: { targetStages?: PipelineStageName[] }) => {
     try {
-      const result = await pipelineApi.resumePipeline(runId, stage);
+      const result = await pipelineApi.resumePipeline(runId, stage, {
+        targetStages: options?.targetStages,
+      });
       await refreshStatus(runId);
       return result;
     } catch (err) {

@@ -35,6 +35,9 @@ const PdfCreationPanel: React.FC = () => {
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const stage = status?.stages.find((item) => item.name === "pdf_creation");
+  const runStatus = status?.status ?? "unknown";
+  const parentRunId = (status as any)?.parent_run_id as string | undefined;
+  const resumeTarget = (status as any)?.resume_target as string | undefined;
   const enhanced = (status?.structured_data as any)?.manipulation_results?.enhanced_pdfs || {};
   const originalDoc = (status?.structured_data as any)?.document;
 
@@ -146,17 +149,13 @@ const PdfCreationPanel: React.FC = () => {
   const handleCreatePdf = useCallback(async () => {
     if (!activeRunId || !hasReadyMappings) return;
     try {
-      await resumeFromStage(activeRunId, 'pdf_creation');
+      await resumeFromStage(activeRunId, 'pdf_creation', {
+        targetStages: ['document_enhancement', 'pdf_creation', 'results_generation'],
+      });
     } catch (error) {
       console.error('Failed to trigger PDF creation:', error);
     }
   }, [activeRunId, resumeFromStage, hasReadyMappings]);
-
-  const onEvaluate = () => {
-    if (activeRunId) {
-      resumeFromStage(activeRunId, 'results_generation');
-    }
-  };
 
   return (
     <div className="panel pdf-creation">
@@ -185,6 +184,10 @@ const PdfCreationPanel: React.FC = () => {
 
       <div className="info-grid" style={{ marginBottom: '1rem' }}>
         <div className="info-card">
+          <span className="info-label">Run status</span>
+          <span className="info-value">{runStatus}</span>
+        </div>
+        <div className="info-card">
           <span className="info-label">Stage status</span>
           <span className="info-value" style={{ color: getStatusColor(stage?.status || 'pending') }}>
             {stage?.status || 'pending'}
@@ -202,7 +205,29 @@ const PdfCreationPanel: React.FC = () => {
           <span className="info-label">Duration</span>
           <span className="info-value">{stage?.duration_ms ? `${Math.round(stage.duration_ms / 1000)}s` : '—'}</span>
         </div>
+        {parentRunId ? (
+          <div className="info-card">
+            <span className="info-label">Parent run</span>
+            <span className="info-value" style={{ fontFamily: 'monospace' }}>
+              {parentRunId.slice(0, 8)}
+            </span>
+          </div>
+        ) : null}
+        {resumeTarget ? (
+          <div className="info-card">
+            <span className="info-label">Resume target</span>
+            <span className="info-value">{resumeTarget}</span>
+          </div>
+        ) : null}
       </div>
+
+      {runStatus === 'paused' && resumeTarget === 'pdf_creation' && (
+        <div className="panel-card" style={{ marginBottom: '1rem', background: 'rgba(56,189,248,0.08)' }}>
+          <p style={{ margin: 0 }}>
+            This run is paused and ready for PDF creation. Validate any remaining mappings, then launch the dual-layer render.
+          </p>
+        </div>
+      )}
 
       {stage?.status === 'pending' && hasReadyMappings && !allReady && (
         <div style={{ marginBottom: 16 }}>

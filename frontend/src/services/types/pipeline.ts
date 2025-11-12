@@ -19,10 +19,13 @@ export interface PipelineRunSummary {
   run_id: string;
   status: string;
   current_stage: PipelineStageName;
+  parent_run_id?: string | null;
+  resume_target?: PipelineStageName | null;
   updated_at?: string | null;
   pipeline_config: Record<string, unknown>;
   structured_data?: Record<string, unknown>;
   stages: PipelineStageState[];
+  processing_stats?: Record<string, unknown>;
 }
 
 export interface PipelineConfigPayload {
