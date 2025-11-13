@@ -16,6 +16,8 @@ from ..services.pipeline.pipeline_orchestrator import (
     PipelineOrchestrator,
     PipelineStageEnum,
 )
+from ..services.pipeline.answer_sheet_generation_service import AnswerSheetGenerationService
+from ..services.pipeline.detection_report_service import DetectionReportService
 from ..services.pipeline.resume_service import PipelineResumeService
 from ..services.pipeline.smart_substitution_service import SmartSubstitutionService
 from ..services.data_management.file_manager import FileManager
@@ -881,6 +883,45 @@ def rerun_run():
         ),
         HTTPStatus.ACCEPTED,
     )
+
+
+@bp.post("/<run_id>/answer_sheets")
+def generate_answer_sheets(run_id: str):
+    payload = request.get_json(silent=True) or {}
+    service = AnswerSheetGenerationService()
+    try:
+        result = service.generate(run_id, payload)
+    except ResourceNotFound as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.NOT_FOUND
+    except ValueError as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+    except Exception:  # pragma: no cover - defensive logging
+        db.session.rollback()
+        current_app.logger.exception("Failed to generate answer sheets", extra={"run_id": run_id})
+        return jsonify({"error": "Failed to generate answer sheets"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    return jsonify(result), HTTPStatus.OK
+
+
+@bp.post("/<run_id>/detection_report")
+def generate_detection_report(run_id: str):
+    service = DetectionReportService()
+    try:
+        result = service.generate(run_id)
+    except ResourceNotFound as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.NOT_FOUND
+    except ValueError as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+    except Exception:  # pragma: no cover - defensive logging
+        db.session.rollback()
+        current_app.logger.exception("Failed to generate detection report", extra={"run_id": run_id})
+        return jsonify({"error": "Failed to generate detection report"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    return jsonify(result), HTTPStatus.OK
 
 
 @bp.post("/<run_id>/soft_delete")

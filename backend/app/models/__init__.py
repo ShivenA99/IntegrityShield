@@ -9,6 +9,11 @@ from .pipeline import (
     AIModelResult,
     SystemConfig,
 )
+from .answer_sheets import (
+    AnswerSheetRun,
+    AnswerSheetStudent,
+    AnswerSheetRecord,
+)
 
 __all__ = [
     "PipelineRun",
@@ -20,4 +25,7 @@ __all__ = [
     "PerformanceMetric",
     "AIModelResult",
     "SystemConfig",
+    "AnswerSheetRun",
+    "AnswerSheetStudent",
+    "AnswerSheetRecord",
 ]

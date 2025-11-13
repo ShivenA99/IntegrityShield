@@ -31,6 +31,18 @@ def assets_directory(run_id: str) -> Path:
     return path
 
 
+def answer_sheets_directory(run_id: str) -> Path:
+    path = run_directory(run_id) / "answer_sheets"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def detection_report_directory(run_id: str) -> Path:
+    path = run_directory(run_id) / "detection_report"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
 def structured_data_path(run_id: str) -> Path:
     return run_directory(run_id) / "structured.json"
 

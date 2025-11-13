@@ -1,7 +1,13 @@
 import * as React from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import type { PipelineRunSummary, PipelineStageName } from "@services/types/pipeline";
+import type {
+  AnswerSheetGenerationConfig,
+  AnswerSheetGenerationResult,
+  DetectionReportResult,
+  PipelineRunSummary,
+  PipelineStageName
+} from "@services/types/pipeline";
 import { extractErrorMessage } from "@services/utils/errorHandling";
 import { saveRecentRun, removeRecentRun } from "@services/utils/storage";
 import * as pipelineApi from "@services/api/pipelineApi";
@@ -20,6 +26,8 @@ interface PipelineContextValue {
   resumeFromStage: (runId: string, stage: PipelineStageName, options?: { targetStages?: PipelineStageName[] }) => Promise<void>;
   deleteRun: (runId: string) => Promise<void>;
   resetActiveRun: (options?: { softDelete?: boolean }) => Promise<void>;
+  generateAnswerSheets: (runId: string, config?: AnswerSheetGenerationConfig) => Promise<AnswerSheetGenerationResult>;
+  generateDetectionReport: (runId: string) => Promise<DetectionReportResult>;
 }
 
 interface StartPipelineConfig {
@@ -153,6 +161,40 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
     }
   }, [activeRunId]);
 
+  const generateAnswerSheets = useCallback(
+    async (runId: string, config?: AnswerSheetGenerationConfig) => {
+      if (!runId) {
+        throw new Error("runId is required to generate answer sheets");
+      }
+      try {
+        const result = await pipelineApi.generateAnswerSheets(runId, config);
+        await refreshStatus(runId, { quiet: true });
+        return result;
+      } catch (err) {
+        setError(extractErrorMessage(err));
+        throw err;
+      }
+    },
+    [refreshStatus]
+  );
+
+  const generateDetectionReport = useCallback(
+    async (runId: string) => {
+      if (!runId) {
+        throw new Error("runId is required to generate a detection report");
+      }
+      try {
+        const result = await pipelineApi.generateDetectionReport(runId);
+        await refreshStatus(runId, { quiet: true });
+        return result;
+      } catch (err) {
+        setError(extractErrorMessage(err));
+        throw err;
+      }
+    },
+    [refreshStatus]
+  );
+
   const resetActiveRun = useCallback(async (options?: { softDelete?: boolean }) => {
     if (!activeRunId) return;
 
@@ -202,6 +244,8 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       resumeFromStage,
       deleteRun,
       resetActiveRun,
+      generateAnswerSheets,
+      generateDetectionReport,
     }),
     [
       activeRunId,
@@ -213,6 +257,8 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       resumeFromStage,
       deleteRun,
       resetActiveRun,
+      generateAnswerSheets,
+      generateDetectionReport,
     ]
   );
 

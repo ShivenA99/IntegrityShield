@@ -1,5 +1,10 @@
 import axios from "axios";
-import type { PipelineConfigPayload, PipelineRunSummary } from "@services/types/pipeline";
+import type {
+  AnswerSheetGenerationConfig,
+  AnswerSheetGenerationResult,
+  DetectionReportResult,
+  PipelineRunSummary
+} from "@services/types/pipeline";
 
 const client = axios.create({
   baseURL: "/api/pipeline"
@@ -78,6 +83,19 @@ export async function listRuns(params: ListRunsParams) {
 export async function softDeleteRun(runId: string) {
   const response = await client.post(`/${runId}/soft_delete`);
   return response.data as { run_id: string; deleted: boolean };
+}
+
+export async function generateAnswerSheets(
+  runId: string,
+  payload?: AnswerSheetGenerationConfig
+): Promise<AnswerSheetGenerationResult> {
+  const response = await client.post<AnswerSheetGenerationResult>(`/${runId}/answer_sheets`, payload ?? {});
+  return response.data;
+}
+
+export async function generateDetectionReport(runId: string): Promise<DetectionReportResult> {
+  const response = await client.post<DetectionReportResult>(`/${runId}/detection_report`);
+  return response.data;
 }
 
 export async function forkRun(payload: { source_run_id: string; target_stages?: string[] }) {

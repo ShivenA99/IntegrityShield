@@ -55,6 +55,15 @@ class PipelineRun(db.Model, TimestampMixin):
     ai_model_results: Mapped[list["AIModelResult"]] = relationship(
         back_populates="run", cascade="all, delete-orphan", lazy="selectin"
     )
+    answer_sheet_runs: Mapped[list["AnswerSheetRun"]] = relationship(
+        back_populates="pipeline_run", cascade="all, delete-orphan", lazy="selectin"
+    )
+    answer_sheet_students: Mapped[list["AnswerSheetStudent"]] = relationship(
+        back_populates="pipeline_run", cascade="all, delete-orphan", lazy="selectin"
+    )
+    answer_sheet_records: Mapped[list["AnswerSheetRecord"]] = relationship(
+        back_populates="pipeline_run", cascade="all, delete-orphan", lazy="selectin"
+    )
 
 
 class PipelineStage(db.Model, TimestampMixin):
