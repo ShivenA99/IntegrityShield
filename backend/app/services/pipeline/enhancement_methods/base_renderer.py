@@ -678,6 +678,13 @@ class BaseRenderer:
             if not original or not replacement:
                 continue
 
+            working_stem = stem_text
+            mapping_stem_raw = mapping.get("latex_stem_text") or mapping.get("stem_text")
+            if mapping_stem_raw:
+                mapping_stem = self.strip_zero_width(str(mapping_stem_raw))
+                if mapping_stem and original in mapping_stem and len(mapping_stem) >= len(working_stem):
+                    working_stem = mapping_stem
+
             start_pos = mapping.get("start_pos")
             end_pos = mapping.get("end_pos")
             try:
@@ -691,21 +698,21 @@ class BaseRenderer:
             if end_pos_int <= start_pos_int:
                 raise ValueError(
                     f"Question {q_label} mapping '{original}' has invalid span bounds"
-                )
+            )
 
             span_start, span_end = self._normalize_span_position(
-                stem_text,
+                working_stem,
                 original,
                 start_pos_int,
                 end_pos_int,
             )
 
-            occurrence_index = self._compute_occurrence_index(stem_text, original, span_start)
+            occurrence_index = self._compute_occurrence_index(working_stem, original, span_start)
 
             prefix_window = 24
             suffix_window = 24
-            prefix = stem_text[max(0, span_start - prefix_window) : span_start]
-            suffix = stem_text[span_end : span_end + suffix_window]
+            prefix = working_stem[max(0, span_start - prefix_window) : span_start]
+            suffix = working_stem[span_end : span_end + suffix_window]
 
             fingerprint = {
                 "prefix": prefix,
@@ -746,7 +753,7 @@ class BaseRenderer:
                 "fingerprint": fingerprint,
                 "fingerprint_key": self._fingerprint_key(fingerprint),
                 "occurrence_index": occurrence_index,
-                "stem_text": stem_text,
+                "stem_text": working_stem,
                 "question_type": payload.get("question_type"),
                 "options": payload.get("options"),
                 "selection_page": selection_page_idx,
@@ -1074,6 +1081,10 @@ class BaseRenderer:
         fallback_idx = stem_text.find(original, start_pos)
         if fallback_idx != -1:
             return fallback_idx, fallback_idx + len(original)
+
+        global_idx = stem_text.find(original)
+        if global_idx != -1:
+            return global_idx, global_idx + len(original)
 
         raise ValueError(
             f"Unable to align substring '{original}' within stem text for deterministic mapping"

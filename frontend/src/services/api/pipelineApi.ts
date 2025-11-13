@@ -52,6 +52,14 @@ export async function deletePipelineRun(runId: string) {
   await client.delete(`/${runId}`);
 }
 
+export async function updatePipelineConfig(runId: string, payload: Partial<PipelineConfigPayload>) {
+  const response = await client.patch<{ pipeline_config: Record<string, unknown>; run_id: string }>(
+    `/${runId}/config`,
+    payload
+  );
+  return response.data;
+}
+
 export interface ListRunsParams {
   q?: string;
   status?: string[];

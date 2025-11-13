@@ -94,6 +94,14 @@ class GPT5MappingGeneratorService:
             raise ValueError(f"Could not extract LaTeX stem text for question {question_id}")
         
         question_data["latex_stem_text"] = latex_stem_text
+
+        # Refresh plain-text stem using LaTeX segment when it provides richer context
+        plain_text_from_latex = self._extract_stem_from_segment(latex_stem_text) if latex_stem_text else ""
+        if plain_text_from_latex:
+            existing_stem = question_data.get("stem_text") or ""
+            if not existing_stem or len(plain_text_from_latex) > len(existing_stem):
+                question_data["stem_text"] = plain_text_from_latex
+
         self._prepare_prompt_context(question_data, retry_hint=retry_hint)
         
         # Get strategy
@@ -143,6 +151,7 @@ class GPT5MappingGeneratorService:
                 options_data=question_data.get("options", {}),
                 mappings=mappings,
                 run_id=run_id,
+                latex_text=question_data.get("latex_stem_text"),
             )
             
             # Log validations
@@ -585,19 +594,22 @@ class GPT5MappingGeneratorService:
         retry_hint: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Populate helper fields used in prompt templates."""
-        latex_text = question_data.get("latex_stem_text") or ""
-        normalized_text = self._normalize_copyable_text(latex_text)
+        raw_text = question_data.get("latex_stem_text") or ""
+        if not raw_text:
+            raw_text = question_data.get("stem_text") or ""
+
+        normalized_text = self._normalize_copyable_text(raw_text)
         question_type = (question_data.get("question_type") or "").lower()
 
         prefix_note = ""
-        stripped = latex_text.lstrip()
+        stripped = raw_text.lstrip()
         for prefix in ("True or False:", "True/False:", "True or False –", "True or False —"):
             if stripped.startswith(prefix):
                 prefix_note = f"- Keep the leading \"{prefix}\" exactly as shown; modify only the clause that follows it.\n"
                 break
 
         answer_guidance = ""
-        answer_phrase = self._extract_answer_phrase(latex_text)
+        answer_phrase = self._extract_answer_phrase(raw_text)
         if question_type == "true_false" and answer_phrase:
             answer_guidance = (
                 f"- The current quoted answer text is '{answer_phrase}'. Copy that substring exactly from the copyable block before substituting a new incorrect statement.\n"
@@ -628,6 +640,56 @@ class GPT5MappingGeneratorService:
         normalized = normalized.replace("’", "'").replace("‘", "'")
         normalized = normalized.replace("“", '"').replace("”", '"')
         return normalized
+
+    def _lookup_structured_entries(
+        self,
+        question: QuestionManipulation,
+        structured: Dict[str, Any],
+    ) -> Tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
+        """Locate structured question records associated with this manipulation."""
+        ai_questions = structured.get("ai_questions") or []
+        structured_questions = structured.get("questions") or []
+
+        ai_question: Optional[Dict[str, Any]] = None
+        for candidate in ai_questions:
+            if candidate.get("manipulation_id") == question.id:
+                ai_question = candidate
+                break
+            if question.source_identifier and str(
+                candidate.get("source_identifier") or candidate.get("question_id") or ""
+            ) == str(question.source_identifier):
+                ai_question = candidate
+                break
+            if str(candidate.get("question_number", "")) == str(question.question_number):
+                ai_question = candidate
+                break
+
+        structured_entry: Optional[Dict[str, Any]] = None
+        for candidate in structured_questions:
+            if candidate.get("manipulation_id") == question.id:
+                structured_entry = candidate
+                break
+        if structured_entry is None and question.sequence_index is not None:
+            structured_entry = next(
+                (
+                    candidate
+                    for candidate in structured_questions
+                    if candidate.get("sequence_index") == question.sequence_index
+                ),
+                None,
+            )
+        if structured_entry is None:
+            structured_entry = next(
+                (
+                    candidate
+                    for candidate in structured_questions
+                    if str(candidate.get("q_number") or candidate.get("question_number") or "")
+                    == str(question.question_number)
+                ),
+                None,
+            )
+
+        return ai_question, structured_entry
 
     def _extract_answer_phrase(self, text: str) -> Optional[str]:
         """Extract the last quoted phrase from the text, if present."""
@@ -718,40 +780,7 @@ class GPT5MappingGeneratorService:
         structured: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Get question data for mapping generation."""
-        # Get AI question data if available
-        ai_questions = structured.get("ai_questions", [])
-        structured_questions = structured.get("questions", [])
-        ai_question = None
-        for aq in ai_questions:
-            if aq.get("manipulation_id") == question.id:
-                ai_question = aq
-                break
-            if question.source_identifier and str(aq.get("source_identifier") or aq.get("question_id") or "") == str(question.source_identifier):
-                ai_question = aq
-                break
-            if str(aq.get("question_number", "")) == str(question.question_number):
-                ai_question = aq
-                break
-        
-        structured_entry = next((entry for entry in structured_questions if entry.get("manipulation_id") == question.id), None)
-        if structured_entry is None and question.sequence_index is not None:
-            structured_entry = next(
-                (
-                    entry
-                    for entry in structured_questions
-                    if entry.get("sequence_index") == question.sequence_index
-                ),
-                None,
-            )
-        if structured_entry is None:
-            structured_entry = next(
-                (
-                    entry
-                    for entry in structured_questions
-                    if str(entry.get("q_number") or entry.get("question_number") or "") == str(question.question_number)
-                ),
-                None,
-            )
+        ai_question, structured_entry = self._lookup_structured_entries(question, structured)
         
         # Get options and normalize keys
         options = (
@@ -811,6 +840,41 @@ class GPT5MappingGeneratorService:
             latex_content = latex_file.read_text(encoding="latin-1")
 
         segments = self._compute_top_level_item_spans(latex_content)
+        ai_question, structured_entry = self._lookup_structured_entries(question, structured)
+
+        candidate_texts: List[str] = []
+        if question.original_text:
+            candidate_texts.append(question.original_text)
+        if structured_entry:
+            for key in ("original_text", "stem_text"):
+                value = structured_entry.get(key)
+                if isinstance(value, str) and value.strip():
+                    candidate_texts.append(value)
+            stem_block = structured_entry.get("stem") or {}
+            stem_value = stem_block.get("text")
+            if isinstance(stem_value, str) and stem_value.strip():
+                candidate_texts.append(stem_value)
+        if ai_question:
+            for key in ("original_text", "stem_text"):
+                value = ai_question.get(key)
+                if isinstance(value, str) and value.strip():
+                    candidate_texts.append(value)
+
+        normalized_candidates: List[str] = []
+        for text in candidate_texts:
+            normalized = self._normalize_copyable_text(text or "").strip()
+            if normalized:
+                normalized_candidates.append(normalized)
+
+        if normalized_candidates:
+            for start, end in segments:
+                segment = latex_content[start:end]
+                normalized_segment = self._normalize_copyable_text(segment)
+                if not normalized_segment:
+                    continue
+                if any(candidate in normalized_segment for candidate in normalized_candidates):
+                    return segment.strip()
+
         segment_bounds: Optional[Tuple[int, int]] = None
 
         sequence_index = getattr(question, "sequence_index", None)
@@ -948,11 +1012,14 @@ class GPT5MappingGeneratorService:
         
         # Remove enumerate environments (options)
         stem = re.sub(r"\\begin\{enumerate\}.*?\\end\{enumerate\}", "", stem, flags=re.DOTALL)
-        
+
+        # Remove leading \item token if present
+        stem = re.sub(r"^\\item\s*", "", stem.strip())
+
         # Clean up whitespace
         stem = re.sub(r"\s+", " ", stem)
         stem = stem.strip()
-        
+
         return stem
     
     def _build_substring_mapping(

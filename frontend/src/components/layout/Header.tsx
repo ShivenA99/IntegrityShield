@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FileText, RefreshCcw, RotateCcw } from "lucide-react";
 
 import { usePipeline } from "@hooks/usePipeline";
 import DeveloperToggle from "@components/layout/DeveloperToggle";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
-  const { activeRunId, resetActiveRun, status } = usePipeline();
+  const { activeRunId, resetActiveRun, status, refreshStatus } = usePipeline();
   const documentInfo = (status?.structured_data as any)?.document;
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleReset = async () => {
     if (!activeRunId) {
@@ -23,30 +25,63 @@ const Header: React.FC = () => {
     navigate("/dashboard");
   };
 
+  const handleRefresh = async () => {
+    if (!activeRunId || isRefreshing) {
+      return;
+    }
+    setIsRefreshing(true);
+    try {
+      await refreshStatus(activeRunId, { quiet: true });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const runLabel = activeRunId ? `${activeRunId.slice(0, 6)}…${activeRunId.slice(-4)}` : "No active run";
+
   return (
-    <header className="app-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
-      <h1 style={{ margin: 0 }}>FairTestAI</h1>
-      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+    <header className="app-header">
+      <div className="app-header__brand">
+        <span className="app-header__logo">AntiCheatAI</span>
+        <div className="app-header__run">
+          <RotateCcw size={16} aria-hidden="true" />
+          <span>{runLabel}</span>
+        </div>
+      </div>
+
+      <div className="app-header__meta">
         {documentInfo?.filename ? (
-          <span style={{ fontSize: "0.9rem", color: "var(--muted)" }}>
-            Active file: <strong style={{ color: "var(--text)" }}>{documentInfo.filename}</strong>
+          <span className="app-header__file">
+            <FileText size={15} aria-hidden="true" />
+            {documentInfo.filename}
           </span>
+        ) : (
+          <span className="app-header__file muted">No source loaded</span>
+        )}
+        {status?.current_stage ? (
+          <span className="app-header__stage">Stage: {status.current_stage.replace(/_/g, " ")}</span>
         ) : null}
+      </div>
+
+      <div className="app-header__actions">
+        <button
+          type="button"
+          className="icon-button"
+          onClick={handleRefresh}
+          disabled={!activeRunId}
+          aria-busy={isRefreshing}
+          title="Refresh pipeline status"
+        >
+          <RefreshCcw size={17} aria-hidden="true" />
+        </button>
         <DeveloperToggle />
         <button
           type="button"
           onClick={handleReset}
-          className="pill-button"
-          style={{
-            backgroundColor: activeRunId ? '#ef4444' : 'rgba(55,65,81,0.65)',
-            color: 'var(--text)',
-            border: "none",
-            padding: "0.5rem 1.1rem",
-            fontSize: "0.85rem",
-          }}
+          className="header-reset"
           title={activeRunId ? "Clear the active run and return to dashboard" : "Return to dashboard"}
         >
-          {activeRunId ? "Reset active run" : "Back to dashboard"}
+          {activeRunId ? "Reset Run" : "Back to Dashboard"}
         </button>
       </div>
     </header>

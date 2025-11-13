@@ -48,11 +48,17 @@ class PdfCreationService:
         from ..developer.live_logging_service import live_logging_service
         from .enhancement_methods.base_renderer import BaseRenderer
 
-        configured = run.pipeline_config.get("enhancement_methods") or [
+        configured = list(run.pipeline_config.get("enhancement_methods") or [])
+        if not configured:
+            configured = ["latex_dual_layer", "pymupdf_overlay"]
+        latex_methods = {
             "latex_dual_layer",
-            "pymupdf_overlay",
-        ]
-        if "latex_dual_layer" not in configured:
+            "latex_font_attack",
+            "latex_icw",
+            "latex_icw_dual_layer",
+            "latex_icw_font_attack",
+        }
+        if not any(method in latex_methods for method in configured):
             configured.insert(0, "latex_dual_layer")
         if "pymupdf_overlay" not in configured:
             configured.append("pymupdf_overlay")
@@ -187,6 +193,13 @@ class PdfCreationService:
         run = PipelineRun.query.get(run_id)
         if not run:
             raise ValueError("Pipeline run not found")
+
+        pipeline_config = dict(run.pipeline_config or {})
+        if not pipeline_config.get("attacks_locked"):
+            pipeline_config["attacks_locked"] = True
+            run.pipeline_config = pipeline_config
+            db.session.add(run)
+            db.session.commit()
 
         questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
         total_q = len(questions)

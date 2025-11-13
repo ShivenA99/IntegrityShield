@@ -435,6 +435,68 @@ def get_status(run_id: str):
     )
 
 
+@bp.patch("/<run_id>/config")
+def update_config(run_id: str):
+    run = PipelineRun.query.get(run_id)
+    if not run:
+        return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
+
+    payload = request.get_json(silent=True) or {}
+    if not isinstance(payload, dict):
+        return jsonify({"error": "Invalid payload"}), HTTPStatus.BAD_REQUEST
+
+    pipeline_config = dict(run.pipeline_config or {})
+    updated = False
+
+    if "enhancement_methods" in payload:
+        methods = payload.get("enhancement_methods")
+        if methods is None:
+            pipeline_config.pop("enhancement_methods", None)
+            updated = True
+        elif isinstance(methods, list):
+            sanitized: list[str] = []
+            for entry in methods:
+                if not isinstance(entry, str):
+                    continue
+                candidate = entry.strip()
+                if candidate:
+                    sanitized.append(candidate)
+            pipeline_config["enhancement_methods"] = sanitized or list(
+                current_app.config["PIPELINE_DEFAULT_METHODS"]
+            )
+            updated = True
+        else:
+            return jsonify({"error": "enhancement_methods must be a list"}), HTTPStatus.BAD_REQUEST
+
+    if "attacks_locked" in payload:
+        locked_value = payload.get("attacks_locked")
+        if locked_value is None:
+            pipeline_config.pop("attacks_locked", None)
+            updated = True
+        elif isinstance(locked_value, bool):
+            pipeline_config["attacks_locked"] = locked_value
+            updated = True
+        else:
+            return jsonify({"error": "attacks_locked must be a boolean"}), HTTPStatus.BAD_REQUEST
+
+    if not updated:
+        return jsonify({"pipeline_config": run.pipeline_config, "run_id": run.id})
+
+    run.pipeline_config = pipeline_config
+    db.session.add(run)
+    db.session.commit()
+
+    current_app.logger.info(
+        "Updated pipeline configuration",
+        extra={
+            "run_id": run.id,
+            "enhancement_methods": pipeline_config.get("enhancement_methods"),
+        },
+    )
+
+    return jsonify({"pipeline_config": pipeline_config, "run_id": run.id})
+
+
 @bp.post("/<run_id>/resume/<stage_name>")
 def resume_pipeline(run_id: str, stage_name: str):
     run = PipelineRun.query.get(run_id)
@@ -733,6 +795,38 @@ def rerun_run():
         return value
 
     structured_copy = _rewrite(structured_copy)
+    structured_pipeline_config = structured_copy.get("pipeline_config")
+    if isinstance(structured_pipeline_config, dict):
+        structured_pipeline_config.pop("attacks_locked", None)
+
+    def _copy_path_if_exists(original_path: str | None) -> None:
+        if not original_path:
+            return
+        source_path = Path(original_path)
+        if not source_path.exists():
+            return
+        destination_str = _rewrite(original_path)
+        if not destination_str:
+            return
+        destination_path = Path(destination_str)
+        if destination_path == source_path:
+            return
+        if source_path.is_dir():
+            shutil.copytree(source_path, destination_path, dirs_exist_ok=True)
+        else:
+            destination_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_path, destination_path)
+
+    data_outputs = (
+        (structured.get("pipeline_metadata") or {}).get("data_extraction_outputs") or {}
+    )
+    for path_value in data_outputs.values():
+        _copy_path_if_exists(path_value)
+
+    document_section = structured.get("document") or {}
+    _copy_path_if_exists(document_section.get("latex_path"))
+    _copy_path_if_exists(document_section.get("reconstructed_pdf"))
+    _copy_path_if_exists(document_section.get("json_path"))
 
     document_info = structured_copy.setdefault("document", {})
     if dest_pdf_path:
@@ -743,6 +837,9 @@ def rerun_run():
         document_info.setdefault("filename", source_pdf_path.name)
 
     metadata = structured_copy.setdefault("pipeline_metadata", {})
+    pipeline_metadata_config = metadata.get("pipeline_config")
+    if isinstance(pipeline_metadata_config, dict):
+        pipeline_metadata_config.pop("attacks_locked", None)
     metadata.update(
         {
             "run_id": new_run_id,
@@ -768,6 +865,10 @@ def rerun_run():
     structured_manager = StructuredDataManager()
     structured_manager.save(new_run_id, structured_copy)
 
+    new_pipeline_config = copy.deepcopy(source.pipeline_config or {})
+    if isinstance(new_pipeline_config, dict):
+        new_pipeline_config.pop("attacks_locked", None)
+
     new_stats = copy.deepcopy(source.processing_stats or {})
     new_stats["parent_run_id"] = source_run_id
     new_stats["cloned_at"] = isoformat(utc_now())
@@ -779,7 +880,7 @@ def rerun_run():
         original_filename=dest_pdf_path.name if dest_pdf_path else source.original_filename,
         current_stage=PipelineStageEnum.CONTENT_DISCOVERY.value,
         status="paused",
-        pipeline_config=copy.deepcopy(source.pipeline_config or {}),
+        pipeline_config=new_pipeline_config,
         structured_data=structured_copy,
         processing_stats=new_stats,
     )

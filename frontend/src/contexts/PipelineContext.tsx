@@ -11,6 +11,8 @@ interface PipelineContextValue {
   status: PipelineRunSummary | null;
   isLoading: boolean;
   error: string | null;
+  preferredStage: PipelineStageName | null;
+  setPreferredStage: (stage: PipelineStageName | null) => void;
   setActiveRunId: (runId: string | null) => void;
   refreshStatus: (
     runId?: string,
@@ -38,6 +40,7 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
   const [status, setStatus] = useState<PipelineRunSummary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preferredStage, setPreferredStage] = useState<PipelineStageName | null>(null);
 
   const refreshStatus = useCallback(
     async (
@@ -147,6 +150,7 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
         setActiveRunId(null);
         setStatus(null);
         removeRecentRun(runId);
+        setPreferredStage(null);
       }
     } catch (err) {
       setError(extractErrorMessage(err));
@@ -167,6 +171,7 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       setActiveRunId(null);
       setStatus(null);
       setError(null);
+      setPreferredStage(null);
     }
   }, [activeRunId]);
 
@@ -196,6 +201,8 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       status,
       isLoading,
       error,
+      preferredStage,
+      setPreferredStage,
       setActiveRunId,
       refreshStatus,
       startPipeline,
@@ -208,8 +215,10 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       status,
       isLoading,
       error,
+      preferredStage,
       refreshStatus,
       startPipeline,
+      setPreferredStage,
       resumeFromStage,
       deleteRun,
       resetActiveRun,

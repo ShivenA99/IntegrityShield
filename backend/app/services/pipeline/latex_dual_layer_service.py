@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -114,26 +115,50 @@ class LatexAttackService:
     def __init__(self) -> None:
         self.logger = get_logger(self.__class__.__name__)
         self.structured_manager = StructuredDataManager()
+        self._structured: Optional[Dict[str, Any]] = None
 
-    def execute(self, run_id: str, *, force: bool = False) -> Dict[str, Any]:
+    def execute(
+        self,
+        run_id: str,
+        *,
+        force: bool = False,
+        tex_override: Optional[Path] = None,
+        source_pdf_override: Optional[Path] = None,
+        artifact_label: Optional[str] = None,
+        record_method: Optional[str] = None,
+    ) -> Dict[str, Any]:
         structured = self.structured_manager.load(run_id) or {}
+        self._structured = structured
         manual_meta = structured.get("manual_input") or {}
         document_meta = structured.get("document") or {}
+        artifact_dir_name = artifact_label or "latex-dual-layer"
+        method_key = record_method or artifact_dir_name.replace("-", "_")
 
-        tex_path_str = manual_meta.get("tex_path") or document_meta.get("latex_path")
-        if not tex_path_str:
-            raise ValueError("Manual LaTeX path not present in structured data")
+        if tex_override is not None:
+            tex_path = Path(tex_override)
+            if not tex_path.exists():
+                raise FileNotFoundError(f"Manual LaTeX source not found at {tex_path}")
+        else:
+            tex_path_str = manual_meta.get("tex_path") or document_meta.get("latex_path")
+            if not tex_path_str:
+                raise ValueError("Manual LaTeX path not present in structured data")
+            tex_path = Path(tex_path_str)
+            if not tex_path.exists():
+                raise FileNotFoundError(f"Manual LaTeX source not found at {tex_path}")
 
-        tex_path = Path(tex_path_str)
-        if not tex_path.exists():
-            raise FileNotFoundError(f"Manual LaTeX source not found at {tex_path}")
-
-        artifacts_dir = artifacts_root(run_id) / "latex-dual-layer"
+        artifacts_dir = artifacts_root(run_id) / artifact_dir_name
         artifacts_dir.mkdir(parents=True, exist_ok=True)
         metadata_path = artifacts_dir / "metadata.json"
 
         questions = self._load_questions(run_id)
-        mapping_signature = self._build_mapping_signature(questions)
+        try:
+            original_tex = tex_path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            original_tex = tex_path.read_text(encoding="latin-1")
+
+        base_tex = self._preprocess_source(original_tex)
+        tex_hash = hashlib.sha256(base_tex.encode("utf-8")).hexdigest()
+        mapping_signature = self._build_mapping_signature(questions, tex_hash, tex_path)
 
         if metadata_path.exists() and not force:
             cached = json.loads(metadata_path.read_text(encoding="utf-8"))
@@ -141,14 +166,9 @@ class LatexAttackService:
             if cached_signature == mapping_signature:
                 cached["cached"] = True
                 cached.setdefault("artifacts", {})
+                self._structured = None
                 return cached
 
-        try:
-            original_tex = tex_path.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            original_tex = tex_path.read_text(encoding="latin-1")
-
-        base_tex = self._preprocess_source(original_tex)
         mutated_tex, diagnostics = self._apply_mappings(base_tex, questions)
         mutated_tex = self._apply_enumerate_fallbacks(mutated_tex)
         mutated_tex = self._ensure_macros(mutated_tex)
@@ -187,14 +207,18 @@ class LatexAttackService:
             )
             final_pdf_path.unlink(missing_ok=True)
         else:
-            source_pdf_path = self._resolve_original_pdf_path(manual_meta, document_meta)
+            source_pdf_path = (
+                source_pdf_override
+                if source_pdf_override is not None
+                else self._resolve_original_pdf_path(manual_meta, document_meta)
+            )
             overlay_summary = self._overlay_pdfs(
                 original_pdf_path=source_pdf_path,
                 compiled_pdf_path=compiled_pdf_path,
                 final_pdf_path=final_pdf_path,
             )
 
-        enhanced_pdf = enhanced_pdf_path(run_id, "latex_dual_layer")
+        enhanced_pdf = enhanced_pdf_path(run_id, method_key)
         enhanced_pdf.parent.mkdir(parents=True, exist_ok=True)
         if final_pdf_path.exists():
             shutil.copy2(final_pdf_path, enhanced_pdf)
@@ -205,6 +229,9 @@ class LatexAttackService:
         render_metadata = self._update_structured_data(
             run_id=run_id,
             structured=structured,
+            method_key=method_key,
+            tex_path=tex_path,
+            tex_hash=tex_hash,
             attacked_tex_path=attacked_tex_path,
             compiled_pdf_path=compiled_pdf_path if compiled_pdf_path.exists() else None,
             final_pdf_path=final_pdf_path if final_pdf_path.exists() else None,
@@ -219,6 +246,10 @@ class LatexAttackService:
         result_payload = {
             "run_id": run_id,
             "generated_at": isoformat(utc_now()),
+            "tex_source": {
+                "path": str(tex_path.resolve()),
+                "hash": tex_hash,
+            },
             "artifacts": {
                 "attacked_tex": str(attacked_tex_path),
                 "compiled_pdf": str(compiled_pdf_path) if compiled_pdf_path.exists() else None,
@@ -248,6 +279,7 @@ class LatexAttackService:
 
         metadata_path.write_text(json.dumps(result_payload, indent=2), encoding="utf-8")
 
+        self._structured = None
         return result_payload
 
     # ------------------------------------------------------------------
@@ -747,7 +779,10 @@ class LatexAttackService:
         return normalized.strip()
 
     def _build_mapping_signature(
-        self, questions: Iterable[QuestionManipulation]
+        self,
+        questions: Iterable[QuestionManipulation],
+        tex_hash: str,
+        tex_path: Path,
     ) -> List[str]:
         signature: List[str] = []
         for question in questions:
@@ -766,6 +801,11 @@ class LatexAttackService:
                         ]
                     )
                 )
+        try:
+            resolved = str(tex_path.resolve())
+        except Exception:
+            resolved = str(tex_path)
+        signature.append(f"__tex__|{tex_hash}|{resolved}")
         signature.sort()
         return signature
 
@@ -1092,6 +1132,7 @@ class LatexAttackService:
         *,
         run_id: str,
         structured: Dict[str, Any],
+        method_key: str,
         attacked_tex_path: Path,
         compiled_pdf_path: Optional[Path],
         final_pdf_path: Optional[Path],
@@ -1107,7 +1148,7 @@ class LatexAttackService:
         debug_section = manipulation_results.setdefault("debug", {})
         enhanced_map = manipulation_results.setdefault("enhanced_pdfs", {})
 
-        artifacts_entry = artifacts_section.setdefault("latex_dual_layer", {})
+        artifacts_entry = artifacts_section.setdefault(method_key, {})
         artifacts_entry.update(
             {
                 "attacked_tex": self._relative_to_run(attacked_tex_path, run_id),
@@ -1122,7 +1163,12 @@ class LatexAttackService:
             }
         )
 
-        debug_section["latex_dual_layer"] = {
+        try:
+            resolved_tex_path = str(tex_path.resolve())
+        except Exception:
+            resolved_tex_path = str(tex_path)
+
+        debug_section[method_key] = {
             "replacement_summary": replacement_summary,
             "compile": {
                 "success": compile_summary.success,
@@ -1136,9 +1182,17 @@ class LatexAttackService:
                 "pages_processed": overlay_summary.pages_processed,
                 "per_page": overlay_summary.per_page,
             },
+            "tex_source": {
+                "path": resolved_tex_path,
+                "hash": tex_hash,
+            },
         }
 
         final_size = final_pdf_path.stat().st_size if final_pdf_path and final_pdf_path.exists() else 0
+        tex_source_info = {
+            "path": resolved_tex_path,
+            "hash": tex_hash,
+        }
 
         render_stats = {
             "replacement_targets": replacement_summary.get("total", 0),
@@ -1147,9 +1201,10 @@ class LatexAttackService:
             "compile_duration_ms": compile_summary.duration_ms,
             "overlay_success": overlay_summary.success,
             "overlay_applied": overlay_summary.overlays,
+            "tex_source": tex_source_info,
         }
 
-        enhanced_entry = enhanced_map.setdefault("latex_dual_layer", {})
+        enhanced_entry = enhanced_map.setdefault(method_key, {})
         enhanced_entry.update(
             {
                 "path": str(enhanced_pdf_path),
@@ -1160,6 +1215,7 @@ class LatexAttackService:
                 "overlay_targets": replacement_summary.get("replaced", 0),
                 "effectiveness_score": None,
                 "render_stats": render_stats,
+                "tex_source": tex_source_info,
             }
         )
 
@@ -1170,14 +1226,15 @@ class LatexAttackService:
             "replacements": replacement_summary.get("total", 0),
             "overlay_applied": overlay_summary.overlays,
             "overlay_targets": replacement_summary.get("replaced", 0),
+            "tex_source": tex_source_info,
             "artifact_rel_paths": {
                 key: value
                 for key, value in artifacts_entry.items()
                 if value is not None
             },
             "replacement_summary": replacement_summary,
-            "compile_summary": debug_section["latex_dual_layer"]["compile"],
-            "overlay_summary": debug_section["latex_dual_layer"]["overlay"],
+            "compile_summary": debug_section[method_key]["compile"],
+            "overlay_summary": debug_section[method_key]["overlay"],
         }
 
     def _summarize_replacements(self, diagnostics: List[MappingDiagnostic]) -> Dict[str, Any]:
@@ -1197,7 +1254,17 @@ class LatexAttackService:
         manual_meta: Dict[str, Any],
         document_meta: Dict[str, Any],
     ) -> Optional[Path]:
-        source_pdf_path_str = manual_meta.get("pdf_path") or document_meta.get("source_path")
+        extraction_meta = (
+            (self._structured or {}).get("pipeline_metadata", {}).get("data_extraction_outputs")  # type: ignore[attr-defined]
+            if hasattr(self, "_structured")
+            else None
+        )
+        reconstructed_pdf = None
+        if isinstance(extraction_meta, dict):
+            reconstructed_pdf = extraction_meta.get("pdf")
+        reconstructed_pdf = reconstructed_pdf or document_meta.get("reconstructed_pdf")
+
+        source_pdf_path_str = reconstructed_pdf or manual_meta.get("pdf_path") or document_meta.get("source_path")
         if not source_pdf_path_str:
             return None
         pdf_path = Path(source_pdf_path_str)
@@ -1224,4 +1291,3 @@ class LatexAttackService:
             return int(value)
         except Exception:
             return 0
-

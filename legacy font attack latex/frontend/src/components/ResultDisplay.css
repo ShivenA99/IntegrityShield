@@ -1,0 +1,185 @@
+.result-display {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  color: #6b7280;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.loading-detail {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.success-state {
+  width: 100%;
+}
+
+.success-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.success-icon {
+  width: 48px;
+  height: 48px;
+  background: #059669;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.success-header h3 {
+  margin: 0;
+  color: #065f46;
+}
+
+.success-mode {
+  font-size: 0.875rem;
+  color: #047857;
+  margin-top: 0.25rem;
+  text-transform: capitalize;
+}
+
+.download-section {
+  margin-bottom: 2rem;
+}
+
+.download-section h4 {
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  color: #1f2937;
+  transition: all 0.2s;
+  margin-bottom: 0.75rem;
+}
+
+.download-btn:hover {
+  border-color: #667eea;
+  background: #f9fafb;
+  transform: translateX(4px);
+}
+
+.file-icon {
+  font-size: 2rem;
+}
+
+.file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.file-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.file-detail {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-family: monospace;
+}
+
+.download-icon {
+  font-size: 1.5rem;
+  color: #667eea;
+}
+
+.instructions {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.instructions h4 {
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.instructions ol {
+  margin-left: 1.5rem;
+  color: #4b5563;
+}
+
+.instructions li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.highlight {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.info-box {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 0.75rem;
+}
+
+.info-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.info-box strong {
+  color: #92400e;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.info-box p {
+  font-size: 0.875rem;
+  color: #78350f;
+  margin: 0;
+}

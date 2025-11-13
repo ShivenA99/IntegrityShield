@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useMemo, useState, useCallback } from "react";
 
+import { Eye, FileCode2, RefreshCcw, RotateCcw, Search, Trash2 } from "lucide-react";
+
 import { usePipeline } from "@hooks/usePipeline";
 import * as pipelineApi from "@services/api/pipelineApi";
 import { saveRecentRun } from "@services/utils/storage";
@@ -53,6 +55,10 @@ const PreviousRuns: React.FC = () => {
 
   const statusOptions = useMemo(() => ["pending", "running", "paused", "completed", "failed"], []);
 
+  const toggleStatus = useCallback((value: string) => {
+    setStatus((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]));
+  }, [setStatus]);
+
   const onSoftDelete = async (runId: string) => {
     await pipelineApi.softDeleteRun(runId);
     await load();
@@ -95,133 +101,153 @@ const PreviousRuns: React.FC = () => {
 
   return (
     <div className="page previous-runs">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', margin: 0 }}>
-          <span role="img" aria-hidden="true">📚</span>
-          Previous Runs
-        </h2>
-        <button className="pill-button" onClick={() => load()} title="Refresh run list">
-          🔄 Refresh
-        </button>
-      </div>
-
-      <div className="panel-card" style={{ display: 'grid', gap: 12 }}>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <input
-            placeholder="Search run id or filename"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            style={{ minWidth: 240 }}
-          />
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-            {statusOptions.map((s) => (
-              <label key={s} className="tooltip" data-tip={`Filter by ${s}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <input
-                  type="checkbox"
-                  checked={status.includes(s)}
-                  onChange={() => setStatus((prev) => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
-                />
-                <span>{s}</span>
-              </label>
-            ))}
-          </div>
-          <label className="tooltip" data-tip="Show soft deleted runs" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <input type="checkbox" checked={includeDeleted} onChange={(e) => setIncludeDeleted(e.target.checked)} />
-            Include deleted
-          </label>
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-            <option value="created_at">Sort: Created</option>
-            <option value="updated_at">Sort: Updated</option>
-            <option value="status">Sort: Status</option>
-            <option value="filename">Sort: Filename</option>
-            <option value="validated_ratio">Sort: Validated %</option>
-          </select>
-          <select value={sortDir} onChange={(e) => setSortDir(e.target.value as any)}>
-            <option value="desc">Desc</option>
-            <option value="asc">Asc</option>
-          </select>
-          <button className="pill-button" onClick={() => load()} title="Apply filters">
-            🔎 Apply
+      <header className="page-header">
+        <div className="page-header__title">
+          <h1>Previous Runs</h1>
+          <p>Review history, rerun stages, and investigate artifacts.</p>
+        </div>
+        <div className="page-header__actions">
+          <button type="button" className="icon-button" onClick={load} title="Refresh run list">
+            <RefreshCcw size={17} aria-hidden="true" />
           </button>
         </div>
+      </header>
 
-        {isLoading && <div className="badge">Loading…</div>}
-        {error && <div className="badge" style={{ background: 'rgba(248,113,113,0.2)', color: '#f87171' }}>{error}</div>}
-      </div>
+      <section className="panel filters-panel">
+        <div className="filters-grid">
+          <label className="input-with-icon">
+            <Search size={16} aria-hidden="true" />
+            <input
+              placeholder="Search run id or filename"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+          </label>
+          <div className="filters-grid__chips">
+            {statusOptions.map((s) => {
+              const active = status.includes(s);
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  className={`filter-chip ${active ? "is-active" : ""}`}
+                  onClick={() => toggleStatus(s)}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+          <label className="filters-checkbox">
+            <input type="checkbox" checked={includeDeleted} onChange={(e) => setIncludeDeleted(e.target.checked)} />
+            <span>Include deleted</span>
+          </label>
+          <div className="filters-selects">
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <option value="created_at">Sort: Created</option>
+              <option value="updated_at">Sort: Updated</option>
+              <option value="status">Sort: Status</option>
+              <option value="filename">Sort: Filename</option>
+              <option value="validated_ratio">Sort: Validated %</option>
+            </select>
+            <select value={sortDir} onChange={(e) => setSortDir(e.target.value as any)}>
+              <option value="desc">Desc</option>
+              <option value="asc">Asc</option>
+            </select>
+          </div>
+        </div>
+        {error ? <div className="panel-flash panel-flash--error">{error}</div> : null}
+      </section>
 
-      <div className="panel-card" style={{ overflow: 'auto' }}>
-        <table style={{ minWidth: 880 }}>
-          <thead>
-            <tr>
-              <th>Run ID</th>
-              <th>Filename</th>
-              <th>Status</th>
-              <th>Stage</th>
-              <th>Parent</th>
-              <th>Validated</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {runs.map((r) => (
-              <tr key={r.run_id}>
-                <td style={{ fontFamily: 'monospace' }}>{r.run_id}</td>
-                <td>{r.filename}</td>
-                <td>
-                  <span className="badge" style={{ background: 'rgba(56,189,248,0.18)', color: '#bae6fd' }}>{r.status}</span>
-                </td>
-                <td>{r.current_stage}</td>
-                <td style={{ fontFamily: 'monospace', color: 'var(--muted)' }}>
-                  {r.parent_run_id ? r.parent_run_id.slice(0, 8) : "—"}
-                </td>
-                <td>{r.validated_count}/{r.total_questions}</td>
-                <td>{r.created_at ? new Date(r.created_at).toLocaleString() : '-'}</td>
-                <td>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    <button
-                      className="pill-button"
-                      onClick={() => onView(r.run_id)}
-                      title="Load this run on the dashboard"
-                    >
-                      👁️ View
-                    </button>
-                    <button
-                      className="pill-button"
-                      onClick={() => onDownloadStructured(r.run_id)}
-                      title="Download structured data JSON"
-                    >
-                      📄 JSON
-                    </button>
-                    <button
-                      className="pill-button"
-                      onClick={() => onReRun(r.run_id)}
-                      title="Create a new run from stage 3 with this run's mappings"
-                    >
-                      🔁 Re-run
-                    </button>
-                    {!r.deleted && (
-                      <button
-                        className="pill-button"
-                        onClick={() => onSoftDelete(r.run_id)}
-                        title="Mark run as deleted"
-                        style={{ background: 'rgba(239,68,68,0.15)', color: '#fca5a5' }}
-                      >
-                        🗑️ Delete
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {runs.length === 0 && !isLoading && (
-              <tr>
-                <td colSpan={7} style={{ textAlign: 'center', padding: 16, color: 'var(--muted)' }}>No runs found</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <section className="panel runs-table-panel">
+        {isLoading ? (
+          <div className="panel-loading">
+            <div className="panel-loading__indicator" aria-hidden="true" />
+            <span>Loading runs…</span>
+          </div>
+        ) : (
+          <div className="table-scroll">
+            <table className="runs-table">
+              <thead>
+                <tr>
+                  <th>Run ID</th>
+                  <th>Filename</th>
+                  <th>Status</th>
+                  <th>Stage</th>
+                  <th>Validated</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {runs.map((r) => (
+                  <tr key={r.run_id}>
+                    <td className="mono-cell">{r.run_id}</td>
+                    <td>{r.filename || "—"}</td>
+                    <td>
+                      <span className={`status-tag status-${r.status}`}>{r.status}</span>
+                    </td>
+                    <td>{r.current_stage ? r.current_stage.replace(/_/g, " ") : "—"}</td>
+                    <td>
+                      {r.validated_count}/{r.total_questions}
+                    </td>
+                    <td>{r.created_at ? new Date(r.created_at).toLocaleString() : "—"}</td>
+                    <td>
+                      <div className="runs-actions">
+                        <button
+                          type="button"
+                          className="ghost-button button-with-icon"
+                          onClick={() => onView(r.run_id)}
+                          title="Load this run on the dashboard"
+                        >
+                          <Eye size={15} aria-hidden="true" />
+                          <span>View</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="ghost-button button-with-icon"
+                          onClick={() => onDownloadStructured(r.run_id)}
+                          title="Download structured data JSON"
+                        >
+                          <FileCode2 size={15} aria-hidden="true" />
+                          <span>JSON</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="ghost-button button-with-icon"
+                          onClick={() => onReRun(r.run_id)}
+                          title="Create a new run from this source"
+                        >
+                          <RotateCcw size={15} aria-hidden="true" />
+                          <span>Re-run</span>
+                        </button>
+                        {!r.deleted && (
+                          <button
+                            type="button"
+                            className="ghost-button button-with-icon danger"
+                            onClick={() => onSoftDelete(r.run_id)}
+                            title="Mark run as deleted"
+                          >
+                            <Trash2 size={15} aria-hidden="true" />
+                            <span>Delete</span>
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {runs.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="empty-cell">
+                      No runs found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 };
