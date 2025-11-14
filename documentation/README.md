@@ -1,53 +1,33 @@
-# FairTestAI LLM Vulnerability Simulator — Documentation Hub
+# Documentation Index
 
-Welcome to the consolidated documentation set for the FairTestAI "LLM Assessment Vulnerability Simulator". The goal of this folder is to provide a single, well-organized location for all engineering knowledge about the platform so that future Codex agents (or human contributors) can ramp up rapidly and keep the docs current after each major change.
+Welcome to the living guide for the AntiCheatAI vulnerability simulator. This index links to the current, non-legacy documentation that reflects the `AntiCheat-v0.0` branch status. Every feature change should be paired with an update in the appropriate section to keep this knowledge base trustworthy.
 
-## Structure
+## How To Use These Docs
 
-```
-documentation/
-├─ README.md                # This file – directory map & contribution guidance
-├─ backend/                 # Services, pipelines, APIs, logging, testing
-├─ frontend/                # UI architecture, core flows, component registry
-├─ data/                    # Database schema, structured JSON, artifacts
-├─ prompts/                 # AI prompt catalog and usage notes
-└─ operations/              # Dev workflows, environment setup, maintenance
-```
-
-Each subtree contains standalone markdown files that can be updated independently. When you touch a feature, update the relevant doc file and add a brief note under `operations/change-log.md` so history stays auditable.
-
-## Keeping Documentation Fresh
-
-1. **During development** – note major architectural or behavioral changes in the relevant doc file immediately.
-2. **Before merging** – skim the table of contents below and make sure modified domains are covered.
-3. **After releases** – append a short summary to `operations/change-log.md` (date, change set, point of contact).
+- **New contributors** – start with [setup.md](setup.md) to get the backend/frontend running.
+- **Feature work** – reference [backend.md](backend.md), [frontend.md](frontend.md), and [pipeline.md](pipeline.md) for architecture and stage behaviour.
+- **Data-focused tasks** – consult [data.md](data.md) for schema/storage layouts and [models-and-attacks.md](models-and-attacks.md) for configurable AI levers.
+- **Operational tasks** – see [operations.md](operations.md) for day-to-day workflows and release hygiene.
+- **Prompt tuning** – use [prompts.md](prompts.md) for the current AI prompt catalogue.
 
 ## Table of Contents
 
-- [Backend](backend/README.md)
-  - [Architecture Overview](backend/architecture.md)
-  - [Pipeline & Stage Behaviors](backend/pipeline.md)
-  - [API Reference](backend/api_reference.md)
-  - [Logging & Telemetry](backend/logging.md)
-  - [Testing & Validation](backend/testing.md)
-- [Frontend](frontend/README.md)
-  - [SPA Architecture](frontend/architecture.md)
-  - [UI Screens & Flows](frontend/ui_flows.md)
-  - [Component Catalog](frontend/components.md)
-- [Data & Storage](data/README.md)
-  - [Database Schema](data/database.md)
-  - [Structured JSON Contracts](data/structured_payloads.md)
-  - [File Artifacts & Conventions](data/artifacts.md)
-- [Prompts & AI Integrations](prompts/README.md)
-- [Operations](operations/README.md)
-  - [Environment & Tooling](operations/environment.md)
-  - [Development Workflow](operations/development.md)
-  - [Change Log](operations/change-log.md)
+- [setup.md](setup.md) — prerequisites, environment variables, backend/frontend bootstrapping
+- [overview.md](overview.md) — platform goals, user journeys, and component map
+- [backend.md](backend.md) — Flask architecture, pipeline services, API surface, logging, migrations
+- [frontend.md](frontend.md) — SPA layout, stage UX, shared components, styling system
+- [pipeline.md](pipeline.md) — stage-by-stage behaviour, classroom dataset lifecycle, failure modes
+- [data.md](data.md) — database schema (including classroom tables), structured JSON, filesystem artifacts
+- [models-and-attacks.md](models-and-attacks.md) — default model roster, enhancement methods, configuration knobs
+- [prompts.md](prompts.md) — prompt templates, locations in code, maintenance notes
+- [operations.md](operations.md) — development workflow, testing strategy, troubleshooting, logging tips
 
-## Contributing to Docs
+## Legacy References
 
-- Prefer short, scannable sections with direct links to source files.
-- Add diagrams or ASCII flows when they clarify the pipeline.
-- When documenting API or schema changes, include the version or commit hash.
+Older documents that no longer describe the active system are stored under [`documentation/archive/`](archive/) for historical context. Do not rely on them for implementation decisions.
 
-Need to document something not listed? Create a new file, add it to the appropriate README, and keep the structure consistent.
+## Keeping Documentation Fresh
+
+1. Update the relevant markdown file while the change is still in your working tree.
+2. Mention the doc update in your PR description.
+3. If a change invalidates a section, rewrite it instead of appending a warning—clarity beats nostalgia.
