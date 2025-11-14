@@ -4,9 +4,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type {
   AnswerSheetGenerationConfig,
   AnswerSheetGenerationResult,
+  ClassroomCreationPayload,
+  ClassroomDataset,
+  ClassroomEvaluationResponse,
+  ClassroomEvaluatePayload,
   DetectionReportResult,
   PipelineRunSummary,
-  PipelineStageName
+  PipelineStageName,
+  CorePipelineStageName
 } from "@services/types/pipeline";
 import { extractErrorMessage } from "@services/utils/errorHandling";
 import { saveRecentRun, removeRecentRun } from "@services/utils/storage";
@@ -17,6 +22,8 @@ interface PipelineContextValue {
   status: PipelineRunSummary | null;
   isLoading: boolean;
   error: string | null;
+  preferredStage: PipelineStageName | null;
+  setPreferredStage: (stage: PipelineStageName | null) => void;
   setActiveRunId: (runId: string | null) => void;
   refreshStatus: (
     runId?: string,
@@ -28,10 +35,20 @@ interface PipelineContextValue {
   resetActiveRun: (options?: { softDelete?: boolean }) => Promise<void>;
   generateAnswerSheets: (runId: string, config?: AnswerSheetGenerationConfig) => Promise<AnswerSheetGenerationResult>;
   generateDetectionReport: (runId: string) => Promise<DetectionReportResult>;
+  selectedClassroomId: number | null;
+  setSelectedClassroomId: (id: number | null) => void;
+  createClassroomDataset: (runId: string, payload: ClassroomCreationPayload) => Promise<ClassroomDataset | null>;
+  deleteClassroomDataset: (runId: string, classroomId: number) => Promise<void>;
+  evaluateClassroom: (
+    runId: string,
+    classroomId: number,
+    payload?: ClassroomEvaluatePayload
+  ) => Promise<ClassroomEvaluationResponse>;
+  fetchClassroomEvaluation: (runId: string, classroomId: number) => Promise<ClassroomEvaluationResponse>;
 }
 
 interface StartPipelineConfig {
-  targetStages: PipelineStageName[];
+  targetStages: CorePipelineStageName[];
   aiModels: string[];
   enhancementMethods: string[];
   skipIfExists: boolean;
@@ -46,6 +63,8 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
   const [status, setStatus] = useState<PipelineRunSummary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preferredStage, setPreferredStage] = useState<PipelineStageName | null>(null);
+  const [selectedClassroomId, setSelectedClassroomId] = useState<number | null>(null);
 
   const refreshStatus = useCallback(
     async (
@@ -155,9 +174,30 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
         setActiveRunId(null);
         setStatus(null);
         removeRecentRun(runId);
+        setPreferredStage(null);
+        setSelectedClassroomId(null);
       }
     } catch (err) {
       setError(extractErrorMessage(err));
+    }
+  }, [activeRunId]);
+
+  const resetActiveRun = useCallback(async (options?: { softDelete?: boolean }) => {
+    if (!activeRunId) return;
+
+    try {
+      if (options?.softDelete) {
+        await pipelineApi.softDeleteRun(activeRunId).catch(() => undefined);
+      }
+    } catch (err) {
+      console.warn("Failed to soft delete run", err);
+    } finally {
+      removeRecentRun(activeRunId);
+      setActiveRunId(null);
+      setStatus(null);
+      setError(null);
+      setPreferredStage(null);
+      setSelectedClassroomId(null);
     }
   }, [activeRunId]);
 
@@ -169,6 +209,11 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       try {
         const result = await pipelineApi.generateAnswerSheets(runId, config);
         await refreshStatus(runId, { quiet: true });
+        const classroom = result.classroom;
+        if (classroom?.id) {
+          setSelectedClassroomId(classroom.id);
+          setPreferredStage("classroom_dataset");
+        }
         return result;
       } catch (err) {
         setError(extractErrorMessage(err));
@@ -195,22 +240,74 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
     [refreshStatus]
   );
 
-  const resetActiveRun = useCallback(async (options?: { softDelete?: boolean }) => {
-    if (!activeRunId) return;
-
-    try {
-      if (options?.softDelete) {
-        await pipelineApi.softDeleteRun(activeRunId).catch(() => undefined);
+  const createClassroomDataset = useCallback(
+    async (runId: string, payload: ClassroomCreationPayload) => {
+      if (!runId) throw new Error("runId is required to create classroom datasets");
+      try {
+        const result = await pipelineApi.createClassroomDataset(runId, payload);
+        await refreshStatus(runId, { quiet: true });
+        const dataset = result.classroom ?? null;
+        if (dataset?.id) {
+          setSelectedClassroomId(dataset.id);
+          setPreferredStage("classroom_dataset");
+        }
+        return dataset;
+      } catch (err) {
+        setError(extractErrorMessage(err));
+        throw err;
       }
-    } catch (err) {
-      console.warn("Failed to soft delete run", err);
-    } finally {
-      removeRecentRun(activeRunId);
-      setActiveRunId(null);
-      setStatus(null);
-      setError(null);
-    }
-  }, [activeRunId]);
+    },
+    [refreshStatus]
+  );
+
+  const deleteClassroomDataset = useCallback(
+    async (runId: string, classroomId: number) => {
+      if (!runId) throw new Error("runId is required to delete classroom datasets");
+      try {
+        await pipelineApi.deleteClassroomDataset(runId, classroomId);
+        await refreshStatus(runId, { quiet: true });
+        setSelectedClassroomId((current) => (current === classroomId ? null : current));
+      } catch (err) {
+        setError(extractErrorMessage(err));
+        throw err;
+      }
+    },
+    [refreshStatus]
+  );
+
+  const evaluateClassroom = useCallback(
+    async (runId: string, classroomId: number, payload?: ClassroomEvaluatePayload) => {
+      if (!runId) throw new Error("runId is required to evaluate classroom datasets");
+      try {
+        const result = await pipelineApi.evaluateClassroom(runId, classroomId, payload);
+        await refreshStatus(runId, { quiet: true });
+        const dataset = result.classroom;
+        if (dataset?.id) {
+          setSelectedClassroomId(dataset.id);
+        } else {
+          setSelectedClassroomId(classroomId);
+        }
+        setPreferredStage("classroom_evaluation");
+        return result;
+      } catch (err) {
+        setError(extractErrorMessage(err));
+        throw err;
+      }
+    },
+    [refreshStatus]
+  );
+
+  const fetchClassroomEvaluation = useCallback(
+    async (runId: string, classroomId: number) => {
+      try {
+        return await pipelineApi.getClassroomEvaluation(runId, classroomId);
+      } catch (err) {
+        setError(extractErrorMessage(err));
+        throw err;
+      }
+    },
+    []
+  );
 
   // Bootstrap last active run from localStorage if none is set
   useEffect(() => {
@@ -232,12 +329,20 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
     };
   }, [activeRunId, status?.status, refreshStatus]);
 
+  useEffect(() => {
+    setSelectedClassroomId(null);
+  }, [activeRunId]);
+
   const value = useMemo(
     () => ({
       activeRunId,
       status,
       isLoading,
       error,
+      preferredStage,
+      setPreferredStage,
+      selectedClassroomId,
+      setSelectedClassroomId,
       setActiveRunId,
       refreshStatus,
       startPipeline,
@@ -246,19 +351,30 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       resetActiveRun,
       generateAnswerSheets,
       generateDetectionReport,
+      createClassroomDataset,
+      deleteClassroomDataset,
+      evaluateClassroom,
+      fetchClassroomEvaluation,
     }),
     [
       activeRunId,
       status,
       isLoading,
       error,
+      preferredStage,
+      selectedClassroomId,
       refreshStatus,
       startPipeline,
+      setPreferredStage,
       resumeFromStage,
       deleteRun,
       resetActiveRun,
       generateAnswerSheets,
       generateDetectionReport,
+      createClassroomDataset,
+      deleteClassroomDataset,
+      evaluateClassroom,
+      fetchClassroomEvaluation,
     ]
   );
 

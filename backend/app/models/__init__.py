@@ -13,6 +13,7 @@ from .answer_sheets import (
     AnswerSheetRun,
     AnswerSheetStudent,
     AnswerSheetRecord,
+    ClassroomEvaluation,
 )
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "AnswerSheetRun",
     "AnswerSheetStudent",
     "AnswerSheetRecord",
+    "ClassroomEvaluation",
 ]

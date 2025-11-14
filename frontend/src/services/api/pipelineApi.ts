@@ -2,7 +2,12 @@ import axios from "axios";
 import type {
   AnswerSheetGenerationConfig,
   AnswerSheetGenerationResult,
+  ClassroomCreationPayload,
+  ClassroomDataset,
+  ClassroomEvaluationResponse,
+  ClassroomEvaluatePayload,
   DetectionReportResult,
+  PipelineConfigPayload,
   PipelineRunSummary
 } from "@services/types/pipeline";
 
@@ -57,6 +62,14 @@ export async function deletePipelineRun(runId: string) {
   await client.delete(`/${runId}`);
 }
 
+export async function updatePipelineConfig(runId: string, payload: Partial<PipelineConfigPayload>) {
+  const response = await client.patch<{ pipeline_config: Record<string, unknown>; run_id: string }>(
+    `/${runId}/config`,
+    payload
+  );
+  return response.data;
+}
+
 export interface ListRunsParams {
   q?: string;
   status?: string[];
@@ -95,6 +108,36 @@ export async function generateAnswerSheets(
 
 export async function generateDetectionReport(runId: string): Promise<DetectionReportResult> {
   const response = await client.post<DetectionReportResult>(`/${runId}/detection_report`);
+  return response.data;
+}
+
+export async function createClassroomDataset(
+  runId: string,
+  payload: ClassroomCreationPayload
+): Promise<AnswerSheetGenerationResult> {
+  const response = await client.post<AnswerSheetGenerationResult>(`/${runId}/classrooms`, payload);
+  return response.data;
+}
+
+export async function deleteClassroomDataset(runId: string, classroomId: number): Promise<{ deleted: boolean }> {
+  const response = await client.delete<{ deleted: boolean }>(`/${runId}/classrooms/${classroomId}`);
+  return response.data;
+}
+
+export async function evaluateClassroom(
+  runId: string,
+  classroomId: number,
+  payload?: ClassroomEvaluatePayload
+): Promise<ClassroomEvaluationResponse & { classroom?: ClassroomDataset }> {
+  const response = await client.post<ClassroomEvaluationResponse & { classroom?: ClassroomDataset }>(
+    `/${runId}/classrooms/${classroomId}/evaluate`,
+    payload ?? {}
+  );
+  return response.data;
+}
+
+export async function getClassroomEvaluation(runId: string, classroomId: number): Promise<ClassroomEvaluationResponse> {
+  const response = await client.get<ClassroomEvaluationResponse>(`/${runId}/classrooms/${classroomId}/evaluation`);
   return response.data;
 }
 

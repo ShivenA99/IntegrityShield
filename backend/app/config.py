@@ -44,6 +44,9 @@ class BaseConfig:
     ENABLE_DEVELOPER_TOOLS = (
         os.getenv("FAIRTESTAI_ENABLE_DEV_TOOLS", "true").lower() == "true"
     )
+    AUTO_APPLY_DB_MIGRATIONS = (
+        os.getenv("FAIRTESTAI_AUTO_APPLY_MIGRATIONS", "true").lower() == "true"
+    )
     PIPELINE_DEFAULT_MODELS = os.getenv(
         "FAIRTESTAI_DEFAULT_MODELS", "gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro"
     ).split(",")

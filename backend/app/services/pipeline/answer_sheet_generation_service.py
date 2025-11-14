@@ -4,12 +4,14 @@ import json
 import logging
 import math
 import random
+import re
 import shutil
 from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass
+from pathlib import Path
 from statistics import mean, pstdev
-from typing import Any, Iterable, Optional
+from typing import Any, Dict, Iterable, Optional, Tuple
 
 try:
     from openai import OpenAI
@@ -22,7 +24,7 @@ from sqlalchemy.orm import selectinload
 from ...extensions import db
 from ...models import AnswerSheetRecord, AnswerSheetRun, AnswerSheetStudent, PipelineRun, QuestionManipulation
 from ...utils.exceptions import ResourceNotFound
-from ...utils.storage_paths import answer_sheets_directory, run_directory
+from ...utils.storage_paths import classroom_dataset_directory, run_directory
 from ...utils.time import isoformat, utc_now
 
 logger = logging.getLogger(__name__)
@@ -69,11 +71,28 @@ class AnswerSheetGenerationService:
     def __init__(self, *, session=None) -> None:
         self.session = session or db.session
 
-    def generate(self, run_id: str, config_overrides: dict[str, Any] | None = None) -> dict[str, Any]:
+    def generate(self, run_id: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        payload = payload or {}
+        if not isinstance(payload, dict):
+            raise ValueError("Answer sheet generation payload must be an object.")
+        classroom_payload = payload.get("classroom")
+        if classroom_payload is not None and not isinstance(classroom_payload, dict):
+            raise ValueError("classroom must be an object when provided.")
+        classroom_payload = classroom_payload or {}
+        config_overrides = (
+            payload.get("config")
+            or payload.get("generation")
+            or {k: v for k, v in payload.items() if k not in {"classroom"}}
+        )
+        if not isinstance(config_overrides, dict):
+            raise ValueError("config overrides must be an object.")
+
         run: PipelineRun | None = (
             PipelineRun.query.options(
                 selectinload(PipelineRun.questions),
                 selectinload(PipelineRun.stages),
+                selectinload(PipelineRun.enhanced_pdfs),
+                selectinload(PipelineRun.answer_sheet_runs),
             )
             .filter_by(id=run_id)
             .one_or_none()
@@ -91,21 +110,29 @@ class AnswerSheetGenerationService:
         if not questions:
             raise ValueError("No questions available to generate answer sheets.")
 
-        # Remove previous directory if it exists
-        answers_root = run_directory(run_id) / "answer_sheets"
-        if answers_root.exists():
-            shutil.rmtree(answers_root, ignore_errors=True)
-        answers_dir = answer_sheets_directory(run_id)
+        classroom_meta, existing_run = self._prepare_classroom_metadata(run, classroom_payload)
+
+        dataset_dir = classroom_dataset_directory(run_id, classroom_meta["classroom_key"])
+        if dataset_dir.exists():
+            shutil.rmtree(dataset_dir, ignore_errors=True)
+        dataset_dir.mkdir(parents=True, exist_ok=True)
+        answers_dir = dataset_dir
 
         simulation = self._simulate_answers(run, questions, config, rng)
 
-        existing = AnswerSheetRun.query.filter_by(pipeline_run_id=run_id).one_or_none()
-        if existing:
-            self.session.delete(existing)
+        if existing_run:
+            self.session.delete(existing_run)
             self.session.flush()
 
         answer_run = AnswerSheetRun(
             pipeline_run_id=run_id,
+            classroom_key=classroom_meta["classroom_key"],
+            classroom_label=classroom_meta["classroom_label"],
+            notes=classroom_meta.get("notes"),
+            attacked_pdf_method=classroom_meta["attacked_pdf_method"],
+            attacked_pdf_path=classroom_meta.get("attacked_pdf_path"),
+            origin=classroom_meta.get("origin", "generated"),
+            status="ready",
             config=config,
             summary=simulation["summary"],
             total_students=len(simulation["students"]),
@@ -184,17 +211,177 @@ class AnswerSheetGenerationService:
             except Exception:  # pragma: no cover - defensive logging
                 logger.exception("Failed to write Parquet answer sheets.")
 
+        artifacts = {
+            "json": str(json_path.relative_to(run_directory(run_id))),
+            "summary": str(summary_path.relative_to(run_directory(run_id))),
+            "parquet": parquet_path,
+        }
+        answer_run.artifacts = artifacts
+
         result = {
             "run_id": run_id,
             "students": len(simulation["students"]),
             "cheating_counts": simulation["summary"]["cheating_counts"],
-            "output_files": {
-                "json": str(json_path.relative_to(run_directory(run_id))),
-                "summary": str(summary_path.relative_to(run_directory(run_id))),
-                "parquet": parquet_path,
+            "output_files": artifacts,
+            "classroom": {
+                "id": answer_run.id,
+                "classroom_key": answer_run.classroom_key,
+                "classroom_label": answer_run.classroom_label,
+                "notes": answer_run.notes,
+                "attacked_pdf_method": answer_run.attacked_pdf_method,
+                "attacked_pdf_path": answer_run.attacked_pdf_path,
+                "origin": answer_run.origin,
+                "total_students": answer_run.total_students,
+                "summary": simulation["summary"],
+                "artifacts": artifacts,
             },
         }
         return result
+
+    def _prepare_classroom_metadata(
+        self,
+        run: PipelineRun,
+        classroom_payload: Dict[str, Any],
+    ) -> Tuple[Dict[str, Any], Optional[AnswerSheetRun]]:
+        run_id = run.id
+        available_pdfs = self._available_enhanced_pdfs(run)
+
+        classroom_id = classroom_payload.get("id")
+        provided_key = classroom_payload.get("classroom_key") or classroom_payload.get("key")
+        label = (
+            classroom_payload.get("classroom_label")
+            or classroom_payload.get("label")
+            or classroom_payload.get("name")
+        )
+        notes = classroom_payload.get("notes")
+        origin = str(classroom_payload.get("origin") or "generated")
+        method = classroom_payload.get("attacked_pdf_method") or classroom_payload.get("pdf_method")
+
+        existing: Optional[AnswerSheetRun] = None
+        if classroom_id is not None:
+            existing = (
+                AnswerSheetRun.query.filter_by(pipeline_run_id=run_id, id=int(classroom_id)).one_or_none()
+            )
+            if not existing:
+                raise ResourceNotFound(f"Classroom dataset {classroom_id} not found for run {run_id}")
+            provided_key = provided_key or existing.classroom_key
+            label = label or existing.classroom_label
+            notes = notes or existing.notes
+            origin = existing.origin or origin
+            method = method or existing.attacked_pdf_method
+        elif provided_key:
+            existing = (
+                AnswerSheetRun.query.filter_by(pipeline_run_id=run_id, classroom_key=provided_key).one_or_none()
+            )
+            if existing:
+                label = label or existing.classroom_label
+                notes = notes or existing.notes
+                origin = existing.origin or origin
+                method = method or existing.attacked_pdf_method
+
+        if not available_pdfs:
+            raise ValueError("Generate at least one attacked PDF before creating classroom datasets.")
+
+        if not method:
+            method = self._preferred_pdf_method(available_pdfs)
+        if not method or method not in available_pdfs:
+            raise ValueError("Selected attacked PDF variant is not available for this run.")
+
+        label = (label or self._default_classroom_label(run)).strip()
+        if not label:
+            label = self._default_classroom_label(run)
+
+        classroom_key = provided_key or self._slugify(label)
+        classroom_key = self._ensure_unique_classroom_key(run, classroom_key, exclude_id=existing.id if existing else None)
+
+        pdf_path = self._resolve_enhanced_pdf(run, method, available_pdfs)
+        metadata = {
+            "classroom_key": classroom_key,
+            "classroom_label": label,
+            "notes": notes,
+            "attacked_pdf_method": method,
+            "attacked_pdf_path": pdf_path,
+            "origin": origin,
+        }
+        return metadata, existing
+
+    def _default_classroom_label(self, run: PipelineRun) -> str:
+        count = len(run.answer_sheet_runs or [])
+        return f"Classroom {count + 1}"
+
+    def _available_enhanced_pdfs(self, run: PipelineRun) -> Dict[str, Dict[str, Any]]:
+        structured = run.structured_data or {}
+        manipulation_results = (structured.get("manipulation_results") or {})
+        enhanced = (manipulation_results.get("enhanced_pdfs") or {})
+        available: Dict[str, Dict[str, Any]] = {}
+        for method, details in enhanced.items():
+            if not isinstance(details, dict):
+                continue
+            status = details.get("status")
+            if status and status == "error":
+                continue
+            available[method] = details
+        for pdf in run.enhanced_pdfs or []:
+            entry = available.setdefault(pdf.method_name, {})
+            entry.setdefault("file_path", pdf.file_path)
+        return available
+
+    def _preferred_pdf_method(self, available: Dict[str, Dict[str, Any]]) -> Optional[str]:
+        if "latex_dual_layer" in available:
+            return "latex_dual_layer"
+        return next(iter(available.keys()), None)
+
+    def _resolve_enhanced_pdf(
+        self,
+        run: PipelineRun,
+        method: str,
+        available: Dict[str, Dict[str, Any]],
+    ) -> str:
+        details = available.get(method)
+        if not details:
+            raise ValueError(f"Enhanced PDF '{method}' is not available for this run.")
+        candidates = [
+            details.get("relative_path"),
+            details.get("path"),
+            details.get("file_path"),
+            details.get("final"),
+        ]
+        for candidate in candidates:
+            if isinstance(candidate, str) and candidate:
+                return self._normalize_relative_path(run.id, candidate)
+        raise ValueError(f"Could not locate artifact path for PDF variant '{method}'.")
+
+    def _normalize_relative_path(self, run_id: str, candidate: str) -> str:
+        candidate_path = Path(candidate)
+        if candidate_path.is_absolute():
+            try:
+                return str(candidate_path.resolve().relative_to(run_directory(run_id)))
+            except ValueError:
+                return candidate
+        return candidate
+
+    def _slugify(self, value: str) -> str:
+        slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+        return slug or "classroom"
+
+    def _ensure_unique_classroom_key(
+        self,
+        run: PipelineRun,
+        key: str,
+        *,
+        exclude_id: Optional[int] = None,
+    ) -> str:
+        existing_keys = {
+            sheet.classroom_key
+            for sheet in (run.answer_sheet_runs or [])
+            if sheet.classroom_key and (exclude_id is None or sheet.id != exclude_id)
+        }
+        base = key
+        counter = 2
+        while key in existing_keys:
+            key = f"{base}-{counter}"
+            counter += 1
+        return key
 
     def _guard_required_stages(self, run: PipelineRun) -> None:
         stage_map = {stage.stage_name: stage.status for stage in run.stages}
@@ -1249,4 +1436,3 @@ class AnswerSheetGenerationService:
             "min": round(min(scores), 2),
             "max": round(max(scores), 2),
         }
-

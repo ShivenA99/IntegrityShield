@@ -10,7 +10,7 @@ import copy
 from flask import Blueprint, current_app, jsonify, request
 from werkzeug.datastructures import FileStorage
 
-from ..models import PipelineRun, PipelineStage, QuestionManipulation
+from ..models import PipelineRun, PipelineStage, QuestionManipulation, AnswerSheetRun
 from ..services.pipeline.pipeline_orchestrator import (
     PipelineConfig,
     PipelineOrchestrator,
@@ -18,6 +18,7 @@ from ..services.pipeline.pipeline_orchestrator import (
 )
 from ..services.pipeline.answer_sheet_generation_service import AnswerSheetGenerationService
 from ..services.pipeline.detection_report_service import DetectionReportService
+from ..services.pipeline.classroom_evaluation_service import ClassroomEvaluationService
 from ..services.pipeline.resume_service import PipelineResumeService
 from ..services.pipeline.smart_substitution_service import SmartSubstitutionService
 from ..services.data_management.file_manager import FileManager
@@ -31,6 +32,7 @@ from ..utils.storage_paths import (
     assets_directory,
 )
 from ..utils.time import isoformat, utc_now
+from sqlalchemy.orm import selectinload
 
 
 bp = Blueprint("pipeline", __name__, url_prefix="/pipeline")
@@ -38,6 +40,37 @@ bp = Blueprint("pipeline", __name__, url_prefix="/pipeline")
 
 def init_app(api_bp: Blueprint) -> None:
     api_bp.register_blueprint(bp)
+
+
+def _serialize_classroom(classroom: AnswerSheetRun) -> dict:
+    evaluation = classroom.evaluation
+    return {
+        "id": classroom.id,
+        "classroom_key": classroom.classroom_key,
+        "classroom_label": classroom.classroom_label,
+        "notes": classroom.notes,
+        "attacked_pdf_method": classroom.attacked_pdf_method,
+        "attacked_pdf_path": classroom.attacked_pdf_path,
+        "origin": classroom.origin,
+        "status": classroom.status,
+        "total_students": classroom.total_students,
+        "summary": classroom.summary or {},
+        "artifacts": classroom.artifacts or {},
+        "created_at": classroom.created_at.isoformat() if classroom.created_at else None,
+        "updated_at": classroom.updated_at.isoformat() if classroom.updated_at else None,
+        "last_evaluated_at": classroom.last_evaluated_at.isoformat() if classroom.last_evaluated_at else None,
+        "evaluation": {
+            "id": evaluation.id,
+            "status": evaluation.status,
+            "summary": evaluation.summary or {},
+            "artifacts": evaluation.artifacts or {},
+            "evaluation_config": evaluation.evaluation_config or {},
+            "completed_at": evaluation.completed_at.isoformat() if evaluation.completed_at else None,
+            "updated_at": evaluation.updated_at.isoformat() if evaluation.updated_at else None,
+        }
+        if evaluation
+        else None,
+    }
 
 
 @bp.post("/start")
@@ -404,13 +437,25 @@ def list_runs():
 
 @bp.get("/<run_id>/status")
 def get_status(run_id: str):
-    run = PipelineRun.query.get(run_id)
+    run = (
+        PipelineRun.query.options(
+            selectinload(PipelineRun.answer_sheet_runs).selectinload(AnswerSheetRun.evaluation),
+            selectinload(PipelineRun.enhanced_pdfs),
+        )
+        .filter_by(id=run_id)
+        .one_or_none()
+    )
     if not run:
         return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
 
     stages = PipelineStage.query.filter_by(pipeline_run_id=run_id).order_by(PipelineStage.id).all()
 
     processing_stats = run.processing_stats or {}
+    classrooms = [_serialize_classroom(classroom) for classroom in run.answer_sheet_runs or []]
+    has_attacked_pdf = bool(run.enhanced_pdfs)
+    completed_evaluations = sum(
+        1 for classroom in classrooms if (classroom.get("evaluation") or {}).get("status") == "completed"
+    )
 
     return jsonify(
         {
@@ -433,6 +478,12 @@ def get_status(run_id: str):
             "pipeline_config": run.pipeline_config,
             "structured_data": run.structured_data,
             "updated_at": run.updated_at.isoformat() if run.updated_at else None,
+            "classrooms": classrooms,
+            "classroom_progress": {
+                "has_attacked_pdf": has_attacked_pdf,
+                "classrooms": len(classrooms),
+                "evaluations_completed": completed_evaluations,
+            },
         }
     )
 
@@ -885,6 +936,142 @@ def rerun_run():
     )
 
 
+@bp.get("/<run_id>/classrooms")
+def list_classrooms(run_id: str):
+    classrooms = (
+        AnswerSheetRun.query.options(selectinload(AnswerSheetRun.evaluation))
+        .filter_by(pipeline_run_id=run_id)
+        .order_by(AnswerSheetRun.created_at)
+        .all()
+    )
+    return jsonify({"classrooms": [_serialize_classroom(classroom) for classroom in classrooms]})
+
+
+@bp.post("/<run_id>/classrooms")
+def create_classroom_dataset(run_id: str):
+    payload = request.get_json(silent=True) or {}
+    service = AnswerSheetGenerationService()
+    try:
+        result = service.generate(run_id, payload)
+    except ResourceNotFound as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.NOT_FOUND
+    except ValueError as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+    except Exception:  # pragma: no cover - defensive logging
+        db.session.rollback()
+        current_app.logger.exception("Failed to generate classroom dataset", extra={"run_id": run_id})
+        return jsonify({"error": "Failed to generate classroom dataset"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    dataset_id = (result.get("classroom") or {}).get("id")
+    if dataset_id:
+        classroom = (
+            AnswerSheetRun.query.options(selectinload(AnswerSheetRun.evaluation))
+            .filter_by(pipeline_run_id=run_id, id=dataset_id)
+            .one_or_none()
+        )
+        if classroom:
+            result["classroom"] = _serialize_classroom(classroom)
+
+    return jsonify(result), HTTPStatus.OK
+
+
+@bp.delete("/<run_id>/classrooms/<int:classroom_id>")
+def delete_classroom_dataset(run_id: str, classroom_id: int):
+    classroom = (
+        AnswerSheetRun.query.options(selectinload(AnswerSheetRun.evaluation))
+        .filter_by(pipeline_run_id=run_id, id=classroom_id)
+        .one_or_none()
+    )
+    if not classroom:
+        return jsonify({"error": "Classroom dataset not found"}), HTTPStatus.NOT_FOUND
+
+    dataset_dir = run_directory(run_id) / "answer_sheets"
+    key = classroom.classroom_key or f"classroom-{classroom.id}"
+    target_dir = dataset_dir / key
+    if target_dir.exists():
+        shutil.rmtree(target_dir, ignore_errors=True)
+
+    evaluation_dir = run_directory(run_id) / "classroom_evaluations" / key
+    if evaluation_dir.exists():
+        shutil.rmtree(evaluation_dir, ignore_errors=True)
+
+    db.session.delete(classroom)
+    db.session.commit()
+
+    return jsonify({"deleted": True, "classroom_id": classroom_id})
+
+
+@bp.post("/<run_id>/classrooms/<int:classroom_id>/evaluate")
+def evaluate_classroom(run_id: str, classroom_id: int):
+    payload = request.get_json(silent=True) or {}
+    service = ClassroomEvaluationService()
+    try:
+        result = service.evaluate(run_id, classroom_id, payload)
+    except ResourceNotFound as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.NOT_FOUND
+    except ValueError as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+    except Exception:  # pragma: no cover - defensive logging
+        db.session.rollback()
+        current_app.logger.exception("Failed to evaluate classroom", extra={"run_id": run_id, "classroom_id": classroom_id})
+        return jsonify({"error": "Failed to evaluate classroom"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    classroom = (
+        AnswerSheetRun.query.options(selectinload(AnswerSheetRun.evaluation))
+        .filter_by(pipeline_run_id=run_id, id=classroom_id)
+        .one_or_none()
+    )
+    if classroom:
+        result["classroom"] = _serialize_classroom(classroom)
+    return jsonify(result), HTTPStatus.OK
+
+
+@bp.get("/<run_id>/classrooms/<int:classroom_id>/evaluation")
+def get_classroom_evaluation(run_id: str, classroom_id: int):
+    classroom = (
+        AnswerSheetRun.query.options(selectinload(AnswerSheetRun.evaluation))
+        .filter_by(pipeline_run_id=run_id, id=classroom_id)
+        .one_or_none()
+    )
+    if not classroom:
+        return jsonify({"error": "Classroom dataset not found"}), HTTPStatus.NOT_FOUND
+    if not classroom.evaluation:
+        return jsonify({"error": "Evaluation not available"}), HTTPStatus.NOT_FOUND
+
+    evaluation = classroom.evaluation
+    students: list[dict] = []
+    artifacts = evaluation.artifacts or {}
+    json_rel = artifacts.get("json")
+    if isinstance(json_rel, str):
+        eval_path = run_directory(run_id) / json_rel
+        if eval_path.exists():
+            try:
+                with eval_path.open("r", encoding="utf-8") as handle:
+                    payload = json.load(handle)
+                    students = payload.get("students", [])
+            except Exception:  # pragma: no cover - defensive logging
+                current_app.logger.warning(
+                    "Failed to load classroom evaluation artifact",
+                    extra={"run_id": run_id, "classroom_id": classroom_id, "path": str(eval_path)},
+                )
+
+    payload = {
+        "id": evaluation.id,
+        "status": evaluation.status,
+        "summary": evaluation.summary or {},
+        "artifacts": evaluation.artifacts or {},
+        "evaluation_config": evaluation.evaluation_config or {},
+        "completed_at": evaluation.completed_at.isoformat() if evaluation.completed_at else None,
+        "updated_at": evaluation.updated_at.isoformat() if evaluation.updated_at else None,
+        "students": students,
+    }
+    return jsonify(payload)
+
+
 @bp.post("/<run_id>/answer_sheets")
 def generate_answer_sheets(run_id: str):
     payload = request.get_json(silent=True) or {}
@@ -901,6 +1088,16 @@ def generate_answer_sheets(run_id: str):
         db.session.rollback()
         current_app.logger.exception("Failed to generate answer sheets", extra={"run_id": run_id})
         return jsonify({"error": "Failed to generate answer sheets"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    dataset_id = (result.get("classroom") or {}).get("id")
+    if dataset_id:
+        classroom = (
+            AnswerSheetRun.query.options(selectinload(AnswerSheetRun.evaluation))
+            .filter_by(pipeline_run_id=run_id, id=dataset_id)
+            .one_or_none()
+        )
+        if classroom:
+            result["classroom"] = _serialize_classroom(classroom)
 
     return jsonify(result), HTTPStatus.OK
 

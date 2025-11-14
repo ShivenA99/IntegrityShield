@@ -1,4 +1,5 @@
 import * as React from "react";
+import clsx from "clsx";
 
 import type { PipelineStageState, PipelineStageName } from "@services/types/pipeline";
 
@@ -20,14 +21,20 @@ const baseStageOrder: PipelineStageName[] = [
 const stageLabels: Record<PipelineStageName, string> = {
   smart_reading: "Smart Reading",
   content_discovery: "Content Discovery",
-  smart_substitution: "Smart Substitution",
+  smart_substitution: "Strategy",
   effectiveness_testing: "Effectiveness Testing",
   document_enhancement: "Document Enhancement",
   pdf_creation: "PDF Creation",
   results_generation: "Results",
 };
 
-const ProgressTracker: React.FC<ProgressTrackerProps> = ({ stages, isLoading, selectedStage, onStageSelect, currentStage }) => {
+const ProgressTracker: React.FC<ProgressTrackerProps> = ({
+  stages,
+  isLoading,
+  selectedStage,
+  onStageSelect,
+  currentStage,
+}) => {
   const stageMap = new Map(stages.map((stage) => [stage.name, stage]));
   const hiddenStages: PipelineStageName[] = ["effectiveness_testing", "document_enhancement", "results_generation"];
 
@@ -42,25 +49,62 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ stages, isLoading, se
 
   return (
     <div className="progress-tracker">
-      {visibleStages.map((name) => {
+      {visibleStages.map((name, index) => {
         const stage = stageMap.get(name);
         const status = stage?.status ?? "pending";
+        const label = stageLabels[name] || name.replace(/_/g, " ");
+        const statusLabel =
+          status === "completed"
+            ? "Complete"
+            : status === "running"
+            ? "In progress"
+            : status === "failed"
+            ? "Error"
+            : "Pending";
         const isSelected = selectedStage === name;
         const isCurrent = currentStage === name;
+
         return (
-          <button
+          <div
             key={name}
-            className={`stage ${status} ${isSelected ? "selected" : ""} ${isCurrent ? "current" : ""}`}
-            onClick={() => onStageSelect?.(name)}
-            type="button"
-            title={isCurrent ? "Pipeline is here now" : undefined}
+            className={clsx(
+              "progress-tracker__item",
+              `state-${status}`,
+              isSelected && "is-selected",
+              isCurrent && "is-current"
+            )}
           >
-            <div className="stage-icon">{status === "completed" ? "✔" : status === "running" || isCurrent ? "⏳" : "•"}</div>
-            <div className="stage-label">{stageLabels[name] || name.replace(/_/g, " ")}</div>
-          </button>
+            <button
+              type="button"
+              className={[
+                "progress-tracker__segment",
+                `state-${status}`,
+                isSelected ? "is-selected" : "",
+                isCurrent ? "is-current" : "",
+              ]
+                .join(" ")
+                .trim()}
+              onClick={() => onStageSelect?.(name)}
+            >
+              <span
+                className="progress-tracker__circle"
+                data-step={index + 1}
+                data-status={status}
+                aria-hidden="true"
+              />
+              <span className="progress-tracker__meta">
+                <span className="progress-tracker__label">{label}</span>
+                <span className="progress-tracker__status">{statusLabel}</span>
+              </span>
+            </button>
+            <div className="progress-tracker__bar">
+              <span className="progress-tracker__bar-fill" />
+            </div>
+            {index < visibleStages.length - 1 ? <span className="progress-tracker__connector" /> : null}
+          </div>
         );
       })}
-      {isLoading ? <div className="tracker-loading">Updating…</div> : null}
+      {isLoading ? <div className="progress-tracker__loading">Updating…</div> : null}
     </div>
   );
 };

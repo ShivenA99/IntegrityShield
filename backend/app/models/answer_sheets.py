@@ -21,11 +21,19 @@ class AnswerSheetRun(db.Model, TimestampMixin):
         db.String(36),
         db.ForeignKey("pipeline_runs.id", ondelete="CASCADE"),
         nullable=False,
-        unique=True,
     )
+    classroom_key: Mapped[Optional[str]] = mapped_column(db.String(64), nullable=True)
+    classroom_label: Mapped[Optional[str]] = mapped_column(db.String(128), nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(db.Text, nullable=True)
+    attacked_pdf_method: Mapped[Optional[str]] = mapped_column(db.String(64), nullable=True)
+    attacked_pdf_path: Mapped[Optional[str]] = mapped_column(db.Text, nullable=True)
+    origin: Mapped[str] = mapped_column(db.String(32), nullable=False, default="generated")
+    status: Mapped[str] = mapped_column(db.String(32), nullable=False, default="ready")
     config: Mapped[dict] = mapped_column(json_type, default=dict)
     summary: Mapped[dict] = mapped_column(json_type, default=dict)
     total_students: Mapped[int] = mapped_column(db.Integer, default=0)
+    artifacts: Mapped[dict] = mapped_column(json_type, default=dict)
+    last_evaluated_at: Mapped[Optional[Any]] = mapped_column(db.DateTime(timezone=True), nullable=True)
 
     pipeline_run: Mapped[PipelineRun] = relationship(back_populates="answer_sheet_runs")
     students: Mapped[list["AnswerSheetStudent"]] = relationship(
@@ -36,6 +44,13 @@ class AnswerSheetRun(db.Model, TimestampMixin):
     records: Mapped[list["AnswerSheetRecord"]] = relationship(
         back_populates="run",
         cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+    evaluation: Mapped[Optional["ClassroomEvaluation"]] = relationship(
+        "ClassroomEvaluation",
+        back_populates="classroom_run",
+        cascade="all, delete-orphan",
+        uselist=False,
         lazy="selectin",
     )
 
@@ -70,6 +85,31 @@ class AnswerSheetStudent(db.Model, TimestampMixin):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+
+
+class ClassroomEvaluation(db.Model, TimestampMixin):
+    __tablename__ = "classroom_evaluations"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    answer_sheet_run_id: Mapped[int] = mapped_column(
+        db.Integer,
+        db.ForeignKey("answer_sheet_runs.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    pipeline_run_id: Mapped[str] = mapped_column(
+        db.String(36),
+        db.ForeignKey("pipeline_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    status: Mapped[str] = mapped_column(db.String(32), nullable=False, default="pending")
+    summary: Mapped[dict] = mapped_column(json_type, default=dict)
+    artifacts: Mapped[dict] = mapped_column(json_type, default=dict)
+    evaluation_config: Mapped[dict] = mapped_column(json_type, default=dict)
+    completed_at: Mapped[Optional[Any]] = mapped_column(db.DateTime(timezone=True), nullable=True)
+
+    classroom_run: Mapped[AnswerSheetRun] = relationship(back_populates="evaluation")
+    pipeline_run: Mapped[PipelineRun] = relationship(back_populates="classroom_evaluations")
 
 
 class AnswerSheetRecord(db.Model, TimestampMixin):
@@ -110,4 +150,3 @@ class AnswerSheetRecord(db.Model, TimestampMixin):
     student: Mapped[AnswerSheetStudent] = relationship(back_populates="records")
     pipeline_run: Mapped[PipelineRun] = relationship(back_populates="answer_sheet_records")
     question: Mapped[Optional[QuestionManipulation]] = relationship(lazy="selectin")
-

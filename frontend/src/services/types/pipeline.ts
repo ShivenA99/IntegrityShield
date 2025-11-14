@@ -1,4 +1,4 @@
-export type PipelineStageName =
+export type CorePipelineStageName =
   | "smart_reading"
   | "content_discovery"
   | "smart_substitution"
@@ -6,6 +6,8 @@ export type PipelineStageName =
   | "document_enhancement"
   | "pdf_creation"
   | "results_generation";
+
+export type PipelineStageName = CorePipelineStageName | "classroom_dataset" | "classroom_evaluation";
 
 export interface PipelineStageState {
   id: number;
@@ -18,7 +20,7 @@ export interface PipelineStageState {
 export interface PipelineRunSummary {
   run_id: string;
   status: string;
-  current_stage: PipelineStageName;
+  current_stage: CorePipelineStageName;
   parent_run_id?: string | null;
   resume_target?: PipelineStageName | null;
   updated_at?: string | null;
@@ -26,12 +28,14 @@ export interface PipelineRunSummary {
   structured_data?: Record<string, unknown>;
   stages: PipelineStageState[];
   processing_stats?: Record<string, unknown>;
+  classrooms?: ClassroomDataset[];
+  classroom_progress?: ClassroomProgress;
 }
 
 export interface PipelineConfigPayload {
   ai_models: string[];
   enhancement_methods: string[];
-  target_stages: PipelineStageName[];
+  target_stages: CorePipelineStageName[];
   skip_if_exists: boolean;
   parallel_processing: boolean;
 }
@@ -66,6 +70,7 @@ export interface AnswerSheetGenerationResult {
     summary: string;
     parquet: string | null;
   };
+  classroom?: ClassroomDataset;
 }
 
 export interface DetectionReportMappingInsight {
@@ -127,4 +132,82 @@ export interface DetectionReportResult {
   output_files: {
     json: string;
   };
+}
+
+export interface ClassroomProgress {
+  has_attacked_pdf: boolean;
+  classrooms: number;
+  evaluations_completed: number;
+}
+
+export interface ClassroomEvaluation {
+  id: number;
+  status: string;
+  summary: Record<string, unknown>;
+  artifacts: Record<string, string>;
+  evaluation_config: Record<string, unknown>;
+  completed_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface ClassroomDataset {
+  id: number;
+  classroom_key: string | null;
+  classroom_label: string | null;
+  notes?: string | null;
+  attacked_pdf_method: string | null;
+  attacked_pdf_path?: string | null;
+  origin: string;
+  status: string;
+  total_students: number;
+  summary: Record<string, unknown>;
+  artifacts: Record<string, string | null>;
+  created_at?: string | null;
+  updated_at?: string | null;
+  last_evaluated_at?: string | null;
+  evaluation?: ClassroomEvaluation | null;
+}
+
+export interface ClassroomCreationPayload {
+  classroom: {
+    id?: number;
+    classroom_key?: string;
+    label: string;
+    notes?: string;
+    attacked_pdf_method: string;
+    origin?: string;
+  };
+  config?: AnswerSheetGenerationConfig;
+}
+
+export interface ClassroomEvaluatePayload {
+  config?: Record<string, unknown>;
+}
+
+export interface ClassroomEvaluationResponse {
+  id: number;
+  status: string;
+  summary: Record<string, unknown>;
+  artifacts: Record<string, string>;
+  evaluation_config: Record<string, unknown>;
+  completed_at?: string | null;
+  updated_at?: string | null;
+  students?: ClassroomStudentMetric[];
+}
+
+export interface ClassroomStudentMetric {
+  student_id: number;
+  student_key: string;
+  display_name: string;
+  is_cheating: boolean;
+  cheating_strategy?: string | null;
+  copy_fraction?: number | null;
+  paraphrase_style?: string | null;
+  score: number;
+  total_questions: number;
+  correct_answers: number;
+  incorrect_answers: number;
+  cheating_source_counts: Record<string, number>;
+  average_confidence?: number | null;
+  metadata?: Record<string, unknown>;
 }

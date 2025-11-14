@@ -16,20 +16,32 @@ import { NotificationProvider } from "@contexts/NotificationContext";
 import PreviousRuns from "@pages/PreviousRuns";
 
 const App: React.FC = () => {
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+
   return (
     <NotificationProvider>
       <PipelineProvider>
         <DeveloperProvider>
           <ErrorBoundary>
-            <div className="app-shell">
+            <div className={`app-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
               <Header />
               <div className="app-body" style={{ display: "flex", minHeight: "calc(100vh - 160px)" }}>
-                <Sidebar />
-                <main style={{ flex: 1, padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((prev) => !prev)} />
+                <main
+                  style={{
+                    flex: 1,
+                    padding: "1.5rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1.5rem",
+                    transition: "margin-left 0.2s ease",
+                  }}
+                >
                   <Routes>
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/runs" element={<PreviousRuns />} />
+                    <Route path="/runs/:runId" element={<RunDetail />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/developer" element={<DeveloperConsole />} />
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />

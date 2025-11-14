@@ -1,4 +1,6 @@
 import React from "react";
+import clsx from "clsx";
+import { Code } from "lucide-react";
 
 import { useDeveloperContext } from "@contexts/DeveloperContext";
 
@@ -8,20 +10,17 @@ const DeveloperToggle: React.FC = () => {
   return (
     <button
       type="button"
-      className="pill-button"
+      className={clsx("dev-toggle", isDeveloperMode && "is-active")}
       onClick={toggleDeveloperMode}
-      title={isDeveloperMode ? "Hide developer utilities" : "Show developer utilities"}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "0.45rem",
-        background: isDeveloperMode ? "rgba(96, 165, 250, 0.25)" : "rgba(55, 65, 81, 0.65)",
-        color: "#f8fafc",
-        border: "1px solid rgba(148, 163, 184, 0.35)",
-      }}
+      role="switch"
+      aria-checked={isDeveloperMode}
+      title={isDeveloperMode ? "Disable developer utilities" : "Enable developer utilities"}
     >
-      <span role="img" aria-hidden="true">🛠️</span>
-      {isDeveloperMode ? "Developer On" : "Developer Off"}
+      <Code size={16} aria-hidden="true" />
+      <span className="dev-toggle__label">Developer</span>
+      <span className="dev-toggle__slider" aria-hidden="true">
+        <span className="dev-toggle__thumb" />
+      </span>
     </button>
   );
 };

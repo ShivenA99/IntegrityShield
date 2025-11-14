@@ -11,6 +11,7 @@ load_dotenv(Path.cwd() / ".env")
 from .config import get_config
 from .extensions import db, init_extensions
 from .utils.json import ORJSONProvider
+from .utils.migrations import ensure_database_schema
 from .utils.logging import configure_logging
 
 
@@ -29,6 +30,9 @@ def create_app(config_name: str | None = None) -> Flask:
 
     register_error_handlers(app)
     register_shellcontext(app)
+
+    with app.app_context():
+        ensure_database_schema()
 
     return app
 

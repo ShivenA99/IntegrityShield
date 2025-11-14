@@ -37,6 +37,25 @@ def answer_sheets_directory(run_id: str) -> Path:
     return path
 
 
+def classroom_dataset_directory(run_id: str, classroom_key: str) -> Path:
+    safe_key = classroom_key or "default"
+    path = answer_sheets_directory(run_id) / safe_key
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def classroom_evaluations_directory(run_id: str) -> Path:
+    path = run_directory(run_id) / "classroom_evaluations"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def classroom_evaluation_artifact(run_id: str, classroom_key: str, filename: str) -> Path:
+    path = classroom_evaluations_directory(run_id) / classroom_key / filename
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
 def detection_report_directory(run_id: str) -> Path:
     path = run_directory(run_id) / "detection_report"
     path.mkdir(parents=True, exist_ok=True)
