@@ -203,6 +203,44 @@ body * {
   cursor: not-allowed;
 }
 
+[data-tooltip] {
+  position: relative;
+  cursor: default;
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-within::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(12, 18, 32, 0.95);
+  color: var(--text);
+  padding: 0.35rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 8px 20px rgba(8, 12, 22, 0.55);
+  z-index: 2000;
+}
+
+[data-tooltip]:hover::before,
+[data-tooltip]:focus-within::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0 6px;
+  border-style: solid;
+  border-color: rgba(12, 18, 32, 0.95) transparent transparent transparent;
+  pointer-events: none;
+  z-index: 2000;
+}
+
 .header-reset {
   padding: 0.45rem 0.95rem;
   border-radius: 999px;

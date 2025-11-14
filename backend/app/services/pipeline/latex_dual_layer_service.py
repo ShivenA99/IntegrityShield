@@ -1470,6 +1470,14 @@ class LatexAttackService:
                     source_page_rect = original_page.rect
                     target_page_rect = page.rect
                     scale_x, scale_y = self._calculate_page_scale(source_page_rect, target_page_rect)
+                    same_dimensions = (
+                        source_page_rect
+                        and target_page_rect
+                        and abs(source_page_rect.width - target_page_rect.width) < 0.25
+                        and abs(source_page_rect.height - target_page_rect.height) < 0.25
+                    )
+                    if same_dimensions:
+                        scale_x = scale_y = 1.0
                     if source_page_rect and target_page_rect:
                         page_info["transform"] = {
                             "source_size": [
@@ -1509,11 +1517,14 @@ class LatexAttackService:
                             )
                             break
 
-                        target_rect = self._map_rect_between_pages(
-                            clip_rect,
-                            source_page_rect,
-                            target_page_rect,
-                        )
+                        if same_dimensions:
+                            target_rect = fitz.Rect(clip_rect)
+                        else:
+                            target_rect = self._map_rect_between_pages(
+                                clip_rect,
+                                source_page_rect,
+                                target_page_rect,
+                            )
                         if target_rect.get_area() <= 0:
                             continue
 

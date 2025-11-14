@@ -122,31 +122,29 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
               </span>
             </div>
             <div className="app-sidebar__run-actions">
-              <span className="icon-button__wrapper" title="Refresh status">
-                <button
-                  type="button"
-                  className="icon-button"
-                  onClick={handleRefresh}
-                  disabled={!activeRunId || isRefreshing}
-                  aria-label="Refresh status"
-                  title="Refresh status"
-                >
-                  <RefreshCcw size={14} aria-hidden="true" />
-                </button>
-              </span>
-              <span className="icon-button__wrapper" title="Reset active run">
-                <button
-                  type="button"
-                  className="icon-button"
-                  onClick={handleReset}
-                  disabled={!activeRunId}
-                  aria-label="Reset active run"
-                  title="Reset active run"
-                >
-                  <RotateCcw size={14} aria-hidden="true" />
-                </button>
-              </span>
-              <DeveloperToggle />
+            <span className="icon-button__wrapper" data-tooltip="Refresh status">
+              <button
+                type="button"
+                className="icon-button"
+                onClick={handleRefresh}
+                disabled={!activeRunId || isRefreshing}
+                aria-label="Refresh status"
+              >
+                <RefreshCcw size={14} aria-hidden="true" />
+              </button>
+            </span>
+            <span className="icon-button__wrapper" data-tooltip="Reset active run">
+              <button
+                type="button"
+                className="icon-button"
+                onClick={handleReset}
+                disabled={!activeRunId}
+                aria-label="Reset active run"
+              >
+                <RotateCcw size={14} aria-hidden="true" />
+              </button>
+            </span>
+            <DeveloperToggle />
             </div>
           </div>
         ) : null}

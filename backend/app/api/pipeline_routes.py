@@ -6,6 +6,7 @@ from http import HTTPStatus
 from pathlib import Path
 import shutil
 import copy
+from typing import Any, Dict
 
 from flask import Blueprint, current_app, jsonify, request
 from werkzeug.datastructures import FileStorage
@@ -372,6 +373,24 @@ def list_runs():
         # default order
         base_query = base_query.order_by(PipelineRun.created_at.desc())
 
+    def _as_dict(value: Any) -> dict:
+        if value is None:
+            return {}
+        if isinstance(value, dict):
+            return value
+        if isinstance(value, (bytes, bytearray)):
+            try:
+                value = value.decode("utf-8")
+            except Exception:  # noqa: BLE001
+                return {}
+        if isinstance(value, str):
+            try:
+                return json.loads(value) if value else {}
+            except json.JSONDecodeError:
+                current_app.logger.warning("Failed to decode JSON column; returning empty dict", extra={"value": value[:64]})
+                return {}
+        return {}
+
     rows = base_query.all()
 
     items = []
@@ -383,8 +402,8 @@ def list_runs():
         created_at = row[4]
         updated_at = row[5]
         completed_at = row[6]
-        processing_stats = row[7] or {}
-        structured = row[8] or {}
+        processing_stats = _as_dict(row[7])
+        structured = _as_dict(row[8])
 
         deleted = bool(processing_stats.get("deleted"))
         if deleted and not include_deleted:

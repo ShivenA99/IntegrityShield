@@ -342,34 +342,35 @@ const PipelineContainer: React.FC = () => {
             </span>
           </div>
         </div>
-        <div className="pipeline-topbar__actions">
-          <span className="icon-button__wrapper" title="Refresh pipeline status">
-            <button
-              type="button"
-              className="icon-button"
-              onClick={handleRefresh}
-              disabled={!runId || isRefreshing}
-              aria-busy={isRefreshing}
-              aria-label="Refresh pipeline status"
-              title="Refresh pipeline status"
-            >
-              <RefreshCcw size={16} aria-hidden="true" />
-            </button>
-          </span>
-          <DeveloperToggle />
-          <span className="ghost-button__wrapper" title={runId ? "Reset active run" : "No run to reset"}>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="ghost-button"
-              disabled={!runId}
-              aria-label="Reset active run"
-              title={runId ? "Reset active run" : "No run to reset"}
-            >
-              Reset Run
-            </button>
-          </span>
-        </div>
+      <div className="pipeline-topbar__actions">
+        <span className="icon-button__wrapper has-tooltip" data-tooltip="Refresh pipeline status">
+          <button
+            type="button"
+            className="icon-button"
+            onClick={handleRefresh}
+            disabled={!runId || isRefreshing}
+            aria-busy={isRefreshing}
+            aria-label="Refresh pipeline status"
+          >
+            <RefreshCcw size={16} aria-hidden="true" />
+          </button>
+        </span>
+        <DeveloperToggle />
+        <span
+          className="ghost-button__wrapper has-tooltip"
+          data-tooltip={runId ? "Reset active run" : "No run to reset"}
+        >
+          <button
+            type="button"
+            onClick={handleReset}
+            className="ghost-button"
+            disabled={!runId}
+            aria-label="Reset active run"
+          >
+            Reset Run
+          </button>
+        </span>
+      </div>
       </div>
 
       <div className="pipeline-stage-strip">
@@ -393,14 +394,13 @@ const PipelineContainer: React.FC = () => {
       </div>
 
       <div className="pipeline-stage-actions">
-        <div className="pipeline-stage-actions__item" title={classroomActionTitle}>
+        <div className="pipeline-stage-actions__item has-tooltip" data-tooltip={classroomActionTitle}>
           <button
             type="button"
             className="pipeline-stage-actions__button"
             onClick={() => navigate("/classrooms?view=datasets")}
             disabled={!classroomsReady}
             aria-label="Open classroom datasets"
-            title={classroomActionTitle}
           >
             <span className="pipeline-stage-actions__icon" aria-hidden="true">
               <Layers size={22} />
@@ -411,14 +411,13 @@ const PipelineContainer: React.FC = () => {
             </div>
           </button>
         </div>
-        <div className="pipeline-stage-actions__item" title={evaluationActionTitle}>
+        <div className="pipeline-stage-actions__item has-tooltip" data-tooltip={evaluationActionTitle}>
           <button
             type="button"
             className="pipeline-stage-actions__button"
             onClick={() => navigate("/classrooms?view=evaluations")}
             disabled={!evaluationReady}
             aria-label="Open classroom evaluations"
-            title={evaluationActionTitle}
           >
             <span className="pipeline-stage-actions__icon" aria-hidden="true">
               <BarChart2 size={22} />
