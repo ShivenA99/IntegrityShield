@@ -54,17 +54,23 @@ class DocumentEnhancementService:
         existing_map.update(enhanced_map)
 
         summaries: Dict[str, Any] = {}
-        if "latex_dual_layer" in methods:
+        latex_variants: list[str] = []
+        for method in methods:
+            if isinstance(method, str) and method.startswith("latex_"):
+                latex_variants.append(method)
+        for method in dict.fromkeys(latex_variants):
             try:
-                summaries["latex_dual_layer"] = self.latex_service.execute(run_id, force=True)
+                summaries[method] = self.latex_service.execute(run_id, method_name=method, force=True)
                 structured = self.structured_manager.load(run_id) or structured
             except Exception as exc:
                 self.logger.warning(
-                    "Latex dual-layer generation failed",
-                    extra={"run_id": run_id, "error": str(exc)},
+                    "Latex overlay generation failed",
+                    extra={"run_id": run_id, "method": method, "error": str(exc)},
                 )
-                summaries["latex_dual_layer"] = {"error": str(exc)}
+                summaries[method] = {"error": str(exc), "method": method}
                 structured = self.structured_manager.load(run_id) or structured
+        if "latex_dual_layer" not in summaries and "latex_icw_dual_layer" in summaries:
+            summaries["latex_dual_layer"] = summaries["latex_icw_dual_layer"]
 
         metadata = structured.setdefault("pipeline_metadata", {})
         stages_completed = set(metadata.get("stages_completed", []))

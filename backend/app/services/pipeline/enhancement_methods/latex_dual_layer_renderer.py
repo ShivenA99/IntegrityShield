@@ -22,9 +22,16 @@ class LatexDualLayerRenderer(BaseRenderer):
         destination: Path,
         mapping: Dict[str, str],  # noqa: ARG002 - attack service pulls mappings directly
     ) -> Dict[str, float | str | int | None]:
-        self.logger.info("Starting latex-dual-layer render", extra={"run_id": run_id})
+        method_name = destination.stem.replace("enhanced_", "")
+        if not method_name or method_name == destination.stem:
+            method_name = "latex_dual_layer"
 
-        result = self.attack_service.execute(run_id, force=False)
+        self.logger.info(
+            "Starting latex-based render",
+            extra={"run_id": run_id, "method": method_name},
+        )
+
+        result = self.attack_service.execute(run_id, method_name=method_name, force=False)
         artifacts = result.get("artifacts") or {}
         final_pdf_path_str = artifacts.get("final_pdf") or artifacts.get("enhanced_pdf")
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -61,4 +68,3 @@ class LatexDualLayerRenderer(BaseRenderer):
         )
 
         return metadata
-

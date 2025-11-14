@@ -19,6 +19,10 @@ RENDERERS: Dict[str, Type[BaseRenderer]] = {
     "content_stream_span_overlay": ContentStreamRenderer,
     "pymupdf_overlay": PyMuPDFRenderer,
     "latex_dual_layer": LatexDualLayerRenderer,
+    "latex_font_attack": LatexDualLayerRenderer,
+    "latex_icw": LatexDualLayerRenderer,
+    "latex_icw_dual_layer": LatexDualLayerRenderer,
+    "latex_icw_font_attack": LatexDualLayerRenderer,
 }
 
 __all__ = ["RENDERERS", "BaseRenderer"]

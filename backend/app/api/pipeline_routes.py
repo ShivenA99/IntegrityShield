@@ -488,6 +488,83 @@ def get_status(run_id: str):
     )
 
 
+@bp.patch("/<run_id>/config")
+def update_pipeline_config(run_id: str):
+    run = PipelineRun.query.get(run_id)
+    if not run:
+        return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
+
+    payload = request.get_json(silent=True) or {}
+    if not isinstance(payload, dict):
+        return jsonify({"error": "Invalid payload"}), HTTPStatus.BAD_REQUEST
+
+    allowed_keys = {
+        "ai_models",
+        "enhancement_methods",
+        "target_stages",
+        "skip_if_exists",
+        "parallel_processing",
+    }
+
+    updates: Dict[str, Any] = {}
+    for key, value in payload.items():
+        if key not in allowed_keys:
+            continue
+        updates[key] = value
+
+    if not updates:
+        return jsonify({"run_id": run_id, "pipeline_config": run.pipeline_config}), HTTPStatus.OK
+
+    updated_config = dict(run.pipeline_config or {})
+
+    if "enhancement_methods" in updates:
+        methods = updates["enhancement_methods"]
+        if not isinstance(methods, (list, tuple)):
+            return jsonify({"error": "enhancement_methods must be a list"}), HTTPStatus.BAD_REQUEST
+        updated_config["enhancement_methods"] = [str(method).strip() for method in methods if str(method).strip()]
+
+    if "ai_models" in updates:
+        models = updates["ai_models"]
+        if not isinstance(models, (list, tuple)):
+            return jsonify({"error": "ai_models must be a list"}), HTTPStatus.BAD_REQUEST
+        updated_config["ai_models"] = [str(model).strip() for model in models if str(model).strip()]
+
+    if "target_stages" in updates:
+        stages = updates["target_stages"]
+        if not isinstance(stages, (list, tuple)):
+            return jsonify({"error": "target_stages must be a list"}), HTTPStatus.BAD_REQUEST
+        normalized_stages: list[str] = []
+        for stage in stages:
+            try:
+                enum_value = PipelineStageEnum(str(stage)).value
+            except ValueError:
+                current_app.logger.warning("Ignoring unknown target stage '%s' during config update", stage)
+                continue
+            if enum_value not in normalized_stages:
+                normalized_stages.append(enum_value)
+        updated_config["target_stages"] = normalized_stages
+
+    if "skip_if_exists" in updates:
+        updated_config["skip_if_exists"] = bool(updates["skip_if_exists"])
+
+    if "parallel_processing" in updates:
+        updated_config["parallel_processing"] = bool(updates["parallel_processing"])
+
+    run.pipeline_config = updated_config
+    db.session.add(run)
+    db.session.commit()
+
+    current_app.logger.info(
+        "Updated pipeline configuration",
+        extra={
+            "run_id": run_id,
+            "keys": list(updates.keys()),
+        },
+    )
+
+    return jsonify({"run_id": run.id, "pipeline_config": run.pipeline_config}), HTTPStatus.OK
+
+
 @bp.post("/<run_id>/resume/<stage_name>")
 def resume_pipeline(run_id: str, stage_name: str):
     run = PipelineRun.query.get(run_id)
@@ -759,7 +836,26 @@ def rerun_run():
     run_directory(new_run_id)
     file_manager = FileManager()
 
-    source_pdf_path = Path(source.original_pdf_path) if source.original_pdf_path else None
+    pipeline_meta = structured.get("pipeline_metadata") or {}
+    extraction_outputs = pipeline_meta.get("data_extraction_outputs") or {}
+    document_meta = structured.get("document") or {}
+
+    source_pdf_candidates = [
+        extraction_outputs.get("pdf"),
+        document_meta.get("reconstructed_path"),
+        document_meta.get("pdf"),
+        source.original_pdf_path,
+    ]
+    source_pdf_path = None
+    for candidate in source_pdf_candidates:
+        if not candidate:
+            continue
+        candidate_path = Path(str(candidate))
+        if candidate_path.exists():
+            source_pdf_path = candidate_path
+            break
+    if source_pdf_path is None and source.original_pdf_path:
+        source_pdf_path = Path(source.original_pdf_path)
     dest_pdf_path = None
     if source_pdf_path and source_pdf_path.exists():
         dest_pdf_path = file_manager.import_manual_pdf(new_run_id, source_pdf_path)
@@ -788,12 +884,18 @@ def rerun_run():
     structured_copy = _rewrite(structured_copy)
 
     document_info = structured_copy.setdefault("document", {})
+    if source.original_pdf_path:
+        document_info["original_path"] = source.original_pdf_path
     if dest_pdf_path:
         document_info["source_path"] = str(dest_pdf_path)
         document_info["filename"] = dest_pdf_path.name
+        document_info["reconstructed_path"] = str(dest_pdf_path)
+        document_info["pdf"] = str(dest_pdf_path)
     elif source_pdf_path:
         document_info.setdefault("source_path", str(source_pdf_path))
         document_info.setdefault("filename", source_pdf_path.name)
+        document_info.setdefault("reconstructed_path", str(source_pdf_path))
+        document_info.setdefault("pdf", str(source_pdf_path))
 
     metadata = structured_copy.setdefault("pipeline_metadata", {})
     metadata.update(

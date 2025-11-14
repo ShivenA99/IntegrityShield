@@ -58,13 +58,13 @@ Stages run sequentially via `PipelineOrchestrator`:
 | `content_discovery` | `ContentDiscoveryService` | Fuse multi-model outputs, seed `QuestionManipulation`. | DB rows for questions/spans, structured metadata. |
 | `smart_substitution` | `SmartSubstitutionService` | Apply adversarial mappings, resolve geometry, sync JSON ↔ DB. | Updated mappings, character map stats. |
 | `effectiveness_testing` | `EffectivenessTestingService` | Optional: re-run manipulated content through target models. | `ai_model_results` metrics, cheat detection hints. |
-| `document_enhancement` | `DocumentEnhancementService` | Prepare overlay/LaTeX assets, fonts, geometry. | Artifact configs under `artifacts/`. |
-| `pdf_creation` | `PdfCreationService` | Render attacked PDFs for each configured method. | `enhanced_pdfs`, `artifacts/<method>/final.pdf`. |
+| `document_enhancement` | `DocumentEnhancementService` | Compile LaTeX variants, prepare overlay assets, fonts, geometry. | Method-specific artifacts under `artifacts/<method>/`, selective overlay crops under `assets/<method>_overlays/`, metadata cached in `metadata.json`. |
+| `pdf_creation` | `PdfCreationService` | Render attacked PDFs for each configured method. | Updates `enhanced_pdfs` (one row per method) and `enhanced_<method>.pdf` files, refreshes validation logs. |
 | `results_generation` | `ResultsGenerationService` | Summarise pipeline stats, finalize run status. | `performance_metrics`, status `completed`. |
 
 ### Classroom Dataset Lifecycle
 
-Beyond the enumerated stages, the pipeline now supports classroom-level modelling:
+Beyond the enumerated stages, the pipeline now supports classroom-level modelling (exposed in the UI via the **Classroom** action once Stage 4/`pdf_creation` has produced at least one downloadable PDF):
 
 1. **Dataset Generation** – `AnswerSheetGenerationService.generate` synthesises student answer sheets once attacked PDFs exist. It writes artifacts under `answer_sheets/<classroom_key>/` and persists `AnswerSheetRun`, `AnswerSheetStudent`, and `AnswerSheetRecord` rows.
 2. **Evaluation** – `ClassroomEvaluationService.evaluate` aggregates student metrics (cheating breakdown, score distributions, averages) and saves a `ClassroomEvaluation` record with JSON summary under `classroom_evaluations/<classroom_key>/evaluation.json`.
@@ -83,6 +83,7 @@ All routes are rooted at `/api`. Selected highlights:
 | `POST /pipeline/<run_id>/resume/<stage>` | Resume execution from a given stage. |
 | `POST /pipeline/<run_id>/continue` | Queue downstream stages based on pending targets. |
 | `POST /pipeline/rerun` | Clone a run, preserving mappings and structured data. |
+| `PATCH /pipeline/<run_id>/config` | Update pipeline config mid-run (e.g., toggle enhancement methods). |
 | `DELETE /pipeline/<run_id>` | Permanently delete a run and artifacts. |
 | `GET /pipeline/<run_id>/classrooms` | List classroom datasets attached to a run. |
 | `POST /pipeline/<run_id>/classrooms` | Generate (or regenerate) a classroom dataset. Payload supports overrides: `{ "classroom": { "classroom_key", "classroom_label", "notes", "attacked_pdf_method" }, "config": { ...generation overrides... } }`. |
@@ -106,12 +107,13 @@ Questions, mappings, and validation endpoints remain available under `/api/quest
 - **Live Streaming** – `live_logging_service` pushes events over WebSocket/SSE to the frontend developer console.
 - **Persistent Logs** – `pipeline_logs` table stores historical entries accessible via the API and `developer` panel.
 - **Metrics** – Use `record_metric(run_id, stage, metric_name, value, unit)` to capture timings and counts in `performance_metrics`.
-- **Artifacts** – Validation logs (`validation.json`) and overlay snapshots live under each run’s `artifacts/` folder.
+- **Artifacts** – Validation logs (`validation.json`), selective overlay crops (`assets/<method>_overlays/*.png`), and overlay summaries (`manipulation_results.debug.<method>.overlay`) live under each run’s directory for post-mortem analysis.
 
 ### Debugging Tips
 
 - Tail server logs: `tail -f backend/dev-server.log` or `backend_server.log`.
 - Inspect structured data: `jq '.' data/pipeline_runs/<run>/structured.json`.
+- Review overlay diagnostics: `jq '.manipulation_results.debug.latex_dual_layer.overlay' data/pipeline_runs/<run>/structured.json`.
 - Query classroom tables: `SELECT classroom_label, total_students FROM answer_sheet_runs WHERE pipeline_run_id = '<run>'`.
 - Check evaluation artifacts: `cat data/pipeline_runs/<run>/classroom_evaluations/<key>/evaluation.json | jq`.
 

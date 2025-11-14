@@ -11,7 +11,7 @@ interface ProgressTrackerProps {
   currentStage?: string;
 }
 
-const baseStageOrder: PipelineStageName[] = [
+const BASE_STAGE_ORDER: PipelineStageName[] = [
   "smart_reading",
   "content_discovery",
   "smart_substitution",
@@ -24,7 +24,7 @@ const stageLabels: Record<PipelineStageName, string> = {
   smart_substitution: "Strategy",
   effectiveness_testing: "Effectiveness Testing",
   document_enhancement: "Document Enhancement",
-  pdf_creation: "PDF Creation",
+  pdf_creation: "Download PDFs",
   results_generation: "Results",
 };
 
@@ -36,16 +36,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   currentStage,
 }) => {
   const stageMap = new Map(stages.map((stage) => [stage.name, stage]));
-  const hiddenStages: PipelineStageName[] = ["effectiveness_testing", "document_enhancement", "results_generation"];
-
-  const extraStages = stages
-    .map((stage) => stage.name)
-    .filter((name) => !baseStageOrder.includes(name) && !hiddenStages.includes(name as PipelineStageName));
-
-  const orderedUnique = [...baseStageOrder, ...extraStages];
-  const visibleStages: PipelineStageName[] = orderedUnique.filter(
-    (name, index) => orderedUnique.indexOf(name) === index
-  );
+  const visibleStages: PipelineStageName[] = [...BASE_STAGE_ORDER];
 
   return (
     <div className="progress-tracker">
@@ -85,6 +76,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
                 .join(" ")
                 .trim()}
               onClick={() => onStageSelect?.(name)}
+              title={`${label} • ${statusLabel}`}
             >
               <span
                 className="progress-tracker__circle"

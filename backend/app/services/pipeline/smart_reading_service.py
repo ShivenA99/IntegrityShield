@@ -210,6 +210,10 @@ class SmartReadingService:
         }
         if copied_files.get("assets"):
             structured["document"]["assets_path"] = copied_files["assets"]
+        structured["document"]["original_path"] = str(pdf_path)
+        if copied_files.get("pdf"):
+            structured["document"]["reconstructed_path"] = copied_files["pdf"]
+            structured["document"]["pdf"] = copied_files["pdf"]
         
         # Transform questions to ai_questions format
         ai_questions = []

@@ -227,7 +227,7 @@ const handleDownload = useCallback(
   return (
     <div className="panel pdf-creation">
       <header className="panel-header panel-header--tight">
-        <h1>PDF Creation</h1>
+        <h1>Download PDFs</h1>
         <button
           type="button"
           className="primary-button"

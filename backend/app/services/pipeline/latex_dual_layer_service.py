@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
@@ -16,7 +17,7 @@ import fitz
 from ...models import QuestionManipulation
 from ...services.data_management.structured_data_manager import StructuredDataManager
 from ...utils.logging import get_logger
-from ...utils.storage_paths import artifacts_root, enhanced_pdf_path, run_directory
+from ...utils.storage_paths import artifacts_root, assets_directory, enhanced_pdf_path, run_directory
 from ...utils.time import isoformat, utc_now
 
 
@@ -59,6 +60,8 @@ class OverlaySummary:
     pages_processed: int
     per_page: List[Dict[str, Any]] = field(default_factory=list)
     method: str = "full_page_overlay"
+    missing: List[Dict[str, Any]] = field(default_factory=list)
+    source_pdf: Optional[str] = None
 
 
 class LatexAttackService:
@@ -115,10 +118,16 @@ class LatexAttackService:
         self.logger = get_logger(self.__class__.__name__)
         self.structured_manager = StructuredDataManager()
 
-    def execute(self, run_id: str, *, force: bool = False) -> Dict[str, Any]:
+    def execute(self, run_id: str, *, method_name: str = "latex_dual_layer", force: bool = False) -> Dict[str, Any]:
         structured = self.structured_manager.load(run_id) or {}
         manual_meta = structured.get("manual_input") or {}
         document_meta = structured.get("document") or {}
+
+        method_key = method_name or "latex_dual_layer"
+        file_prefix = self._method_file_prefix(method_key)
+        artifact_folder = self._method_artifact_folder(method_key)
+        overlay_dirname = self._method_overlay_folder(method_key)
+        log_method = method_key.replace("_", "-")
 
         tex_path_str = manual_meta.get("tex_path") or document_meta.get("latex_path")
         if not tex_path_str:
@@ -128,7 +137,7 @@ class LatexAttackService:
         if not tex_path.exists():
             raise FileNotFoundError(f"Manual LaTeX source not found at {tex_path}")
 
-        artifacts_dir = artifacts_root(run_id) / "latex-dual-layer"
+        artifacts_dir = artifacts_root(run_id) / artifact_folder
         artifacts_dir.mkdir(parents=True, exist_ok=True)
         metadata_path = artifacts_dir / "metadata.json"
 
@@ -149,11 +158,11 @@ class LatexAttackService:
             original_tex = tex_path.read_text(encoding="latin-1")
 
         base_tex = self._preprocess_source(original_tex)
-        mutated_tex, diagnostics = self._apply_mappings(base_tex, questions)
+        mutated_tex, diagnostics = self._apply_mappings(base_tex, questions, method_key=method_key)
         mutated_tex = self._apply_enumerate_fallbacks(mutated_tex)
         mutated_tex = self._ensure_macros(mutated_tex)
 
-        attacked_tex_path = artifacts_dir / "latex_dual_layer_attacked.tex"
+        attacked_tex_path = artifacts_dir / f"{file_prefix}_attacked.tex"
         attacked_tex_path.write_text(mutated_tex, encoding="utf-8")
         self._prepare_graphics_assets(tex_path, artifacts_dir, mutated_tex)
 
@@ -163,12 +172,12 @@ class LatexAttackService:
             "replacements": [asdict(entry) for entry in diagnostics],
             "replacement_summary": self._summarize_replacements(diagnostics),
         }
-        diagnostics_path = artifacts_dir / "latex_dual_layer_log.json"
+        diagnostics_path = artifacts_dir / f"{file_prefix}_log.json"
         diagnostics_path.write_text(json.dumps(diagnostics_payload, indent=2), encoding="utf-8")
 
-        compile_log_path = artifacts_dir / "latex_dual_layer_compile.log"
-        compiled_pdf_path = artifacts_dir / "latex_dual_layer_attacked.pdf"
-        final_pdf_path = artifacts_dir / "latex_dual_layer_final.pdf"
+        compile_log_path = artifacts_dir / f"{file_prefix}_compile.log"
+        compiled_pdf_path = artifacts_dir / f"{file_prefix}_attacked.pdf"
+        final_pdf_path = artifacts_dir / f"{file_prefix}_final.pdf"
 
         compile_summary = self._compile_latex(
             tex_source_path=tex_path,
@@ -177,24 +186,74 @@ class LatexAttackService:
             log_path=compile_log_path,
         )
 
+        overlay_targets: Dict[int, List[Dict[str, Any]]] = {}
+        missing_overlay_targets: List[Dict[str, Any]] = []
+        overlays_asset_dir = assets_directory(run_id) / overlay_dirname
+        if overlays_asset_dir.exists():
+            shutil.rmtree(overlays_asset_dir, ignore_errors=True)
+
         overlay_summary: OverlaySummary
+        source_pdf_path = self._resolve_original_pdf_path(
+            manual_meta,
+            document_meta,
+            structured,
+            run_id,
+        )
+
         if not compile_summary.success or not compiled_pdf_path.exists():
+            overlays_asset_dir.mkdir(parents=True, exist_ok=True)
             overlay_summary = OverlaySummary(
                 success=False,
                 overlays=0,
                 pages_processed=0,
                 per_page=[],
+                method="none",
+                missing=[],
+                source_pdf=str(source_pdf_path) if source_pdf_path else None,
             )
             final_pdf_path.unlink(missing_ok=True)
         else:
-            source_pdf_path = self._resolve_original_pdf_path(manual_meta, document_meta)
+            overlay_targets, missing_overlay_targets = self._collect_overlay_targets(
+                run_id,
+                questions,
+                method_key=method_key,
+            )
+            if missing_overlay_targets:
+                for entry in missing_overlay_targets:
+                    log_payload = entry | {"run_id": run_id}
+                    self.logger.warning(
+                        "%s overlay target missing geometry",
+                        log_method,
+                        extra=log_payload,
+                    )
+
+            overlays_asset_dir.mkdir(parents=True, exist_ok=True)
+
+            if source_pdf_path is None:
+                self.logger.warning(
+                    "%s overlay source PDF missing; using compiled PDF dimensions",
+                    log_method,
+                    extra={"run_id": run_id},
+                )
+            else:
+                self.logger.info(
+                    "%s overlay source PDF resolved",
+                    log_method,
+                    extra={"run_id": run_id, "source_pdf": str(source_pdf_path)},
+                )
+
             overlay_summary = self._overlay_pdfs(
                 original_pdf_path=source_pdf_path,
                 compiled_pdf_path=compiled_pdf_path,
                 final_pdf_path=final_pdf_path,
+                overlay_targets=overlay_targets,
+                crop_dir=overlays_asset_dir,
+                run_id=run_id,
+                missing_targets=missing_overlay_targets,
+                method_key=method_key,
             )
 
-        enhanced_pdf = enhanced_pdf_path(run_id, "latex_dual_layer")
+        enhanced_pdf = enhanced_pdf_path(run_id, method_key)
         enhanced_pdf.parent.mkdir(parents=True, exist_ok=True)
         if final_pdf_path.exists():
             shutil.copy2(final_pdf_path, enhanced_pdf)
@@ -214,11 +273,13 @@ class LatexAttackService:
             replacement_summary=replacement_summary,
             compile_summary=compile_summary,
             overlay_summary=overlay_summary,
+            method_name=method_key,
         )
 
         result_payload = {
             "run_id": run_id,
             "generated_at": isoformat(utc_now()),
+            "method": method_key,
             "artifacts": {
                 "attacked_tex": str(attacked_tex_path),
                 "compiled_pdf": str(compiled_pdf_path) if compiled_pdf_path.exists() else None,
@@ -247,6 +308,19 @@ class LatexAttackService:
         }
 
         metadata_path.write_text(json.dumps(result_payload, indent=2), encoding="utf-8")
+
+        self.logger.info(
+            "%s overlay complete",
+            log_method,
+            extra={
+                "run_id": run_id,
+                "success": overlay_summary.success,
+                "overlays": overlay_summary.overlays,
+                "pages_processed": overlay_summary.pages_processed,
+                "method": overlay_summary.method,
+                "missing_targets": len(overlay_summary.missing or []),
+            },
+        )
 
         return result_payload
 
@@ -293,6 +367,7 @@ class LatexAttackService:
                     # Convert to JSON-safe format and assign to question
                     json_safe_mappings = json.loads(json.dumps(mappings))
                     question.substring_mappings = json_safe_mappings
+                    setattr(question, "_structured_overlay_meta", structured_q)
                     self.logger.info(
                         f"Loaded {len(json_safe_mappings)} substring_mappings from structured.json for question {question.id}",
                         extra={
@@ -301,8 +376,282 @@ class LatexAttackService:
                             "question_number": question.question_number,
                         },
                     )
+                else:
+                    setattr(question, "_structured_overlay_meta", structured_q)
+            else:
+                setattr(question, "_structured_overlay_meta", None)
         
         return questions
+
+    def _collect_overlay_targets(
+        self,
+        run_id: str,
+        questions: Iterable[QuestionManipulation],
+        *,
+        method_key: str = "latex_dual_layer",
+    ) -> Tuple[Dict[int, List[Dict[str, Any]]], List[Dict[str, Any]]]:
+        raw_targets: Dict[int, List[Dict[str, Any]]] = defaultdict(list)
+        missing: List[Dict[str, Any]] = []
+        total_mappings = 0
+        log_method = method_key.replace("_", "-")
+
+        for question in questions:
+            q_number = str(getattr(question, "question_number", None) or getattr(question, "id", "") or "")
+            mappings = list(getattr(question, "substring_mappings", []) or [])
+            structured_q = getattr(question, "_structured_overlay_meta", None)
+            for mapping in mappings:
+                if not mapping:
+                    continue
+                total_mappings += 1
+                mapping_id = mapping.get("id")
+                page_index = self._resolve_page_index(mapping)
+                if page_index is None and structured_q:
+                    page_from_struct = self._resolve_page_from_structured(structured_q)
+                    if page_from_struct is not None:
+                        page_index = page_from_struct
+                if page_index is None:
+                    missing.append(
+                        {
+                            "reason": "missing_page",
+                            "question_number": q_number,
+                            "mapping_id": mapping_id,
+                        }
+                    )
+                    continue
+
+                rect = self._resolve_mapping_rect(mapping)
+                if rect is None and structured_q:
+                    rect = self._resolve_rect_from_structured(mapping, structured_q)
+                if rect is None or rect.get_area() <= 0:
+                    missing.append(
+                        {
+                            "reason": "missing_geometry",
+                            "question_number": q_number,
+                            "mapping_id": mapping_id,
+                            "page": page_index + 1,
+                        }
+                    )
+                    continue
+
+                padded_rect = self._pad_rect(rect, pad=0.75)
+                raw_targets[page_index].append(
+                    {
+                        "rect": padded_rect,
+                        "mapping": {
+                            "id": mapping_id,
+                            "question_number": q_number,
+                            "original": mapping.get("original"),
+                            "replacement": mapping.get("replacement"),
+                            "context": mapping.get("context"),
+                        },
+                    }
+                )
+
+        merged_targets: Dict[int, List[Dict[str, Any]]] = {}
+        for page_index, entries in raw_targets.items():
+            merged_entries: List[Dict[str, Any]] = []
+            for entry in entries:
+                rect = fitz.Rect(entry["rect"])
+                assigned = False
+                for existing in merged_entries:
+                    if self._rects_should_merge(existing["rect"], rect):
+                        existing["rect"] = existing["rect"] | rect
+                        if isinstance(entry["mapping"], list):
+                            existing["mappings"].extend(dict(mapping) for mapping in entry["mapping"])
+                        else:
+                            existing["mappings"].append(dict(entry["mapping"]))
+                        assigned = True
+                        break
+                if not assigned:
+                    merged_entries.append(
+                        {
+                            "rect": rect,
+                            "mappings": [dict(mapping) for mapping in entry["mapping"]]
+                            if isinstance(entry["mapping"], list)
+                            else [dict(entry["mapping"])],
+                        }
+                    )
+            merged_targets[page_index] = merged_entries
+
+        total_regions = sum(len(entries) for entries in merged_targets.values())
+        self.logger.info(
+            "%s overlay targets prepared",
+            log_method,
+            extra={
+                "run_id": run_id,
+                "pages": len(merged_targets),
+                "regions": total_regions,
+                "mappings_considered": total_mappings,
+                "missing_mappings": len(missing),
+            },
+        )
+        return merged_targets, missing
+
+    def _resolve_page_index(self, mapping: Dict[str, Any]) -> Optional[int]:
+        page = mapping.get("selection_page")
+        if page is not None:
+            try:
+                page_index = int(page)
+                if page_index >= 0:
+                    return page_index
+            except (TypeError, ValueError):
+                pass
+
+        for key in ("selection_span_ids", "span_ids"):
+            identifiers = mapping.get(key)
+            if not identifiers:
+                continue
+            if isinstance(identifiers, str):
+                identifiers = [identifiers]
+            for identifier in identifiers:
+                page_index = self._extract_page_from_span_id(identifier)
+                if page_index is not None:
+                    return page_index
+        return None
+
+    def _resolve_mapping_rect(self, mapping: Dict[str, Any]) -> Optional[fitz.Rect]:
+        bbox = mapping.get("selection_bbox") or mapping.get("bbox")
+        rect = self._rect_from_bbox(bbox)
+
+        if rect is None:
+            selection_rect = mapping.get("selection_rect")
+            if isinstance(selection_rect, dict):
+                rect = self._rect_from_bbox(
+                    [
+                        selection_rect.get("x0"),
+                        selection_rect.get("y0"),
+                        selection_rect.get("x1"),
+                        selection_rect.get("y1"),
+                    ]
+                )
+
+        if rect is None:
+            quads = mapping.get("selection_quads")
+            if isinstance(quads, (list, tuple)) and quads:
+                rect_union: Optional[fitz.Rect] = None
+                for quad in quads:
+                    try:
+                        quad_list = list(quad.values()) if isinstance(quad, dict) else list(quad)
+                        if len(quad_list) == 4:
+                            quad_list = [quad_list[0], quad_list[1], quad_list[2], quad_list[1], quad_list[2], quad_list[3], quad_list[0], quad_list[3]]
+                        quad_obj = fitz.Quad(quad_list)
+                        quad_rect = quad_obj.rect
+                    except Exception:
+                        continue
+                    rect_union = quad_rect if rect_union is None else rect_union | quad_rect
+                rect = rect_union
+
+        return rect
+
+    def _rect_from_bbox(self, bbox: Any) -> Optional[fitz.Rect]:
+        if not bbox:
+            return None
+        if isinstance(bbox, dict):
+            bbox = [bbox.get("x0"), bbox.get("y0"), bbox.get("x1"), bbox.get("y1")]
+        if isinstance(bbox, (list, tuple)) and len(bbox) == 4:
+            try:
+                x0, y0, x1, y1 = [float(val) for val in bbox]
+                rect = fitz.Rect(x0, y0, x1, y1)
+                return rect if rect.get_area() > 0 else None
+            except (TypeError, ValueError):
+                return None
+        return None
+
+    def _rects_should_merge(self, rect_a: fitz.Rect, rect_b: fitz.Rect, tolerance: float = 1.5) -> bool:
+        if rect_a.intersects(rect_b):
+            return True
+        expanded = fitz.Rect(
+            rect_a.x0 - tolerance,
+            rect_a.y0 - tolerance,
+            rect_a.x1 + tolerance,
+            rect_a.y1 + tolerance,
+        )
+        return expanded.intersects(rect_b)
+
+    def _pad_rect(self, rect: fitz.Rect, pad: float = 0.5) -> fitz.Rect:
+        return fitz.Rect(rect.x0 - pad, rect.y0 - pad, rect.x1 + pad, rect.y1 + pad)
+
+    def _extract_page_from_span_id(self, identifier: str) -> Optional[int]:
+        if not identifier:
+            return None
+        match = re.search(r"page(\d+)", identifier)
+        if match:
+            try:
+                return int(match.group(1))
+            except ValueError:
+                return None
+        return None
+
+    def _resolve_page_from_structured(self, structured_question: Dict[str, Any]) -> Optional[int]:
+        positioning = structured_question.get("positioning") or {}
+        page = positioning.get("page")
+        if page is None:
+            page = structured_question.get("page_number")
+        if page is None:
+            return None
+        try:
+            page_index = int(page) - 1
+            return page_index if page_index >= 0 else None
+        except (TypeError, ValueError):
+            return None
+
+    def _resolve_rect_from_structured(self, mapping: Dict[str, Any], structured_question: Dict[str, Any]) -> Optional[fitz.Rect]:
+        positioning = structured_question.get("positioning") or {}
+        context = (mapping.get("context") or "").lower()
+
+        # Stem fallback
+        if context in {"question_stem", "stem", "stem_text"}:
+            rect = self._rect_from_bbox(positioning.get("stem_bbox") or structured_question.get("stem_bbox"))
+            if (rect is None or rect.get_area() == 0) and positioning.get("option_bboxes"):
+                rect = self._rect_from_option_boxes(positioning.get("option_bboxes"))
+            if rect:
+                return rect
+
+        # Option fallback
+        if context.startswith("option"):
+            option_key = None
+            # context patterns: option_a, option_A_text, optionA, option_answer_A
+            match = re.search(r"option[_\\s-]*([a-d])", context, re.IGNORECASE)
+            if match:
+                option_key = match.group(1).upper()
+            if option_key:
+                option_boxes = positioning.get("option_bboxes") or structured_question.get("option_bboxes") or {}
+                rect = self._rect_from_bbox(option_boxes.get(option_key))
+                if rect:
+                    return rect
+
+        # Whole-question fallback
+        rect = self._rect_from_bbox(positioning.get("bbox") or structured_question.get("bbox"))
+        if (rect is None or rect.get_area() == 0) and positioning.get("option_bboxes"):
+            rect = self._rect_from_option_boxes(positioning.get("option_bboxes"))
+        if rect:
+            return rect
+
+        content_area = structured_question.get("content_bbox")
+        if content_area:
+            rect = self._rect_from_bbox(content_area)
+            if rect:
+                return rect
+
+        return None
+
+    def _rect_from_option_boxes(self, option_bboxes: Any) -> Optional[fitz.Rect]:
+        if not option_bboxes:
+            return None
+        union: Optional[fitz.Rect] = None
+        if isinstance(option_bboxes, dict):
+            iterator = option_bboxes.values()
+        elif isinstance(option_bboxes, (list, tuple)):
+            iterator = option_bboxes
+        else:
+            return None
+
+        for bbox in iterator:
+            rect = self._rect_from_bbox(bbox)
+            if rect is None or rect.get_area() <= 0:
+                continue
+            union = rect if union is None else union | rect
+        return union
 
     def _preprocess_source(self, tex_content: str) -> str:
         pattern = re.compile(r"\\usepackage\{enumitem\}\s*")
@@ -312,6 +661,8 @@ class LatexAttackService:
         self,
         tex_content: str,
         questions: Iterable[QuestionManipulation],
+        *,
+        method_key: str = "latex_dual_layer",
     ) -> Tuple[str, List[MappingDiagnostic]]:
         diagnostics: List[MappingDiagnostic] = []
 
@@ -323,7 +674,8 @@ class LatexAttackService:
 
         if not segments or len(segments) != len(sorted_questions):
             self.logger.warning(
-                "latex-dual-layer: question segmentation mismatch (segments=%s, questions=%s); falling back to global replacement",
+                "%s: question segmentation mismatch (segments=%s, questions=%s); falling back to global replacement",
+                method_key.replace("_", "-"),
                 len(segments),
                 len(sorted_questions),
             )
@@ -1046,43 +1398,236 @@ class LatexAttackService:
         original_pdf_path: Optional[Path],
         compiled_pdf_path: Path,
         final_pdf_path: Path,
+        overlay_targets: Dict[int, List[Dict[str, Any]]],
+        crop_dir: Path,
+        run_id: str,
+        missing_targets: List[Dict[str, Any]],
+        *,
+        method_key: str = "latex_dual_layer",
     ) -> OverlaySummary:
-        if not compiled_pdf_path.exists():
-            return OverlaySummary(success=False, overlays=0, pages_processed=0)
+        log_method = method_key.replace("_", "-")
+        overlay_summary = OverlaySummary(
+            success=False,
+            overlays=0,
+            pages_processed=0,
+            per_page=[],
+            method="none",
+            missing=list(missing_targets or []),
+            source_pdf=str(original_pdf_path) if original_pdf_path else None,
+        )
 
-        overlays = 0
-        pages_processed = 0
-        per_page: List[Dict[str, Any]] = []
+        if not compiled_pdf_path.exists():
+            return overlay_summary
 
         compiled_doc = fitz.open(compiled_pdf_path)
+        overlays_applied = 0
+        pages_processed = 0
+        per_page: List[Dict[str, Any]] = []
+        used_selective = False
+        used_full_fallback = False
+        success = False
+
+        missing_pages = {
+            int(entry["page"]) - 1
+            for entry in missing_targets
+            if isinstance(entry.get("page"), (int, float))
+        }
+
         try:
             original_doc = fitz.open(original_pdf_path) if original_pdf_path and original_pdf_path.exists() else None
+
+            if original_doc is None:
+                self.logger.warning(
+                    "%s original PDF not found; copying compiled PDF without overlays",
+                    log_method,
+                    extra={"run_id": run_id},
+                )
+                compiled_doc.save(final_pdf_path)
+                return OverlaySummary(
+                    success=True,
+                    overlays=0,
+                    pages_processed=len(compiled_doc),
+                    per_page=[],
+                    method="none",
+                    missing=missing_targets,
+                )
 
             for page_index in range(len(compiled_doc)):
                 page = compiled_doc[page_index]
                 pages_processed += 1
-                overlay_count = 0
-                if original_doc and page_index < len(original_doc):
-                    original_page = original_doc[page_index]
+                page_info: Dict[str, Any] = {
+                    "page": page_index + 1,
+                    "overlays": 0,
+                    "rects": [],
+                }
+
+                original_page = original_doc[page_index] if page_index < len(original_doc) else None
+                page_targets = overlay_targets.get(page_index, [])
+                fallback_required = False
+
+                if original_page and page_targets:
+                    used_selective = True
+                    source_page_rect = original_page.rect
+                    target_page_rect = page.rect
+                    scale_x, scale_y = self._calculate_page_scale(source_page_rect, target_page_rect)
+                    if source_page_rect and target_page_rect:
+                        page_info["transform"] = {
+                            "source_size": [
+                                round(source_page_rect.width, 4),
+                                round(source_page_rect.height, 4),
+                            ],
+                            "target_size": [
+                                round(target_page_rect.width, 4),
+                                round(target_page_rect.height, 4),
+                            ],
+                            "scale": [round(scale_x, 6), round(scale_y, 6)],
+                        }
+                    for region_index, entry in enumerate(page_targets, start=1):
+                        source_rect = fitz.Rect(entry["rect"])
+                        if source_rect.get_area() <= 0:
+                            continue
+                        clip_rect = source_rect & source_page_rect
+                        if clip_rect.get_area() <= 0:
+                            continue
+                        try:
+                            pix = original_page.get_pixmap(matrix=fitz.Matrix(1.5, 1.5), clip=clip_rect, alpha=False)
+                        except Exception as exc:
+                            fallback_required = True
+                            self.logger.exception(
+                                "%s failed to capture selective overlay region; falling back to full page",
+                                log_method,
+                                extra={
+                                    "run_id": run_id,
+                                    "page": page_index + 1,
+                                    "rect": [
+                                        round(clip_rect.x0, 2),
+                                        round(clip_rect.y0, 2),
+                                        round(clip_rect.x1, 2),
+                                        round(clip_rect.y1, 2),
+                                    ],
+                                },
+                            )
+                            break
+
+                        target_rect = self._map_rect_between_pages(
+                            clip_rect,
+                            source_page_rect,
+                            target_page_rect,
+                        )
+                        if target_rect.get_area() <= 0:
+                            continue
+
+                        crop_filename = f"page{page_index + 1:03d}_overlay_{region_index:02d}.png"
+                        crop_path = crop_dir / crop_filename
+                        pix.save(crop_path)
+                        page.insert_image(target_rect, stream=pix.tobytes("png"))
+                        overlays_applied += 1
+                        page_info["overlays"] += 1
+
+                        mapping_details: List[Dict[str, Any]] = []
+                        for mapping_info in entry.get("mappings", []):
+                            mapping_details.append(
+                                {
+                                    "id": mapping_info.get("id"),
+                                    "question_number": mapping_info.get("question_number"),
+                                    "original": mapping_info.get("original"),
+                                    "replacement": mapping_info.get("replacement"),
+                                }
+                            )
+                            self.logger.info(
+                                "%s selective overlay applied",
+                                log_method,
+                                extra={
+                                    "run_id": run_id,
+                                    "page": page_index + 1,
+                                    "mapping_id": mapping_info.get("id"),
+                                    "question_number": mapping_info.get("question_number"),
+                                    "original": mapping_info.get("original"),
+                                    "replacement": mapping_info.get("replacement"),
+                                    "source_rect": [
+                                        round(clip_rect.x0, 2),
+                                        round(clip_rect.y0, 2),
+                                        round(clip_rect.x1, 2),
+                                        round(clip_rect.y1, 2),
+                                    ],
+                                    "target_rect": [
+                                        round(target_rect.x0, 2),
+                                        round(target_rect.y0, 2),
+                                        round(target_rect.x1, 2),
+                                        round(target_rect.y1, 2),
+                                    ],
+                                    "crop_asset": self._relative_to_run(crop_path, run_id),
+                                    "scale_x": round(scale_x, 6),
+                                    "scale_y": round(scale_y, 6),
+                                },
+                            )
+
+                        page_info["rects"].append(
+                            {
+                                "type": "selective",
+                                "source_rect": [clip_rect.x0, clip_rect.y0, clip_rect.x1, clip_rect.y1],
+                                "target_rect": [target_rect.x0, target_rect.y0, target_rect.x1, target_rect.y1],
+                                "scale": [scale_x, scale_y],
+                                "crop_asset": self._relative_to_run(crop_path, run_id),
+                                "mappings": mapping_details,
+                            }
+                        )
+
+                needs_full_page = False
+                if fallback_required:
+                    needs_full_page = True
+                if page_index in missing_pages:
+                    needs_full_page = True
+
+                if needs_full_page and original_page is not None:
+                    used_full_fallback = True
                     pix = original_page.get_pixmap(matrix=fitz.Matrix(1.5, 1.5), alpha=False)
                     page.insert_image(page.rect, stream=pix.tobytes("png"))
-                    overlay_count += 1
-                overlays += overlay_count
-                per_page.append({"page": page_index + 1, "overlays": overlay_count})
+                    overlays_applied += 1
+                    page_info["overlays"] += 1
+                    page_info["rects"].append({"type": "full_page"})
+                    self.logger.warning(
+                        "%s full-page overlay applied",
+                        log_method,
+                        extra={"run_id": run_id, "page": page_index + 1},
+                    )
+
+                if page_info["overlays"] == 0:
+                    page_info["mode"] = "none"
+                elif needs_full_page and page_targets:
+                    page_info["mode"] = "mixed"
+                elif needs_full_page:
+                    page_info["mode"] = "full_page_fallback"
+                else:
+                    page_info["mode"] = "selective"
+
+                per_page.append(page_info)
 
             compiled_doc.save(final_pdf_path)
             success = True
         finally:
             compiled_doc.close()
-            if 'original_doc' in locals() and original_doc is not None:
+            if "original_doc" in locals() and original_doc is not None:
                 original_doc.close()
 
-        return OverlaySummary(
-            success=success,
-            overlays=overlays,
-            pages_processed=pages_processed,
-            per_page=per_page,
-        )
+        overlay_summary.overlays = overlays_applied
+        overlay_summary.pages_processed = pages_processed
+        overlay_summary.per_page = per_page
+        overlay_summary.missing = list(missing_targets or [])
+        overlay_summary.source_pdf = str(original_pdf_path) if original_pdf_path else None
+
+        if success:
+            overlay_summary.success = True
+            if overlays_applied == 0:
+                overlay_summary.method = "none"
+            elif used_selective and used_full_fallback:
+                overlay_summary.method = "mixed_overlay"
+            elif used_selective:
+                overlay_summary.method = "selective_rect_overlay"
+            else:
+                overlay_summary.method = "full_page_overlay"
+
+        return overlay_summary
 
     # ------------------------------------------------------------------
     # Structured data & helpers
@@ -1101,13 +1646,14 @@ class LatexAttackService:
         replacement_summary: Dict[str, Any],
         compile_summary: CompileSummary,
         overlay_summary: OverlaySummary,
+        method_name: str,
     ) -> Dict[str, Any]:
         manipulation_results = structured.setdefault("manipulation_results", {})
         artifacts_section = manipulation_results.setdefault("artifacts", {})
         debug_section = manipulation_results.setdefault("debug", {})
         enhanced_map = manipulation_results.setdefault("enhanced_pdfs", {})
 
-        artifacts_entry = artifacts_section.setdefault("latex_dual_layer", {})
+        artifacts_entry = artifacts_section.setdefault(method_name, {})
         artifacts_entry.update(
             {
                 "attacked_tex": self._relative_to_run(attacked_tex_path, run_id),
@@ -1122,7 +1668,7 @@ class LatexAttackService:
             }
         )
 
-        debug_section["latex_dual_layer"] = {
+        method_debug = {
             "replacement_summary": replacement_summary,
             "compile": {
                 "success": compile_summary.success,
@@ -1135,8 +1681,11 @@ class LatexAttackService:
                 "overlays": overlay_summary.overlays,
                 "pages_processed": overlay_summary.pages_processed,
                 "per_page": overlay_summary.per_page,
+                "method": overlay_summary.method,
+                "missing": overlay_summary.missing,
             },
         }
+        debug_section[method_name] = method_debug
 
         final_size = final_pdf_path.stat().st_size if final_pdf_path and final_pdf_path.exists() else 0
 
@@ -1147,9 +1696,11 @@ class LatexAttackService:
             "compile_duration_ms": compile_summary.duration_ms,
             "overlay_success": overlay_summary.success,
             "overlay_applied": overlay_summary.overlays,
+            "overlay_method": overlay_summary.method,
+            "overlay_missing": len(overlay_summary.missing or []),
         }
 
-        enhanced_entry = enhanced_map.setdefault("latex_dual_layer", {})
+        enhanced_entry = enhanced_map.setdefault(method_name, {})
         enhanced_entry.update(
             {
                 "path": str(enhanced_pdf_path),
@@ -1166,6 +1717,7 @@ class LatexAttackService:
         self.structured_manager.save(run_id, structured)
 
         return {
+            "method": method_name,
             "file_size_bytes": final_size,
             "replacements": replacement_summary.get("total", 0),
             "overlay_applied": overlay_summary.overlays,
@@ -1176,8 +1728,8 @@ class LatexAttackService:
                 if value is not None
             },
             "replacement_summary": replacement_summary,
-            "compile_summary": debug_section["latex_dual_layer"]["compile"],
-            "overlay_summary": debug_section["latex_dual_layer"]["overlay"],
+            "compile_summary": method_debug["compile"],
+            "overlay_summary": method_debug["overlay"],
         }
 
     def _summarize_replacements(self, diagnostics: List[MappingDiagnostic]) -> Dict[str, Any]:
@@ -1194,14 +1746,78 @@ class LatexAttackService:
 
     def _resolve_original_pdf_path(
         self,
-        manual_meta: Dict[str, Any],
-        document_meta: Dict[str, Any],
+        manual_meta: Dict[str, Any] | None,
+        document_meta: Dict[str, Any] | None,
+        structured: Dict[str, Any] | None,
+        run_id: str,
     ) -> Optional[Path]:
-        source_pdf_path_str = manual_meta.get("pdf_path") or document_meta.get("source_path")
-        if not source_pdf_path_str:
+        manual_meta = manual_meta or {}
+        document_meta = document_meta or {}
+        structured = structured or {}
+
+        pipeline_meta = structured.get("pipeline_metadata") or {}
+        extraction_outputs = pipeline_meta.get("data_extraction_outputs") or {}
+
+        candidates = [
+            manual_meta.get("reconstructed_pdf_path"),
+            manual_meta.get("reconstructed_path"),
+            manual_meta.get("pdf"),
+            document_meta.get("reconstructed_path"),
+            document_meta.get("pdf"),
+            extraction_outputs.get("pdf"),
+            manual_meta.get("pdf_path"),
+            document_meta.get("source_path"),
+            manual_meta.get("original_path"),
+        ]
+
+        for candidate in candidates:
+            candidate_path = self._safe_path(candidate)
+            if candidate_path and candidate_path.exists():
+                return candidate_path
+
+        # Fall back to any reconstructed PDF inside the run directory
+        run_dir = run_directory(run_id)
+        try:
+            reconstructed = next(iter(sorted(run_dir.glob("*_reconstructed.pdf"))))
+            if reconstructed.exists():
+                return reconstructed
+        except StopIteration:
+            pass
+
+        return None
+
+    def _calculate_page_scale(
+        self,
+        source_rect: Optional[fitz.Rect],
+        target_rect: Optional[fitz.Rect],
+    ) -> Tuple[float, float]:
+        if not source_rect or not target_rect:
+            return 1.0, 1.0
+        width = source_rect.width or 1.0
+        height = source_rect.height or 1.0
+        return (target_rect.width or width) / width, (target_rect.height or height) / height
+
+    def _map_rect_between_pages(
+        self,
+        rect: fitz.Rect,
+        source_page_rect: fitz.Rect,
+        target_page_rect: fitz.Rect,
+    ) -> fitz.Rect:
+        scale_x, scale_y = self._calculate_page_scale(source_page_rect, target_page_rect)
+        return fitz.Rect(
+            target_page_rect.x0 + (rect.x0 - source_page_rect.x0) * scale_x,
+            target_page_rect.y0 + (rect.y0 - source_page_rect.y0) * scale_y,
+            target_page_rect.x0 + (rect.x1 - source_page_rect.x0) * scale_x,
+            target_page_rect.y0 + (rect.y1 - source_page_rect.y0) * scale_y,
+        )
+
+    def _safe_path(self, value: Any) -> Optional[Path]:
+        if not value:
             return None
-        pdf_path = Path(source_pdf_path_str)
-        return pdf_path if pdf_path.exists() else None
+        try:
+            return Path(str(value))
+        except Exception:
+            return None
 
     def _relative_to_run(self, path: Optional[Path], run_id: str) -> Optional[str]:
         if not path:
@@ -1225,3 +1841,15 @@ class LatexAttackService:
         except Exception:
             return 0
 
+    def _method_file_prefix(self, method_name: str) -> str:
+        return "latex_dual_layer" if method_name == "latex_dual_layer" else method_name
+
+    def _method_artifact_folder(self, method_name: str) -> str:
+        if method_name == "latex_dual_layer":
+            return "latex-dual-layer"
+        return method_name.replace("_", "-")
+
+    def _method_overlay_folder(self, method_name: str) -> str:
+        if method_name == "latex_dual_layer":
+            return "latex_dual_layer_overlays"
+        return f"{method_name}_overlays"

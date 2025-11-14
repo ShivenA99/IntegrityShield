@@ -54,6 +54,7 @@ const AttackVariantPalette: React.FC<AttackVariantPaletteProps> = ({
                 if (disabled) return;
                 onToggle(method);
               }}
+              title={label}
             >
               <span className="attack-toggle__label">{label}</span>
             </button>

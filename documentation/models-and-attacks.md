@@ -12,15 +12,23 @@ Environment variables (see `backend/app/config.py`) define defaults:
 
 Overriding these env vars changes the baseline for all runs. Per-run overrides can be supplied in the API payload (`POST /api/pipeline/start`) or via the classroom dataset creation body.
 
+All LaTeX-oriented methods share `LatexAttackService`, which now applies selective overlay crops and records diagnostics per method.
+
 ## Enhancement Methods
 
 | Method Key | Renderer | Description | Artifacts |
 | --- | --- | --- | --- |
 | `pymupdf_overlay` | `ContentStreamRenderer` | Manipulates PDF content streams directly, preserving original layout. | `artifacts/stream_rewrite-overlay/final.pdf`, overlays JSON, snapshots. |
 | `content_stream_overlay` | Alias of stream rewrite overlay. | Maintains compatibility with legacy naming. | Same as above. |
-| `latex_dual_layer` | `LatexAttackService` | Rebuilds pages with adversarial text beneath rendered imagery (dual-layer). | `artifacts/latex-dual-layer/latex_dual_layer_final.pdf`, metadata logs, compile logs. |
+| `latex_dual_layer` | `LatexAttackService` | Rebuilds pages with adversarial text beneath rendered imagery (dual-layer) using selective overlay crops. | `artifacts/latex-dual-layer/latex_dual_layer_final.pdf`, `assets/latex_dual_layer_overlays/*.png`, metadata logs, compile logs. |
+| `latex_font_attack` | `LatexAttackService` | Variant of the dual-layer flow that swaps stealth fonts and overlay crops for targeted phrases. | `artifacts/latex_font_attack/*`, `assets/latex_font_attack_overlays/*.png`. |
+| `latex_icw` | `LatexAttackService` | Injects in-context writing prompts (ICW) without overlays; often combined with other methods. | `artifacts/latex_icw/latex_icw_attacked.tex`, config metadata. |
+| `latex_icw_dual_layer` | `LatexAttackService` | Runs ICW prompts plus dual-layer overlays with selective crops. | `artifacts/latex-icw-dual-layer/*`, `assets/latex_icw_dual_layer_overlays/*.png`. |
+| `latex_icw_font_attack` | `LatexAttackService` | Hybrid of font attack + ICW prompt injection. | `artifacts/latex_icw_font_attack/*`, `assets/latex_icw_font_attack_overlays/*.png`. |
 
 Add new methods by implementing a renderer under `backend/app/services/pipeline/enhancement_methods/` and registering it in `DocumentEnhancementService`.
+
+> Toggle enhancement methods on a live run via `PATCH /api/pipeline/<run_id>/config` with `{ "enhancement_methods": ["latex_dual_layer","latex_icw_dual_layer","pymupdf_overlay"] }`. The backend ensures `pymupdf_overlay` remains present as a baseline overlay.
 
 ## AI Providers & Clients
 

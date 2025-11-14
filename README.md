@@ -59,8 +59,10 @@ Core stages (managed by `PipelineOrchestrator`) run in sequence on a background 
 
 The SPA exposes two additional post-pipeline phases:
 
-- **Classroom Datasets** – `POST /api/pipeline/<run_id>/classrooms` synthesises student answer sheets per attacked PDF. Artifacts and metadata live under `backend/data/pipeline_runs/<run>/answer_sheets/<classroom_key>/`.
-- **Classroom Evaluation** – `POST /api/pipeline/<run_id>/classrooms/<id>/evaluate` aggregates student metrics (cheating breakdowns, score distributions) and persists `classroom_evaluations` records with JSON artifacts.
+- **Classroom Datasets** – Triggered via the Classroom action once downloads exist; `POST /api/pipeline/<run_id>/classrooms` synthesises student answer sheets per attacked PDF. Artifacts and metadata live under `backend/data/pipeline_runs/<run>/answer_sheets/<classroom_key>/`.
+- **Classroom Evaluation** – The Evaluation action (`POST /api/pipeline/<run_id>/classrooms/<id>/evaluate`) aggregates student metrics (cheating breakdowns, score distributions) and persists `classroom_evaluations` records with JSON artifacts.
+
+LaTeX-based methods now capture selective overlay crops per manipulated rectangle (`assets/<method>_overlays/*.png`) so analysts can audit replacements alongside the final PDFs.
 
 ## Documentation
 

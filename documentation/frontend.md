@@ -13,9 +13,11 @@ The frontend is a React + TypeScript SPA (Vite) that guides users through pipeli
 | `frontend/src/services/` | REST clients (`pipelineApi.ts`, `questionsApi.ts`), WebSocket/SSE connectors, TypeScript DTOs. |
 | `frontend/src/styles/global.css` | Design tokens, gradient backgrounds, button styles, stage accent classes. |
 
+Classroom workflows now live under `frontend/src/pages/Classrooms.tsx` and `frontend/src/pages/ClassroomEvaluation.tsx`, reached via the action buttons surfaced in Stage 4.
 ### State Management
 
 - `PipelineContext` tracks the active run (`status`, `stages`, `enhanced_pdfs`, `classrooms`) and handles polling/resume logic.
+- Stage actions derive availability from `PipelineContext` (download counts, classroom completion) and update preferred stage on completion.
 - `ClassroomManagerContext` (embedded in Stage 5) manages datasets, filters, and evaluation results.
 - `DeveloperToolsContext` subscribes to live logs and keeps panel preferences.
 - Local component state drives UI controls (e.g., disable buttons after actions complete, collapse panels, hover tooltips).
@@ -27,25 +29,26 @@ The frontend is a React + TypeScript SPA (Vite) that guides users through pipeli
 | Smart Reading | `SmartReadingPanel.tsx` | Upload UI, run creation, start button auto-disables once stage completes. |
 | Content Discovery | `ContentDiscoveryPanel.tsx` | Shows question fusion progress, exposes "Continue to Smart Substitution". |
 | Smart Substitution | `SmartSubstitutionPanel.tsx` | Mapping editor, validation/test triggers, stage advancement guard. |
-| PDF Creation | `PdfCreationPanel.tsx` | Variant palette (compacted card layout), auto-focus on Stage 4 completion, create button locks once invoked. |
+| Download PDFs | `PdfCreationPanel.tsx` | Compact variant palette, overlay summaries, "Create PDFs" auto-disables after queue, surfaces Classroom/Evaluation action buttons once downloads exist. |
 | Results & QA | `ProgressTracker.tsx`, `ContentDiscoveryPanel` summary | Stage chips show progress, tooltips provide status detail. |
-| Classroom Datasets | `ClassroomManagerPanel.tsx` | Distinct accent colour, searchable/filterable dataset table, create/import modal, success/error flashes, action dropdowns. |
-| Classroom Evaluation | `ClassroomEvaluationPanel.tsx` | Tied to selected dataset, surfaces summary metrics, charts (score buckets, cheating breakdown), evaluate button disabled when in-flight or data missing. |
+| Classroom (action) | `pages/Classrooms.tsx` | Run/PDF picker, searchable & sortable dataset table, generation form with advanced config, import placeholder, success/error toasts. |
+| Classroom Evaluation (action) | `pages/ClassroomEvaluation.tsx` | Dataset-specific analytics (cheating mix, scores, student table), re-evaluate button disabled while in flight, breadcrumbs back to classroom list. |
 
 The first four panels map directly to orchestrator stages; classroom panels operate on `answer_sheet_runs` and `classroom_evaluations` records returned by `GET /pipeline/<run>/status`.
 
 ## Navigation & Layout
 
-- **Sidebar** houses stage chips, previous runs, and developer toggle.
-- **Header** surfaces active run metadata and global actions (resume pipeline, rerun).
+- **Sidebar** now presents a compact shield logo, consistent nav button sizing, and a redesigned run card (status pill, document, download/classroom chips, refresh/reset actions).
+- **Pipeline run bar** (top of the dashboard) surfaces run metadata chips (document, stage, variant count, downloads, classrooms, evaluation coverage) and action icons (refresh, reset, developer toggle).
+- **Stage actions row** sits beneath the tracker, exposing `Classroom` and `Evaluation` buttons with availability guards (disabled until downloads/classrooms exist).
 - **Footer** displays logs/status hints.
-- **Developer Console** (toggle in header) slides in from the right, consuming live log streams and metrics.
+- **Developer Console** (toggle in the run bar and sidebar card) slides in from the right, consuming live log streams and metrics.
 
 ## Styling Guidelines
 
-- Utility classes in `global.css` define consistent typography, spacing, and gradient backgrounds. Stage-specific modifiers (`.stage-card`, `.classroom-stage-strip`) keep the new classroom row visually distinct.
-- Buttons follow a "pill" aesthetic with disabled states and loading animations.
-- Tooltips (`data-tooltip`) provide hover hints for action icons; keep copy concise (<80 chars).
+- Utility classes in `global.css` define consistent typography, spacing, and gradient backgrounds. New tokens (`.pipeline-chip`, `.pipeline-stage-actions__button`, `.app-sidebar__run-chip`) keep run metadata and action buttons visually coherent.
+- Buttons follow a "pill" aesthetic with disabled states and loading animations; selective actions (Classroom/Evaluation) expose secondary labels for counts.
+- Tooltips (`title` attributes) are attached to icons, chips, and action buttons; keep copy concise (<80 chars) and note that disabled buttons still surface tooltips for guidance.
 
 ## API Consumption
 

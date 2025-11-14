@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState, useCallback, useEffect, useMemo } from "react";
+import clsx from "clsx";
 
 import { usePipeline } from "@hooks/usePipeline";
 import { useQuestions } from "@hooks/useQuestions";
@@ -46,6 +47,47 @@ const SmartSubstitutionPanel: React.FC = () => {
     }
     return [];
   }, [status?.pipeline_config]);
+  const manipulationResults = (structuredData?.manipulation_results ?? {}) as Record<string, any>;
+  const enhancedPdfs = (manipulationResults.enhanced_pdfs ?? {}) as Record<string, any>;
+  const overlayKey = useMemo(() => {
+    const preference = [
+      "latex_dual_layer",
+      "latex_icw_dual_layer",
+      "latex_icw_font_attack",
+      "latex_font_attack",
+      "latex_icw",
+    ];
+    for (const candidate of preference) {
+      if (enhancedPdfs[candidate]) {
+        return candidate;
+      }
+    }
+    const fallback = Object.keys(enhancedPdfs)[0];
+    return fallback || "latex_dual_layer";
+  }, [enhancedPdfs]);
+  const overlayRenderStats = (enhancedPdfs[overlayKey]?.render_stats ?? {}) as Record<string, any>;
+  const artifactsMap = (manipulationResults.artifacts ?? {}) as Record<string, any>;
+  const overlayArtifactsKey = useMemo(() => {
+    if (artifactsMap[overlayKey]) {
+      return overlayKey;
+    }
+    if (artifactsMap.latex_dual_layer) {
+      return "latex_dual_layer";
+    }
+    const keys = Object.keys(artifactsMap);
+    return keys.length ? keys[0] : overlayKey;
+  }, [artifactsMap, overlayKey]);
+  const debugMap = (manipulationResults.debug ?? {}) as Record<string, any>;
+  const overlayDebugKey = useMemo(() => {
+    if (debugMap[overlayKey]) {
+      return overlayKey;
+    }
+    if (debugMap.latex_dual_layer) {
+      return "latex_dual_layer";
+    }
+    const keys = Object.keys(debugMap);
+    return keys.length ? keys[0] : overlayKey;
+  }, [debugMap, overlayKey]);
   const logsByQuestion = useMemo(() => {
     const grouped = new Map<string, any[]>();
     generationLogs.forEach((entry) => {
@@ -103,21 +145,19 @@ const SmartSubstitutionPanel: React.FC = () => {
   }, [runId]);
 
   const spanPlanRelativePath = useMemo(() => {
-    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.latex_dual_layer?.render_stats ?? {};
-    const artifacts = renderStats.artifact_rel_paths ?? renderStats.artifacts ?? {};
-    const rawPath: string | undefined = artifacts.span_plan ?? structuredData?.manipulation_results?.artifacts?.latex_dual_layer?.span_plan;
+    const artifacts = overlayRenderStats.artifact_rel_paths ?? overlayRenderStats.artifacts ?? {};
+    const artifactSection = artifactsMap[overlayArtifactsKey] ?? {};
+    const rawPath: string | undefined = artifacts.span_plan ?? artifactSection?.span_plan ?? artifactSection?.span_plan_path;
     return resolveRelativePath(rawPath);
-  }, [resolveRelativePath, structuredData]);
+  }, [artifactsMap, overlayArtifactsKey, overlayRenderStats, resolveRelativePath]);
 
   const spanPlanUrl = runId && spanPlanRelativePath ? `/api/files/${runId}/${spanPlanRelativePath}` : null;
 
   const spanPlanStatsByQuestion = useMemo(() => {
     const stats: Record<number, { spans: number }> = {};
-    const debugPlan = structuredData?.manipulation_results?.debug?.latex_dual_layer?.span_plan ?? null;
-    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.latex_dual_layer?.render_stats ?? {};
-    const spanPlan = debugPlan || renderStats.span_plan || {};
-    if (spanPlan && typeof spanPlan === "object") {
-      Object.values(spanPlan).forEach((entryList: any) => {
+    const spanPlanSource = debugMap[overlayDebugKey]?.span_plan ?? overlayRenderStats.span_plan ?? {};
+    if (spanPlanSource && typeof spanPlanSource === "object") {
+      Object.values(spanPlanSource).forEach((entryList: any) => {
         if (!Array.isArray(entryList)) return;
         entryList.forEach((entry: any) => {
           const mappings: any[] = Array.isArray(entry?.mappings) ? entry.mappings : [];
@@ -134,18 +174,20 @@ const SmartSubstitutionPanel: React.FC = () => {
       });
     }
     return stats;
-  }, [structuredData]);
+  }, [debugMap, overlayDebugKey, overlayRenderStats]);
 
   const spanSummary = useMemo(() => {
-    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.latex_dual_layer?.render_stats ?? {};
-    const summary = renderStats.span_plan_summary || {};
+    const summary = overlayRenderStats.span_plan_summary || {};
     const totalEntries = typeof summary.entries === "number" ? summary.entries : null;
-    const scaledEntries = typeof summary.scaled_entries === "number"
-      ? summary.scaled_entries
-      : (typeof renderStats.scaled_spans === "number" ? renderStats.scaled_spans : null);
+    const scaledEntries =
+      typeof summary.scaled_entries === "number"
+        ? summary.scaled_entries
+        : typeof overlayRenderStats.scaled_spans === "number"
+        ? overlayRenderStats.scaled_spans
+        : null;
     const pageCount = typeof summary.pages === "number" ? summary.pages : null;
     return { totalEntries, scaledEntries, pageCount };
-  }, [structuredData]);
+  }, [overlayRenderStats]);
 
   const getEffectiveMappingStats = useCallback((question: QuestionManipulation) => {
     const stagedEntry = stagedMappings[question.id];
@@ -482,19 +524,57 @@ const SmartSubstitutionPanel: React.FC = () => {
               const question = questions.find((q) => q.id === parseInt(questionId, 10));
               if (!question) return null;
               const statusValue = progress?.status ?? "pending";
-              const stateClass =
-                statusValue === "success"
-                  ? "is-success"
-                  : statusValue === "failed"
-                  ? "is-error"
-                  : "is-running";
+              const questionKey = String(progress.question_number ?? question.question_number ?? question.id);
+              const questionLogs = logsByQuestion.get(questionKey) ?? [];
+              const generationLoops =
+                questionLogs.filter((entry) => entry?.stage === "generation").length ||
+                Math.max(progress?.mappings_generated ?? 0, statusValue === "success" ? 1 : 0);
+              const validationLogs = questionLogs.filter((entry) => entry?.stage === "validation");
+              const hasValidationFailure =
+                statusValue === "failed" || validationLogs.some((entry) => entry?.status === "failed");
+              const hasValidationSuccess =
+                progress?.mappings_validated > 0 || validationLogs.some((entry) => entry?.status === "success");
+
+              const stateClass = hasValidationFailure
+                ? "is-error"
+                : hasValidationSuccess
+                ? "is-success"
+                : statusValue === "running"
+                ? "is-running"
+                : "is-pending";
+
               return (
-                <div key={questionId} className={`strategy-progress__row ${stateClass}`}>
-                  <span className="strategy-progress__id">
-                    Q{progress.question_number ?? question.question_number ?? question.id}
+                <div key={questionId} className={clsx("strategy-progress__row", stateClass)}>
+                  <span className="strategy-progress__id" title={`Question ${questionKey}`}>
+                    Q{questionKey}
                   </span>
                   <span className="strategy-progress__meta">
-                    {progress.mappings_generated || 0} generated · {progress.mappings_validated || 0} validated
+                    <span className="status-chip status-chip--generation" title="Generation attempts">
+                      Gen {Math.max(0, generationLoops)}×
+                    </span>
+                    <span
+                      className={clsx(
+                        "status-chip",
+                        "status-chip--validation",
+                        hasValidationFailure ? "is-error" : hasValidationSuccess ? "is-success" : "is-pending"
+                      )}
+                      title={
+                        hasValidationFailure
+                          ? "Latest validation failed"
+                          : hasValidationSuccess
+                          ? "Validation succeeded"
+                          : "Awaiting validation results"
+                      }
+                    >
+                      {hasValidationFailure
+                        ? "Validation ✕"
+                        : hasValidationSuccess
+                        ? "Validation ✓"
+                        : "Validation …"}
+                    </span>
+                    <span className="status-chip status-chip--totals" title="Generated vs validated mappings">
+                      {progress.mappings_generated || 0} gen · {progress.mappings_validated || 0} val
+                    </span>
                   </span>
                 </div>
               );

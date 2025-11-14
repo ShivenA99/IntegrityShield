@@ -7,9 +7,9 @@ AntiCheatAI simulates adversarial pressure on automated grading systems. The wor
 1. **Upload Source Material** – Instructor PDF (or manual question set) is uploaded through the dashboard (`frontend/src/components/pipeline/SmartReadingPanel.tsx`).
 2. **Automated Pipeline** – The backend orchestrator (`backend/app/services/pipeline/pipeline_orchestrator.py`) runs smart reading → substitution → document enhancement → PDF creation, persisting state to SQL + disk.
 3. **Manual Validation** – Analysts tweak mappings, inspect overlays, and re-run effectiveness tests directly from the SPA.
-4. **Attacked PDF Distribution** – Final attacked variants are stored under `backend/data/pipeline_runs/<run-id>/artifacts/` and attached to the run record.
-5. **Classroom Simulation** – Synthetic student answer sheets are generated per attacked PDF (`AnswerSheetGenerationService`) and stored both in the database and as JSON artifacts.
-6. **Classroom Evaluation** – Aggregated cheating metrics, score distributions, and strategy breakdowns are computed (`ClassroomEvaluationService`) to understand classroom-level exposure.
+4. **Download PDFs** – Stage 4 renders attacked variants (`artifacts/<method>/final.pdf`, `enhanced_<method>.pdf`) and updates the run bar chips so analysts know when downloads are ready.
+5. **Classroom Simulation** – Using the Classroom action, synthetic student answer sheets are generated per attacked PDF (`AnswerSheetGenerationService`) and stored both in the database and as JSON artifacts.
+6. **Classroom Evaluation** – The Evaluation action aggregates cheating metrics, score distributions, and strategy breakdowns (`ClassroomEvaluationService`) to understand classroom-level exposure.
 
 ## High-Level Architecture
 
@@ -34,9 +34,10 @@ AntiCheatAI simulates adversarial pressure on automated grading systems. The wor
 
 ### Frontend Pillars
 
-- **PipelineContainer** orchestrates stage panels and status badges (`frontend/src/components/pipeline/PipelineContainer.tsx`).
+- **PipelineContainer** orchestrates stage panels, run summary chips, and Classroom/Evaluation action buttons (`frontend/src/components/pipeline/PipelineContainer.tsx`).
 - **Context Providers** in `frontend/src/contexts/` stream run status, developer logs, and UI settings to components.
 - **Shared Styles** (`frontend/src/styles/global.css`) deliver the gradient and accent themes, while classroom stages apply a distinct accent tone.
+- **Standalone Pages** (`frontend/src/pages/Classrooms.tsx`, `ClassroomEvaluation.tsx`) handle dataset management and analytics outside the core stage carousel.
 
 ## Key Features at a Glance
 
@@ -44,6 +45,7 @@ AntiCheatAI simulates adversarial pressure on automated grading systems. The wor
 | --- | --- | --- |
 | Background pipeline execution | `PipelineOrchestrator.start_background` | Async thread per run; emits stage logs and performance metrics. |
 | Attacked PDF variants | `DocumentEnhancementService`, `PdfCreationService` | Supports stream rewrite overlay, dual-layer LaTeX, PyMuPDF overlays. |
+| Selective overlay crops | `LatexAttackService.execute` | Captures per-rectangle PNG overlays and logs summaries for each LaTeX method. |
 | Classroom datasets | `/api/pipeline/<run>/classrooms` + `AnswerSheetRun` model | Creates `answer_sheet_runs`, `answer_sheet_students`, and JSON artifacts. |
 | Classroom evaluation | `/api/pipeline/<run>/classrooms/<id>/evaluate` | Computes cheating ratios, strategy breakdowns, score distributions. |
 | Live developer console | `frontend/src/components/developer` + `/api/developer/logs` | Streams structured logs with contextual metadata. |

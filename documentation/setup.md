@@ -35,6 +35,8 @@ OPENAI_API_KEY=sk-...
 MISTRAL_API_KEY=...
 ```
 
+> **Windows paths:** When running outside WSL, use double backslashes (e.g., `C:\\Users\\you\\fairtestai\\backend\\data\\pipeline_runs`). If you develop inside WSL (recommended), keep Unix-style paths but grant filesystem permissions to your Windows user so the frontend can download artifacts.
+
 > **Tip:** Leave `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true` (default) to let the app run Alembic `upgrade()` on startup.
 
 Start the server:
@@ -107,6 +109,7 @@ Run `docker compose up -d db` (or `docker-compose up -d db`) to launch the datab
 - **Initialize schema manually** (optional): `flask db upgrade` if you prefer explicit migrations.
 - **Inspect tables**: `psql fairtestai` then `\dt` (Postgres) or `sqlite3 backend/data/fairtestai.db` for SQLite.
 - **Reset local data**: Remove `backend/data/pipeline_runs/<run-id>/` for targeted cleanup; avoid `rm -rf data` without confirming you no longer need artifacts.
+- **Verify overlays**: Run `ls backend/data/pipeline_runs/<run-id>/assets/<method>_overlays/` to confirm selective LaTeX crops were generated (PNG clips plus overlay logs).
 
 ## Frontend Setup
 
@@ -136,9 +139,10 @@ The Vite dev server proxies `/api` requests to `http://localhost:8000` by defaul
 
 1. Launch backend and frontend as described above.
 2. Upload a sample PDF (see `demo_assets/`).
-3. Watch the pipeline advance through stage 4; ensure attacked PDFs appear under `backend/data/pipeline_runs/<run-id>/`.
-4. Generate a classroom dataset from Stage 5 in the UI; confirm `answer_sheet_runs` rows exist and JSON artifacts land under `answer_sheets/<classroom_key>/`.
-5. Run classroom evaluation and check `classroom_evaluations` for a completed record.
-6. If using Docker, tail database logs with `docker logs -f fairtestai-db` to confirm connections succeed.
+3. Watch the pipeline advance through Stage 4 (**Download PDFs**); ensure attacked PDFs appear under `backend/data/pipeline_runs/<run-id>/`.
+4. Click the `Classroom` action button (beneath the stage tracker) and generate a dataset; confirm `answer_sheet_runs` rows exist and JSON artifacts land under `answer_sheets/<classroom_key>/`.
+5. Use the `Evaluation` action to run classroom analytics and check `classroom_evaluations` for a completed record.
+6. Inspect `assets/<method>_overlays/` to verify selective overlay crops were saved for debugging.
+7. If using Docker, tail database logs with `docker logs -f fairtestai-db` to confirm connections succeed.
 
 If any step fails, consult [operations.md](operations.md) for troubleshooting tips and logging commands.

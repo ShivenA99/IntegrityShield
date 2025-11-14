@@ -14,7 +14,7 @@ Alembic migrations define the canonical schema (`backend/migrations/versions/`).
 | `pipeline_stages` | Per-stage execution metadata. | `pipeline_run_id`, `stage_name`, `status`, `stage_data` (JSON), `duration_ms`, `error_details`, timestamps. |
 | `question_manipulations` | Editable question content and mappings. | `pipeline_run_id`, `question_number`, `question_type`, `original_text`, `options_data` (JSON), `substring_mappings` (JSON), `stem_position`, `ai_model_results` (JSON). |
 | `ai_model_results` | Effectiveness testing responses. | `pipeline_run_id`, `question_id`, `model_name`, `manipulated_answer`, `was_fooled`, `full_response` (JSON), `tested_at`. |
-| `enhanced_pdfs` | Generated PDF artifacts. | `pipeline_run_id`, `method_name`, `file_path`, `generation_config` (JSON), `validation_results` (JSON). |
+| `enhanced_pdfs` | Generated PDF artifacts. | `pipeline_run_id`, `method_name`, `file_path`, `generation_config` (JSON), `validation_results` (JSON), `render_stats` (JSON with overlay summary, replacements, file size). |
 | `pipeline_logs` | Structured log events. | `pipeline_run_id`, `stage`, `level`, `message`, `context` (JSON), `timestamp`. |
 | `performance_metrics` | Custom metrics per stage. | `pipeline_run_id`, `stage`, `metric_name`, `metric_value`, `metric_unit`, `details` (JSON). |
 | `character_mappings` | Character substitution metadata. | `pipeline_run_id`, `mapping_strategy`, `character_map` (JSON), `usage_statistics` (JSON). |
@@ -46,6 +46,7 @@ Alembic migrations define the canonical schema (`backend/migrations/versions/`).
 - `question_index` – Geometry info (page, spans, bounding boxes).
 - `character_mappings` – Current substitution strategy.
 - `ai_questions` – Raw AI model outputs pre-fusion.
+- `manipulation_results.debug.<method>.overlay` – Per-page overlay summary (rectangles, crops, fallback flags) emitted by `LatexAttackService`.
 
 Classroom dataset artifacts (`answer_sheets.json`, `answer_sheet_summary.json`) expose:
 
@@ -72,6 +73,7 @@ backend/data/
 │  └─ <run-id>/
 │     ├─ structured.json
 │     ├─ enhanced_<method>.pdf
+│     ├─ assets/<method>_overlays/*.png
 │     ├─ answer_sheets/<classroom_key>/...
 │     ├─ classroom_evaluations/<classroom_key>/evaluation.json
 │     └─ artifacts/<method>/...
@@ -82,13 +84,14 @@ Artifacts follow method-specific schemas:
 
 - **Stream Rewrite Overlay** – `artifacts/stream_rewrite-overlay/{overlays.json,snapshots/,after_stream_rewrite.pdf,final.pdf}`
 - **Redaction Overlay** – `artifacts/redaction-rewrite-overlay/...`
-- **LaTeX Dual Layer** – `artifacts/latex-dual-layer/{latex_dual_layer_attacked.tex, latex_dual_layer_final.pdf, metadata.json}`
+- **LaTeX Dual Layer & Variants** – `artifacts/latex-dual-layer/` (and sibling folders such as `latex-icw-dual-layer/`) contain `*_attacked.tex`, `*_final.pdf`, `metadata.json`, and compile logs derived from `LatexAttackService.execute`.
 
 ## Data Access Tips
 
 - **Run Directory Helper** – Use `backend/app/utils/storage_paths.py` to resolve run-relative paths.
 - **Cleanup** – `AnswerSheetGenerationService` and `pipeline_routes.delete_classroom_dataset` remove stale directories before regenerating data.
 - **Relative Paths** – All artifact paths returned via API are relative to the run directory to keep browser downloads simple.
+- **Overlay Inspection** – Cropped assets for LaTeX methods live under `assets/<method>_overlays/`; pair them with the overlay summary in `structured.json` to debug mismatched rectangles.
 
 ## Schema Changes Checklist
 

@@ -10,6 +10,7 @@ smart_reading → content_discovery → smart_substitution
 → pdf_creation → results_generation
 ```
 
+> **UI naming:** Stage 4 appears as **Download PDFs** in the dashboard. Classroom dataset and evaluation flows are surfaced via action buttons once Stage 4 succeeds; they are no longer numbered pipeline stages.
 Each stage runs inside `PipelineOrchestrator.start_background`, which spins up an asyncio loop on a worker thread. Stage progress is recorded in `pipeline_stages` and mirrored to the frontend via `GET /api/pipeline/<run>/status`.
 
 ### Stage Details
@@ -20,8 +21,8 @@ Each stage runs inside `PipelineOrchestrator.start_background`, which spins up a
 | content_discovery | `ContentDiscoveryService` | Structured JSON, AI outputs | `question_manipulations`, `structured.json` enriched with geometry, pipeline metadata. |
 | smart_substitution | `SmartSubstitutionService` | Fused questions, mapping strategy | Updated substring mappings, `character_mappings`, geometry validation logs. |
 | effectiveness_testing | `EffectivenessTestingService` | Manipulated questions, target model list | `ai_model_results`, cheating rate analytics (optional stage). |
-| document_enhancement | `DocumentEnhancementService` | Questions + mappings + structured data | Prepares overlay assets (`artifacts/<method>/overlays.json`, snapshots). |
-| pdf_creation | `PdfCreationService` | Enhancement assets, config | Renders attacked PDFs (`artifacts/<method>/final.pdf`), updates `enhanced_pdfs` table, validation logs. |
+| document_enhancement | `DocumentEnhancementService` | Questions + mappings + structured data | Compiles LaTeX variants, captures selective overlay crops (`assets/<method>_overlays/*.png`), produces method-specific metadata under `artifacts/<method>/`. |
+| pdf_creation | `PdfCreationService` | Enhancement assets, config | Renders attacked PDFs (`artifacts/<method>/final.pdf`), syncs `enhanced_<method>.pdf` and `enhanced_pdfs` entries, refreshes validation + overlay summaries. |
 | results_generation | `ResultsGenerationService` | Previous stage outputs | Summary metrics, finalises run status, updates `processing_stats`. |
 
 ### Stage Pausing
@@ -36,6 +37,9 @@ Each stage runs inside `PipelineOrchestrator.start_background`, which spins up a
 backend/data/pipeline_runs/<run-id>/
 ├─ structured.json
 ├─ enhanced_<method>.pdf
+├─ assets/
+│  └─ <method>_overlays/
+│     └─ page001_overlay_01.png
 ├─ answer_sheets/                # Populated after classroom dataset generation
 │  └─ <classroom_key>/
 │     ├─ answer_sheets.json
@@ -46,14 +50,15 @@ backend/data/pipeline_runs/<run-id>/
 └─ artifacts/
    ├─ stream_rewrite-overlay/
    ├─ redaction-rewrite-overlay/
-   └─ latex-dual-layer/
+   ├─ latex-dual-layer/
+   └─ latex-icw-dual-layer/
 ```
 
 Key JSON contracts are documented in [data.md](data.md).
 
-## Classroom Dataset Stage (Stage 5 UI)
+## Classroom Dataset Action
 
-After attacked PDFs exist, Stage 5 allows analysts to generate one or more classroom datasets:
+After attacked PDFs exist (Stage 4 completed), the **Classroom** action allows analysts to generate one or more classroom datasets:
 
 1. **Trigger** – `POST /api/pipeline/<run>/classrooms` with an optional payload:
    ```json
@@ -82,9 +87,9 @@ After attacked PDFs exist, Stage 5 allows analysts to generate one or more class
 - Passing an existing `classroom_key` or `id` overwrites the previous dataset (old artifacts are removed before writing new ones).
 - Each dataset tracks `origin` (`generated` vs `imported`) to support future upload flows.
 
-## Classroom Evaluation Stage (Stage 6 UI)
+## Classroom Evaluation Action
 
-Evaluation analyses the synthetic classroom to surface cheating insights.
+Evaluation analyses the synthetic classroom to surface cheating insights (triggered via the **Evaluation** action once at least one dataset exists).
 
 1. **Trigger** – `POST /api/pipeline/<run>/classrooms/<dataset_id>/evaluate` (empty body is fine for defaults).
 2. **Processing** – `ClassroomEvaluationService` aggregates per-student metrics:
@@ -99,6 +104,17 @@ Evaluation analyses the synthetic classroom to surface cheating insights.
 - Missing dataset triggers `404`.
 - Empty classroom (no students) returns `400` with guidance to regenerate dataset.
 - Server errors surface a generic `500` and log context in `backend_server.log`.
+
+## Selective LaTeX Overlay
+
+`LatexAttackService` now crops only the manipulated rectangles from the reconstructed PDF and pastes them onto the attacked TeX output:
+
+1. Mappings supply geometry (`selection_bbox`, `selection_quads`); gaps fall back to structured JSON.
+2. Rectangles are padded, merged per page, and captured from the original PDF via PyMuPDF.
+3. Crops are saved under `assets/<method>_overlays/` alongside their mapping metadata; overlay logs are persisted to `manipulation_results.debug.<method>.overlay`.
+4. If a crop fails (e.g., geometry missing), the service falls back to a full-page overlay and logs a warning.
+
+This approach keeps visual fidelity while reducing final PDF size compared to full-page overlays.
 
 ## Failure Modes & Recovery
 

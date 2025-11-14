@@ -41,6 +41,40 @@ class PdfCreationService:
                 missing.append({"question": q_label, "reason": "no_validated_mappings"})
         return missing
 
+    def _resolve_base_pdf(self, run: PipelineRun) -> Path:
+        structured = self.structured_manager.load(run.id) or {}
+        document_meta = structured.get("document") or {}
+        pipeline_meta = structured.get("pipeline_metadata") or {}
+        extraction_outputs = (pipeline_meta.get("data_extraction_outputs") or {}) if isinstance(pipeline_meta, dict) else {}
+
+        candidates = [
+            document_meta.get("reconstructed_path"),
+            document_meta.get("pdf"),
+            extraction_outputs.get("pdf"),
+            document_meta.get("source_path"),
+            run.original_pdf_path,
+        ]
+
+        for candidate in candidates:
+            if not candidate:
+                continue
+            candidate_path = Path(str(candidate))
+            if candidate_path.exists():
+                if str(candidate_path) != run.original_pdf_path:
+                    self.logger.info(
+                        "pdf_creation base PDF resolved",
+                        extra={"run_id": run.id, "path": str(candidate_path)},
+                    )
+                return candidate_path
+
+        fallback = Path(run.original_pdf_path)
+        if not fallback.exists():
+            self.logger.warning(
+                "pdf_creation base PDF fallback missing on disk",
+                extra={"run_id": run.id, "path": run.original_pdf_path},
+            )
+        return fallback
+
     def _prepare_methods_if_missing(self, run: PipelineRun) -> None:
         """Ensure EnhancedPDF rows exist for configured methods so pdf_creation can render.
         If some exist, add any missing ones (always include image_overlay).
@@ -228,7 +262,7 @@ class PdfCreationService:
         self._prepare_methods_if_missing(run)
 
         run_dir = run_directory(run_id).resolve()
-        original_pdf = Path(run.original_pdf_path)
+        original_pdf = self._resolve_base_pdf(run)
         enhanced_records = EnhancedPDF.query.filter_by(pipeline_run_id=run_id).all()
 
         results: Dict[str, Any] = {"skipped_questions": mapping_gaps}
@@ -280,7 +314,14 @@ class PdfCreationService:
             "content_stream",
             "content_stream_span_overlay",
         }
-        overlay_methods = {"image_overlay"}
+        overlay_methods = {
+            "image_overlay",
+            "latex_dual_layer",
+            "latex_font_attack",
+            "latex_icw",
+            "latex_icw_dual_layer",
+            "latex_icw_font_attack",
+        }
         pymupdf_methods = {"pymupdf_overlay"}
 
         content_stream_records = [

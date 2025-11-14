@@ -23,6 +23,7 @@ interface PipelineContextValue {
   isLoading: boolean;
   error: string | null;
   preferredStage: PipelineStageName | null;
+  preferredStageToken: number;
   setPreferredStage: (stage: PipelineStageName | null) => void;
   setActiveRunId: (runId: string | null) => void;
   refreshStatus: (
@@ -63,8 +64,13 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
   const [status, setStatus] = useState<PipelineRunSummary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [preferredStage, setPreferredStage] = useState<PipelineStageName | null>(null);
+  const [preferredStage, setPreferredStageState] = useState<PipelineStageName | null>(null);
+  const [preferredStageToken, bumpPreferredStageToken] = useState(0);
   const [selectedClassroomId, setSelectedClassroomId] = useState<number | null>(null);
+  const setPreferredStage = useCallback((stage: PipelineStageName | null) => {
+    setPreferredStageState(stage);
+    bumpPreferredStageToken((value) => value + 1);
+  }, []);
 
   const refreshStatus = useCallback(
     async (
@@ -340,6 +346,7 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       isLoading,
       error,
       preferredStage,
+      preferredStageToken,
       setPreferredStage,
       selectedClassroomId,
       setSelectedClassroomId,
@@ -362,6 +369,7 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       isLoading,
       error,
       preferredStage,
+      preferredStageToken,
       selectedClassroomId,
       refreshStatus,
       startPipeline,

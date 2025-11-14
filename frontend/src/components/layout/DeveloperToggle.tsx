@@ -16,10 +16,12 @@ const DeveloperToggle: React.FC = () => {
       aria-checked={isDeveloperMode}
       title={isDeveloperMode ? "Disable developer utilities" : "Enable developer utilities"}
     >
-      <Code size={16} aria-hidden="true" />
+      <span className="dev-toggle__icon" aria-hidden="true">
+        <Code size={14} />
+      </span>
       <span className="dev-toggle__label">Developer</span>
-      <span className="dev-toggle__slider" aria-hidden="true">
-        <span className="dev-toggle__thumb" />
+      <span className="dev-toggle__pill" aria-hidden="true">
+        <span className="dev-toggle__dot" />
       </span>
     </button>
   );
