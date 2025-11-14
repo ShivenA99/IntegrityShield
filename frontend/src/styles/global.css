@@ -1214,6 +1214,26 @@ table tbody tr:hover {
   border-color: rgba(246, 109, 109, 0.4);
   color: #ffc0c0;
 }
+.panel-flash--with-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.panel-flash__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1 1 auto;
+}
+
+.panel-flash__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
 
 .panel-error {
   color: var(--danger);
