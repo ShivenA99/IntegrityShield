@@ -6,7 +6,7 @@ from http import HTTPStatus
 from pathlib import Path
 import shutil
 import copy
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from flask import Blueprint, current_app, jsonify, request
 from werkzeug.datastructures import FileStorage
@@ -852,32 +852,79 @@ def rerun_run():
         )
 
     new_run_id = str(uuid.uuid4())
-    run_directory(new_run_id)
+    new_run_dir = run_directory(new_run_id)
     file_manager = FileManager()
 
     pipeline_meta = structured.get("pipeline_metadata") or {}
     extraction_outputs = pipeline_meta.get("data_extraction_outputs") or {}
     document_meta = structured.get("document") or {}
 
-    source_pdf_candidates = [
-        extraction_outputs.get("pdf"),
-        document_meta.get("reconstructed_path"),
-        document_meta.get("pdf"),
+    def _copy_artifact_path(candidate: object) -> Optional[Path]:
+        if not candidate:
+            return None
+        candidate_path = Path(str(candidate))
+        if not candidate_path.exists():
+            return None
+        destination = new_run_dir / candidate_path.name
+        if candidate_path.is_dir():
+            shutil.copytree(candidate_path, destination, dirs_exist_ok=True)
+        else:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(candidate_path, destination)
+        return destination
+
+    dest_original_pdf_path: Optional[Path] = None
+    original_pdf_candidates = [
         source.original_pdf_path,
+        document_meta.get("source_path"),
+        document_meta.get("original_path"),
     ]
-    source_pdf_path = None
-    for candidate in source_pdf_candidates:
+    for candidate in original_pdf_candidates:
         if not candidate:
             continue
         candidate_path = Path(str(candidate))
-        if candidate_path.exists():
-            source_pdf_path = candidate_path
+        if not candidate_path.exists():
+            continue
+        try:
+            dest_original_pdf_path = file_manager.import_manual_pdf(new_run_id, candidate_path)
             break
-    if source_pdf_path is None and source.original_pdf_path:
-        source_pdf_path = Path(source.original_pdf_path)
-    dest_pdf_path = None
-    if source_pdf_path and source_pdf_path.exists():
-        dest_pdf_path = file_manager.import_manual_pdf(new_run_id, source_pdf_path)
+        except FileNotFoundError:
+            dest_original_pdf_path = None
+
+    dest_reconstructed_pdf_path: Optional[Path] = None
+    reconstructed_candidates = [
+        extraction_outputs.get("pdf"),
+        document_meta.get("reconstructed_path"),
+        document_meta.get("pdf"),
+    ]
+    for candidate in reconstructed_candidates:
+        dest_reconstructed_pdf_path = _copy_artifact_path(candidate)
+        if dest_reconstructed_pdf_path:
+            break
+
+    tex_candidates = [
+        extraction_outputs.get("tex"),
+        document_meta.get("latex_path"),
+        (structured.get("manual_input") or {}).get("tex_path"),
+    ]
+    dest_tex_path: Optional[Path] = None
+    for candidate in tex_candidates:
+        dest_tex_path = _copy_artifact_path(candidate)
+        if dest_tex_path:
+            break
+
+    assets_candidates = [
+        extraction_outputs.get("assets"),
+        document_meta.get("assets_path"),
+        (structured.get("manual_input") or {}).get("assets_path"),
+    ]
+    dest_asset_dir: Optional[Path] = None
+    for candidate in assets_candidates:
+        dest_asset_dir = _copy_artifact_path(candidate)
+        if dest_asset_dir:
+            break
+
+    extracted_json_path = _copy_artifact_path(extraction_outputs.get("json"))
 
     source_assets_dir = assets_directory(source_run_id)
     dest_assets_dir = assets_directory(new_run_id)
@@ -905,18 +952,46 @@ def rerun_run():
     document_info = structured_copy.setdefault("document", {})
     if source.original_pdf_path:
         document_info["original_path"] = source.original_pdf_path
-    if dest_pdf_path:
-        document_info["source_path"] = str(dest_pdf_path)
-        document_info["filename"] = dest_pdf_path.name
-        document_info["reconstructed_path"] = str(dest_pdf_path)
-        document_info["pdf"] = str(dest_pdf_path)
-    elif source_pdf_path:
-        document_info.setdefault("source_path", str(source_pdf_path))
-        document_info.setdefault("filename", source_pdf_path.name)
-        document_info.setdefault("reconstructed_path", str(source_pdf_path))
-        document_info.setdefault("pdf", str(source_pdf_path))
+    if dest_original_pdf_path:
+        document_info["source_path"] = str(dest_original_pdf_path)
+        document_info["filename"] = dest_original_pdf_path.name
+    elif document_info.get("source_path"):
+        original_path = Path(document_info["source_path"])
+        if original_path.exists():
+            document_info["filename"] = original_path.name
+    if dest_reconstructed_pdf_path:
+        document_info["reconstructed_path"] = str(dest_reconstructed_pdf_path)
+        document_info["pdf"] = str(dest_reconstructed_pdf_path)
+    elif dest_original_pdf_path:
+        document_info["reconstructed_path"] = str(dest_original_pdf_path)
+        document_info["pdf"] = str(dest_original_pdf_path)
+    if dest_tex_path:
+        document_info["latex_path"] = str(dest_tex_path)
+    if dest_asset_dir:
+        document_info["assets_path"] = str(dest_asset_dir)
+
+    manual_input_meta = structured_copy.setdefault("manual_input", {})
+    if dest_tex_path:
+        manual_input_meta["tex_path"] = str(dest_tex_path)
+    if dest_reconstructed_pdf_path:
+        manual_input_meta["pdf_path"] = str(dest_reconstructed_pdf_path)
 
     metadata = structured_copy.setdefault("pipeline_metadata", {})
+    new_extraction_outputs: Dict[str, Any] = {}
+    if dest_tex_path:
+        new_extraction_outputs["tex"] = str(dest_tex_path)
+    if dest_asset_dir:
+        new_extraction_outputs["assets"] = str(dest_asset_dir)
+    if dest_reconstructed_pdf_path:
+        new_extraction_outputs["pdf"] = str(dest_reconstructed_pdf_path)
+    if extracted_json_path:
+        new_extraction_outputs["json"] = str(extracted_json_path)
+    if new_extraction_outputs:
+        metadata["data_extraction_outputs"] = {
+            **(metadata.get("data_extraction_outputs") or {}),
+            **new_extraction_outputs,
+        }
+
     metadata.update(
         {
             "run_id": new_run_id,
@@ -949,8 +1024,8 @@ def rerun_run():
 
     new_run = PipelineRun(
         id=new_run_id,
-        original_pdf_path=str(dest_pdf_path) if dest_pdf_path else source.original_pdf_path,
-        original_filename=dest_pdf_path.name if dest_pdf_path else source.original_filename,
+        original_pdf_path=str(dest_original_pdf_path) if dest_original_pdf_path else source.original_pdf_path,
+        original_filename=dest_original_pdf_path.name if dest_original_pdf_path else source.original_filename,
         current_stage=PipelineStageEnum.CONTENT_DISCOVERY.value,
         status="paused",
         pipeline_config=copy.deepcopy(source.pipeline_config or {}),

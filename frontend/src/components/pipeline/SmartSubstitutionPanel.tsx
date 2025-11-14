@@ -33,6 +33,7 @@ const SmartSubstitutionPanel: React.FC = () => {
   const [bulkMessage, setBulkMessage] = useState<string | null>(null);
   const [bulkError, setBulkError] = useState<string | null>(null);
   const [isGeneratingMappings, setIsGeneratingMappings] = useState(false);
+  const [isFinalizing, setIsFinalizing] = useState(false);
   const [generationStatus, setGenerationStatus] = useState<Record<number, any>>({});
   const [generationLogs, setGenerationLogs] = useState<any[]>([]);
   const [stagedMappings, setStagedMappings] = useState<Record<number, any>>({});
@@ -338,7 +339,8 @@ const SmartSubstitutionPanel: React.FC = () => {
   const readyForPdf = questionsWithValidated > 0;
 
   const onFinalize = async () => {
-    if (!activeRunId || !readyForPdf) return;
+    if (!activeRunId || !readyForPdf || isFinalizing) return;
+    setIsFinalizing(true);
     setBulkError(null);
     try {
       const result = await resumeFromStage(activeRunId, "pdf_creation", {
@@ -362,6 +364,8 @@ const SmartSubstitutionPanel: React.FC = () => {
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || String(err);
       setBulkError(`Failed to proceed to PDF creation: ${message}`);
+    } finally {
+      setIsFinalizing(false);
     }
   };
 
@@ -502,12 +506,13 @@ const SmartSubstitutionPanel: React.FC = () => {
           ) : null}
           <button
             onClick={onFinalize}
-            disabled={!readyForPdf || generatingQuestionId !== null || isGeneratingMappings}
-            className="primary-button button-with-icon"
+            disabled={!readyForPdf || generatingQuestionId !== null || isGeneratingMappings || isFinalizing}
+            className={clsx("primary-button button-with-icon", isFinalizing && "is-loading")}
+            aria-busy={isFinalizing}
             title={readyForPdf ? "Promote staged mappings and continue" : "Validate a mapping to continue"}
           >
             <ArrowRight size={16} aria-hidden="true" />
-            <span>Create PDFs</span>
+            <span>{isFinalizing ? "Continuing…" : "Create PDFs"}</span>
           </button>
         </div>
       </header>

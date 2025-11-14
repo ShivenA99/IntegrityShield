@@ -8,6 +8,7 @@ python-dotenv>=1.0
 pydantic>=2.8
 orjson>=3.10
 PyMuPDF>=1.24
+fonttools>=4.51
 Pillow>=10.2
 numpy>=1.26
 reportlab>=4.1

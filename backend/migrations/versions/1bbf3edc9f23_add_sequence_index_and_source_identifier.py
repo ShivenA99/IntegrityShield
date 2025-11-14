@@ -7,8 +7,8 @@ Create Date: 2025-11-07 21:13:00.000000
 """
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "1bbf3edc9f23"
@@ -18,7 +18,15 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column("question_manipulations", sa.Column("sequence_index", sa.Integer(), nullable=True))
+    op.add_column(
+        "question_manipulations",
+        sa.Column(
+            "sequence_index",
+            sa.Integer(),
+            nullable=False,
+            server_default=sa.text("0"),
+        ),
+    )
     op.add_column("question_manipulations", sa.Column("source_identifier", sa.String(length=255), nullable=True))
 
     bind = op.get_bind()
@@ -56,14 +64,6 @@ def upgrade() -> None:
             ),
             update_params,
         )
-
-    op.alter_column(
-        "question_manipulations",
-        "sequence_index",
-        existing_type=sa.Integer(),
-        nullable=False,
-        server_default="0",
-    )
 
 
 def downgrade() -> None:

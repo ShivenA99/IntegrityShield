@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from app import create_app
 from app.extensions import db
-from app.models import QuestionManipulation
+from app.models import PipelineRun, QuestionManipulation
 from app.services.data_management.structured_data_manager import StructuredDataManager
 from app.services.pipeline.latex_dual_layer_service import (
     CompilePass,
@@ -55,6 +55,18 @@ def test_latex_attack_service_generates_artifacts(tmp_path):
 
         StructuredDataManager().save(run_id, structured)
 
+        pipeline_run = PipelineRun(
+            id=run_id,
+            original_pdf_path=str(pdf_path),
+            original_filename=pdf_path.name,
+            structured_data=structured,
+            pipeline_config={},
+            processing_stats={},
+            status="completed",
+            current_stage="results_generation",
+        )
+        db.session.add(pipeline_run)
+
         question = QuestionManipulation(
             pipeline_run_id=run_id,
             question_number="1",
@@ -94,7 +106,8 @@ def test_latex_attack_service_generates_artifacts(tmp_path):
                 error=None,
             )
 
-        def fake_overlay(original_pdf_path, compiled_pdf_path, final_pdf_path):
+        def fake_overlay(**kwargs):
+            final_pdf_path = kwargs["final_pdf_path"]
             final_pdf_path.write_bytes(b"%PDF-1.4\n%%mock final\n%EOF")
             return OverlaySummary(
                 success=True,
@@ -174,6 +187,18 @@ def test_latex_attack_service_skips_questions_without_mappings(tmp_path):
 
         StructuredDataManager().save(run_id, structured)
 
+        pipeline_run = PipelineRun(
+            id=run_id,
+            original_pdf_path=str(pdf_path),
+            original_filename=pdf_path.name,
+            structured_data=structured,
+            pipeline_config={},
+            processing_stats={},
+            status="completed",
+            current_stage="results_generation",
+        )
+        db.session.add(pipeline_run)
+
         question = QuestionManipulation(
             pipeline_run_id=run_id,
             question_number="1",
@@ -198,7 +223,8 @@ def test_latex_attack_service_skips_questions_without_mappings(tmp_path):
                 passes=[CompilePass(number=1, return_code=0, duration_ms=2.5, log_length=10)],
             )
 
-        def fake_overlay(original_pdf_path, compiled_pdf_path, final_pdf_path):
+        def fake_overlay(**kwargs):
+            final_pdf_path = kwargs["final_pdf_path"]
             final_pdf_path.write_bytes(b"%PDF-1.4\n%%overlay\n%EOF")
             return OverlaySummary(success=True, overlays=0, pages_processed=0, per_page=[])
 
@@ -210,9 +236,9 @@ def test_latex_attack_service_skips_questions_without_mappings(tmp_path):
         artifacts_dir = artifacts_root(run_id) / "latex-dual-layer"
         log_path = artifacts_dir / "latex_dual_layer_log.json"
         payload = json.loads(log_path.read_text(encoding="utf-8"))
-        assert payload["replacement_summary"]["no_mapping"] == 1
-        assert payload["replacements"][0]["status"] == "no_mapping"
-        assert summary["renderer_metadata"]["replacement_summary"]["no_mapping"] == 1
+        assert payload["replacement_summary"]["total"] == 0
+        assert not payload["replacements"]
+        assert summary["renderer_metadata"]["replacement_summary"]["total"] == 0
 
         db.session.remove()
         db.drop_all()

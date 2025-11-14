@@ -67,6 +67,9 @@ class OverlaySummary:
 class LatexAttackService:
     """Applies substring mappings directly to the manual LaTeX source and prepares artifacts."""
 
+    SELECTIVE_OVERLAY_METHODS: Tuple[str, ...] = ("latex_dual_layer", "latex_icw_dual_layer")
+    FORCE_FULL_PAGE_METHODS: Tuple[str, ...] = ("latex_dual_layer", "latex_icw_dual_layer")
+
     MACRO_DEFINITION = r"""
 % --- latex-dual-layer macros (auto-generated) ---
 \newlength{\dlboxwidth}
@@ -112,6 +115,17 @@ class LatexAttackService:
         b"\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0c"
         b"IDATx\x9cc\xf8\xff\xff?\x00\x05\xfe\x02\xfe\r\xefF\xb8\x00\x00\x00"
         b"\x00IEND\xaeB`\x82"
+    )
+    _TEXT_SANITIZE_TABLE = str.maketrans(
+        {
+            "\u2018": "'",
+            "\u2019": "'",
+            "\u201c": '"',
+            "\u201d": '"',
+            "\u2013": "-",
+            "\u2014": "-",
+            "\u2212": "-",
+        }
     )
 
     def __init__(self) -> None:
@@ -200,6 +214,8 @@ class LatexAttackService:
             run_id,
         )
 
+        selective_overlay_enabled = method_key in self.SELECTIVE_OVERLAY_METHODS
+
         if not compile_summary.success or not compiled_pdf_path.exists():
             overlays_asset_dir.mkdir(parents=True, exist_ok=True)
             overlay_summary = OverlaySummary(
@@ -212,11 +228,30 @@ class LatexAttackService:
                 source_pdf=str(source_pdf_path) if source_pdf_path else None,
             )
             final_pdf_path.unlink(missing_ok=True)
+        elif not selective_overlay_enabled:
+            overlays_asset_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(compiled_pdf_path, final_pdf_path)
+            overlay_summary = OverlaySummary(
+                success=True,
+                overlays=0,
+                pages_processed=0,
+                per_page=[],
+                method="none",
+                missing=[],
+                source_pdf=None,
+            )
         else:
+            search_pdf_path: Optional[Path] = None
+            if source_pdf_path and Path(source_pdf_path).exists():
+                search_pdf_path = Path(source_pdf_path)
+            elif compiled_pdf_path.exists():
+                search_pdf_path = compiled_pdf_path
+
             overlay_targets, missing_overlay_targets = self._collect_overlay_targets(
                 run_id,
                 questions,
                 method_key=method_key,
+                search_pdf_path=search_pdf_path,
             )
             if missing_overlay_targets:
                 for entry in missing_overlay_targets:
@@ -251,6 +286,7 @@ class LatexAttackService:
                 run_id=run_id,
                 missing_targets=missing_overlay_targets,
                 method_key=method_key,
+                force_full_page=method_key in self.FORCE_FULL_PAGE_METHODS,
             )
 
         enhanced_pdf = enhanced_pdf_path(run_id, method_key)
@@ -389,63 +425,88 @@ class LatexAttackService:
         questions: Iterable[QuestionManipulation],
         *,
         method_key: str = "latex_dual_layer",
+        search_pdf_path: Optional[Path] = None,
     ) -> Tuple[Dict[int, List[Dict[str, Any]]], List[Dict[str, Any]]]:
         raw_targets: Dict[int, List[Dict[str, Any]]] = defaultdict(list)
         missing: List[Dict[str, Any]] = []
         total_mappings = 0
         log_method = method_key.replace("_", "-")
-
-        for question in questions:
-            q_number = str(getattr(question, "question_number", None) or getattr(question, "id", "") or "")
-            mappings = list(getattr(question, "substring_mappings", []) or [])
-            structured_q = getattr(question, "_structured_overlay_meta", None)
-            for mapping in mappings:
-                if not mapping:
-                    continue
-                total_mappings += 1
-                mapping_id = mapping.get("id")
-                page_index = self._resolve_page_index(mapping)
-                if page_index is None and structured_q:
-                    page_from_struct = self._resolve_page_from_structured(structured_q)
-                    if page_from_struct is not None:
-                        page_index = page_from_struct
-                if page_index is None:
-                    missing.append(
-                        {
-                            "reason": "missing_page",
-                            "question_number": q_number,
-                            "mapping_id": mapping_id,
-                        }
-                    )
-                    continue
-
-                rect = self._resolve_mapping_rect(mapping)
-                if rect is None and structured_q:
-                    rect = self._resolve_rect_from_structured(mapping, structured_q)
-                if rect is None or rect.get_area() <= 0:
-                    missing.append(
-                        {
-                            "reason": "missing_geometry",
-                            "question_number": q_number,
-                            "mapping_id": mapping_id,
-                            "page": page_index + 1,
-                        }
-                    )
-                    continue
-
-                padded_rect = self._pad_rect(rect, pad=0.75)
-                raw_targets[page_index].append(
-                    {
-                        "rect": padded_rect,
-                        "mapping": {
-                            "id": mapping_id,
-                            "question_number": q_number,
-                            "original": mapping.get("original"),
-                            "replacement": mapping.get("replacement"),
-                            "context": mapping.get("context"),
-                        },
-                    }
+        pdf_doc: Optional[fitz.Document] = None
+        if search_pdf_path:
+            try:
+                pdf_doc = fitz.open(str(search_pdf_path))
+            except Exception as exc:  # noqa: BLE001
+                self.logger.warning(
+                    "%s overlay fallback PDF open failed",
+                    log_method,
+                    extra={"run_id": run_id, "pdf": str(search_pdf_path), "error": str(exc)},
                 )
+                pdf_doc = None
+
+        try:
+            for question in questions:
+                q_number = str(getattr(question, "question_number", None) or getattr(question, "id", "") or "")
+                mappings = list(getattr(question, "substring_mappings", []) or [])
+                structured_q = getattr(question, "_structured_overlay_meta", None)
+                for mapping in mappings:
+                    if not mapping:
+                        continue
+                    total_mappings += 1
+                    mapping_id = mapping.get("id")
+                    page_index = self._resolve_page_index(mapping)
+                    if page_index is None and structured_q:
+                        page_from_struct = self._resolve_page_from_structured(structured_q)
+                        if page_from_struct is not None:
+                            page_index = page_from_struct
+                    if page_index is None:
+                        missing.append(
+                            {
+                                "reason": "missing_page",
+                                "question_number": q_number,
+                                "mapping_id": mapping_id,
+                            }
+                        )
+                        continue
+
+                    rect = self._resolve_mapping_rect(mapping)
+                    if rect is None and structured_q:
+                        rect = self._resolve_rect_from_structured(mapping, structured_q)
+                    if (rect is None or rect.get_area() <= 0) and pdf_doc is not None:
+                        rect = self._resolve_rect_from_pdf(
+                            pdf_doc,
+                            page_index,
+                            mapping,
+                            structured_q,
+                            run_id,
+                            log_method,
+                        )
+                    if rect is None or rect.get_area() <= 0:
+                        missing.append(
+                            {
+                                "reason": "missing_geometry",
+                                "question_number": q_number,
+                                "mapping_id": mapping_id,
+                                "page": page_index + 1,
+                            }
+                        )
+                        continue
+
+                    padded_rect = self._pad_rect(rect, pad=0.75)
+                    raw_targets[page_index].append(
+                        {
+                            "rect": padded_rect,
+                            "mapping": {
+                                "id": mapping_id,
+                                "question_number": q_number,
+                                "original": mapping.get("original"),
+                                "replacement": mapping.get("replacement"),
+                                "context": mapping.get("context"),
+                            },
+                        }
+                    )
+        finally:
+            if pdf_doc is not None:
+                pdf_doc.close()
 
         merged_targets: Dict[int, List[Dict[str, Any]]] = {}
         for page_index, entries in raw_targets.items():
@@ -652,6 +713,174 @@ class LatexAttackService:
                 continue
             union = rect if union is None else union | rect
         return union
+
+    def _resolve_rect_from_pdf(
+        self,
+        pdf_doc: fitz.Document,
+        page_index: int,
+        mapping: Dict[str, Any],
+        structured_question: Optional[Dict[str, Any]],
+        run_id: str,
+        log_method: str,
+    ) -> Optional[fitz.Rect]:
+        if page_index < 0:
+            return None
+        try:
+            page = pdf_doc.load_page(page_index)
+        except (ValueError, RuntimeError):
+            return None
+
+        candidates = self._gather_overlay_text_candidates(mapping, structured_question)
+        for text in candidates:
+            for candidate in self._iter_search_candidates(text):
+                rect = self._search_text_in_page(page, candidate)
+                if rect is not None and rect.get_area() > 0:
+                    self.logger.info(
+                        "%s overlay geometry recovered via PDF search",
+                        log_method,
+                        extra={
+                            "run_id": run_id,
+                            "mapping_id": mapping.get("id"),
+                            "question_number": mapping.get("question_number"),
+                            "page_index": page_index,
+                            "candidate": candidate[:120],
+                        },
+                    )
+                    return rect
+        return None
+
+    def _gather_overlay_text_candidates(
+        self,
+        mapping: Dict[str, Any],
+        structured_question: Optional[Dict[str, Any]],
+    ) -> List[str]:
+        candidates: List[str] = []
+        for key in ("matched_fragment", "original"):
+            value = (mapping or {}).get(key)
+            if isinstance(value, str):
+                candidates.append(value)
+
+        if not candidates and structured_question:
+            stem_text = structured_question.get("stem_text")
+            if isinstance(stem_text, str):
+                candidates.append(stem_text)
+
+        replacement = (mapping or {}).get("replacement")
+        if replacement and isinstance(replacement, str):
+            candidates.append(replacement)
+
+        unique: List[str] = []
+        seen: set[str] = set()
+        for text in candidates:
+            normalized = (text or "").strip()
+            if not normalized:
+                continue
+            if normalized not in seen:
+                seen.add(normalized)
+                unique.append(normalized)
+        return unique
+
+    def _iter_search_candidates(self, text: str) -> Iterable[str]:
+        if not text:
+            return []
+
+        variations = [
+            text,
+            text.translate(self._TEXT_SANITIZE_TABLE),
+        ]
+
+        normalized = self._normalize_search_text(text)
+        if normalized:
+            variations.append(normalized)
+
+        ascii_only = normalized.encode("ascii", "ignore").decode("ascii") if normalized else ""
+        if ascii_only and ascii_only not in variations:
+            variations.append(ascii_only)
+
+        words = normalized.split() if normalized else text.split()
+        if len(words) > 8:
+            truncated = " ".join(words[:8])
+            variations.append(truncated)
+
+        seen: set[str] = set()
+        ordered: List[str] = []
+        for candidate in variations:
+            candidate = (candidate or "").strip()
+            if not candidate:
+                continue
+            if candidate in seen:
+                continue
+            seen.add(candidate)
+            ordered.append(candidate)
+        return ordered
+
+    def _normalize_search_text(self, text: str) -> str:
+        normalized = (text or "").translate(self._TEXT_SANITIZE_TABLE)
+        normalized = " ".join(normalized.split())
+        return normalized.strip()
+
+    def _search_text_in_page(self, page: fitz.Page, text: str) -> Optional[fitz.Rect]:
+        if not text:
+            return None
+        try:
+            hits = page.search_for(text, hit_max=8)
+        except Exception:  # noqa: BLE001
+            hits = []
+        for rect in hits:
+            if rect.get_area() > 0:
+                return rect
+
+        tokens = self._tokenize_text(text)
+        if not tokens:
+            return None
+        return self._locate_tokens_sequence(page, tokens)
+
+    def _tokenize_text(self, text: str, limit: int = 12) -> List[str]:
+        if not text:
+            return []
+        tokens = re.findall(r"[0-9a-zA-Z]+", text.lower())
+        if limit > 0:
+            tokens = tokens[:limit]
+        return tokens
+
+    def _locate_tokens_sequence(self, page: fitz.Page, tokens: List[str]) -> Optional[fitz.Rect]:
+        if not tokens:
+            return None
+        try:
+            words = page.get_text("words") or []
+        except Exception:  # noqa: BLE001
+            return None
+
+        normalized_words: List[Tuple[str, fitz.Rect]] = []
+        for entry in words:
+            if len(entry) < 5:
+                continue
+            raw_word = str(entry[4])
+            token = re.sub(r"[^0-9a-z]+", "", raw_word.lower())
+            if not token:
+                continue
+            rect = fitz.Rect(entry[0], entry[1], entry[2], entry[3])
+            normalized_words.append((token, rect))
+
+        token_len = len(tokens)
+        if token_len > len(normalized_words):
+            return None
+
+        for idx in range(len(normalized_words) - token_len + 1):
+            word_token, word_rect = normalized_words[idx]
+            if word_token != tokens[0]:
+                continue
+            rect = fitz.Rect(word_rect)
+            match = True
+            for offset in range(1, token_len):
+                next_token, next_rect = normalized_words[idx + offset]
+                if next_token != tokens[offset]:
+                    match = False
+                    break
+                rect |= next_rect
+            if match and rect.get_area() > 0:
+                return rect
+        return None
 
     def _preprocess_source(self, tex_content: str) -> str:
         pattern = re.compile(r"\\usepackage\{enumitem\}\s*")
@@ -1404,6 +1633,7 @@ class LatexAttackService:
         missing_targets: List[Dict[str, Any]],
         *,
         method_key: str = "latex_dual_layer",
+        force_full_page: bool = False,
     ) -> OverlaySummary:
         log_method = method_key.replace("_", "-")
         overlay_summary = OverlaySummary(
@@ -1424,7 +1654,7 @@ class LatexAttackService:
         pages_processed = 0
         per_page: List[Dict[str, Any]] = []
         used_selective = False
-        used_full_fallback = False
+        used_full_fallback = force_full_page
         success = False
 
         missing_pages = {
@@ -1462,8 +1692,8 @@ class LatexAttackService:
                 }
 
                 original_page = original_doc[page_index] if page_index < len(original_doc) else None
-                page_targets = overlay_targets.get(page_index, [])
-                fallback_required = False
+                page_targets = [] if force_full_page else overlay_targets.get(page_index, [])
+                fallback_required = force_full_page
 
                 if original_page and page_targets:
                     used_selective = True
@@ -1584,9 +1814,7 @@ class LatexAttackService:
                             }
                         )
 
-                needs_full_page = False
-                if fallback_required:
-                    needs_full_page = True
+                needs_full_page = fallback_required
                 if page_index in missing_pages:
                     needs_full_page = True
 
