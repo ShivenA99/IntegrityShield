@@ -15,6 +15,9 @@ import { NotificationProvider } from "@contexts/NotificationContext";
 import PreviousRuns from "@pages/PreviousRuns";
 import ClassroomsPage from "@pages/Classrooms";
 import ClassroomEvaluationPage from "@pages/ClassroomEvaluation";
+import DetectionReportPage from "@pages/reports/DetectionReportPage";
+import VulnerabilityReportPage from "@pages/reports/VulnerabilityReportPage";
+import EvaluationReportPage from "@pages/reports/EvaluationReportPage";
 
 const App: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
@@ -44,6 +47,9 @@ const App: React.FC = () => {
                     <Route path="/runs/:runId" element={<RunDetail />} />
                     <Route path="/classrooms" element={<ClassroomsPage />} />
                     <Route path="/classrooms/:runId/:classroomId" element={<ClassroomEvaluationPage />} />
+                    <Route path="/runs/:runId/reports/detection" element={<DetectionReportPage />} />
+                    <Route path="/runs/:runId/reports/vulnerability" element={<VulnerabilityReportPage />} />
+                    <Route path="/runs/:runId/reports/evaluation" element={<EvaluationReportPage />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/developer" element={<DeveloperConsole />} />
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />

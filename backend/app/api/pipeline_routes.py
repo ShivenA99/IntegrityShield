@@ -25,6 +25,7 @@ from ..services.pipeline.smart_substitution_service import SmartSubstitutionServ
 from ..services.data_management.file_manager import FileManager
 from ..services.data_management.structured_data_manager import StructuredDataManager
 from ..services.pipeline.manual_input_loader import ManualInputLoader
+from ..services.reports import EvaluationReportService, VulnerabilityReportService
 from ..utils.exceptions import ResourceNotFound
 from ..extensions import db
 from ..utils.storage_paths import (
@@ -1313,6 +1314,50 @@ def generate_detection_report(run_id: str):
         db.session.rollback()
         current_app.logger.exception("Failed to generate detection report", extra={"run_id": run_id})
         return jsonify({"error": "Failed to generate detection report"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    return jsonify(result), HTTPStatus.OK
+
+
+@bp.post("/<run_id>/vulnerability_report")
+def generate_vulnerability_report(run_id: str):
+    service = VulnerabilityReportService()
+    try:
+        result = service.generate(run_id)
+    except ResourceNotFound as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.NOT_FOUND
+    except ValueError as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+    except Exception:  # pragma: no cover
+        db.session.rollback()
+        current_app.logger.exception("Failed to generate vulnerability report", extra={"run_id": run_id})
+        return jsonify({"error": "Failed to generate vulnerability report"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    return jsonify(result), HTTPStatus.OK
+
+
+@bp.post("/<run_id>/evaluation_report")
+def generate_evaluation_report(run_id: str):
+    payload = request.get_json(silent=True) or {}
+    method = None
+    if isinstance(payload, dict):
+        method = payload.get("method") or payload.get("variant")
+    service = EvaluationReportService()
+    try:
+        result = service.generate(run_id, method=method)
+    except ResourceNotFound as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.NOT_FOUND
+    except ValueError as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+    except Exception:  # pragma: no cover
+        db.session.rollback()
+        current_app.logger.exception(
+            "Failed to generate evaluation report", extra={"run_id": run_id, "method": method}
+        )
+        return jsonify({"error": "Failed to generate evaluation report"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
     return jsonify(result), HTTPStatus.OK
 

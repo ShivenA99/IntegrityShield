@@ -7,8 +7,10 @@ import type {
   ClassroomEvaluationResponse,
   ClassroomEvaluatePayload,
   DetectionReportResult,
+  EvaluationReportResult,
   PipelineConfigPayload,
-  PipelineRunSummary
+  PipelineRunSummary,
+  VulnerabilityReportResult
 } from "@services/types/pipeline";
 
 const client = axios.create({
@@ -108,6 +110,19 @@ export async function generateAnswerSheets(
 
 export async function generateDetectionReport(runId: string): Promise<DetectionReportResult> {
   const response = await client.post<DetectionReportResult>(`/${runId}/detection_report`);
+  return response.data;
+}
+
+export async function generateVulnerabilityReport(runId: string): Promise<VulnerabilityReportResult> {
+  const response = await client.post<VulnerabilityReportResult>(`/${runId}/vulnerability_report`);
+  return response.data;
+}
+
+export async function generateEvaluationReport(
+  runId: string,
+  payload?: { method?: string }
+): Promise<EvaluationReportResult> {
+  const response = await client.post<EvaluationReportResult>(`/${runId}/evaluation_report`, payload ?? {});
   return response.data;
 }
 

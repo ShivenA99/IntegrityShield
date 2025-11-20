@@ -9,6 +9,7 @@ from ...models import QuestionManipulation
 from ...services.data_management.structured_data_manager import StructuredDataManager
 from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
+from .gold_answer_generation_service import GoldAnswerGenerationService
 
 
 class ContentDiscoveryService:
@@ -120,6 +121,8 @@ class ContentDiscoveryService:
                     existing.question_type = str(question.get("question_type", existing.question_type or "mcq_single"))
                     existing.original_text = str(question.get("stem_text") or existing.original_text or "")
                     existing.options_data = question.get("options", existing.options_data or {})
+                    if question.get("visual_elements") is not None:
+                        existing.visual_elements = question.get("visual_elements")
                     positioning = question.get("positioning") or {}
                     if positioning:
                         existing.stem_position = positioning
@@ -179,6 +182,7 @@ class ContentDiscoveryService:
                         question_type=str(question.get("question_type", "mcq_single")),
                         original_text=str(question.get("stem_text") or f"Question {sequence_index + 1}"),
                         options_data=question.get("options", {}),
+                        visual_elements=question.get("visual_elements"),
                         ai_model_results={},
                         sequence_index=sequence_index,
                         source_identifier=source_identifier,
@@ -236,6 +240,7 @@ class ContentDiscoveryService:
                     question_type=str(question.get("question_type", "mcq_single")),
                     original_text=str(question["stem_text"]),
                     options_data=question.get("options", {}),
+                    visual_elements=question.get("visual_elements"),
                     ai_model_results={},
                     sequence_index=sequence_index,
                     source_identifier=source_identifier,
@@ -258,6 +263,95 @@ class ContentDiscoveryService:
             db.session.commit()
             existing_rows = new_rows
             existing_by_id = {row.id: row for row in existing_rows}
+
+        structured["questions"] = questions
+
+        metadata = structured.setdefault("pipeline_metadata", metadata)
+        total_questions = len(questions)
+        satisfied_count = sum(
+            1 for question in questions if GoldAnswerGenerationService.is_gold_answer_satisfied(question)
+        )
+        gold_progress = {
+            "status": "completed" if satisfied_count == total_questions else "running",
+            "total": total_questions,
+            "completed": satisfied_count,
+            "pending": max(total_questions - satisfied_count, 0),
+            "updated_at": isoformat(utc_now()),
+        }
+        metadata["gold_generation"] = gold_progress
+        self.structured_manager.save(run_id, structured)
+
+        gold_generator = GoldAnswerGenerationService()
+        needs_gold = satisfied_count < total_questions
+        if needs_gold and not gold_generator.is_configured():
+            raise ValueError(
+                "Gold answer generation requires GPT-5 configuration. "
+                "Set OPENAI_API_KEY and FAIRTESTAI_GOLD_ANSWER_MODEL to continue."
+            )
+
+        processed_updates: set[tuple[int | None, str | None]] = set()
+
+        def _persist_question_update(update: Optional[Dict[str, Any]]) -> None:
+            if not update:
+                return
+            manip_id = update.get("manipulation_id")
+            key = (manip_id, update.get("gold_answer"))
+            if key in processed_updates:
+                return
+            if manip_id and manip_id in existing_by_id:
+                row = existing_by_id[manip_id]
+                gold_answer = update.get("gold_answer")
+                gold_conf = update.get("gold_confidence")
+                changed = False
+                if gold_answer and row.gold_answer != gold_answer:
+                    row.gold_answer = gold_answer
+                    changed = True
+                if gold_conf is not None and row.gold_confidence != gold_conf:
+                    row.gold_confidence = gold_conf
+                    changed = True
+                if changed:
+                    db.session.add(row)
+                    db.session.commit()
+                    existing_by_id[manip_id] = row
+            processed_updates.add(key)
+
+        def _progress_update(payload: Dict[str, Any], question_update: Optional[Dict[str, Any]]) -> None:
+            metadata["gold_generation"] = payload
+            metadata["last_updated"] = isoformat(utc_now())
+            if question_update:
+                _persist_question_update(question_update)
+            self.structured_manager.save(run_id, structured)
+
+        gold_updates: List[Dict[str, Any]] = []
+        if gold_generator.is_configured():
+            try:
+                structured, gold_updates = gold_generator.populate_gold_answers(
+                    run_id,
+                    structured,
+                    progress_callback=_progress_update,
+                )
+                questions = structured.get("questions", questions)
+                # Explicitly sync gold answers to ai_questions after generation completes
+                gold_generator._sync_ai_questions(structured)
+                # Ensure structured["questions"] updates are persisted
+                self.structured_manager.save(run_id, structured)
+            except Exception as exc:  # pragma: no cover - defensive logging
+                self.logger.warning("Gold answer generation failed: %s", exc, run_id=run_id)
+        for update in gold_updates or []:
+            _persist_question_update(update)
+
+        final_completed = sum(
+            1 for question in structured.get("questions", questions)
+            if GoldAnswerGenerationService.is_gold_answer_satisfied(question)
+        )
+        metadata["gold_generation"] = {
+            **metadata.get("gold_generation", {}),
+            "status": "completed" if final_completed == total_questions else metadata.get("gold_generation", {}).get("status", "partial"),
+            "total": total_questions,
+            "completed": final_completed,
+            "pending": max(total_questions - final_completed, 0),
+            "updated_at": isoformat(utc_now()),
+        }
 
         question_index: List[Dict[str, Any]] = []
         span_index_available = bool(structured.get("pymupdf_span_index"))

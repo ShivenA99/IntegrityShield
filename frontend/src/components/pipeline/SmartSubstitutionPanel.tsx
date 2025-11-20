@@ -916,11 +916,6 @@ const SmartSubstitutionPanel: React.FC = () => {
                         </div>
                         <div style={{ color: 'var(--muted)', fontWeight: 'bold' }}>
                           {question.gold_answer}
-                          {question.gold_confidence && (
-                            <span style={{ fontSize: '12px', marginLeft: '8px', opacity: 0.8 }}>
-                              (Confidence: {Math.round(question.gold_confidence * 100)}%)
-                            </span>
-                          )}
                         </div>
                       </div>
                     )}

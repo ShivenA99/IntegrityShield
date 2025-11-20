@@ -62,7 +62,8 @@ const PipelineContainer: React.FC = () => {
   const messageTimerRef = useRef<number | null>(null);
 
   const runId = status?.run_id ?? activeRunId ?? null;
-  const documentInfo = (status?.structured_data as Record<string, any> | undefined)?.document;
+  const structuredData = (status?.structured_data as Record<string, any> | undefined) ?? undefined;
+  const documentInfo = structuredData?.document;
   const classrooms = status?.classrooms ?? [];
 
   const enhancementMethods = useMemo(() => {
@@ -79,8 +80,7 @@ const PipelineContainer: React.FC = () => {
   }, [enhancementMethods]);
 
   const pdfStage = status?.stages.find((stage) => stage.name === "pdf_creation");
-  const manipulationResults = ((status?.structured_data as Record<string, any> | undefined)?.manipulation_results ??
-    {}) as Record<string, any>;
+  const manipulationResults = (structuredData?.manipulation_results ?? {}) as Record<string, any>;
   const enhancedPdfs = (manipulationResults?.enhanced_pdfs ?? {}) as Record<string, any>;
   const availableDownloads = useMemo(() => {
     return Object.entries(enhancedPdfs)
@@ -243,6 +243,13 @@ const PipelineContainer: React.FC = () => {
   }, [status?.status, status?.current_stage]);
 
   const trackerStages = useMemo(() => status?.stages ?? [], [status?.stages]);
+  const reportsBucket = (structuredData?.reports as Record<string, any> | undefined) ?? {};
+  const vulnerabilityReportMeta = reportsBucket?.vulnerability ?? null;
+  const detectionReportMeta = reportsBucket?.detection ?? null;
+  const evaluationReportBucket = (reportsBucket?.evaluation as Record<string, any> | undefined) ?? undefined;
+  const hasEvaluationReports = Boolean(evaluationReportBucket && Object.keys(evaluationReportBucket).length > 0);
+  const reconstructedPdfRelative = structuredData?.pipeline_metadata?.data_extraction_outputs?.pdf as string | undefined;
+
   const runLabel = runId ? `${runId.slice(0, 6)}…${runId.slice(-4)}` : "No active run";
   const currentStageLabel = status?.current_stage
     ? CORE_STAGE_LABELS[status.current_stage] ?? status.current_stage.replace(/_/g, " ")
@@ -256,6 +263,85 @@ const PipelineContainer: React.FC = () => {
   const evaluationActionTitle = evaluationReady
     ? "Review classroom evaluations"
     : "Create at least one classroom dataset to enable evaluation";
+
+  const renderStageActions = useCallback(
+    (stageName: PipelineStageName) => {
+      if (!runId) return null;
+
+      if (stageName === "content_discovery") {
+        return (
+          <>
+            <button
+              type="button"
+              className="progress-tracker__quick-button"
+              disabled={!vulnerabilityReportMeta?.artifact}
+              onClick={() => navigate(`/runs/${runId}/reports/vulnerability`)}
+              title={
+                vulnerabilityReportMeta?.artifact
+                  ? "Open vulnerability report"
+                  : "Generate vulnerability report from Content Discovery first"
+              }
+            >
+              V
+            </button>
+            <button
+              type="button"
+              className="progress-tracker__quick-button"
+              disabled={!reconstructedPdfRelative}
+              onClick={() => handleStageSelect("content_discovery")}
+              title="Jump to Content Discovery to access reconstructed PDF"
+            >
+              R
+            </button>
+          </>
+        );
+      }
+
+      if (stageName === "pdf_creation") {
+        return (
+          <>
+            <button
+              type="button"
+              className="progress-tracker__quick-button"
+              disabled={!detectionReportMeta?.artifact}
+              onClick={() => navigate(`/runs/${runId}/reports/detection`)}
+              title={
+                detectionReportMeta?.artifact
+                  ? "Open detection report"
+                  : "Generate a detection report from PDF Creation panel"
+              }
+            >
+              D
+            </button>
+            <button
+              type="button"
+              className="progress-tracker__quick-button"
+              disabled={!hasEvaluationReports}
+              onClick={() => navigate(`/runs/${runId}/reports/evaluation`)}
+              title={
+                hasEvaluationReports
+                  ? "View evaluation reports"
+                  : "Run classroom evaluations to unlock reports"
+              }
+            >
+              E
+            </button>
+          </>
+        );
+      }
+
+      return null;
+    },
+    [
+      detectionReportMeta?.artifact,
+      handleStageSelect,
+      hasEvaluationReports,
+      navigate,
+      reconstructedPdfRelative,
+      runId,
+      vulnerabilityReportMeta?.artifact,
+    ]
+  );
 
   const handleRefresh = useCallback(async () => {
     if (!runId || isRefreshing) return;
@@ -381,6 +467,7 @@ const PipelineContainer: React.FC = () => {
             onStageSelect={(stage) => handleStageSelect(stage as PipelineStageName)}
             selectedStage={selectedStage}
             currentStage={status?.current_stage}
+            renderStageActions={renderStageActions}
           />
         </div>
         <AttackVariantPalette

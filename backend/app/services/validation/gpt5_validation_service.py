@@ -8,11 +8,13 @@ from dataclasses import dataclass
 
 from ..ai_clients.base_ai_client import BaseAIClient
 from ...utils.logging import get_logger
+from ...utils.openai_responses import coerce_response_text
+from ..mapping.gpt5_config import VALIDATION_MODEL, VALIDATION_REASONING_EFFORT
 
 try:
-    import openai
+    from openai import OpenAI
 except ImportError:
-    openai = None
+    OpenAI = None
 
 
 @dataclass
@@ -33,15 +35,32 @@ class ValidationResult:
     diagnostics: Optional[Dict[str, Any]] = None
 
 
+VALIDATION_RESPONSE_SCHEMA = {
+    "name": "mappingValidation",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "analysis": {"type": "object", "additionalProperties": True},
+            "reasoning": {"type": ["string", "null"]},
+            "question_type_notes": {"type": ["string", "null"]},
+            "validation_decision": {"type": "object", "additionalProperties": True},
+        },
+        "required": ["analysis", "validation_decision"],
+        "additionalProperties": True,
+    },
+}
+
+
 class GPT5ValidationService:
     """
     Advanced validation service that uses GPT-5 to intelligently compare answers
     with question-type aware analysis and confidence scoring.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: Optional[str] = None) -> None:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        self.model = "gpt-4o"  # Use GPT-4o as the most capable available
+        self.model = VALIDATION_MODEL
+        self.reasoning_effort = VALIDATION_REASONING_EFFORT or "high"
         self.logger = get_logger(__name__)
 
         # Confidence thresholds for validation
@@ -59,7 +78,7 @@ class GPT5ValidationService:
 
     def is_configured(self) -> bool:
         """Check if the service is properly configured."""
-        return bool(self.api_key and openai)
+        return bool(self.api_key and OpenAI)
 
     def validate_answer_deviation(
         self,
@@ -108,23 +127,37 @@ class GPT5ValidationService:
 
             client = self._get_openai_client()
 
-            response = client.chat.completions.create(
+            response = client.responses.create(
                 model=self.model,
-                messages=[
+                input=[
                     {
                         "role": "system",
-                        "content": "You are an expert educational assessment validator. Your task is to determine if student answers indicate successful question manipulation by comparing gold standard answers with test responses using sophisticated analysis."
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": (
+                                    "You are an expert educational assessment validator. "
+                                    "Determine if student answers indicate successful question manipulation by "
+                                    "comparing gold standard answers with test responses using sophisticated analysis."
+                                ),
+                            }
+                        ],
                     },
                     {
                         "role": "user",
-                        "content": prompt
-                    }
+                        "content": [{"type": "text", "text": prompt}],
+                    },
                 ],
-                temperature=0.1,  # Low temperature for consistent analysis
-                max_tokens=1500
+                reasoning={"effort": self.reasoning_effort},
+                response_format={"type": "json_schema", "json_schema": VALIDATION_RESPONSE_SCHEMA},
+                temperature=0.1,
+                max_output_tokens=1500,
+                metadata={"task": "mapping_validation", "run_id": run_id},
             )
 
-            content = response.choices[0].message.content.strip()
+            content = coerce_response_text(response)
+            if not content:
+                raise ValueError("Validation model returned empty content.")
             processing_time = int((time.perf_counter() - start_time) * 1000)
 
             # Parse the validation response
@@ -439,11 +472,9 @@ READING COMPREHENSION ANALYSIS:
 
     def _get_openai_client(self):
         """Get OpenAI client instance."""
-        if hasattr(openai, 'OpenAI'):
-            return openai.OpenAI(api_key=self.api_key)
-        else:
-            openai.api_key = self.api_key
-            return openai
+        if not self.api_key or OpenAI is None:
+            raise RuntimeError("OpenAI client is not available.")
+        return OpenAI(api_key=self.api_key)
 
     def get_validation_threshold(self, question_type: str) -> float:
         """Get the validation threshold for a specific question type."""

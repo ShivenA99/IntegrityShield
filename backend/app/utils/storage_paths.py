@@ -62,6 +62,29 @@ def detection_report_directory(run_id: str) -> Path:
     return path
 
 
+def vulnerability_report_directory(run_id: str) -> Path:
+    path = run_directory(run_id) / "vulnerability_report"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def evaluation_report_directory(run_id: str, method_name: str | None = None) -> Path:
+    path = run_directory(run_id) / "evaluation_report"
+    if method_name:
+        path = path / method_name
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def resolve_run_relative_path(run_id: str, relative_path: str) -> Path:
+    candidate = Path(relative_path)
+    if candidate.is_absolute():
+        return candidate
+    base = run_directory(run_id)
+    normalized = relative_path.lstrip("/\\")
+    return (base / normalized).resolve()
+
+
 def structured_data_path(run_id: str) -> Path:
     return run_directory(run_id) / "structured.json"
 

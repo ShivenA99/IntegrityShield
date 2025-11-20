@@ -40,7 +40,7 @@ class DetectionReportService:
         "constructed_response",
     }
 
-    REQUIRED_STAGES = {"smart_substitution"}
+    REQUIRED_STAGES = {"smart_substitution", "pdf_creation"}
 
     def __init__(self) -> None:
         self.structured_manager = StructuredDataManager()
@@ -144,6 +144,7 @@ class DetectionReportService:
 
         result_payload = {
             "run_id": run_id,
+            "report_type": "detection",
             "generated_at": generated_at,
             "summary": summary,
             "questions": compiled_questions,
@@ -161,11 +162,20 @@ class DetectionReportService:
             **result_payload,
             "file_path": str(report_path),
             "relative_path": relative_path,
+            "status": "completed",
         }
         manipulation_results["detection_report"] = detection_payload
 
         artifacts = manipulation_results.setdefault("artifacts", {})
         artifacts["detection_report"] = {"json": relative_path}
+
+        reports_section = structured.setdefault("reports", {})
+        reports_section["detection"] = {
+            "generated_at": generated_at,
+            "summary": summary,
+            "artifact": relative_path,
+            "status": "completed",
+        }
 
         self.structured_manager.save(run_id, structured)
 
@@ -178,8 +188,9 @@ class DetectionReportService:
         stage_status = {stage.stage_name: stage.status for stage in run.stages}
         missing = sorted(stage for stage in self.REQUIRED_STAGES if stage_status.get(stage) != "completed")
         if missing:
+            missing_list = ", ".join(missing)
             raise ValueError(
-                "Cannot generate detection report until prerequisite stages are completed.",
+                f"Cannot generate detection report until prerequisite stages are completed ({missing_list})."
             )
 
     def _compile_mappings(self, mappings: List[Dict[str, Any]]) -> Tuple[List[MappingInsight], Dict[str, Any]]:
@@ -374,5 +385,3 @@ class DetectionReportService:
         if has_options and mapping_stats.get("target_labels"):
             return "high"
         return "medium"
-
-

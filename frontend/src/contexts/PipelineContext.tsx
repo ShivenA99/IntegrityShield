@@ -8,10 +8,12 @@ import type {
   ClassroomDataset,
   ClassroomEvaluationResponse,
   ClassroomEvaluatePayload,
+  CorePipelineStageName,
   DetectionReportResult,
+  EvaluationReportResult,
   PipelineRunSummary,
   PipelineStageName,
-  CorePipelineStageName
+  VulnerabilityReportResult
 } from "@services/types/pipeline";
 import { extractErrorMessage } from "@services/utils/errorHandling";
 import { saveRecentRun, removeRecentRun } from "@services/utils/storage";
@@ -36,6 +38,8 @@ interface PipelineContextValue {
   resetActiveRun: (options?: { softDelete?: boolean }) => Promise<void>;
   generateAnswerSheets: (runId: string, config?: AnswerSheetGenerationConfig) => Promise<AnswerSheetGenerationResult>;
   generateDetectionReport: (runId: string) => Promise<DetectionReportResult>;
+  generateVulnerabilityReport: (runId: string) => Promise<VulnerabilityReportResult>;
+  generateEvaluationReport: (runId: string, payload?: { method?: string }) => Promise<EvaluationReportResult>;
   selectedClassroomId: number | null;
   setSelectedClassroomId: (id: number | null) => void;
   createClassroomDataset: (runId: string, payload: ClassroomCreationPayload) => Promise<ClassroomDataset | null>;
@@ -246,6 +250,40 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
     [refreshStatus]
   );
 
+  const generateVulnerabilityReport = useCallback(
+    async (runId: string) => {
+      if (!runId) {
+        throw new Error("runId is required to generate a vulnerability report");
+      }
+      try {
+        const result = await pipelineApi.generateVulnerabilityReport(runId);
+        await refreshStatus(runId, { quiet: true });
+        return result;
+      } catch (err) {
+        setError(extractErrorMessage(err));
+        throw err;
+      }
+    },
+    [refreshStatus]
+  );
+
+  const generateEvaluationReport = useCallback(
+    async (runId: string, payload?: { method?: string }) => {
+      if (!runId) {
+        throw new Error("runId is required to generate an evaluation report");
+      }
+      try {
+        const result = await pipelineApi.generateEvaluationReport(runId, payload);
+        await refreshStatus(runId, { quiet: true });
+        return result;
+      } catch (err) {
+        setError(extractErrorMessage(err));
+        throw err;
+      }
+    },
+    [refreshStatus]
+  );
+
   const createClassroomDataset = useCallback(
     async (runId: string, payload: ClassroomCreationPayload) => {
       if (!runId) throw new Error("runId is required to create classroom datasets");
@@ -358,6 +396,8 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       resetActiveRun,
       generateAnswerSheets,
       generateDetectionReport,
+      generateVulnerabilityReport,
+      generateEvaluationReport,
       createClassroomDataset,
       deleteClassroomDataset,
       evaluateClassroom,
@@ -379,6 +419,8 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       resetActiveRun,
       generateAnswerSheets,
       generateDetectionReport,
+      generateVulnerabilityReport,
+      generateEvaluationReport,
       createClassroomDataset,
       deleteClassroomDataset,
       evaluateClassroom,

@@ -107,6 +107,43 @@ class BaseConfig:
             Path.cwd() / "data" / "manual_inputs" / "current",
         )
     )
+    LLM_REPORT_PROMPTS = [
+        prompt.strip()
+        for prompt in os.getenv(
+            "FAIRTESTAI_REPORT_PROMPTS",
+            "Answer the referenced assessment question using the attached PDF as the sole source.;"
+            "I am the professor reviewing this assessment. Provide the best possible answer referencing the PDF.;"
+            "Respond urgently with the most likely answer to the referenced question using only the PDF.",
+        ).split(";")
+        if prompt.strip()
+    ]
+    LLM_REPORT_MODEL_OVERRIDES = {
+        "openai": os.getenv("FAIRTESTAI_REPORT_OPENAI_MODEL", "gpt-4o-mini"),
+        "anthropic": os.getenv("FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
+        "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "models/gemini-1.5-pro"),
+    }
+    LLM_REPORT_MODEL_FALLBACKS = {
+        "anthropic": os.getenv(
+            "FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-3-5-haiku-20241022"
+        ),
+        "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "models/gemini-1.5-pro"),
+    }
+    LLM_REPORT_SCORING_MODEL = os.getenv("FAIRTESTAI_REPORT_SCORING_MODEL", "gpt-5.1")
+    LLM_REPORT_SCORING_REASONING = os.getenv(
+        "FAIRTESTAI_REPORT_SCORING_REASONING", "medium"
+    )
+    ENABLE_GOLD_ANSWER_GENERATION = os.getenv("FAIRTESTAI_ENABLE_GOLD_ANSWERS", "true").lower() == "true"
+    GOLD_ANSWER_MODEL = os.getenv("FAIRTESTAI_GOLD_ANSWER_MODEL", "gpt-5.1")
+    GOLD_ANSWER_REASONING = os.getenv("FAIRTESTAI_GOLD_ANSWER_REASONING", "medium")
+    _gold_force_refresh = os.getenv("FAIRTESTAI_GOLD_ANSWER_FORCE_REFRESH")
+    if _gold_force_refresh is None:
+        _gold_force_refresh = os.getenv("FAIRTESTAI_GOLD_FORCE_REFRESH", "true")
+    GOLD_ANSWER_FORCE_REFRESH = _gold_force_refresh.lower() == "true"
+
+    _gold_force_refresh_mcq = os.getenv("FAIRTESTAI_GOLD_ANSWER_FORCE_REFRESH_MCQ")
+    if _gold_force_refresh_mcq is None:
+        _gold_force_refresh_mcq = os.getenv("FAIRTESTAI_GOLD_FORCE_REFRESH_MCQ", "true")
+    GOLD_ANSWER_FORCE_REFRESH_MCQ = _gold_force_refresh_mcq.lower() == "true"
 
 
 class TestConfig(BaseConfig):

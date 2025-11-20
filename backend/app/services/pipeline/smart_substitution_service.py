@@ -1346,9 +1346,13 @@ class SmartSubstitutionService:
 		mappings_created = 0
 		auto_generated_count = 0
 
-		# Compute true gold answers per question up-front
+		# Compute true gold answers per question up-front (skip if already populated)
 		for question_model in questions_models:
 			question_dict = ensure_structured_entry(question_model)
+			if question_model.gold_answer:
+				question_dict["gold_answer"] = question_model.gold_answer
+				question_dict["gold_confidence"] = question_model.gold_confidence
+				continue
 			gold_answer, gold_conf = self._compute_true_gold(question_model)
 			question_model.gold_answer = gold_answer
 			question_model.gold_confidence = gold_conf

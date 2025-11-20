@@ -4,7 +4,7 @@ import pytest
 
 from app import create_app
 from app.extensions import db
-from app.models import QuestionManipulation
+from app.models import PipelineRun, QuestionManipulation
 from app.services.pipeline.content_discovery_service import ContentDiscoveryService
 from app.services.data_management.structured_data_manager import StructuredDataManager
 from app.utils.storage_paths import run_directory
@@ -29,6 +29,8 @@ def _build_ai_question(number: str, stem: str, question_id: str) -> dict:
 			"A": f"{stem} option A",
 			"B": f"{stem} option B",
 		},
+		"gold_answer": "A",
+		"gold_confidence": 0.9,
 		"positioning": {
 			"page": 1,
 			"bbox": [0, 0, 100, 20],
@@ -41,7 +43,10 @@ def _build_ai_question(number: str, stem: str, question_id: str) -> dict:
 
 def test_content_discovery_preserves_order_with_duplicate_numbers(app_context):
 	run_id = "dup-questions"
-	run_directory(run_id)
+	run_dir = run_directory(run_id)
+	run_dir.mkdir(parents=True, exist_ok=True)
+	source_pdf = run_dir / "source.pdf"
+	source_pdf.write_text("dummy pdf", encoding="utf-8")
 	manager = StructuredDataManager()
 
 	structured = {
@@ -52,6 +57,16 @@ def test_content_discovery_preserves_order_with_duplicate_numbers(app_context):
 		],
 	}
 	manager.save(run_id, structured)
+
+	run = PipelineRun(
+		id=run_id,
+		original_pdf_path=str(source_pdf),
+		original_filename="source.pdf",
+		current_stage="content_discovery",
+		status="running",
+	)
+	db.session.add(run)
+	db.session.commit()
 
 	service = ContentDiscoveryService()
 	service._discover_questions(run_id)
@@ -87,6 +102,10 @@ def test_content_discovery_preserves_order_with_duplicate_numbers(app_context):
 	)
 	assert [q.id for q in questions_after] == [questions[0].id, questions[1].id]
 	assert [q.sequence_index for q in questions_after] == [0, 1]
+
+
+
+
 
 
 

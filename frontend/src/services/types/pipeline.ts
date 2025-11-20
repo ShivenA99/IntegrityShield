@@ -124,14 +124,77 @@ export interface DetectionReportSummary {
   target_label_distribution: { label: string; count: number }[];
 }
 
-export interface DetectionReportResult {
+export interface BaseReportResult {
   run_id: string;
+  report_type?: string;
   generated_at: string;
-  summary: DetectionReportSummary;
-  questions: DetectionReportQuestion[];
+  summary: Record<string, unknown>;
+  questions: Record<string, unknown>[];
   output_files: {
     json: string;
   };
+}
+
+export interface DetectionReportResult extends BaseReportResult {
+  report_type: "detection";
+  summary: DetectionReportSummary;
+  questions: DetectionReportQuestion[];
+}
+
+export interface VulnerabilityReportResult extends BaseReportResult {
+  report_type: "vulnerability";
+  questions: {
+    question_number: string;
+    question_text: string;
+    answers: any[];
+  }[];
+}
+
+export interface EvaluationReportContext {
+  detection?: {
+    generated_at?: string;
+    summary?: DetectionReportSummary;
+  };
+  vulnerability?: {
+    generated_at?: string;
+    summary?: Record<string, unknown>;
+  };
+}
+
+export interface EvaluationReportAnswer {
+  provider: string;
+  answer_label?: string | null;
+  answer_text?: string | null;
+  scorecard?: {
+    provider?: string;
+    score?: number;
+    verdict?: string;
+    confidence?: number;
+    rationale?: string;
+    source?: string;
+    hit_detection_target?: boolean | null;
+  };
+  matches_detection_target?: boolean | null;
+  baseline_score?: number | null;
+  delta_from_baseline?: number | null;
+  error?: string | null;
+}
+
+export interface EvaluationReportResult extends BaseReportResult {
+  report_type: "evaluation";
+  method: string;
+  context?: EvaluationReportContext;
+  questions: {
+    question_number: string;
+    question_text: string;
+    question_type?: string;
+    options?: { label: string; text: string }[];
+    detection_target?: {
+      labels?: string[];
+      texts?: string[];
+    };
+    answers: EvaluationReportAnswer[];
+  }[];
 }
 
 export interface ClassroomProgress {

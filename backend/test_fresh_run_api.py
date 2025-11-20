@@ -56,11 +56,10 @@ def test_fresh_run():
         print(f"❌ Test PDF not found: {TEST_PDF}")
         return None
 
+    target_stages = ["smart_reading", "content_discovery"]
     with open(TEST_PDF, 'rb') as f:
         files = {'original_pdf': (Path(TEST_PDF).name, f, 'application/pdf')}
-        data = {
-            'target_stages': json.dumps(['smart_reading', 'content_discovery'])
-        }
+        data = [('target_stages', stage) for stage in target_stages]
 
         response = requests.post(f"{BASE_URL}/api/pipeline/start", files=files, data=data)
 
@@ -85,20 +84,20 @@ def test_fresh_run():
 
     # Step 4: Get questions
     print("\n📋 Step 4: Fetching discovered questions...")
-    response = requests.get(f"{BASE_URL}/api/pipeline/{run_id}/questions")
+    response = requests.get(f"{BASE_URL}/api/questions/{run_id}")
     if response.status_code != 200:
         print(f"❌ Failed to get questions: {response.status_code}")
         return None
 
-    questions = response.json()
-    print(f"✅ Found {len(questions)} questions")
-    for q in questions[:3]:
+    questions_payload = response.json()
+    question_entries = questions_payload.get("questions", [])
+    print(f"✅ Found {len(question_entries)} questions")
+    for q in question_entries[:3]:
         print(f"   Q{q['question_number']}: {q.get('stem_text', '')[:60]}...")
 
     # Step 5: Manually advance to smart_substitution (user clicks button)
     print("\n🔄 Step 5: Advancing to smart_substitution stage (user clicks 'Continue')...")
-    response = requests.post(f"{BASE_URL}/api/pipeline/{run_id}/resume",
-                            json={'stage': 'smart_substitution'})
+    response = requests.post(f"{BASE_URL}/api/pipeline/{run_id}/resume/smart_substitution")
     if response.status_code != 200:
         print(f"❌ Failed to resume: {response.status_code}")
         return None
@@ -108,7 +107,7 @@ def test_fresh_run():
     print("\n✏️ Step 6: Adding sample mappings to questions...")
 
     # Get first few questions and add simple mappings
-    for i, question in enumerate(questions[:3]):
+    for i, question in enumerate(question_entries[:3]):
         q_num = question['question_number']
         stem_text = question.get('stem_text', '')
 
@@ -144,8 +143,7 @@ def test_fresh_run():
 
     # Step 7: Manually advance to pdf_creation (user clicks button)
     print("\n📄 Step 7: Advancing to pdf_creation stage (user clicks 'Create PDF')...")
-    response = requests.post(f"{BASE_URL}/api/pipeline/{run_id}/resume",
-                            json={'stage': 'pdf_creation'})
+    response = requests.post(f"{BASE_URL}/api/pipeline/{run_id}/resume/pdf_creation")
     if response.status_code != 200:
         print(f"❌ Failed to start PDF creation: {response.status_code}")
         return None
@@ -172,7 +170,10 @@ def test_fresh_run():
     for method, metadata in enhanced_pdfs.items():
         print(f"   - {method}: {metadata.get('file_path', 'N/A')}")
         print(f"     Replacements: {metadata.get('replacements', 0)}")
-        print(f"     Effectiveness: {metadata.get('effectiveness_score', 0):.2%}")
+        effectiveness = metadata.get('effectiveness_score')
+        if effectiveness is None:
+            effectiveness = 0.0
+        print(f"     Effectiveness: {effectiveness:.2%}")
 
     print("\n" + "=" * 80)
     print(f"✅ FRESH RUN COMPLETED SUCCESSFULLY: {run_id}")

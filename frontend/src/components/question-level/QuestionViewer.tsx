@@ -222,7 +222,6 @@ const QuestionViewer: React.FC<QuestionViewerProps> = ({ runId, question, onUpda
       {question.gold_answer && (
         <p>
           <strong>Gold Answer:</strong> {question.gold_answer}
-          {question.gold_confidence && <span style={{ color: "#666" }}> (confidence: {Math.round(question.gold_confidence * 100)}%)</span>}
         </p>
       )}
       <p style={{ color: "#666" }}>{qTypeHint}</p>

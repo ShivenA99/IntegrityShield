@@ -18,6 +18,7 @@ from ...models import QuestionManipulation
 from ...services.data_management.structured_data_manager import StructuredDataManager
 from ...services.integration.external_api_client import ExternalAIClient
 from ...utils.logging import get_logger
+from ...utils.openai_responses import coerce_response_text
 from ...utils.time import isoformat, utc_now
 from sqlalchemy import text
 
@@ -25,6 +26,7 @@ from .gpt5_config import (
     GPT5_MODEL,
     GPT5_MAX_TOKENS,
     GPT5_TEMPERATURE,
+    GPT5_REASONING_EFFORT,
     MAPPINGS_PER_QUESTION,
     MAX_RETRIES,
     RETRY_DELAY,
@@ -33,6 +35,22 @@ from .mapping_generation_logger import get_mapping_logger
 from .mapping_strategies import get_strategy_registry
 from .mapping_staging_service import MappingStagingService
 from .mapping_validator import MappingValidator
+
+
+MAPPING_RESPONSE_SCHEMA = {
+    "name": "mappingBatch",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "mappings": {
+                "type": "array",
+                "items": {"type": "object", "additionalProperties": True},
+            }
+        },
+        "required": ["mappings"],
+        "additionalProperties": True,
+    },
+}
 
 
 class GPT5MappingGeneratorService:
@@ -349,80 +367,62 @@ class GPT5MappingGeneratorService:
             )
             raise ValueError(f"Failed to build prompt: {e}") from e
         
-        # Prepare messages
+        prompt = (
+            f"{prompt.strip()}\n\nReturn strict JSON with a top-level object "
+            'containing a "mappings" array of mapping objects.'
+        )
+        
+        # Prepare messages for Responses API
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert at generating text substitutions for academic questions. Return only valid JSON."
+                "content": [
+                    {
+                        "type": "text",
+                        "text": (
+                            "You are an expert at generating text substitutions for academic questions. "
+                            "Return strict JSON following the required schema."
+                        ),
+                    }
+                ],
             },
             {
                 "role": "user",
-                "content": prompt
-            }
+                "content": [{"type": "text", "text": prompt}],
+            },
         ]
         
-        # Call GPT-5 API
+        # Call GPT-5.1 Responses API
         for attempt in range(MAX_RETRIES):
             try:
-                # Use OpenAI client directly for GPT-5
                 import os
                 from openai import OpenAI
-                
+
                 api_key = os.getenv("OPENAI_API_KEY") or current_app.config.get("OPENAI_API_KEY")
                 if not api_key:
                     raise ValueError("OPENAI_API_KEY not configured")
-                
+
                 client = OpenAI(api_key=api_key)
-                
-                # Prepare request
-                request_args: Dict[str, Any] = {
-                    "model": GPT5_MODEL,
-                    "messages": messages,
-                    "temperature": GPT5_TEMPERATURE,
-                    "max_tokens": GPT5_MAX_TOKENS
-                }
-                
-                # Add response format for JSON if supported
-                if GPT5_MODEL.lower().startswith("gpt-4o"):
-                    request_args["response_format"] = {"type": "json_object"}
-                
-                # Make API call
-                response_obj = client.chat.completions.create(**request_args)
-                
-                # Extract response
-                choice = response_obj.choices[0]
-                content = getattr(choice.message, "content", None)
 
-                if isinstance(content, list):
-                    content = "".join(
-                        part.get("text", "")
-                        for part in content
-                        if isinstance(part, dict) and part.get("type") in (None, "text")
-                    )
+                response_obj = client.responses.create(
+                    model=GPT5_MODEL,
+                    input=messages,
+                    reasoning={"effort": GPT5_REASONING_EFFORT},
+                    response_format={"type": "json_schema", "json_schema": MAPPING_RESPONSE_SCHEMA},
+                    temperature=GPT5_TEMPERATURE,
+                    max_output_tokens=GPT5_MAX_TOKENS,
+                    metadata={"task": "mapping_generation", "run_id": run_id},
+                )
 
-                if not content:
-                    parsed_payload = getattr(choice.message, "parsed", None)
-                    if parsed_payload is not None:
-                        content = json.dumps(parsed_payload)
-                    else:
-                        raw_message = choice.message.model_dump()
-                        if isinstance(raw_message, dict):
-                            raw_content = raw_message.get("content")
-                            if isinstance(raw_content, list):
-                                content = "".join(
-                                    part.get("text", "")
-                                    for part in raw_content
-                                    if isinstance(part, dict) and part.get("type") in (None, "text")
-                                )
-
+                content = coerce_response_text(response_obj)
                 if not content or not content.strip():
-                    raise ValueError("Empty response from GPT-5 API")
-                
+                    raise ValueError("Empty response from GPT-5.1 Responses API")
+
                 response = {
                     "response": content,
-                    "raw_response": response_obj
+                    "raw_response": response_obj,
                 }
-                
+
                 # Parse response
                 mappings = self._parse_mapping_response(response, question_data)
                 
@@ -444,13 +444,13 @@ class GPT5MappingGeneratorService:
                 else:
                     self.logger.warning(
                         f"No valid mappings found in response (attempt {attempt + 1}/{MAX_RETRIES})",
-                        run_id=run_id
+                        run_id=run_id,
                     )
-            
+
             except Exception as e:
                 self.logger.warning(
-                    f"GPT-5 API call failed (attempt {attempt + 1}/{MAX_RETRIES}): {e}",
-                    run_id=run_id
+                    f"GPT-5.1 responses call failed (attempt {attempt + 1}/{MAX_RETRIES}): {e}",
+                    run_id=run_id,
                 )
                 if attempt < MAX_RETRIES - 1:
                     time.sleep(RETRY_DELAY * (attempt + 1))

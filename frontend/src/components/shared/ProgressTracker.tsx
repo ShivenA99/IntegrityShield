@@ -9,6 +9,7 @@ interface ProgressTrackerProps {
   selectedStage?: string;
   onStageSelect?: (stage: string) => void;
   currentStage?: string;
+  renderStageActions?: (stage: PipelineStageName) => React.ReactNode;
 }
 
 const BASE_STAGE_ORDER: PipelineStageName[] = [
@@ -34,6 +35,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   selectedStage,
   onStageSelect,
   currentStage,
+  renderStageActions,
 }) => {
   const stageMap = new Map(stages.map((stage) => [stage.name, stage]));
   const visibleStages: PipelineStageName[] = [...BASE_STAGE_ORDER];
@@ -92,6 +94,9 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
             <div className="progress-tracker__bar">
               <span className="progress-tracker__bar-fill" />
             </div>
+            {renderStageActions ? (
+              <div className="progress-tracker__actions">{renderStageActions(name)}</div>
+            ) : null}
             {index < visibleStages.length - 1 ? <span className="progress-tracker__connector" /> : null}
           </div>
         );
