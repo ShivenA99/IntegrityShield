@@ -138,6 +138,13 @@ def test_target_config_determination():
     
     print(f"✓ Signal configs: {len(signal_configs)} sets, strategies: {[c.get('signal_strategy') for c in signal_configs]}")
 
+    # Test true/false without explicit options
+    tf_data = {"question_type": "true_false", "gold_answer": "True"}
+    tf_configs = service._determine_target_configs(tf_data, "true_false")
+    assert len(tf_configs) == 3
+    assert tf_configs[0]["target_option"] == "False"
+    print(f"✓ True/False configs: {[c.get('target_option') for c in tf_configs]}")
+
 
 def test_label_extraction():
     """Test label extraction from various formats."""

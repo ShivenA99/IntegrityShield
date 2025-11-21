@@ -976,9 +976,9 @@ class StreamlinedMappingService:
         For MCQ: target different wrong options (up to 3)
         For signal types: use different signal strategies
         """
-        configs = []
+        configs: List[Dict[str, Any]] = []
 
-        if question_type in ["mcq_single", "mcq_multi", "true_false", "matching"]:
+        if question_type in ["mcq_single", "mcq_multi", "matching"]:
             # Target-based: get wrong options
             options = question_data.get("options", {})
             gold_answer = question_data.get("gold_answer", "")
@@ -999,6 +999,43 @@ class StreamlinedMappingService:
                 })
             
             # If we have fewer than 3 options, pad with None
+            while len(configs) < 3:
+                configs.append({
+                    "target_option": None,
+                    "target_option_text": None,
+                    "signal_strategy": None,
+                })
+
+        elif question_type == "true_false":
+            gold_label = self._extract_true_false_label(question_data.get("gold_answer"))
+            options = question_data.get("options") or {}
+            candidate_labels: List[str] = []
+
+            for key in options.keys():
+                normalized = self._extract_true_false_label(key)
+                if normalized and normalized not in candidate_labels:
+                    candidate_labels.append(normalized)
+            for value in options.values():
+                normalized = self._extract_true_false_label(value)
+                if normalized and normalized not in candidate_labels:
+                    candidate_labels.append(normalized)
+
+            if not candidate_labels:
+                candidate_labels = ["True", "False"]
+
+            candidate_labels = [
+                label for label in candidate_labels if label.upper() != gold_label.upper()
+            ]
+            if not candidate_labels:
+                candidate_labels = ["True" if gold_label.upper() == "FALSE" else "False"]
+
+            for label in candidate_labels[:3]:
+                configs.append({
+                    "target_option": label,
+                    "target_option_text": label,
+                    "signal_strategy": None,
+                })
+
             while len(configs) < 3:
                 configs.append({
                     "target_option": None,
@@ -1038,6 +1075,21 @@ class StreamlinedMappingService:
             return text.strip().upper()
         
         return text.strip()
+
+    def _extract_true_false_label(self, value: Optional[str]) -> str:
+        """Normalize various representations of True/False answers."""
+        if not value:
+            return ""
+        text = str(value).strip().lower()
+        if text in {"true", "t", "1"}:
+            return "True"
+        if text in {"false", "f", "0"}:
+            return "False"
+        if text.startswith("true"):
+            return "True"
+        if text.startswith("false"):
+            return "False"
+        return ""
 
     async def _generate_all_mapping_sets(
         self,
@@ -1294,6 +1346,22 @@ class StreamlinedMappingService:
                         mapping["target_option_text"] = target_config.get("target_option_text")
                     if target_config.get("signal_strategy"):
                         mapping["signal_strategy"] = target_config["signal_strategy"]
+                        signal_phrase = str(mapping.get("signal_phrase") or "").strip()
+                        if not signal_phrase:
+                            self.logger.warning(
+                                "Signal mapping missing 'signal_phrase'; skipping mapping",
+                                run_id=run_id,
+                                question_id=question_id,
+                                set_index=set_idx,
+                            )
+                            continue
+                        mapping["signal_phrase"] = signal_phrase
+                        signal_type = str(mapping.get("signal_type") or target_config["signal_strategy"]).strip()
+                        mapping["signal_type"] = signal_type or target_config["signal_strategy"]
+                        signal_notes = str(mapping.get("signal_notes") or "").strip()
+                        if not signal_notes:
+                            signal_notes = f"Detection cue for {target_config['signal_strategy']} strategy"
+                        mapping["signal_notes"] = signal_notes
                     
                     valid_mappings.append(mapping)
                 
@@ -1364,6 +1432,7 @@ GOLD ANSWER: {gold_answer}
             elif target_config.get("signal_strategy"):
                 prompt += f"\nSET {idx}: Signal strategy '{target_config['signal_strategy']}'\n"
                 prompt += f"   - Generate EXACTLY ONE mapping using the '{target_config['signal_strategy']}' strategy to create subtle but effective changes.\n"
+                prompt += f"   - Each signal mapping MUST include \"signal_phrase\" (phrase the detector should watch for), \"signal_type\" (keyword, concept, pattern, etc.), and \"signal_notes\" (why that signal reveals the manipulation).\n"
                 prompt += f"   - The mapping can be a single word (best case) or the entire question stem substring (worst case).\n"
             else:
                 prompt += f"\nSET {idx}: General manipulation\n"
@@ -1543,6 +1612,29 @@ Return your response now as pure JSON following the schema above:
 """
 
         return prompt
+
+    def _build_signal_metadata(
+        self,
+        mapping: Dict[str, Any],
+        target_config: Dict[str, Any],
+    ) -> Optional[Dict[str, str]]:
+        """Construct signal metadata payload for validation."""
+        if not target_config.get("signal_strategy"):
+            return None
+        phrase = str(mapping.get("signal_phrase") or "").strip()
+        if not phrase:
+            return None
+        metadata: Dict[str, str] = {
+            "signal_phrase": phrase,
+            "signal_strategy": target_config.get("signal_strategy"),
+        }
+        signal_type = str(mapping.get("signal_type") or "").strip()
+        if signal_type:
+            metadata["signal_type"] = signal_type
+        signal_notes = str(mapping.get("signal_notes") or "").strip()
+        if signal_notes:
+            metadata["signal_notes"] = signal_notes
+        return metadata
 
     async def _validate_mapping_set_with_semaphore(
         self,
@@ -1984,4 +2076,3 @@ Return your response now as pure JSON following the schema above:
                 exc_info=True,
             )
             return {}
-

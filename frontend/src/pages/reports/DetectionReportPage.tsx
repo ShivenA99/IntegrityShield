@@ -163,6 +163,7 @@ const DetectionReportPage: React.FC = () => {
                 questions.map((question) => {
                   const mappings = Array.isArray(question.mappings) ? question.mappings : [];
                   const limitedMappings = mappings.slice(0, 3);
+                  const signalPhrase = question.target_answer?.signal?.phrase ?? null;
                   return (
                     <article
                       key={question.question_number}
@@ -187,9 +188,14 @@ const DetectionReportPage: React.FC = () => {
                               Target {label}
                             </span>
                           ))
-                        ) : (
+                        ) : !signalPhrase ? (
                           <span className="report-tag report-tag--muted">No target</span>
-                        )}
+                        ) : null}
+                        {signalPhrase ? (
+                          <span className="report-tag report-tag--target">
+                            Signal “{signalPhrase}”
+                          </span>
+                        ) : null}
                       </div>
                       <div className="report-question-card__meta">
                         <span>Gold: {question.gold_answer?.label ?? "—"}</span>
@@ -198,6 +204,9 @@ const DetectionReportPage: React.FC = () => {
                           {question.target_answer?.labels?.length
                             ? question.target_answer.labels.join(", ")
                             : "—"}
+                        </span>
+                        <span>
+                          Signal: {question.target_answer?.signal?.phrase ?? "—"}
                         </span>
                         <span>Mappings: {mappings.length}</span>
                       </div>
@@ -219,6 +228,11 @@ const DetectionReportPage: React.FC = () => {
                               <small className="muted">
                                 {mapping.original ?? "—"} → {mapping.replacement ?? "—"}
                               </small>
+                              {mapping.signal_phrase ? (
+                                <small className="muted">
+                                  Signal: {mapping.signal_phrase}
+                                </small>
+                              ) : null}
                               {mapping.validation_reason ? (
                                 <p>{mapping.validation_reason}</p>
                               ) : mapping.reasoning ? (
@@ -259,4 +273,3 @@ const DetectionReportPage: React.FC = () => {
 };
 
 export default DetectionReportPage;
-

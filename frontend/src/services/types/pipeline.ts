@@ -73,6 +73,12 @@ export interface AnswerSheetGenerationResult {
   classroom?: ClassroomDataset;
 }
 
+export interface DetectionSignal {
+  phrase?: string | null;
+  type?: string | null;
+  notes?: string | null;
+}
+
 export interface DetectionReportMappingInsight {
   original: string | null;
   replacement: string | null;
@@ -82,6 +88,9 @@ export interface DetectionReportMappingInsight {
   deviation_score: number | null;
   confidence: number | null;
   validation_reason: string | null;
+  signal_phrase?: string | null;
+  signal_type?: string | null;
+  signal_notes?: string | null;
 }
 
 export interface DetectionReportRiskFactors {
@@ -91,6 +100,7 @@ export interface DetectionReportRiskFactors {
   replacements: string[];
   average_deviation_score: number | null;
   average_confidence: number | null;
+  signals?: DetectionSignal[];
 }
 
 export interface DetectionReportQuestion {
@@ -108,6 +118,7 @@ export interface DetectionReportQuestion {
     labels: string[];
     texts: string[];
     raw_replacements: string[];
+    signal?: DetectionSignal;
   };
   mappings: DetectionReportMappingInsight[];
   risk_level: string;
@@ -192,6 +203,7 @@ export interface EvaluationReportResult extends BaseReportResult {
     detection_target?: {
       labels?: string[];
       texts?: string[];
+      signal?: DetectionSignal;
     };
     answers: EvaluationReportAnswer[];
   }[];

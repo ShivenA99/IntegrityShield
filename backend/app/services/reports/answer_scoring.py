@@ -268,6 +268,8 @@ class AnswerScoringService:
         system_text = "\n".join([
             "You are an expert grading assistant. Respond ONLY with valid JSON matching the exact schema provided.",
             "",
+            "If `detection_context` is provided, use `target_labels` and/or `signal_phrase` to set the `hit_detection_target` boolean.",
+            "",
             "REQUIRED JSON SCHEMA:",
             "{",
             '  "scores": [',
@@ -446,12 +448,20 @@ class AnswerScoringService:
     def _matches_detection_target(answer_text: str, detection_context: Dict[str, Any]) -> Optional[bool]:
         if not answer_text or not detection_context:
             return None
-        labels = detection_context.get("target_labels") or []
-        normalized_answer = answer_text.strip().upper()
-        if not normalized_answer or not labels:
+        normalized_text = answer_text.strip()
+        if not normalized_text:
             return None
-        normalized_labels = {str(label).strip().upper() for label in labels if label}
-        return normalized_answer in normalized_labels
+        labels = detection_context.get("target_labels") or []
+        if labels:
+            normalized_answer = normalized_text.upper()
+            normalized_labels = {str(label).strip().upper() for label in labels if label}
+            normalized_labels = {label for label in normalized_labels if label}
+            if normalized_labels:
+                return normalized_answer in normalized_labels
+        signal_phrase = str(detection_context.get("signal_phrase") or "").strip()
+        if signal_phrase:
+            return signal_phrase.lower() in normalized_text.lower()
+        return None
 
     @staticmethod
     def _extract_json_payload(content: str) -> str:
@@ -466,4 +476,3 @@ class AnswerScoringService:
             if closing != -1:
                 text = text[:closing]
         return text.strip()
-

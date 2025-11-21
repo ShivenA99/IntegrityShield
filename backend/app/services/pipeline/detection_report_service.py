@@ -24,6 +24,9 @@ class MappingInsight:
     deviation_score: Optional[float]
     confidence: Optional[float]
     validation_reason: Optional[str]
+    signal_phrase: Optional[str] = None
+    signal_type: Optional[str] = None
+    signal_notes: Optional[str] = None
 
 
 class DetectionReportService:
@@ -101,6 +104,18 @@ class DetectionReportService:
 
             replacements = mapping_stats["replacements"]
             target_texts = self._resolve_target_texts(target_labels, replacements, option_lookup)
+            signal_entry = self._select_signal_entry(mapping_stats.get("signals", []))
+            target_answer_payload = {
+                "labels": sorted(target_labels),
+                "texts": target_texts,
+                "raw_replacements": sorted(replacements),
+            }
+            if signal_entry:
+                target_answer_payload["signal"] = {
+                    "phrase": signal_entry.get("phrase"),
+                    "type": signal_entry.get("type"),
+                    "notes": signal_entry.get("notes"),
+                }
 
             risk_level = self._assess_risk(mapping_stats, bool(options))
             if risk_level == "high":
@@ -118,11 +133,7 @@ class DetectionReportService:
                         "label": gold_label,
                         "text": gold_entry["text"] if gold_entry else structured_info.get("gold_answer") or question.gold_answer,
                     },
-                    "target_answer": {
-                        "labels": sorted(target_labels),
-                        "texts": target_texts,
-                        "raw_replacements": sorted(replacements),
-                    },
+                    "target_answer": target_answer_payload,
                     "mappings": [insight.__dict__ for insight in mapping_insights],
                     "risk_level": risk_level,
                     "risk_factors": mapping_stats,
@@ -201,6 +212,7 @@ class DetectionReportService:
         replacements: set[str] = set()
         deviations: List[float] = []
         confidences: List[float] = []
+        signal_entries: List[Dict[str, Any]] = []
 
         for mapping in mappings:
             total += 1
@@ -230,6 +242,16 @@ class DetectionReportService:
 
             # Extract target_wrong_answer from either field
             target_wrong_answer_value = mapping.get("target_wrong_answer") or mapping.get("target_option")
+            if mapping.get("signal_phrase"):
+                signal_entries.append(
+                    {
+                        "phrase": self._safe_strip(mapping.get("signal_phrase")),
+                        "type": self._safe_strip(mapping.get("signal_type")),
+                        "notes": self._safe_strip(mapping.get("signal_notes")),
+                        "validated": is_validated,
+                    }
+                )
+
             insights.append(
                 MappingInsight(
                     original=self._safe_strip(mapping.get("original")),
@@ -243,6 +265,9 @@ class DetectionReportService:
                         mapping.get("validation", {}).get("reasoning")
                         or mapping.get("validation_reasoning")
                     ),
+                    signal_phrase=self._safe_strip(mapping.get("signal_phrase")),
+                    signal_type=self._safe_strip(mapping.get("signal_type")),
+                    signal_notes=self._safe_strip(mapping.get("signal_notes")),
                 )
             )
 
@@ -266,6 +291,7 @@ class DetectionReportService:
             "replacements": sorted(replacements),
             "average_deviation_score": question_deviation_score,  # Actually the primary/max deviation score
             "average_confidence": average_confidence,
+            "signals": signal_entries,
         }
 
         return insights, stats
@@ -365,6 +391,15 @@ class DetectionReportService:
         if texts:
             return texts
         return [self._safe_strip(value) for value in replacements if self._safe_strip(value)]
+
+    @staticmethod
+    def _select_signal_entry(entries: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        if not entries:
+            return None
+        for entry in entries:
+            if entry.get("validated"):
+                return entry
+        return entries[0]
 
     @staticmethod
     def _normalize_label(label: Any) -> Optional[str]:

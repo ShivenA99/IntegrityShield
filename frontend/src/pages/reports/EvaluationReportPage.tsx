@@ -233,6 +233,7 @@ const EvaluationReportPage: React.FC = () => {
                         return acc;
                       }, {});
                       const detectionTarget = question.detection_target?.labels || [];
+                      const detectionSignal = question.detection_target?.signal;
                       return (
                         <article
                           key={question.question_number}
@@ -255,6 +256,10 @@ const EvaluationReportPage: React.FC = () => {
                                   Target {label}
                                 </span>
                               ))
+                            ) : detectionSignal?.phrase ? (
+                              <span className="report-tag report-tag--target">
+                                Signal “{detectionSignal.phrase}”
+                              </span>
                             ) : (
                               <span className="report-tag report-tag--muted">No detection target</span>
                             )}
@@ -356,4 +361,3 @@ const EvaluationReportPage: React.FC = () => {
 };
 
 export default EvaluationReportPage;
-

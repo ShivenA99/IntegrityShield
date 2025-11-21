@@ -259,21 +259,38 @@ class EvaluationReportService:
     def _matches_detection(self, answer: str | None, detection_info: Dict[str, Any]) -> bool | None:
         if not answer or not detection_info:
             return None
-        labels = detection_info.get("target_answer", {}).get("labels") or []
+        target = detection_info.get("target_answer", {}) or {}
+        labels = target.get("labels") or []
         normalized_answer = self._normalize_label(answer)
-        return normalized_answer in {self._normalize_label(label) for label in labels if label}
+        normalized_labels = {self._normalize_label(label) for label in labels if label}
+        normalized_labels = {label for label in normalized_labels if label}
+        if normalized_labels and normalized_answer:
+            return normalized_answer in normalized_labels
+        signal = target.get("signal") or {}
+        phrase = (signal.get("phrase") or "").strip()
+        if phrase:
+            return phrase.lower() in (answer or "").lower()
+        return None
 
     @staticmethod
     def _build_detection_context(detection_info: Dict[str, Any]) -> Dict[str, Any] | None:
         if not detection_info:
             return None
         target = detection_info.get("target_answer") or {}
-        return {
+        context = {
             "risk_level": detection_info.get("risk_level"),
             "target_labels": target.get("labels") or [],
             "target_texts": target.get("texts") or [],
             "raw_replacements": target.get("raw_replacements") or [],
         }
+        signal = target.get("signal") or {}
+        if signal.get("phrase"):
+            context["signal_phrase"] = signal.get("phrase")
+            if signal.get("type"):
+                context["signal_type"] = signal.get("type")
+            if signal.get("notes"):
+                context["signal_notes"] = signal.get("notes")
+        return context
 
     @staticmethod
     def _question_sort_key(entry: Dict[str, Any]) -> tuple[int, int]:
@@ -393,4 +410,3 @@ class EvaluationReportService:
             "method": payload["method"],
         }
         self.structured_manager.save(run_id, structured)
-
