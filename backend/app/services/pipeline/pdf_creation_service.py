@@ -84,12 +84,9 @@ class PdfCreationService:
 
         configured = run.pipeline_config.get("enhancement_methods") or [
             "latex_dual_layer",
-            "pymupdf_overlay",
         ]
         if "latex_dual_layer" not in configured:
             configured.insert(0, "latex_dual_layer")
-        if "pymupdf_overlay" not in configured:
-            configured.append("pymupdf_overlay")
         # Deduplicate while preserving order
         seen = set()
         configured = [m for m in configured if not (m in seen or seen.add(m))]

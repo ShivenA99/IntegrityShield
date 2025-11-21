@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import time
@@ -9,12 +10,13 @@ from dataclasses import dataclass
 from ..ai_clients.base_ai_client import BaseAIClient
 from ...utils.logging import get_logger
 from ...utils.openai_responses import coerce_response_text
-from ..mapping.gpt5_config import VALIDATION_MODEL, VALIDATION_REASONING_EFFORT
+from ..mapping.gpt5_config import VALIDATION_MODEL, VALIDATION_REASONING_EFFORT, API_TIMEOUT
 
 try:
-    from openai import OpenAI
+    from openai import OpenAI, AsyncOpenAI
 except ImportError:
-    OpenAI = None
+    OpenAI = None  # type: ignore
+    AsyncOpenAI = None  # type: ignore
 
 
 @dataclass
@@ -78,9 +80,9 @@ class GPT5ValidationService:
 
     def is_configured(self) -> bool:
         """Check if the service is properly configured."""
-        return bool(self.api_key and OpenAI)
+        return bool(self.api_key and AsyncOpenAI)
 
-    def validate_answer_deviation(
+    async def validate_answer_deviation(
         self,
         question_text: str,
         question_type: str,
@@ -127,32 +129,32 @@ class GPT5ValidationService:
 
             client = self._get_openai_client()
 
-            response = client.responses.create(
+            # Use AsyncOpenAI directly for native async performance
+            response = await client.responses.create(
                 model=self.model,
                 input=[
                     {
                         "role": "system",
                         "content": [
                             {
-                                "type": "text",
+                                "type": "input_text",
                                 "text": (
                                     "You are an expert educational assessment validator. "
                                     "Determine if student answers indicate successful question manipulation by "
-                                    "comparing gold standard answers with test responses using sophisticated analysis."
+                                    "comparing gold standard answers with test responses using sophisticated analysis. "
+                                    "Return strict JSON following the required schema."
                                 ),
                             }
                         ],
                     },
                     {
                         "role": "user",
-                        "content": [{"type": "text", "text": prompt}],
+                        "content": [{"type": "input_text", "text": prompt}],
                     },
                 ],
                 reasoning={"effort": self.reasoning_effort},
-                response_format={"type": "json_schema", "json_schema": VALIDATION_RESPONSE_SCHEMA},
-                temperature=0.1,
                 max_output_tokens=1500,
-                metadata={"task": "mapping_validation", "run_id": run_id},
+                metadata={"task": "mapping_validation", "run_id": str(run_id) if run_id else None},
             )
 
             content = coerce_response_text(response)
@@ -270,7 +272,26 @@ ANALYSIS FRAMEWORK:
    - How confident are you in this analysis?
    - Account for answer clarity, question complexity, etc.
 
-OUTPUT FORMAT (JSON only):
+OUTPUT FORMAT (JSON only - STRICT SCHEMA):
+You MUST return valid JSON matching this exact schema:
+{
+  "analysis": {
+    "semantic_similarity": <float 0.0-1.0>,
+    "factual_accuracy": <boolean>,
+    "deviation_score": <float 0.0-1.0>,
+    "manipulation_detected": <boolean>,
+    "confidence": <float 0.0-1.0>
+  },
+  "reasoning": "<string>",
+  "question_type_notes": "<string>",
+  "validation_decision": {
+    "is_valid": <boolean>,
+    "threshold_met": <boolean>,
+    "recommended_action": "<string>"
+  }
+}
+
+EXAMPLE OUTPUT:
 {
   "analysis": {
     "semantic_similarity": 0.85,
@@ -279,8 +300,8 @@ OUTPUT FORMAT (JSON only):
     "manipulation_detected": true,
     "confidence": 0.90
   },
-  "reasoning": "Detailed explanation of the analysis and decision",
-  "question_type_notes": "Specific observations for this question type",
+  "reasoning": "The test answer shows a clear deviation from the gold answer, indicating successful manipulation. The semantic similarity is moderate (0.85) but the deviation score is high (0.75), suggesting the mapping successfully altered the question's meaning.",
+  "question_type_notes": "For MCQ single choice, the answer changed from option A to option B, indicating successful manipulation.",
   "validation_decision": {
     "is_valid": true,
     "threshold_met": true,
@@ -288,7 +309,7 @@ OUTPUT FORMAT (JSON only):
   }
 }
 
-IMPORTANT: Return ONLY valid JSON. Be thorough but precise in your analysis.
+CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no additional text. Start with { and end with }.
 """
 
         return prompt
@@ -471,16 +492,16 @@ READING COMPREHENSION ANALYSIS:
         return min(1.0, different_chars / max(len(gold_clean), len(test_clean)))
 
     def _get_openai_client(self):
-        """Get OpenAI client instance."""
-        if not self.api_key or OpenAI is None:
-            raise RuntimeError("OpenAI client is not available.")
-        return OpenAI(api_key=self.api_key)
+        """Get AsyncOpenAI client instance."""
+        if not self.api_key or AsyncOpenAI is None:
+            raise RuntimeError("AsyncOpenAI client is not available.")
+        return AsyncOpenAI(api_key=self.api_key, timeout=API_TIMEOUT)
 
     def get_validation_threshold(self, question_type: str) -> float:
         """Get the validation threshold for a specific question type."""
         return self.validation_thresholds.get(question_type, self.validation_thresholds['default'])
 
-    def batch_validate_mappings(
+    async def batch_validate_mappings(
         self,
         questions_data: List[Dict[str, Any]],
         run_id: Optional[str] = None
@@ -489,7 +510,7 @@ READING COMPREHENSION ANALYSIS:
         results = []
 
         for question_data in questions_data:
-            result = self.validate_answer_deviation(
+            result = await self.validate_answer_deviation(
                 question_text=question_data.get('question_text', ''),
                 question_type=question_data.get('question_type', 'mcq_single'),
                 gold_answer=question_data.get('gold_answer', ''),

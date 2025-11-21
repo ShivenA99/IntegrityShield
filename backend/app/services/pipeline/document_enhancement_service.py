@@ -21,7 +21,6 @@ class DocumentEnhancementService:
     async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
         methods = config.get("enhancement_methods") or [
             "latex_dual_layer",
-            "pymupdf_overlay",
         ]
         return await asyncio.to_thread(self._prepare_methods, run_id, methods)
 

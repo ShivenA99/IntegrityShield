@@ -25,6 +25,12 @@ VALIDATION_REASONING_EFFORT = os.getenv(
 )
 VALIDATION_TIMEOUT = int(os.getenv("VALIDATION_TIMEOUT", "30"))  # seconds
 
+# Generation-specific Configuration
+GPT5_GENERATION_REASONING_EFFORT = os.getenv("GPT5_GENERATION_REASONING_EFFORT", "medium")
+MAPPING_MAX_CONCURRENT = int(os.getenv("MAPPING_MAX_CONCURRENT", "10"))
+VALIDATION_MAX_CONCURRENT = int(os.getenv("VALIDATION_MAX_CONCURRENT", "5"))
+API_TIMEOUT = int(os.getenv("MAPPING_API_TIMEOUT", "120"))  # seconds
+
 # Retry Configuration
 MAX_RETRIES = int(os.getenv("MAPPING_GENERATION_MAX_RETRIES", "3"))
 RETRY_DELAY = float(os.getenv("MAPPING_GENERATION_RETRY_DELAY", "1.0"))  # seconds

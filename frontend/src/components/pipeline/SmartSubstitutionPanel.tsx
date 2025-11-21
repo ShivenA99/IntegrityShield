@@ -246,8 +246,27 @@ const SmartSubstitutionPanel: React.FC = () => {
   const applyGenerationSnapshot = useCallback((snapshot: any) => {
     const rawSummary = snapshot?.status_summary || {};
     const normalizedSummary: Record<number, any> = {};
-    Object.entries(rawSummary).forEach(([key, value]) => {
-      normalizedSummary[Number(key)] = value;
+    Object.entries(rawSummary).forEach(([key, value]: [string, any]) => {
+      const status = value as any;
+      // Compute mappings_generated and mappings_validated if not present
+      if (status.mappings_generated === undefined && status.mapping_sets_generated) {
+        status.mappings_generated = status.mapping_sets_generated.reduce(
+          (sum: number, ms: any) => sum + (ms.mappings_count || 0),
+          0
+        );
+      }
+      if (status.mappings_validated === undefined && status.validation_outcomes) {
+        status.mappings_validated = status.validation_outcomes.length;
+      }
+      // Use status_display if available, else map status values
+      if (!status.status_display) {
+        if (status.status === "generating" || status.status === "validating" || status.status === "retrying") {
+          status.status_display = "running";
+        } else {
+          status.status_display = status.status || "pending";
+        }
+      }
+      normalizedSummary[Number(key)] = status;
     });
     setGenerationStatus(normalizedSummary);
 
@@ -288,8 +307,8 @@ const SmartSubstitutionPanel: React.FC = () => {
 
           const checkQuestionId = options?.questionId;
           const isComplete = checkQuestionId != null
-            ? doneStatuses.has(normalizedSummary[checkQuestionId]?.status)
-            : Object.values(normalizedSummary).every((entry: any) => doneStatuses.has(entry?.status));
+            ? doneStatuses.has(normalizedSummary[checkQuestionId]?.status_display ?? normalizedSummary[checkQuestionId]?.status)
+            : Object.values(normalizedSummary).every((entry: any) => doneStatuses.has(entry?.status_display ?? entry?.status));
 
           if (!isComplete && !cancelled) {
             timeoutRef = window.setTimeout(poll, 2000);
@@ -528,17 +547,29 @@ const SmartSubstitutionPanel: React.FC = () => {
             {Object.entries(generationStatus).map(([questionId, progress]: [string, any]) => {
               const question = questions.find((q) => q.id === parseInt(questionId, 10));
               if (!question) return null;
-              const statusValue = progress?.status ?? "pending";
+              // Use status_display if available, else use status
+              const statusValue = progress?.status_display ?? progress?.status ?? "pending";
               const questionKey = String(progress.question_number ?? question.question_number ?? question.id);
               const questionLogs = logsByQuestion.get(questionKey) ?? [];
-              const generationLoops =
-                questionLogs.filter((entry) => entry?.stage === "generation").length ||
-                Math.max(progress?.mappings_generated ?? 0, statusValue === "success" ? 1 : 0);
+              
+              // Get generation attempts from retry_count or current_attempt
+              const generationLoops = progress?.retry_count 
+                ? progress.retry_count + 1 
+                : progress?.current_attempt 
+                ? progress.current_attempt 
+                : questionLogs.filter((entry) => entry?.stage === "generation").length ||
+                  Math.max(progress?.mappings_generated ?? 0, statusValue === "success" ? 1 : 0);
+              
               const validationLogs = questionLogs.filter((entry) => entry?.stage === "validation");
               const hasValidationFailure =
-                statusValue === "failed" || validationLogs.some((entry) => entry?.status === "failed");
+                statusValue === "failed" || 
+                progress?.status === "failed" ||
+                validationLogs.some((entry) => entry?.status === "failed");
               const hasValidationSuccess =
-                progress?.mappings_validated > 0 || validationLogs.some((entry) => entry?.status === "success");
+                statusValue === "success" ||
+                progress?.status === "success" ||
+                progress?.mappings_validated > 0 || 
+                validationLogs.some((entry) => entry?.status === "success");
 
               const stateClass = hasValidationFailure
                 ? "is-error"
@@ -580,6 +611,21 @@ const SmartSubstitutionPanel: React.FC = () => {
                     <span className="status-chip status-chip--totals" title="Generated vs validated mappings">
                       {progress.mappings_generated || 0} gen · {progress.mappings_validated || 0} val
                     </span>
+                    {progress.retry_count > 0 && (
+                      <span className="status-chip status-chip--retry" title={`Retry attempts: ${progress.retry_count}`}>
+                        Retry {progress.retry_count}
+                      </span>
+                    )}
+                    {progress.mapping_sets_generated && progress.mapping_sets_generated.length > 0 && (
+                      <span className="status-chip status-chip--sets" title={`Mapping sets generated: ${progress.mapping_sets_generated.length}`}>
+                        Sets: {progress.mapping_sets_generated.length}
+                      </span>
+                    )}
+                    {progress.generation_exceptions && progress.generation_exceptions.length > 0 && (
+                      <span className="status-chip status-chip--error" title={`Generation exceptions: ${progress.generation_exceptions.length}`} style={{ color: 'var(--error)', backgroundColor: 'rgba(248,113,113,0.1)' }}>
+                        {progress.generation_exceptions.length} error{progress.generation_exceptions.length !== 1 ? 's' : ''}
+                      </span>
+                    )}
                   </span>
                 </div>
               );
@@ -610,6 +656,12 @@ const SmartSubstitutionPanel: React.FC = () => {
                 const snippet = question?.stem_text
                   ? `${question.stem_text.slice(0, 110)}${question.stem_text.length > 110 ? '...' : ''}`
                   : null;
+                const questionStatus = Object.values(generationStatus).find((s: any) => 
+                  String(s?.question_number ?? s?.question_id) === key
+                ) as any;
+                const hasGenerationErrors = questionStatus?.generation_exceptions && questionStatus.generation_exceptions.length > 0;
+                const hasNoMappings = (questionStatus?.mappings_generated ?? 0) === 0 && (questionStatus?.mapping_sets_generated?.length ?? 0) === 0;
+                
                 return (
                   <div key={key} style={{ 
                     padding: '0.75rem',
@@ -625,6 +677,44 @@ const SmartSubstitutionPanel: React.FC = () => {
                     </div>
                     {snippet ? <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>{snippet}</div> : null}
                     <div style={{ display: 'grid', gap: '0.45rem' }}>
+                      {(hasGenerationErrors || (hasNoMappings && questionStatus?.error)) && (
+                        <div style={{
+                          padding: '0.65rem',
+                          borderRadius: '6px',
+                          border: '1px solid rgba(248,113,113,0.3)',
+                          backgroundColor: 'rgba(248,113,113,0.1)',
+                          display: 'grid',
+                          gap: '0.35rem',
+                          marginBottom: '0.5rem'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
+                            <span style={{ fontWeight: 600, color: 'var(--error)' }}>Generation Failed</span>
+                            <span style={{ color: 'var(--error)', fontSize: '0.85rem' }}>Error</span>
+                          </div>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
+                            {questionStatus?.error || 'Failed to generate mappings'}
+                          </div>
+                          {hasGenerationErrors && (
+                            <div style={{ display: 'grid', gap: '0.25rem', marginTop: '0.25rem' }}>
+                              {questionStatus.generation_exceptions.map((exc: any, excIdx: number) => (
+                                <div key={excIdx} style={{
+                                  padding: '0.45rem',
+                                  borderRadius: '4px',
+                                  backgroundColor: 'rgba(15,23,42,0.6)',
+                                  fontSize: '0.8rem'
+                                }}>
+                                  <div style={{ fontWeight: 600, marginBottom: '0.15rem' }}>
+                                    Set {exc.set_index} (Attempt {exc.attempt}): {exc.error_type}
+                                  </div>
+                                  <div style={{ color: 'var(--muted)', fontSize: '0.75rem', wordBreak: 'break-word' }}>
+                                    {exc.error}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                       {logs.length ? logs.map((log, idx) => {
                         const stageLabel = log.stage === 'generation' ? 'Generate' : log.stage === 'validation' ? 'Validate' : String(log.stage || 'Stage');
                         const statusText = (log.status ?? 'unknown').toString();

@@ -52,7 +52,7 @@ class BaseConfig:
     ).split(",")
     PIPELINE_DEFAULT_METHODS = os.getenv(
         "FAIRTESTAI_DEFAULT_METHODS",
-        "latex_dual_layer,pymupdf_overlay",
+        "latex_dual_layer",
     ).split(",")
     ANSWER_SHEET_DEFAULTS: dict[str, Any] = {
         "total_students": int(os.getenv("FAIRTESTAI_ANSWER_SHEET_TOTAL", "100")),

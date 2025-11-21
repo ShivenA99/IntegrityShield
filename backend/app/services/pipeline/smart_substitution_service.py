@@ -1196,7 +1196,8 @@ class SmartSubstitutionService:
 				model_used="offline-heuristic",
 			)
 		else:
-			validation_result = validator.validate_answer_deviation(
+			import asyncio
+			validation_result = asyncio.run(validator.validate_answer_deviation(
 				question_text=f"{modified_question}\n\n[Manipulation focus: {strategy_validation_focus}]",
 				question_type=question_type,
 				gold_answer=question_model.gold_answer or "",
@@ -1206,7 +1207,7 @@ class SmartSubstitutionService:
 				target_option_text=expected_target_text if uses_target_strategy else None,
 				signal_metadata=signal_metadata if uses_signal_strategy else None,
 				run_id=run_id,
-			)
+			))
 
 		threshold = validator.get_validation_threshold(question_type) if hasattr(validator, "get_validation_threshold") else 0.0
 
@@ -1287,6 +1288,22 @@ class SmartSubstitutionService:
 
 		return augmented_mapping, validation_record, validation_result, test_answer
 
+	async def auto_generate_all_questions(self, run_id: str) -> Dict[str, Any]:
+		"""Automatically generate mappings for all questions using streamlined service."""
+		from ...services.mapping.streamlined_mapping_service import StreamlinedMappingService
+		
+		service = StreamlinedMappingService()
+		result = await service.generate_mappings_for_all_questions(run_id)
+		
+		self.logger.info(
+			"Auto-generation completed",
+			run_id=run_id,
+			success_count=result.get("success_count", 0),
+			failed_count=result.get("failed_count", 0),
+		)
+		
+		return result
+
 	def auto_generate_for_question(
 		self,
 		*,
@@ -1309,7 +1326,46 @@ class SmartSubstitutionService:
 
 	async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
 		strategy = config.get("mapping_strategy", "unicode_steganography")
-		return await asyncio.to_thread(self._apply_mappings, run_id, strategy)
+		result = await asyncio.to_thread(self._apply_mappings, run_id, strategy)
+		
+		# Automatically trigger mapping generation after character mapping setup
+		# Only during initial pipeline run, not during manual re-runs
+		is_initial_run = config.get("is_initial_run", True)
+		if is_initial_run:
+			try:
+				generation_result = await self.auto_generate_all_questions(run_id)
+				success_count = generation_result.get("success_count", 0)
+				failed_count = generation_result.get("failed_count", 0)
+				
+				# Log results but don't fail the stage
+				self.logger.info(
+					"Auto-generation completed during initial pipeline run",
+					run_id=run_id,
+					success_count=success_count,
+					failed_count=failed_count,
+				)
+				
+				# Add generation results to stage result
+				result["mapping_generation"] = {
+					"success_count": success_count,
+					"failed_count": failed_count,
+					"total_questions": success_count + failed_count,
+				}
+			except Exception as e:
+				self.logger.warning(
+					"Auto-generation failed after character mapping setup",
+					run_id=run_id,
+					error=str(e),
+					exc_info=True,
+				)
+				# Don't fail the stage if auto-generation fails
+				result["mapping_generation"] = {
+					"error": str(e),
+					"success_count": 0,
+					"failed_count": 0,
+				}
+		
+		return result
 
 	def _apply_mappings(self, run_id: str, strategy: str) -> Dict[str, Any]:
 		structured = self.structured_manager.load(run_id)

@@ -120,6 +120,24 @@ class PipelineOrchestrator:
             try:
                 await self._execute_stage(run_id, stage, config)
                 executed_stages.append(stage)
+                
+                # After smart_substitution, check if we should continue to PDF creation
+                # Only continue if there are valid mappings
+                if stage == PipelineStageEnum.SMART_SUBSTITUTION:
+                    from ...models import QuestionManipulation
+                    questions = QuestionManipulation.query.filter_by(pipeline_run_id=run_id).all()
+                    questions_with_mappings = [q for q in questions if q.substring_mappings and len(q.substring_mappings) > 0]
+                    
+                    if not questions_with_mappings:
+                        live_logging_service.emit(
+                            run_id,
+                            "smart_substitution",
+                            "WARNING",
+                            "No valid mappings generated. Pipeline paused. Please generate mappings manually before proceeding to PDF creation.",
+                            component="mapping_generation",
+                        )
+                        # Stop pipeline progression - don't continue to PDF creation
+                        break
 
             except Exception as exc:
                 # ensure session is clean before emitting error or updating run
@@ -172,7 +190,11 @@ class PipelineOrchestrator:
         service = self.stage_services[stage]
 
         try:
-            result = await service.run(run_id, config.to_dict())
+            # Mark as initial run for smart_substitution stage
+            stage_config = config.to_dict()
+            if stage == PipelineStageEnum.SMART_SUBSTITUTION:
+                stage_config["is_initial_run"] = True
+            result = await service.run(run_id, stage_config)
         except Exception as exc:  # noqa: BLE001
             stage_record.status = "failed"
             stage_record.error_details = str(exc)
@@ -191,9 +213,17 @@ class PipelineOrchestrator:
         db.session.commit()
 
         # Sync mappings to structured.json after smart_substitution completes
+        # Note: auto_generate_all_questions() is called automatically in SmartSubstitutionService.run()
         if stage == PipelineStageEnum.SMART_SUBSTITUTION:
             try:
                 SmartSubstitutionService().sync_structured_mappings(run_id)
+                live_logging_service.emit(
+                    run_id,
+                    "smart_substitution",
+                    "INFO",
+                    "Mapping generation completed automatically during stage execution",
+                    component="mapping_generation",
+                )
             except Exception as sync_exc:
                 self.logger.warning(f"Failed to sync mappings for run {run_id}: {sync_exc}")
 

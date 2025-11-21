@@ -145,7 +145,8 @@ class MappingValidator:
             target_option_text = options_data.get(target_option)
         
         # Validate using GPT5ValidationService
-        validation_result = self.validator.validate_answer_deviation(
+        import asyncio
+        validation_result = asyncio.run(self.validator.validate_answer_deviation(
             question_text=modified_text,
             question_type=question_type,
             gold_answer=gold_answer,
@@ -154,7 +155,7 @@ class MappingValidator:
             target_option=target_option,
             target_option_text=target_option_text,
             run_id=run_id
-        )
+        ))
         
         suggestion = self._build_validation_suggestion(
             validation_result=validation_result,
