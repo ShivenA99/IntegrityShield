@@ -26,14 +26,59 @@ scripts/        One-off utilities and operational helpers
 
 ```bash
 cd backend
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv venv_host
+source venv_host/bin/activate
 pip install -r requirements.txt
-cp .env.example .env  # supply database URL + AI keys
-python run.py         # auto-applies Alembic migrations on startup
 ```
 
-The application factory (`app.create_app`) runs Alembic migrations automatically when `FAIRTESTAI_AUTO_APPLY_MIGRATIONS` is left at its default `true`. Point `FAIRTESTAI_DATABASE_URL` at Postgres to unlock JSONB-backed tables for classroom datasets (`answer_sheet_runs`, `answer_sheet_students`, `classroom_evaluations`).
+**Configure Environment Variables:**
+
+Create a `.env` file in the `backend/` directory with the following required variables:
+
+```bash
+# Environment Configuration
+FAIRTESTAI_ENV=development
+FAIRTESTAI_PORT=8000
+FAIRTESTAI_LOG_LEVEL=INFO
+
+# Database Configuration
+FAIRTESTAI_DATABASE_URL=postgresql+psycopg://fairtestai:fairtestai@localhost:5433/fairtestai
+
+# Default Models and Methods
+FAIRTESTAI_DEFAULT_MODELS=gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro
+FAIRTESTAI_DEFAULT_METHODS=content_stream_overlay,pymupdf_overlay
+
+# Development Tools
+FAIRTESTAI_ENABLE_DEV_TOOLS=true
+
+# Model Configuration
+POST_FUSER_MODEL=gpt-5
+
+# API Keys (REQUIRED)
+OPENAI_API_KEY=your_openai_api_key_here
+GOOGLE_AI_KEY=your_google_ai_key_here
+MISTRAL_API_KEY=your_mistral_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+ANTHROPIC_MODEL=claude-sonnet-4-5-20250929
+```
+
+**Start the Backend:**
+
+Use the provided startup script which automatically loads environment variables and sets up the correct configuration:
+
+```bash
+# From the project root directory
+bash backend/scripts/run_dev_server.sh
+```
+
+The startup script will:
+- Load environment variables from `backend/.env`
+- Verify required API keys are present
+- Set default database URL (SQLite for local dev) and other configuration
+- Activate the virtual environment
+- Start the Flask server on port 8000
+
+> **Note:** The script automatically sets `FAIRTESTAI_DATABASE_URL` to use SQLite (`sqlite:////.../data/fairtestai.db`) for local development. To use PostgreSQL, override this in your `.env` file. The application factory (`app.create_app`) runs Alembic migrations automatically when `FAIRTESTAI_AUTO_APPLY_MIGRATIONS` is set to `true` (default is `false` in the script).
 
 ### Frontend
 

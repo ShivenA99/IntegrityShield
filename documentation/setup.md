@@ -15,37 +15,87 @@ Use this guide to bootstrap a development environment that mirrors production be
 
 ## Backend Setup
 
+### 1. Install Dependencies
+
 ```bash
 cd backend
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv venv_host
+source venv_host/bin/activate
 pip install -r requirements.txt
-touch .env  # or copy from a template if you maintain one locally
 ```
 
-> **Windows note:** Replace `python3` with `py` if needed, and activate the virtualenv via `.venv\Scripts\activate`.
+> **Windows note:** Replace `python3` with `py` if needed, and activate the virtualenv via `venv_host\Scripts\activate`.
 
-Populate `.env` (or export env vars) with:
+### 2. Configure Environment Variables
 
-```
-FAIRTESTAI_ENV=development
-FAIRTESTAI_DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/fairtestai
-FAIRTESTAI_PIPELINE_ROOT=/absolute/path/to/backend/data/pipeline_runs
-OPENAI_API_KEY=sk-...
-MISTRAL_API_KEY=...
-```
-
-> **Windows paths:** When running outside WSL, use double backslashes (e.g., `C:\\Users\\you\\fairtestai\\backend\\data\\pipeline_runs`). If you develop inside WSL (recommended), keep Unix-style paths but grant filesystem permissions to your Windows user so the frontend can download artifacts.
-
-> **Tip:** Leave `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true` (default) to let the app run Alembic `upgrade()` on startup.
-
-Start the server:
+Create a `.env` file in the `backend/` directory with the following configuration:
 
 ```bash
+# Environment Configuration
+FAIRTESTAI_ENV=development
+FAIRTESTAI_PORT=8000
+FAIRTESTAI_LOG_LEVEL=INFO
+
+# Database Configuration
+# For PostgreSQL (recommended for production):
+FAIRTESTAI_DATABASE_URL=postgresql+psycopg://fairtestai:fairtestai@localhost:5433/fairtestai
+# For SQLite (default in startup script, good for local dev):
+# The startup script will override this to use SQLite unless explicitly set
+
+# Default Models and Methods
+FAIRTESTAI_DEFAULT_MODELS=gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro
+FAIRTESTAI_DEFAULT_METHODS=content_stream_overlay,pymupdf_overlay
+
+# Development Tools
+FAIRTESTAI_ENABLE_DEV_TOOLS=true
+
+# Model Configuration
+POST_FUSER_MODEL=gpt-5
+
+# API Keys (REQUIRED - the startup script will check for these)
+OPENAI_API_KEY=your_openai_api_key_here
+GOOGLE_AI_KEY=your_google_ai_key_here
+MISTRAL_API_KEY=your_mistral_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+ANTHROPIC_MODEL=claude-sonnet-4-5-20250929
+```
+
+> **Windows paths:** When running outside WSL, use double backslashes for file paths. If you develop inside WSL (recommended), keep Unix-style paths but grant filesystem permissions to your Windows user so the frontend can download artifacts.
+
+> **Database Note:** The startup script defaults to SQLite for local development (`sqlite:////.../data/fairtestai.db`). To use PostgreSQL, set `FAIRTESTAI_DATABASE_URL` in your `.env` file. The script will respect your override.
+
+> **Migrations:** The startup script sets `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=false` by default. To enable automatic migrations, set this to `true` in your `.env` file.
+
+### 3. Start the Backend Server
+
+**Recommended: Use the Startup Script**
+
+From the project root directory, run:
+
+```bash
+bash backend/scripts/run_dev_server.sh
+```
+
+The startup script (`backend/scripts/run_dev_server.sh`) will:
+- Load environment variables from `backend/.env`
+- Verify that required API keys (`OPENAI_API_KEY`, `GOOGLE_AI_KEY`) are present
+- Set default configuration values (database URL, model settings, etc.)
+- Activate the `venv_host` virtual environment
+- Start the Flask server on port 8000 (or the port specified in `FAIRTESTAI_PORT`)
+
+**Alternative: Manual Startup**
+
+If you prefer to start manually:
+
+```bash
+cd backend
+source venv_host/bin/activate
+export $(cat .env | xargs)  # Load .env variables
+export FAIRTESTAI_DATABASE_URL="sqlite:////$(pwd)/data/fairtestai.db"  # Override for local dev
 python run.py  # listens on 0.0.0.0:8000
 ```
 
-Flask runs in debug mode for the `development` config, spawning background threads for pipeline execution. Logs stream to `backend_server.log`.
+Flask runs in debug mode for the `development` config, spawning background threads for pipeline execution. Logs stream to `backend_server.log` or `/tmp/backend_flask.log` depending on your configuration.
 
 ### Fresh Postgres via Docker (Optional)
 

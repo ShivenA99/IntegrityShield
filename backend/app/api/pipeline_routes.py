@@ -1328,11 +1328,21 @@ def generate_vulnerability_report(run_id: str):
         return jsonify({"error": str(exc)}), HTTPStatus.NOT_FOUND
     except ValueError as exc:
         db.session.rollback()
-        return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
-    except Exception:  # pragma: no cover
+        error_msg = str(exc)
+        current_app.logger.warning(
+            "Vulnerability report generation failed with ValueError",
+            extra={"run_id": run_id, "error": error_msg}
+        )
+        return jsonify({"error": error_msg}), HTTPStatus.BAD_REQUEST
+    except Exception as exc:  # pragma: no cover
         db.session.rollback()
-        current_app.logger.exception("Failed to generate vulnerability report", extra={"run_id": run_id})
-        return jsonify({"error": "Failed to generate vulnerability report"}), HTTPStatus.INTERNAL_SERVER_ERROR
+        error_type = type(exc).__name__
+        error_msg = str(exc)
+        current_app.logger.exception(
+            "Failed to generate vulnerability report",
+            extra={"run_id": run_id, "error_type": error_type, "error": error_msg}
+        )
+        return jsonify({"error": f"Failed to generate vulnerability report: {error_msg}"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
     return jsonify(result), HTTPStatus.OK
 

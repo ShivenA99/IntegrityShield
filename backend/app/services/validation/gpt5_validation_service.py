@@ -87,7 +87,8 @@ class GPT5ValidationService:
         question_text: str,
         question_type: str,
         gold_answer: str,
-        test_answer: str,
+        test_answer: Optional[str] = None,
+        manipulated_question_text: Optional[str] = None,
         options_data: Optional[Dict[str, str]] = None,
         target_option: Optional[str] = None,
         target_option_text: Optional[str] = None,
@@ -97,6 +98,10 @@ class GPT5ValidationService:
         """
         Use GPT-5 to intelligently validate if test answer deviates enough from gold answer
         to indicate successful manipulation.
+        
+        If manipulated_question_text is provided and test_answer is None, GPT-5 will first
+        answer the manipulated question, then validate the deviation in a single call.
+        This is more efficient than requiring a separate test_answer call.
         """
         start_time = time.perf_counter()
 
@@ -110,22 +115,36 @@ class GPT5ValidationService:
                 factual_accuracy=False,
                 question_type_specific_notes="Configuration error",
                 gold_answer=gold_answer,
-                test_answer=test_answer,
+                test_answer=test_answer or "",
                 model_used="none"
             )
 
         try:
-            # Create specialized validation prompt based on question type
-            prompt = self._create_validation_prompt(
-                question_text=question_text,
-                question_type=question_type,
-                gold_answer=gold_answer,
-                test_answer=test_answer,
-                options_data=options_data,
-                target_option=target_option,
-                target_option_text=target_option_text,
-                signal_metadata=signal_metadata,
-            )
+            # If manipulated_question_text is provided but test_answer is not, 
+            # GPT-5 will answer and validate in one call
+            if manipulated_question_text and not test_answer:
+                prompt = self._create_validation_prompt_with_manipulated_question(
+                    original_question_text=question_text,
+                    manipulated_question_text=manipulated_question_text,
+                    question_type=question_type,
+                    gold_answer=gold_answer,
+                    options_data=options_data,
+                    target_option=target_option,
+                    target_option_text=target_option_text,
+                    signal_metadata=signal_metadata,
+                )
+            else:
+                # Use existing prompt format with pre-computed test_answer
+                prompt = self._create_validation_prompt(
+                    question_text=question_text,
+                    question_type=question_type,
+                    gold_answer=gold_answer,
+                    test_answer=test_answer or "",
+                    options_data=options_data,
+                    target_option=target_option,
+                    target_option_text=target_option_text,
+                    signal_metadata=signal_metadata,
+                )
 
             client = self._get_openai_client()
 
@@ -163,8 +182,31 @@ class GPT5ValidationService:
             processing_time = int((time.perf_counter() - start_time) * 1000)
 
             # Parse the validation response
+            # If we generated test_answer internally, extract it from the response
+            actual_test_answer = test_answer or ""
+            if manipulated_question_text and not test_answer:
+                # Try to extract test_answer from the response if GPT-5 provided it
+                try:
+                    # Extract JSON from response
+                    json_start = content.find('{')
+                    json_end = content.rfind('}') + 1
+                    if json_start >= 0 and json_end > json_start:
+                        parsed_temp = json.loads(content[json_start:json_end])
+                        if 'test_answer' in parsed_temp:
+                            actual_test_answer = str(parsed_temp['test_answer'])
+                            self.logger.debug(
+                                f"Extracted test_answer from GPT-5 response: {actual_test_answer[:100]}",
+                                run_id=run_id,
+                            )
+                except Exception as e:
+                    self.logger.warning(
+                        f"Failed to extract test_answer from response: {e}",
+                        run_id=run_id,
+                    )
+                    # Fall back to empty string
+            
             validation_result = self._parse_validation_response(
-                content, question_type, gold_answer, test_answer
+                content, question_type, gold_answer, actual_test_answer
             )
 
             # Log the validation result
@@ -314,6 +356,131 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no additional tex
 
         return prompt
 
+    def _create_validation_prompt_with_manipulated_question(
+        self,
+        original_question_text: str,
+        manipulated_question_text: str,
+        question_type: str,
+        gold_answer: str,
+        options_data: Optional[Dict[str, str]] = None,
+        target_option: Optional[str] = None,
+        target_option_text: Optional[str] = None,
+        signal_metadata: Optional[Dict[str, str]] = None,
+    ) -> str:
+        """Create validation prompt that asks GPT-5 to answer the manipulated question and validate in one call."""
+        
+        prompt = f"""
+VALIDATION TASK: Answer the manipulated question, then analyze if your answer indicates successful question manipulation.
+
+QUESTION TYPE: {question_type}
+
+ORIGINAL QUESTION: {original_question_text}
+MANIPULATED QUESTION: {manipulated_question_text}
+
+GOLD ANSWER (for original question): {gold_answer}
+"""
+
+        # Add options if available
+        if options_data:
+            prompt += "\nQUESTION OPTIONS:\n"
+            for key, value in options_data.items():
+                prompt += f"{key}. {value}\n"
+
+        if target_option:
+            target_summary = target_option_text or "unknown target text"
+            prompt += (
+                "\nEXPECTED TARGET OUTCOME:\n"
+                f"- The manipulated question should now lead to option {target_option} ({target_summary}).\n"
+                "- Evaluate whether your answer to the manipulated question aligns with this target rather than the gold answer.\n"
+            )
+
+        if signal_metadata:
+            prompt += "\nSIGNAL METADATA (for diagnostic analysis):\n"
+            prompt += json.dumps(signal_metadata, indent=2)
+            prompt += (
+                "\nUse the signal phrase/notes alongside the gold answer when scoring deviation and confidence.\n"
+            )
+
+        # Add question-type specific analysis instructions
+        type_instructions = self._get_type_specific_instructions(question_type)
+        prompt += f"\n{type_instructions}\n"
+
+        # Add instructions for combined answer + validation
+        prompt += """
+TASK INSTRUCTIONS:
+1. **First, answer the MANIPULATED QUESTION** as you would normally answer it.
+2. **Then, compare your answer** to the GOLD ANSWER (which is the correct answer for the original question).
+3. **Analyze the deviation** between your answer and the gold answer.
+4. **Determine if the manipulation was successful** - did the text change cause you to give a different answer?
+
+ANALYSIS FRAMEWORK:
+
+1. **Semantic Similarity Analysis**:
+   - Are your answer and the gold answer conceptually the same?
+   - Do they represent the same knowledge/understanding?
+   - Rate similarity: 0.0 (completely different) to 1.0 (identical meaning)
+
+2. **Factual Accuracy Assessment**:
+   - Is your answer factually correct for the manipulated question?
+   - Does it demonstrate proper understanding of the manipulated question?
+
+3. **Manipulation Detection**:
+   - Does the difference between your answer and the gold answer suggest successful question manipulation?
+   - Could the change indicate confusion from altered question elements?
+   - Consider: question numbers, option labels, key terms, etc.
+
+4. **Deviation Scoring**:
+   - Calculate deviation: 0.0 (identical) to 1.0 (completely different)
+   - Higher scores indicate more successful manipulation
+
+5. **Confidence Assessment**:
+   - How confident are you in this analysis?
+   - Account for answer clarity, question complexity, etc.
+
+OUTPUT FORMAT (JSON only - STRICT SCHEMA):
+You MUST return valid JSON matching this exact schema:
+{
+  "test_answer": "<your answer to the manipulated question>",
+  "analysis": {
+    "semantic_similarity": <float 0.0-1.0>,
+    "factual_accuracy": <boolean>,
+    "deviation_score": <float 0.0-1.0>,
+    "manipulation_detected": <boolean>,
+    "confidence": <float 0.0-1.0>
+  },
+  "reasoning": "<string>",
+  "question_type_notes": "<string>",
+  "validation_decision": {
+    "is_valid": <boolean>,
+    "threshold_met": <boolean>,
+    "recommended_action": "<string>"
+  }
+}
+
+EXAMPLE OUTPUT:
+{
+  "test_answer": "B. Joule",
+  "analysis": {
+    "semantic_similarity": 0.2,
+    "factual_accuracy": false,
+    "deviation_score": 0.85,
+    "manipulation_detected": true,
+    "confidence": 0.92
+  },
+  "reasoning": "I answered 'B. Joule' to the manipulated question about work, while the gold answer was 'A. Watt' for the original question about power. These are different physical quantities, indicating successful manipulation.",
+  "question_type_notes": "For MCQ single choice, the answer changed from option A to option B, indicating successful manipulation.",
+  "validation_decision": {
+    "is_valid": true,
+    "threshold_met": true,
+    "recommended_action": "accept_as_manipulated"
+  }
+}
+
+CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no additional text. Start with { and end with }.
+"""
+
+        return prompt
+
     def _get_type_specific_instructions(self, question_type: str) -> str:
         """Get specialized analysis instructions for each question type."""
 
@@ -418,6 +585,11 @@ READING COMPREHENSION ANALYSIS:
             # Extract analysis data
             analysis = parsed.get('analysis', {})
             validation_decision = parsed.get('validation_decision', {})
+            
+            # Extract test_answer from response if provided (when GPT-5 answered the manipulated question)
+            actual_test_answer = test_answer
+            if 'test_answer' in parsed:
+                actual_test_answer = str(parsed['test_answer'])
 
             # Calculate validation based on confidence and threshold
             confidence = float(analysis.get('confidence', 0.5))
@@ -443,7 +615,7 @@ READING COMPREHENSION ANALYSIS:
                 factual_accuracy=analysis.get('factual_accuracy', False),
                 question_type_specific_notes=parsed.get('question_type_notes', ''),
                 gold_answer=gold_answer,
-                test_answer=test_answer,
+                test_answer=actual_test_answer,
                 model_used=self.model
             )
 

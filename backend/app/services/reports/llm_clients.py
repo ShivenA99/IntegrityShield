@@ -423,14 +423,22 @@ class GoogleClient(BaseLLMClient):
                         error_details = error_json.get("error", {})
                         error_message = error_details.get("message", error_text)
                         error_status = error_details.get("status", "UNKNOWN")
+                        error_code = error_details.get("code", resp.status)
                         logger.error(
-                            "Google Gemini API error: status=%d, error_status=%s, message=%s, file_uri=%s, model=%s",
+                            "Google Gemini API error: status=%d, error_status=%s, error_code=%s, message=%s, file_uri=%s, model=%s",
                             resp.status,
                             error_status,
+                            error_code,
                             error_message,
                             file_uri,
                             self.model,
                         )
+                        # Raise LLMClientError with detailed message
+                        raise LLMClientError(
+                            f"Google completion failed ({resp.status}): {error_status} - {error_message}"
+                        )
+                    except LLMClientError:
+                        raise  # Re-raise LLMClientError
                     except Exception:
                         logger.error(
                             "Google Gemini API error: status=%d, body=%s, file_uri=%s, model=%s",
@@ -438,6 +446,9 @@ class GoogleClient(BaseLLMClient):
                             error_text[:500],
                             file_uri,
                             self.model,
+                        )
+                        raise LLMClientError(
+                            f"Google completion failed ({resp.status}): {error_text[:200]}"
                         )
                     raise LLMClientError(f"Google completion failed ({resp.status}): {error_text}")
                 result = await resp.json()
