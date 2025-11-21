@@ -22,9 +22,8 @@ class LatexDualLayerRenderer(BaseRenderer):
         destination: Path,
         mapping: Dict[str, str],  # noqa: ARG002 - attack service pulls mappings directly
     ) -> Dict[str, float | str | int | None]:
-        method_name = destination.stem.replace("enhanced_", "")
-        if not method_name or method_name == destination.stem:
-            method_name = "latex_dual_layer"
+        # This renderer only handles latex_dual_layer
+        method_name = "latex_dual_layer"
 
         self.logger.info(
             "Starting latex-based render",

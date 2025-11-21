@@ -654,8 +654,38 @@ class StreamlinedMappingService:
                         validation_tasks.append(task)
                         task_data.append((mapping_idx, mapping))
                     
-                    # Wait for all validations in this set to complete in parallel
-                    validation_results = await asyncio.gather(*validation_tasks, return_exceptions=True)
+                    # Wait for all validations in this set to complete in parallel with timeout
+                    # Use 2x API_TIMEOUT to allow for parallel execution of multiple validations
+                    try:
+                        validation_results = await asyncio.wait_for(
+                            asyncio.gather(*validation_tasks, return_exceptions=True),
+                            timeout=API_TIMEOUT * 2,  # Allow 2x timeout for parallel validations
+                        )
+                    except asyncio.TimeoutError:
+                        self.logger.error(
+                            f"Validation batch timed out after {API_TIMEOUT * 2}s",
+                            run_id=run_id,
+                            question_id=question_id,
+                            set_index=set_idx,
+                            attempt=attempt,
+                            tasks_count=len(validation_tasks),
+                        )
+                        # Collect results from completed tasks and mark pending ones as timed out
+                        validation_results = []
+                        for task in validation_tasks:
+                            if task.done():
+                                try:
+                                    validation_results.append(task.result())
+                                except Exception as e:
+                                    validation_results.append(e)
+                            else:
+                                # Task is still pending - mark as timed out
+                                # Use a regular Exception that will be handled by the exception handler below
+                                validation_results.append(
+                                    TimeoutError(f"Validation task timed out after {API_TIMEOUT * 2}s")
+                                )
+                                # Cancel the task to free resources
+                                task.cancel()
                     
                     for (mapping_idx, mapping), validation_result in zip(task_data, validation_results):
                         mappings_validated_count += 1
@@ -1072,6 +1102,8 @@ class StreamlinedMappingService:
 
         try:
             # Use AsyncOpenAI directly for native async performance
+            # NOTE: GPT-5.1 Responses API may not support response_format with json_schema
+            # Instead, we rely on explicit prompt instructions and few-shot examples
             response = await client.responses.create(
                 model=GPT5_MODEL,
                 input=messages,
@@ -1096,62 +1128,113 @@ class StreamlinedMappingService:
                 )
                 raise ValueError("Empty response from GPT-5.1 Responses API")
 
-            # Parse JSON response with better error handling
+            # Parse JSON response with comprehensive error handling and recovery
+            parsed = None
+            content_original = content
+            
+            # Strategy 1: Try direct JSON parsing
             try:
                 parsed = json.loads(content)
             except json.JSONDecodeError as json_err:
-                # Log response preview for debugging (truncated to 500 chars)
-                content_preview = content[:500] + "..." if len(content) > 500 else content
-                response_id = getattr(response, "id", None)
-                response_model = getattr(response, "model", None)
-                self.logger.error(
-                    f"Failed to parse JSON response: {json_err}",
+                self.logger.warning(
+                    f"Direct JSON parse failed, attempting recovery: {json_err}",
                     run_id=run_id,
                     question_id=question_id,
                     attempt=attempt,
-                    json_error=str(json_err),
-                    json_error_line=json_err.lineno if hasattr(json_err, 'lineno') else None,
-                    json_error_col=json_err.colno if hasattr(json_err, 'colno') else None,
-                    content_preview=content_preview,
-                    content_length=len(content),
-                    response_id=response_id,
-                    response_model=response_model,
+                    error_pos=json_err.pos if hasattr(json_err, 'pos') else None,
                 )
-                # Try to extract JSON from markdown code blocks if present
-                if "```json" in content:
+                
+                # Strategy 2: Extract from markdown code blocks
+                for marker in ["```json", "```"]:
+                    if marker in content:
+                        try:
+                            json_start = content.find(marker) + len(marker)
+                            json_end = content.find("```", json_start)
+                            if json_end > json_start:
+                                extracted = content[json_start:json_end].strip()
+                                parsed = json.loads(extracted)
+                                self.logger.info(
+                                    f"Successfully extracted JSON from {marker} code block",
+                                    run_id=run_id,
+                                    question_id=question_id,
+                                )
+                                break
+                        except (json.JSONDecodeError, ValueError):
+                            continue
+                
+                # Strategy 3: Try to find JSON object boundaries
+                if parsed is None:
                     try:
-                        json_start = content.find("```json") + 7
-                        json_end = content.find("```", json_start)
-                        if json_end > json_start:
-                            content = content[json_start:json_end].strip()
-                            parsed = json.loads(content)
+                        # Find first { and last }
+                        first_brace = content.find("{")
+                        last_brace = content.rfind("}")
+                        if first_brace >= 0 and last_brace > first_brace:
+                            extracted = content[first_brace:last_brace + 1]
+                            parsed = json.loads(extracted)
                             self.logger.info(
-                                f"Successfully extracted JSON from markdown code block",
+                                f"Successfully extracted JSON by finding brace boundaries",
                                 run_id=run_id,
                                 question_id=question_id,
                             )
-                        else:
-                            raise json_err
                     except (json.JSONDecodeError, ValueError):
-                        raise json_err
-                elif "```" in content:
+                        pass
+                
+                # Strategy 4: Try to fix common JSON issues
+                if parsed is None:
                     try:
-                        json_start = content.find("```") + 3
-                        json_end = content.find("```", json_start)
-                        if json_end > json_start:
-                            content = content[json_start:json_end].strip()
-                            parsed = json.loads(content)
-                            self.logger.info(
-                                f"Successfully extracted JSON from code block",
-                                run_id=run_id,
-                                question_id=question_id,
-                            )
-                        else:
-                            raise json_err
-                    except (json.JSONDecodeError, ValueError):
+                        # Remove leading/trailing whitespace and non-JSON text
+                        cleaned = content.strip()
+                        # Remove text before first {
+                        first_brace = cleaned.find("{")
+                        if first_brace > 0:
+                            cleaned = cleaned[first_brace:]
+                        # Remove text after last }
+                        last_brace = cleaned.rfind("}")
+                        if last_brace >= 0:
+                            cleaned = cleaned[:last_brace + 1]
+                        
+                        # Try to fix unterminated strings (common issue)
+                        # This is a heuristic - count quotes and try to balance
+                        quote_count = cleaned.count('"')
+                        if quote_count % 2 != 0:
+                            # Odd number of quotes - might be unterminated string
+                            # Try adding a closing quote before the last }
+                            last_quote_pos = cleaned.rfind('"')
+                            if last_quote_pos > 0 and last_quote_pos < len(cleaned) - 2:
+                                # Check if it's likely an unterminated string
+                                before_quote = cleaned[last_quote_pos - 1] if last_quote_pos > 0 else ''
+                                after_quote = cleaned[last_quote_pos + 1] if last_quote_pos + 1 < len(cleaned) else ''
+                                if before_quote != '\\' and after_quote not in ['"', ',', '}', ']', ':', ' ']:
+                                    # Might need to close the string
+                                    cleaned = cleaned[:last_quote_pos + 1] + '"' + cleaned[last_quote_pos + 1:]
+                        
+                        parsed = json.loads(cleaned)
+                        self.logger.info(
+                            f"Successfully parsed JSON after cleaning",
+                            run_id=run_id,
+                            question_id=question_id,
+                        )
+                    except (json.JSONDecodeError, ValueError) as e:
+                        # All recovery strategies failed
+                        content_preview = content[:500] + "..." if len(content) > 500 else content
+                        response_id = getattr(response, "id", None)
+                        response_model = getattr(response, "model", None)
+                        self.logger.error(
+                            f"All JSON parsing recovery strategies failed: {json_err}",
+                            run_id=run_id,
+                            question_id=question_id,
+                            attempt=attempt,
+                            original_error=str(json_err),
+                            recovery_error=str(e),
+                            content_preview=content_preview,
+                            content_length=len(content),
+                            response_id=response_id,
+                            response_model=response_model,
+                        )
                         raise json_err
-                else:
-                    raise json_err
+            
+            if parsed is None:
+                raise ValueError("Failed to parse JSON response after all recovery attempts")
 
             # Validate response structure
             if not isinstance(parsed, dict):
@@ -1276,16 +1359,21 @@ GOLD ANSWER: {gold_answer}
         for idx, target_config in enumerate(target_configs, start=1):
             if target_config.get("target_option"):
                 prompt += f"\nSET {idx}: Target option {target_config['target_option']} ({target_config.get('target_option_text', '')})\n"
-                prompt += f"   - Generate mappings that will cause the LLM to select option {target_config['target_option']} instead of the gold answer.\n"
+                prompt += f"   - Generate EXACTLY ONE mapping that will cause the LLM to select option {target_config['target_option']} instead of the gold answer.\n"
+                prompt += f"   - The mapping can be a single word (best case) or the entire question stem substring (worst case).\n"
             elif target_config.get("signal_strategy"):
                 prompt += f"\nSET {idx}: Signal strategy '{target_config['signal_strategy']}'\n"
-                prompt += f"   - Use the '{target_config['signal_strategy']}' strategy to create subtle but effective changes.\n"
+                prompt += f"   - Generate EXACTLY ONE mapping using the '{target_config['signal_strategy']}' strategy to create subtle but effective changes.\n"
+                prompt += f"   - The mapping can be a single word (best case) or the entire question stem substring (worst case).\n"
             else:
                 prompt += f"\nSET {idx}: General manipulation\n"
-                prompt += f"   - Generate mappings that will cause the LLM to answer incorrectly.\n"
+                prompt += f"   - Generate EXACTLY ONE mapping that will cause the LLM to answer incorrectly.\n"
+                prompt += f"   - The mapping can be a single word (best case) or the entire question stem substring (worst case).\n"
         
         prompt += "\n\nMAPPING CONSTRAINTS:\n"
         prompt += "- Each mapping must replace a contiguous substring from the question text\n"
+        prompt += "- CRITICAL: The replacement substring MUST be DIFFERENT from the original substring. Do NOT generate mappings where original == replacement (e.g., \"power\" → \"power\" is INVALID). The replacement MUST change the text to create actual manipulation.\n"
+        prompt += "- CRITICAL: Neither original nor replacement can be empty strings. Both must contain actual text.\n"
         prompt += "- The replacement substring MUST be smaller or equal in length to the original substring (len(replacement) <= len(original))\n"
         prompt += "- This length constraint is CRITICAL to maintain document layout and prevent text overflow\n"
         prompt += "- Choose shorter replacement words/phrases that still achieve the manipulation goal\n"
@@ -1317,6 +1405,7 @@ You MUST return valid JSON matching this exact schema:
           "context": "surrounding context"
         }}
       ]
+      NOTE: Each set must have EXACTLY ONE mapping in the mappings array. The mapping can be as small as a single word (best case) or as large as the entire question stem substring (worst case).
     }},
     {{
       "set_index": 2,
@@ -1331,38 +1420,126 @@ You MUST return valid JSON matching this exact schema:
 
 CRITICAL REQUIREMENTS:
 1. Generate EXACTLY {len(target_configs)} sets (set_index 1, 2, 3)
-2. Each set must have different mappings targeting its specific configuration
-3. Each set should have at least 1-3 mappings
-4. Return ONLY valid JSON, no markdown, no code blocks
-5. Start with {{ and end with }}
-6. LENGTH CONSTRAINT: The replacement substring MUST be smaller or equal in length to the original substring (len(replacement) <= len(original)). This is critical for maintaining document layout and preventing text overflow.
+2. Each set must have EXACTLY ONE mapping targeting its specific configuration
+3. Each mapping can range from a single word (best case) to the entire question stem substring (worst case)
+4. Each set must have different mappings - do not repeat the same mapping across sets
+5. Return ONLY valid JSON, no markdown, no code blocks, no explanations, no text before or after
+6. Start with {{ and end with }}
+7. LENGTH CONSTRAINT: The replacement substring MUST be smaller or equal in length to the original substring (len(replacement) <= len(original)). This is critical for maintaining document layout and preventing text overflow.
+8. Ensure all JSON strings are properly escaped (use \\" for quotes inside strings)
+9. Ensure all JSON is valid and can be parsed by json.loads() without errors
 
-EXAMPLE:
+FEW-SHOT EXAMPLES:
+
+Example 1 - Single word mapping (best case):
 {{
   "mapping_sets": [
     {{
       "set_index": 1,
       "target_option": "A",
+      "target_option_text": "Watt",
+      "signal_strategy": null,
       "mappings": [
-        {{"original": "resistance", "replacement": "current", "start_pos": 10, "end_pos": 20, "context": "unit of electrical"}}
+        {{"original": "power", "replacement": "work", "start_pos": 23, "end_pos": 28, "context": "SI unit of"}}
       ]
     }},
     {{
       "set_index": 2,
       "target_option": "C",
+      "target_option_text": "Newton",
+      "signal_strategy": null,
       "mappings": [
-        {{"original": "Ohm", "replacement": "Volt", "start_pos": 25, "end_pos": 29, "context": "unit is"}}
+        {{"original": "power", "replacement": "force", "start_pos": 23, "end_pos": 28, "context": "SI unit of"}}
       ]
     }},
     {{
       "set_index": 3,
       "target_option": "D",
+      "target_option_text": "Pascal",
+      "signal_strategy": null,
       "mappings": [
-        {{"original": "electrical", "replacement": "thermal", "start_pos": 5, "end_pos": 15, "context": "the unit of"}}
+        {{"original": "power", "replacement": "pressure", "start_pos": 23, "end_pos": 28, "context": "SI unit of"}}
       ]
     }}
   ]
 }}
+
+Example 2 - Phrase mapping (medium case):
+{{
+  "mapping_sets": [
+    {{
+      "set_index": 1,
+      "target_option": "B",
+      "target_option_text": "Refraction",
+      "signal_strategy": null,
+      "mappings": [
+        {{"original": "splitting of white light", "replacement": "bending of light", "start_pos": 28, "end_pos": 54, "context": "causes the"}}
+      ]
+    }},
+    {{
+      "set_index": 2,
+      "target_option": "C",
+      "target_option_text": "Diffraction",
+      "signal_strategy": null,
+      "mappings": [
+        {{"original": "prism", "replacement": "grating", "start_pos": 20, "end_pos": 25, "context": "in a"}}
+      ]
+    }},
+    {{
+      "set_index": 3,
+      "target_option": "D",
+      "target_option_text": "Polarization",
+      "signal_strategy": null,
+      "mappings": [
+        {{"original": "constituent colors", "replacement": "wave direction", "start_pos": 55, "end_pos": 72, "context": "into its"}}
+      ]
+    }}
+  ]
+}}
+
+Example 3 - Large substring mapping (worst case - entire question stem substring):
+{{
+  "mapping_sets": [
+    {{
+      "set_index": 1,
+      "target_option": "A",
+      "target_option_text": "Dispersion",
+      "signal_strategy": null,
+      "mappings": [
+        {{"original": "What phenomenon in a prism causes the splitting of white light into its constituent colors?", "replacement": "What phenomenon in a prism causes the bending of light at different angles?", "start_pos": 0, "end_pos": 85, "context": ""}}
+      ]
+    }},
+    {{
+      "set_index": 2,
+      "target_option": "B",
+      "target_option_text": "Refraction",
+      "signal_strategy": null,
+      "mappings": [
+        {{"original": "splitting of white light into its constituent colors", "replacement": "bending of light as it passes through", "start_pos": 28, "end_pos": 75, "context": "causes the"}}
+      ]
+    }},
+    {{
+      "set_index": 3,
+      "target_option": "C",
+      "target_option_text": "Diffraction",
+      "signal_strategy": null,
+      "mappings": [
+        {{"original": "prism", "replacement": "grating", "start_pos": 20, "end_pos": 25, "context": "in a"}}
+      ]
+    }}
+  ]
+}}
+
+IMPORTANT JSON FORMATTING RULES:
+- Do NOT include markdown code blocks (no ```json or ```)
+- Do NOT include any text before or after the JSON
+- Do NOT include comments or explanations
+- Escape all quotes inside strings: use \\" not "
+- Ensure all brackets and braces are properly closed
+- Ensure all commas are correctly placed
+- Test your JSON mentally: it must parse as valid JSON
+
+Return your response now as pure JSON following the schema above:
 """
 
         return prompt
@@ -1380,19 +1557,48 @@ EXAMPLE:
         attempt: int,
         target_config: Dict[str, Any],
     ) -> ValidationResult:
-        """Validate mapping with semaphore for concurrency control."""
+        """Validate mapping with semaphore for concurrency control and timeout."""
         async with semaphore:
-            return await self._validate_mapping_set(
-                run_id=run_id,
-                question_id=question_id,
-                question_number=question_number,
-                question_data=question_data,
-                mapping=mapping,
-                set_index=set_index,
-                mapping_index=mapping_index,
-                attempt=attempt,
-                target_config=target_config,
-            )
+            try:
+                # Wrap validation call with timeout to prevent infinite hangs
+                # Use API_TIMEOUT (120s) as the timeout for each validation call
+                validation_timeout = API_TIMEOUT
+                return await asyncio.wait_for(
+                    self._validate_mapping_set(
+                        run_id=run_id,
+                        question_id=question_id,
+                        question_number=question_number,
+                        question_data=question_data,
+                        mapping=mapping,
+                        set_index=set_index,
+                        mapping_index=mapping_index,
+                        attempt=attempt,
+                        target_config=target_config,
+                    ),
+                    timeout=validation_timeout,
+                )
+            except asyncio.TimeoutError:
+                self.logger.error(
+                    f"Validation timeout after {validation_timeout}s",
+                    run_id=run_id,
+                    question_id=question_id,
+                    set_index=set_index,
+                    mapping_index=mapping_index,
+                    attempt=attempt,
+                )
+                # Return failed validation result
+                return ValidationResult(
+                    is_valid=False,
+                    confidence=0.0,
+                    deviation_score=0.0,
+                    reasoning=f"Validation timed out after {validation_timeout} seconds",
+                    semantic_similarity=0.0,
+                    factual_accuracy=False,
+                    question_type_specific_notes="Timeout error",
+                    gold_answer=question_data.get("gold_answer", ""),
+                    test_answer="",
+                    model_used="timeout"
+                )
 
     async def _validate_mapping_set(
         self,
@@ -1430,19 +1636,11 @@ EXAMPLE:
         # Simple text replacement for validation
         manipulated_text = question_text.replace(original, replacement, 1)
 
-        # Get test answer using fast LLM call
-        test_answer = await self._get_test_answer(
-            run_id=run_id,
-            question_id=question_id,
-            question_text=manipulated_text,
-            question_type=question_data.get("question_type", "mcq_single"),
-            options=question_data.get("options", {}),
-        )
-
-        # Validate deviation
+        # Validate deviation - pass manipulated_question_text to let GPT-5.1 answer and validate in one call
+        # This eliminates the need for the separate gpt-4o-mini call
         gold_answer = question_data.get("gold_answer", "")
         self.logger.debug(
-            f"Validating deviation: gold_answer={gold_answer}, test_answer={test_answer}",
+            f"Validating with manipulated question: gold_answer={gold_answer}",
             run_id=run_id,
             question_id=question_id,
             set_index=set_index,
@@ -1453,7 +1651,8 @@ EXAMPLE:
             question_text=question_text,
             question_type=question_data.get("question_type", "mcq_single"),
             gold_answer=gold_answer,
-            test_answer=test_answer,
+            test_answer=None,  # Let GPT-5.1 generate it from manipulated question
+            manipulated_question_text=manipulated_text,  # Pass manipulated question
             options_data=question_data.get("options", {}),
             target_option=target_config.get("target_option"),
             target_option_text=target_config.get("target_option_text"),
@@ -1477,85 +1676,8 @@ EXAMPLE:
 
         return validation_result
 
-    async def _get_test_answer(
-        self,
-        run_id: str,
-        question_id: int,
-        question_text: str,
-        question_type: str,
-        options: Dict[str, str],
-    ) -> str:
-        """Get test answer using fast LLM call (gpt-4o-mini)."""
-        # Log before API call
-        question_preview = question_text[:100] + "..." if len(question_text) > 100 else question_text
-        self.logger.debug(
-            f"Getting test answer for validation",
-            run_id=run_id,
-            question_id=question_id,
-            question_type=question_type,
-            question_preview=question_preview,
-            options_count=len(options),
-        )
-
-        api_key = os.getenv("OPENAI_API_KEY") or current_app.config.get("OPENAI_API_KEY")
-        if not api_key or not AsyncOpenAI:
-            error_msg = "OpenAI API key not configured or AsyncOpenAI not available"
-            self.logger.error(error_msg, run_id=run_id, question_id=question_id)
-            raise RuntimeError(error_msg)
-
-        client = AsyncOpenAI(api_key=api_key, timeout=30)  # 30s timeout for fast test answers
-
-        prompt = f"""Answer the following question.
-
-QUESTION TYPE: {question_type}
-QUESTION: {question_text}
-"""
-
-        if options:
-            prompt += "\nOPTIONS:\n"
-            for key, value in options.items():
-                prompt += f"{key}. {value}\n"
-
-        prompt += "\nProvide your answer."
-
-        try:
-            # Use AsyncOpenAI directly for native async performance
-            response = await client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant that answers questions accurately."},
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.1,
-                max_tokens=100,
-            )
-
-            answer = response.choices[0].message.content.strip()
-            
-            # Log answer received
-            self.logger.debug(
-                f"Received test answer",
-                run_id=run_id,
-                question_id=question_id,
-                answer=answer,
-                answer_length=len(answer),
-            )
-            
-            return answer
-
-        except Exception as e:
-            error_type = type(e).__name__
-            error_msg = str(e)
-            self.logger.warning(
-                f"Failed to get test answer: {error_type}: {error_msg}",
-                run_id=run_id,
-                question_id=question_id,
-                question_type=question_type,
-                error_type=error_type,
-                error=error_msg,
-                exc_info=True,
-            )
-            return ""
+    # NOTE: _get_test_answer() method removed - we now use GPT-5.1 to answer and validate in one call
+    # This eliminates the need for the separate gpt-4o-mini call, reducing latency and cost by ~50%
 
     async def _save_valid_mapping(
         self,

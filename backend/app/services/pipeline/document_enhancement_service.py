@@ -10,6 +10,8 @@ from ...utils.logging import get_logger
 from ...utils.storage_paths import enhanced_pdf_path
 from ...utils.time import isoformat, utc_now
 from .latex_dual_layer_service import LatexAttackService
+from .latex_font_attack_service import LatexFontAttackService
+from .latex_icw_service import LatexICWService
 
 
 class DocumentEnhancementService:
@@ -17,11 +19,11 @@ class DocumentEnhancementService:
         self.logger = get_logger(__name__)
         self.structured_manager = StructuredDataManager()
         self.latex_service = LatexAttackService()
+        self.font_attack_service = LatexFontAttackService()
+        self.icw_service = LatexICWService()
 
     async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
-        methods = config.get("enhancement_methods") or [
-            "latex_dual_layer",
-        ]
+        methods = config.get("enhancement_methods") or []
         return await asyncio.to_thread(self._prepare_methods, run_id, methods)
 
     def _prepare_methods(self, run_id: str, methods: Iterable[str]) -> Dict[str, Any]:
@@ -59,7 +61,18 @@ class DocumentEnhancementService:
                 latex_variants.append(method)
         for method in dict.fromkeys(latex_variants):
             try:
-                summaries[method] = self.latex_service.execute(run_id, method_name=method, force=True)
+                if method == "latex_font_attack":
+                    summaries[method] = self.font_attack_service.execute(run_id, force=True)
+                elif method == "latex_icw":
+                    summaries[method] = self.icw_service.execute(run_id, force=True)
+                elif method in ("latex_dual_layer", "latex_icw_dual_layer"):
+                    summaries[method] = self.latex_service.execute(run_id, method_name=method, force=True)
+                else:
+                    # ICW combinations (latex_icw_font_attack) are handled by renderers, not here
+                    self.logger.warning(
+                        "Method should be handled by renderers",
+                        extra={"run_id": run_id, "method": method},
+                    )
                 structured = self.structured_manager.load(run_id) or structured
             except Exception as exc:
                 self.logger.warning(
@@ -68,8 +81,6 @@ class DocumentEnhancementService:
                 )
                 summaries[method] = {"error": str(exc), "method": method}
                 structured = self.structured_manager.load(run_id) or structured
-        if "latex_dual_layer" not in summaries and "latex_icw_dual_layer" in summaries:
-            summaries["latex_dual_layer"] = summaries["latex_icw_dual_layer"]
 
         metadata = structured.setdefault("pipeline_metadata", {})
         stages_completed = set(metadata.get("stages_completed", []))

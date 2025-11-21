@@ -50,10 +50,11 @@ class BaseConfig:
     PIPELINE_DEFAULT_MODELS = os.getenv(
         "FAIRTESTAI_DEFAULT_MODELS", "gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro"
     ).split(",")
-    PIPELINE_DEFAULT_METHODS = os.getenv(
-        "FAIRTESTAI_DEFAULT_METHODS",
-        "latex_dual_layer",
-    ).split(",")
+    PIPELINE_DEFAULT_METHODS = (
+        os.getenv("FAIRTESTAI_DEFAULT_METHODS", "").split(",")
+        if os.getenv("FAIRTESTAI_DEFAULT_METHODS")
+        else []
+    )
     ANSWER_SHEET_DEFAULTS: dict[str, Any] = {
         "total_students": int(os.getenv("FAIRTESTAI_ANSWER_SHEET_TOTAL", "100")),
         "cheating_rate": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_CHEATING_RATE", "0.35")),

@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
+import asyncio
 import re
 import time
 import unicodedata
 from typing import Any, Dict, List, Optional, Tuple
 
-from ...services.integration.external_api_client import ExternalAIClient
 from ...services.manipulation.substring_manipulator import SubstringManipulator
 from ...services.validation.gpt5_validation_service import GPT5ValidationService, ValidationResult
 from ...utils.logging import get_logger
-from .gpt5_config import VALIDATION_MODEL, VALIDATION_TIMEOUT
+from .gpt5_config import VALIDATION_TIMEOUT, API_TIMEOUT
 
 
 class MappingSuggestionError(ValueError):
@@ -29,7 +29,6 @@ class MappingValidator:
         self.logger = get_logger(__name__)
         self.manipulator = SubstringManipulator()
         self.validator = GPT5ValidationService()
-        self.ai_client = ExternalAIClient()
     
     def validate_mapping_sequence(
         self,
@@ -130,32 +129,52 @@ class MappingValidator:
             latex_text=latex_text,
         )
         
-        # Get AI model response to modified question
-        test_answer = self._get_model_response(
-            modified_text=modified_text,
-            question_type=question_type,
-            options_data=options_data,
-            run_id=run_id
-        )
-        
         # Extract target information from mapping
         target_option = mapping.get("target_wrong_answer")
         target_option_text = None
         if target_option and options_data:
             target_option_text = options_data.get(target_option)
         
-        # Validate using GPT5ValidationService
-        import asyncio
-        validation_result = asyncio.run(self.validator.validate_answer_deviation(
-            question_text=modified_text,
-            question_type=question_type,
-            gold_answer=gold_answer,
-            test_answer=test_answer,
-            options_data=options_data,
-            target_option=target_option,
-            target_option_text=target_option_text,
-            run_id=run_id
-        ))
+        # Use optimized GPT-5.1 validation that answers and validates in one call
+        # This eliminates the need for the separate gpt-4o call
+        # Add timeout to prevent freezing - use API_TIMEOUT (120s) but cap at 60s for single validation
+        validation_timeout = min(API_TIMEOUT, 60)  # Cap at 60 seconds per validation
+        try:
+            validation_result = asyncio.run(
+                asyncio.wait_for(
+                    self.validator.validate_answer_deviation(
+                        question_text=question_text,  # Original question text
+                        question_type=question_type,
+                        gold_answer=gold_answer,
+                        test_answer=None,  # Let GPT-5.1 generate it from manipulated question
+                        manipulated_question_text=modified_text,  # Pass manipulated question
+                        options_data=options_data,
+                        target_option=target_option,
+                        target_option_text=target_option_text,
+                        run_id=run_id
+                    ),
+                    timeout=validation_timeout
+                )
+            )
+        except asyncio.TimeoutError:
+            self.logger.error(
+                f"Validation timeout after {validation_timeout}s",
+                run_id=run_id,
+                mapping_index=mapping_index
+            )
+            # Return failed validation result
+            validation_result = ValidationResult(
+                is_valid=False,
+                confidence=0.0,
+                deviation_score=0.0,
+                reasoning=f"Validation timed out after {validation_timeout} seconds",
+                semantic_similarity=0.0,
+                factual_accuracy=False,
+                question_type_specific_notes="Timeout error",
+                gold_answer=gold_answer,
+                test_answer="",
+                model_used="timeout"
+            )
         
         suggestion = self._build_validation_suggestion(
             validation_result=validation_result,
@@ -410,48 +429,3 @@ class MappingValidator:
             f"Adjust the replacement so the question now drives the model toward {target_display}."
         )
 
-    
-    def _get_model_response(
-        self,
-        modified_text: str,
-        question_type: str,
-        options_data: Optional[Dict[str, str]],
-        run_id: Optional[str] = None
-    ) -> str:
-        """Get AI model response to modified question."""
-        # Build prompt
-        prompt = f"Question: {modified_text}\n"
-        if options_data:
-            prompt += "Options:\n"
-            for key, value in options_data.items():
-                prompt += f"{key}. {value}\n"
-        prompt += "\nReturn only the final answer (e.g., option letter or short text)."
-        
-        try:
-            result = self.ai_client.call_model(
-                provider=VALIDATION_MODEL,
-                payload={"prompt": prompt}
-            )
-            test_answer = (result or {}).get("response", "").strip()
-            
-            if not test_answer or test_answer == "simulated-response":
-                # Fallback for MCQ
-                if question_type in {"mcq_single", "mcq_multi", "true_false"} and options_data:
-                    gold_clean = (options_data.get("A") or "").strip().lower()
-                    for opt_key in options_data.keys():
-                        key_clean = str(opt_key).strip().lower()
-                        if key_clean != gold_clean:
-                            test_answer = str(opt_key)
-                            break
-                    if not test_answer and options_data:
-                        test_answer = str(next(iter(options_data.keys())))
-                else:
-                    test_answer = "inconclusive"
-            
-            return test_answer
-        except Exception as e:
-            self.logger.warning(f"Failed to get model response: {e}", run_id=run_id)
-            # Return fallback answer
-            if question_type in {"mcq_single", "mcq_multi", "true_false"} and options_data:
-                return str(next(iter(options_data.keys())))
-            return "inconclusive"

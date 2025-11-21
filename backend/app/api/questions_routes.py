@@ -14,7 +14,6 @@ from ..services.pipeline.smart_substitution_service import SmartSubstitutionServ
 from ..services.manipulation.substring_manipulator import SubstringManipulator
 from ..services.validation.gpt5_validation_service import GPT5ValidationService, ValidationResult
 from ..utils.logging import get_logger
-from ..services.integration.external_api_client import ExternalAIClient
 from ..services.pipeline.auto_mapping_strategy import (
     describe_strategy_for_validation,
     get_strategy,
@@ -247,7 +246,7 @@ def validate_mapping(run_id: str, question_id: int):
 
 	payload = request.json or {}
 	mappings = payload.get("substring_mappings", [])
-	model = payload.get("model", "openai:fusion")
+	# model parameter no longer used - we use GPT-5.1 directly
 	# Step 1: Apply mappings to create modified question
 	manipulator = SubstringManipulator()
 	try:
@@ -290,65 +289,32 @@ def validate_mapping(run_id: str, question_id: int):
 	except ValueError as exc:
 		return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
 
-	# Step 2: Get model response to modified question
-	prompt = f"Question type: {question.question_type or 'mcq_single'}\n"
-	prompt += f"Question: {modified}\n"
-	if question.options_data:
-		prompt += "Options:\n"
-		for k, v in (question.options_data or {}).items():
-			prompt += f"{k}. {v}\n"
-	strategy_info = (question.ai_model_results or {}).get("auto_generated", {}).get("strategy")
-	if strategy_info:
-		prompt += f"\nManipulation strategy to anticipate: {strategy_info}."
-	prompt += "\nReturn only the final answer (e.g., option letter or short text)."
-
-	client = ExternalAIClient()
-	result = client.call_model(provider=model, payload={"prompt": prompt})
-	test_answer = (result or {}).get("response", "").strip()
-
+	# Use optimized GPT-5.1 validation that answers and validates in one call
+	# This eliminates the need for the separate gpt-4o call
 	strategy_definition = get_strategy(question.question_type or "mcq_single")
 	strategy_validation_focus = describe_strategy_for_validation(strategy_definition)
 
-	if not test_answer or test_answer == "simulated-response":
-		if question.question_type in {"mcq_single", "mcq_multi", "true_false"} and isinstance(question.options_data, dict):
-			gold_clean = (question.gold_answer or "").strip().lower()
-			fallback_answer = None
-			for opt_key in question.options_data.keys():
-				key_clean = str(opt_key).strip().lower()
-				if key_clean != gold_clean:
-					fallback_answer = str(opt_key)
-					break
-			if fallback_answer is None and question.options_data:
-				fallback_answer = str(next(iter(question.options_data.keys())))
-			test_answer = fallback_answer or "B"
-		elif question.gold_answer:
-			test_answer = f"not {question.gold_answer}"
-		else:
-			test_answer = "inconclusive"
-		if result is None:
-			result = {"provider": "offline", "response": test_answer}
-		else:
-			result = {**result, "response": test_answer}
-	elif isinstance(result, dict) and result.get("response") != test_answer:
-		result = {**result, "response": test_answer}
-
-	# Step 3: Use GPT-5 to intelligently validate the answer deviation
 	validator = GPT5ValidationService()
 	question_type = question.question_type or "mcq_single"
 	if validator.is_configured():
 		import asyncio
 		validation_result = asyncio.run(validator.validate_answer_deviation(
-			question_text=f"{modified}\n\n[Manipulation focus: {strategy_validation_focus}]",
+			question_text=source_text,  # Original question text
 			question_type=question_type,
 			gold_answer=question.gold_answer or "",
-			test_answer=test_answer,
+			test_answer=None,  # Let GPT-5.1 generate it from manipulated question
+			manipulated_question_text=modified,  # Pass manipulated question
 			options_data=question.options_data,
 			target_option=None,
 			target_option_text=None,
 			signal_metadata=None,
 			run_id=run_id,
 		))
+		# Extract test_answer from validation result
+		test_answer = validation_result.test_answer or ""
 	else:
+		# Fallback to offline heuristic if GPT-5.1 not configured
+		test_answer = ""
 		deviation = 0.8 if (question.gold_answer or "").strip().lower() != test_answer.strip().lower() else 0.2
 		confidence = 0.65 if deviation >= 0.5 else 0.3
 		validation_result = ValidationResult(
@@ -365,11 +331,12 @@ def validate_mapping(run_id: str, question_id: int):
 		)
 
 	# Step 4: Create comprehensive validation record
+	strategy_info = (question.ai_model_results or {}).get("auto_generated", {}).get("strategy")
 	validation_record = {
-		"model": model,
+		"model": "gpt-5.1" if validator.is_configured() else "offline",
 		"response": test_answer,
 		"gold": question.gold_answer,
-		"prompt_len": len(prompt),
+		"prompt_len": len(modified),
 		"strategy": strategy_info,
 		"strategy_focus": strategy_validation_focus,
 		"gpt5_validation": {
@@ -427,9 +394,9 @@ def validate_mapping(run_id: str, question_id: int):
 			"run_id": run_id,
 			"question_id": question.id,
 			"gold_answer": question.gold_answer,
-			"model": model,
+			"model": "gpt-5.1" if validator.is_configured() else "offline",
 			"modified_question": modified,
-			"model_response": result,
+			"model_response": {"provider": "gpt-5.1", "response": test_answer},
 			"substring_mappings": question.substring_mappings or [],
 			"gpt5_validation": {
 				"is_valid": validation_result.is_valid,
@@ -454,7 +421,8 @@ def auto_generate_mappings(run_id: str, question_id: int):
 		return jsonify({"error": "Question manipulation not found"}), HTTPStatus.NOT_FOUND
 
 	payload = request.json or {}
-	model = payload.get("model", "openai:fusion")
+	# Use GPT-5.1 explicitly for mapping generation, not fusion which defaults to gpt-4o
+	model = payload.get("model", "openai:gpt-5.1")
 	force_refresh = bool(payload.get("force"))
 	# Use new streamlined service instead of old auto_generate_for_question
 	from ..services.mapping.streamlined_mapping_service import StreamlinedMappingService

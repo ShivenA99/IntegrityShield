@@ -1123,33 +1123,45 @@ class SmartSubstitutionService:
 		ordered_entries = [normalized_mapping]
 		modified_question = self.substrings.apply_mappings_to_text(stem_text, ordered_entries)
 
-		prompt_parts = [f"Question type: {question_type}", f"Question: {modified_question}"]
-		if question_model.options_data:
-			prompt_parts.append("Options:")
-			for key, value in (question_model.options_data or {}).items():
-				prompt_parts.append(f"{key}. {value}")
-		if strategy_key:
-			prompt_parts.append("")
-			prompt_parts.append(f"Manipulation strategy to anticipate: {strategy_key}.")
-		prompt_parts.append("Return only the final answer (e.g., option letter or short text).")
-		model_prompt = "\n".join(prompt_parts)
-
-		result = self.ai_client.call_model(provider=provider, payload={"prompt": model_prompt})
-		test_answer = (result or {}).get("response", "").strip() if isinstance(result, dict) else ""
-
-		if not test_answer or test_answer == "simulated-response":
-			if uses_target_strategy and isinstance(question_model.options_data, dict):
-				fallback_answer = self._fallback_option_answer(question_model)
-				test_answer = fallback_answer or "B"
-			if not isinstance(result, dict):
-				result = {"provider": "offline", "response": test_answer}
-			else:
-				result = {**result, "response": test_answer}
-		elif isinstance(result, dict) and result.get("response") != test_answer:
-			result = {**result, "response": test_answer}
-
+		# Use optimized GPT-5.1 validation that answers and validates in one call
+		# This eliminates the need for the separate gpt-4o call
 		options_data = question_model.options_data if isinstance(question_model.options_data, dict) else None
 		validator = GPT5ValidationService()
+		
+		# Use GPT-5.1 to answer the manipulated question and validate in one call
+		if validator.is_configured():
+			import asyncio
+			validation_result = asyncio.run(validator.validate_answer_deviation(
+				question_text=stem_text,
+				question_type=question_type,
+				gold_answer=question_model.gold_answer or "",
+				test_answer=None,  # Let GPT-5.1 generate it from manipulated question
+				manipulated_question_text=modified_question,  # Pass manipulated question
+				options_data=options_data,
+				target_option=expected_target_letter if uses_target_strategy else None,
+				target_option_text=expected_target_text if uses_target_strategy else None,
+				signal_metadata=signal_metadata if uses_signal_strategy else None,
+				run_id=run_id,
+			))
+			# Extract test_answer from validation result
+			test_answer = validation_result.test_answer or ""
+		else:
+			# Fallback to offline heuristic if GPT-5.1 not configured
+			test_answer = ""
+			deviation = 0.8 if (question_model.gold_answer or "").strip().lower() != test_answer.strip().lower() else 0.2
+			confidence = 0.65 if deviation >= 0.5 else 0.3
+			validation_result = ValidationResult(
+				is_valid=deviation >= 0.5,
+				confidence=confidence,
+				deviation_score=deviation,
+				reasoning="Offline heuristic validation (no GPT-5 configuration)",
+				semantic_similarity=1.0 - deviation,
+				factual_accuracy=False,
+				question_type_specific_notes=strategy_validation_focus,
+				gold_answer=question_model.gold_answer or "",
+				test_answer=test_answer,
+				model_used="offline-heuristic",
+			)
 
 		test_option_letter = self._extract_option_letter(test_answer)
 		gold_option_letter = self._extract_option_letter(question_model.gold_answer)
@@ -1180,35 +1192,6 @@ class SmartSubstitutionService:
 		if uses_signal_strategy and signal_metadata and signal_detected is None:
 			signal_detected = False
 
-		if not validator.is_configured():
-			deviation = 0.8 if (question_model.gold_answer or "").strip().lower() != test_answer.strip().lower() else 0.2
-			confidence = 0.65 if deviation >= 0.5 else 0.3
-			validation_result = ValidationResult(
-				is_valid=deviation >= 0.5,
-				confidence=confidence,
-				deviation_score=deviation,
-				reasoning="Offline heuristic validation (no GPT-5 configuration)",
-				semantic_similarity=1.0 - deviation,
-				factual_accuracy=False,
-				question_type_specific_notes=strategy_validation_focus,
-				gold_answer=question_model.gold_answer or "",
-				test_answer=test_answer,
-				model_used="offline-heuristic",
-			)
-		else:
-			import asyncio
-			validation_result = asyncio.run(validator.validate_answer_deviation(
-				question_text=f"{modified_question}\n\n[Manipulation focus: {strategy_validation_focus}]",
-				question_type=question_type,
-				gold_answer=question_model.gold_answer or "",
-				test_answer=test_answer,
-				options_data=options_data,
-				target_option=expected_target_letter if uses_target_strategy else None,
-				target_option_text=expected_target_text if uses_target_strategy else None,
-				signal_metadata=signal_metadata if uses_signal_strategy else None,
-				run_id=run_id,
-			))
-
 		threshold = validator.get_validation_threshold(question_type) if hasattr(validator, "get_validation_threshold") else 0.0
 
 		if uses_target_strategy and option_change_failed:
@@ -1235,10 +1218,10 @@ class SmartSubstitutionService:
 
 		diagnostics_snapshot = dict(validation_result.diagnostics) if validation_result.diagnostics else {}
 		validation_record = {
-			"model": provider,
+			"model": "gpt-5.1" if validator.is_configured() else "offline",
 			"response": test_answer,
 			"gold": question_model.gold_answer,
-			"prompt_len": len(model_prompt),
+			"prompt_len": len(modified_question),
 			"strategy": strategy_key,
 			"strategy_focus": strategy_validation_focus,
 			"gpt5_validation": {
@@ -1309,7 +1292,7 @@ class SmartSubstitutionService:
 		*,
 		run_id: str,
 		question_model: QuestionManipulation,
-		provider: str = "openai:fusion",
+		provider: str = "openai:gpt-5.1",
 		structured: Optional[Dict[str, Any]] = None,
 		max_completion_tokens: int = 4000,
 		force_refresh: bool = False,
@@ -1328,42 +1311,9 @@ class SmartSubstitutionService:
 		strategy = config.get("mapping_strategy", "unicode_steganography")
 		result = await asyncio.to_thread(self._apply_mappings, run_id, strategy)
 		
-		# Automatically trigger mapping generation after character mapping setup
-		# Only during initial pipeline run, not during manual re-runs
-		is_initial_run = config.get("is_initial_run", True)
-		if is_initial_run:
-			try:
-				generation_result = await self.auto_generate_all_questions(run_id)
-				success_count = generation_result.get("success_count", 0)
-				failed_count = generation_result.get("failed_count", 0)
-				
-				# Log results but don't fail the stage
-				self.logger.info(
-					"Auto-generation completed during initial pipeline run",
-					run_id=run_id,
-					success_count=success_count,
-					failed_count=failed_count,
-				)
-				
-				# Add generation results to stage result
-				result["mapping_generation"] = {
-					"success_count": success_count,
-					"failed_count": failed_count,
-					"total_questions": success_count + failed_count,
-				}
-			except Exception as e:
-				self.logger.warning(
-					"Auto-generation failed after character mapping setup",
-					run_id=run_id,
-					error=str(e),
-					exc_info=True,
-				)
-				# Don't fail the stage if auto-generation fails
-				result["mapping_generation"] = {
-					"error": str(e),
-					"success_count": 0,
-					"failed_count": 0,
-				}
+		# Mapping generation is now only triggered manually via UI "Generate All" button
+		# No automatic generation during pipeline execution (neither initial run nor rerun)
+		# Users must explicitly click "Generate All" to trigger mapping generation
 		
 		return result
 
@@ -2029,11 +1979,9 @@ class SmartSubstitutionService:
 		stem_rect: Optional[fitz.Rect],
 		force_refresh: bool = False,
 	) -> List[Dict[str, Any]]:
-		if not mappings or not self.vision_client.is_configured():
-			return mappings
-
-		if not force_refresh and all(norm.get("geometry_source") == "openai_vision_refresh" for norm in mappings):
-			return mappings
+		# Vision geometry refresh disabled - using full page overlays for LaTeX attacks
+		# No need for precise bounding boxes since entire pages are overlaid
+		return mappings
 
 		page_number = page_idx + 1
 		scale = self._vision_geometry_scale if self._vision_geometry_scale > 0 else 1.0
@@ -2913,7 +2861,8 @@ class SmartSubstitutionService:
 			for k, v in options.items():
 				prompt += f"{k}. {v}\n"
 		prompt += "\nReturn only the final answer letter."
-		res = self.ai_client.call_model(provider="openai:fusion", payload={"prompt": prompt})
+		# Use GPT-5.1 explicitly for gold answer computation to avoid gpt-4o conversion
+		res = self.ai_client.call_model(provider="openai:gpt-5.1", payload={"prompt": prompt})
 		ans = (res or {}).get("response")
 		return (str(ans).strip() if ans else None, 0.9 if ans else None)
 
