@@ -40,7 +40,7 @@ class DetectionReportService:
         "constructed_response",
     }
 
-    REQUIRED_STAGES = {"smart_substitution", "pdf_creation"}
+    REQUIRED_STAGES = {"smart_substitution"}
 
     def __init__(self) -> None:
         self.structured_manager = StructuredDataManager()
@@ -103,7 +103,7 @@ class DetectionReportService:
             target_texts = self._resolve_target_texts(target_labels, replacements, option_lookup)
 
             risk_level = self._assess_risk(mapping_stats, bool(options))
-            if risk_level in {"high", "critical"}:
+            if risk_level == "high":
                 high_risk_questions += 1
 
             compiled_questions.append(
@@ -208,7 +208,10 @@ class DetectionReportService:
             if is_validated:
                 validated += 1
 
-            target_label = self._normalize_label(mapping.get("target_wrong_answer"))
+            # Check both target_wrong_answer and target_option fields
+            target_label = self._normalize_label(
+                mapping.get("target_wrong_answer") or mapping.get("target_option")
+            )
             if target_label:
                 target_labels.add(target_label)
 
@@ -216,6 +219,7 @@ class DetectionReportService:
             if replacement:
                 replacements.add(str(replacement))
 
+            # Extract deviation_score from mapping (check both direct field and validation object)
             deviation = mapping.get("deviation_score") or mapping.get("validation", {}).get("deviation_score")
             if isinstance(deviation, (int, float)):
                 deviations.append(float(deviation))
@@ -224,13 +228,15 @@ class DetectionReportService:
             if isinstance(confidence, (int, float)):
                 confidences.append(float(confidence))
 
+            # Extract target_wrong_answer from either field
+            target_wrong_answer_value = mapping.get("target_wrong_answer") or mapping.get("target_option")
             insights.append(
                 MappingInsight(
                     original=self._safe_strip(mapping.get("original")),
                     replacement=self._safe_strip(mapping.get("replacement")),
                     context=mapping.get("context"),
                     validated=is_validated,
-                    target_wrong_answer=target_label,
+                    target_wrong_answer=self._normalize_label(target_wrong_answer_value),
                     deviation_score=float(deviation) if isinstance(deviation, (int, float)) else None,
                     confidence=float(confidence) if isinstance(confidence, (int, float)) else None,
                     validation_reason=(
@@ -240,7 +246,17 @@ class DetectionReportService:
                 )
             )
 
-        average_deviation = sum(deviations) / len(deviations) if deviations else None
+        # For deviation_score: use the first validated mapping's score, or max if multiple
+        # Most questions have one mapping, so averaging doesn't add value
+        # If multiple mappings, use the maximum deviation (most effective attack)
+        question_deviation_score = None
+        if deviations:
+            if len(deviations) == 1:
+                question_deviation_score = deviations[0]
+            else:
+                # Multiple mappings: use the maximum deviation (most effective attack)
+                question_deviation_score = max(deviations)
+        
         average_confidence = sum(confidences) / len(confidences) if confidences else None
 
         stats = {
@@ -248,7 +264,7 @@ class DetectionReportService:
             "validated": validated,
             "target_labels": sorted(target_labels),
             "replacements": sorted(replacements),
-            "average_deviation_score": average_deviation,
+            "average_deviation_score": question_deviation_score,  # Actually the primary/max deviation score
             "average_confidence": average_confidence,
         }
 
@@ -373,15 +389,30 @@ class DetectionReportService:
 
     @staticmethod
     def _assess_risk(mapping_stats: Dict[str, Any], has_options: bool) -> str:
+        """
+        Assess risk level based on mapping statistics.
+        
+        Note: High deviation_score means the attack is EFFECTIVE (successfully changes the answer),
+        which translates to HIGH RISK of cheating. So high deviation = high risk.
+        """
         total = mapping_stats.get("total", 0)
         validated = mapping_stats.get("validated", 0)
         average_deviation = mapping_stats.get("average_deviation_score")
         if total == 0:
-            return "insufficient-data"
-        if isinstance(average_deviation, (int, float)) and average_deviation >= 0.85:
-            return "critical"
+            return "skipped"
         if validated == 0:
             return "needs-review"
+        # High deviation_score (>= 0.7) = attack works well = HIGH RISK of successful cheating
+        # Medium deviation_score (0.5-0.7) = moderate attack effectiveness = MEDIUM RISK
+        # Low deviation_score (< 0.5) = attack less effective = LOW RISK
+        if isinstance(average_deviation, (int, float)):
+            if average_deviation >= 0.7:
+                return "high"
+            elif average_deviation >= 0.5:
+                return "medium"
+            else:
+                return "low"
+        # Fallback: if no deviation score but has target labels, mark as medium
         if has_options and mapping_stats.get("target_labels"):
-            return "high"
-        return "medium"
+            return "medium"
+        return "low"

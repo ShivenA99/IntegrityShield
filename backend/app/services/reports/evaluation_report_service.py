@@ -44,6 +44,16 @@ class EvaluationReportService:
         self._guard_required_stages(run)
 
         structured = self.structured_manager.load(run_id) or {}
+        
+        # Validate detection report exists FIRST (before expensive PDF evaluation)
+        # This provides better error messages and avoids wasting time
+        try:
+            detection_reference = self._load_detection_reference(run_id, structured)
+        except ValueError as exc:
+            raise ValueError(
+                f"Detection report is required for evaluation reports. {str(exc)}"
+            )
+        
         method_name = method or self._default_method(structured)
         if not method_name:
             raise ValueError("No attacked PDF available to evaluate. Generate PDFs first.")
@@ -62,7 +72,7 @@ class EvaluationReportService:
         evaluator = PDFQuestionEvaluator(prompts=prompts)
         evaluation = evaluator.evaluate(str(pdf_path), questions)
 
-        detection_reference = self._load_detection_reference(run_id, structured)
+        # Detection reference already loaded above, reuse it
         vulnerability_reference = self._load_vulnerability_reference(run_id, structured)
 
         scored_questions = self._augment_answers(

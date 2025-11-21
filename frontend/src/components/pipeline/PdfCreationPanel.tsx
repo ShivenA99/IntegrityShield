@@ -314,7 +314,7 @@ useEffect(() => {
 ]);
 
   const detectionReportButtonDisabled =
-    !activeRunId || isGeneratingReport || stage?.status !== "completed";
+    !activeRunId || isGeneratingReport;
 
   const handleGenerateReport = useCallback(async () => {
     if (!activeRunId || isGeneratingReport) return;
@@ -592,7 +592,11 @@ useEffect(() => {
             ? new Date(evaluationMeta.generated_at).toLocaleString()
             : null;
           const evaluationStatus = evaluationState[method];
-          const evaluationDisabled = !hasMeta || Boolean(evaluationStatus?.isLoading);
+          const evaluationDisabled = 
+            !hasMeta || 
+            Boolean(evaluationStatus?.isLoading) ||
+            stage?.status !== "completed" ||
+            !detectionReportInfo;
 
           return (
             <article
@@ -669,6 +673,10 @@ useEffect(() => {
                   title={
                     !hasMeta
                       ? "Render this variant before evaluating."
+                      : stage?.status !== "completed"
+                      ? "Wait for all PDFs to finish rendering."
+                      : !detectionReportInfo
+                      ? "Generate a detection report before evaluating."
                       : "Run multi-model evaluation for this attacked PDF."
                   }
                 >

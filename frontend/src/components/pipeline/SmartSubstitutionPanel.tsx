@@ -361,10 +361,16 @@ const SmartSubstitutionPanel: React.FC = () => {
     if (!activeRunId || !readyForPdf || isFinalizing) return;
     setIsFinalizing(true);
     setBulkError(null);
+    setBulkMessage("Preparing PDF creation...");
+    
     try {
+      // Show progress message - detection report will be generated in backend
+      setBulkMessage("Generating detection report and starting PDF creation...");
+      
       const result = await resumeFromStage(activeRunId, "pdf_creation", {
         targetStages: ["document_enhancement", "pdf_creation", "results_generation"],
       });
+      
       await refresh();
       await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
       setPreferredStage("pdf_creation");
@@ -378,11 +384,15 @@ const SmartSubstitutionPanel: React.FC = () => {
       if (skipped > 0) {
         messageParts.push(`${skipped} skipped`);
       }
-      setBulkMessage(messageParts.length ? `PDF creation queued (${messageParts.join(", ")})` : "PDF creation queued.");
-      setTimeout(() => setBulkMessage(null), 5000);
+      const successMessage = messageParts.length 
+        ? `PDF creation started (${messageParts.join(", ")})` 
+        : "PDF creation started. Detection report generated.";
+      setBulkMessage(successMessage);
+      setTimeout(() => setBulkMessage(null), 8000);
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || String(err);
       setBulkError(`Failed to proceed to PDF creation: ${message}`);
+      setBulkMessage(null);
     } finally {
       setIsFinalizing(false);
     }
@@ -528,10 +538,10 @@ const SmartSubstitutionPanel: React.FC = () => {
             disabled={!readyForPdf || generatingQuestionId !== null || isGeneratingMappings || isFinalizing}
             className={clsx("primary-button button-with-icon", isFinalizing && "is-loading")}
             aria-busy={isFinalizing}
-            title={readyForPdf ? "Promote staged mappings and continue" : "Validate a mapping to continue"}
+            title={readyForPdf ? "Generate detection report and create PDFs" : "Validate a mapping to continue"}
           >
             <ArrowRight size={16} aria-hidden="true" />
-            <span>{isFinalizing ? "Continuing…" : "Create PDFs"}</span>
+            <span>{isFinalizing ? "Preparing…" : "Create PDFs"}</span>
           </button>
         </div>
       </header>

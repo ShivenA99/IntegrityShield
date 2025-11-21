@@ -640,6 +640,27 @@ def resume_pipeline(run_id: str, stage_name: str):
                 "skipped_mappings": promotion_summary.get("skipped"),
             },
         )
+        
+        # Generate detection report before starting PDF creation
+        # This ensures the report is available for evaluation reports
+        try:
+            detection_service = DetectionReportService()
+            detection_result = detection_service.generate(run_id)
+            current_app.logger.info(
+                "Detection report generated before PDF creation",
+                extra={
+                    "run_id": run_id,
+                    "report_path": detection_result.get("output_files", {}).get("json"),
+                },
+            )
+        except Exception as exc:
+            # Log but don't fail - detection report generation is best-effort
+            # User can regenerate it later if needed
+            current_app.logger.warning(
+                "Failed to generate detection report before PDF creation",
+                extra={"run_id": run_id, "error": str(exc)},
+            )
+        
         target_stages.append(PipelineStageEnum.RESULTS_GENERATION.value)
 
     config = PipelineConfig(
