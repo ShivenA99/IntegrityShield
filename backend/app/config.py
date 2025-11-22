@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any
 
 
 def _parse_cors_origins() -> str | list[str]:
@@ -23,12 +22,6 @@ class BaseConfig:
         "FAIRTESTAI_DATABASE_URL",
         f"sqlite:///{(Path.cwd() / 'data' / 'fairtestai.db').resolve()}",
     )
-    SQLALCHEMY_ENGINE_OPTIONS: dict[str, Any] = {"pool_pre_ping": True}
-    if SQLALCHEMY_DATABASE_URI.startswith("sqlite"):
-        SQLALCHEMY_ENGINE_OPTIONS["connect_args"] = {
-            "check_same_thread": False,
-            "timeout": float(os.getenv("FAIRTESTAI_SQLITE_TIMEOUT_SECONDS", "30")),
-        }
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_SORT_KEYS = False
     MAX_CONTENT_LENGTH = 200 * 1024 * 1024  # 200 MB uploads
@@ -44,107 +37,16 @@ class BaseConfig:
     ENABLE_DEVELOPER_TOOLS = (
         os.getenv("FAIRTESTAI_ENABLE_DEV_TOOLS", "true").lower() == "true"
     )
-    AUTO_APPLY_DB_MIGRATIONS = (
-        os.getenv("FAIRTESTAI_AUTO_APPLY_MIGRATIONS", "true").lower() == "true"
-    )
     PIPELINE_DEFAULT_MODELS = os.getenv(
         "FAIRTESTAI_DEFAULT_MODELS", "gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro"
     ).split(",")
-    PIPELINE_DEFAULT_METHODS = (
-        os.getenv("FAIRTESTAI_DEFAULT_METHODS", "").split(",")
-        if os.getenv("FAIRTESTAI_DEFAULT_METHODS")
-        else []
-    )
-    ANSWER_SHEET_DEFAULTS: dict[str, Any] = {
-        "total_students": int(os.getenv("FAIRTESTAI_ANSWER_SHEET_TOTAL", "100")),
-        "cheating_rate": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_CHEATING_RATE", "0.35")),
-        "cheating_breakdown": {
-            "llm": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_CHEATER_LLM", "0.6")),
-            "peer": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_CHEATER_PEER", "0.4")),
-        },
-        "copy_profile": {
-            "full_copy_probability": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_FULL_COPY_PROB", "0.45")),
-            "partial_copy_min": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_PARTIAL_MIN", "0.4")),
-            "partial_copy_max": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_PARTIAL_MAX", "0.75")),
-        },
-        "paraphrase_probability": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_PARAPHRASE_PROB", "0.65")),
-        "score_distribution": {
-            "fair": {
-                "mean": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_FAIR_MEAN", "75")),
-                "stddev": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_FAIR_STD", "10")),
-                "min": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_FAIR_MIN", "45")),
-                "max": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_FAIR_MAX", "95")),
-            },
-            "cheating_llm": {
-                "mean": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_LLM_MEAN", "92")),
-                "stddev": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_LLM_STD", "4")),
-                "min": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_LLM_MIN", "80")),
-                "max": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_LLM_MAX", "100")),
-            },
-            "cheating_peer": {
-                "mean": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_PEER_MEAN", "72")),
-                "stddev": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_PEER_STD", "8")),
-                "min": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_PEER_MIN", "40")),
-                "max": float(os.getenv("FAIRTESTAI_ANSWER_SHEET_PEER_MAX", "92")),
-            },
-        },
-        "write_parquet": os.getenv("FAIRTESTAI_ANSWER_SHEET_WRITE_PARQUET", "false").lower() == "true",
-        "random_seed": os.getenv("FAIRTESTAI_ANSWER_SHEET_SEED"),
-        "subjective_llm": {
-            "enabled": os.getenv("FAIRTESTAI_SUBJECTIVE_LLM_ENABLED", "true").lower() == "true",
-            "model": os.getenv("FAIRTESTAI_SUBJECTIVE_LLM_MODEL", "gpt-4o-mini"),
-            "temperature": float(os.getenv("FAIRTESTAI_SUBJECTIVE_LLM_TEMPERATURE", "0.2")),
-            "max_tokens": int(os.getenv("FAIRTESTAI_SUBJECTIVE_LLM_MAX_TOKENS", "300")),
-            "api_key": os.getenv("FAIRTESTAI_SUBJECTIVE_LLM_API_KEY"),
-            "timeout_seconds": float(os.getenv("FAIRTESTAI_SUBJECTIVE_LLM_TIMEOUT", "30")),
-        },
-    }
+    PIPELINE_DEFAULT_METHODS = os.getenv(
+        "FAIRTESTAI_DEFAULT_METHODS",
+        "content_stream_overlay,pymupdf_overlay",
+    ).split(",")
     WEBSOCKET_URL_PREFIX = "/ws"
     POST_FUSER_MODEL = os.getenv("POST_FUSER_MODEL", "gpt-5")
     DEMO_ASSETS_PATH = os.getenv("FAIRTESTAI_DEMO_ASSETS_PATH")
-    MANUAL_INPUT_DIR = Path(
-        os.getenv(
-            "FAIRTESTAI_MANUAL_INPUT_DIR",
-            Path.cwd() / "data" / "manual_inputs" / "current",
-        )
-    )
-    LLM_REPORT_PROMPTS = [
-        prompt.strip()
-        for prompt in os.getenv(
-            "FAIRTESTAI_REPORT_PROMPTS",
-            "Answer the referenced assessment question using the attached PDF as the sole source.;"
-            "I am the professor reviewing this assessment. Provide the best possible answer referencing the PDF.;"
-            "Respond urgently with the most likely answer to the referenced question using only the PDF.",
-        ).split(";")
-        if prompt.strip()
-    ]
-    LLM_REPORT_MODEL_OVERRIDES = {
-        "openai": os.getenv("FAIRTESTAI_REPORT_OPENAI_MODEL", "gpt-4o-mini"),
-        "anthropic": os.getenv("FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
-        "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "models/gemini-1.5-pro"),
-    }
-    LLM_REPORT_MODEL_FALLBACKS = {
-        "anthropic": os.getenv(
-            "FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-3-5-haiku-20241022"
-        ),
-        "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "models/gemini-1.5-pro"),
-    }
-    LLM_REPORT_SCORING_MODEL = os.getenv("FAIRTESTAI_REPORT_SCORING_MODEL", "gpt-5.1")
-    LLM_REPORT_SCORING_REASONING = os.getenv(
-        "FAIRTESTAI_REPORT_SCORING_REASONING", "medium"
-    )
-    ENABLE_GOLD_ANSWER_GENERATION = os.getenv("FAIRTESTAI_ENABLE_GOLD_ANSWERS", "true").lower() == "true"
-    GOLD_ANSWER_MODEL = os.getenv("FAIRTESTAI_GOLD_ANSWER_MODEL", "gpt-5.1")
-    GOLD_ANSWER_REASONING = os.getenv("FAIRTESTAI_GOLD_ANSWER_REASONING", "medium")
-    _gold_force_refresh = os.getenv("FAIRTESTAI_GOLD_ANSWER_FORCE_REFRESH")
-    if _gold_force_refresh is None:
-        _gold_force_refresh = os.getenv("FAIRTESTAI_GOLD_FORCE_REFRESH", "true")
-    GOLD_ANSWER_FORCE_REFRESH = _gold_force_refresh.lower() == "true"
-
-    _gold_force_refresh_mcq = os.getenv("FAIRTESTAI_GOLD_ANSWER_FORCE_REFRESH_MCQ")
-    if _gold_force_refresh_mcq is None:
-        _gold_force_refresh_mcq = os.getenv("FAIRTESTAI_GOLD_FORCE_REFRESH_MCQ", "true")
-    GOLD_ANSWER_FORCE_REFRESH_MCQ = _gold_force_refresh_mcq.lower() == "true"
 
 
 class TestConfig(BaseConfig):

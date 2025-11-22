@@ -138,8 +138,6 @@ class LatexAttackService:
         document_meta = structured.get("document") or {}
 
         method_key = method_name or "latex_dual_layer"
-        if method_key not in ("latex_dual_layer", "latex_icw_dual_layer"):
-            raise ValueError(f"LatexAttackService only handles dual layer methods, got: {method_key}")
         file_prefix = self._method_file_prefix(method_key)
         artifact_folder = self._method_artifact_folder(method_key)
         overlay_dirname = self._method_overlay_folder(method_key)

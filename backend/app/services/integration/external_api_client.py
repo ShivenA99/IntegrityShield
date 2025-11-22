@@ -38,13 +38,10 @@ class ExternalAIClient:
         if normalized not in {"", "auto", "fusion", "default"}:
             return suffix
 
-        # For mapping generation, always use GPT-5.1 instead of gpt-4o
-        # The "fusion" provider was a legacy concept that defaulted to gpt-4o
-        # Mapping generation should explicitly use GPT-5.1
-        fallback = (configured or "gpt-5.1").strip()
-        # Preserve GPT-5 models - don't convert them
+        fallback = (configured or "gpt-4o").strip()
         if fallback.lower().startswith("gpt-5"):
-            return fallback
+            # Avoid GPT-5 default usage now that fusion is gated to OpenAI Vision output
+            fallback = "gpt-4o"
         return fallback
 
     def _call_openai_chat(

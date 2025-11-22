@@ -14,6 +14,7 @@ from ..services.pipeline.smart_substitution_service import SmartSubstitutionServ
 from ..services.manipulation.substring_manipulator import SubstringManipulator
 from ..services.validation.gpt5_validation_service import GPT5ValidationService, ValidationResult
 from ..utils.logging import get_logger
+from ..services.integration.external_api_client import ExternalAIClient
 from ..services.pipeline.auto_mapping_strategy import (
     describe_strategy_for_validation,
     get_strategy,
@@ -246,7 +247,7 @@ def validate_mapping(run_id: str, question_id: int):
 
 	payload = request.json or {}
 	mappings = payload.get("substring_mappings", [])
-	# model parameter no longer used - we use GPT-5.1 directly
+	model = payload.get("model", "openai:fusion")
 	# Step 1: Apply mappings to create modified question
 	manipulator = SubstringManipulator()
 	try:
@@ -289,32 +290,61 @@ def validate_mapping(run_id: str, question_id: int):
 	except ValueError as exc:
 		return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
 
-	# Use optimized GPT-5.1 validation that answers and validates in one call
-	# This eliminates the need for the separate gpt-4o call
+	# Step 2: Get model response to modified question
+	prompt = f"Question type: {question.question_type or 'mcq_single'}\n"
+	prompt += f"Question: {modified}\n"
+	if question.options_data:
+		prompt += "Options:\n"
+		for k, v in (question.options_data or {}).items():
+			prompt += f"{k}. {v}\n"
+	strategy_info = (question.ai_model_results or {}).get("auto_generated", {}).get("strategy")
+	if strategy_info:
+		prompt += f"\nManipulation strategy to anticipate: {strategy_info}."
+	prompt += "\nReturn only the final answer (e.g., option letter or short text)."
+
+	client = ExternalAIClient()
+	result = client.call_model(provider=model, payload={"prompt": prompt})
+	test_answer = (result or {}).get("response", "").strip()
+
 	strategy_definition = get_strategy(question.question_type or "mcq_single")
 	strategy_validation_focus = describe_strategy_for_validation(strategy_definition)
 
+	if not test_answer or test_answer == "simulated-response":
+		if question.question_type in {"mcq_single", "mcq_multi", "true_false"} and isinstance(question.options_data, dict):
+			gold_clean = (question.gold_answer or "").strip().lower()
+			fallback_answer = None
+			for opt_key in question.options_data.keys():
+				key_clean = str(opt_key).strip().lower()
+				if key_clean != gold_clean:
+					fallback_answer = str(opt_key)
+					break
+			if fallback_answer is None and question.options_data:
+				fallback_answer = str(next(iter(question.options_data.keys())))
+			test_answer = fallback_answer or "B"
+		elif question.gold_answer:
+			test_answer = f"not {question.gold_answer}"
+		else:
+			test_answer = "inconclusive"
+		if result is None:
+			result = {"provider": "offline", "response": test_answer}
+		else:
+			result = {**result, "response": test_answer}
+	elif isinstance(result, dict) and result.get("response") != test_answer:
+		result = {**result, "response": test_answer}
+
+	# Step 3: Use GPT-5 to intelligently validate the answer deviation
 	validator = GPT5ValidationService()
 	question_type = question.question_type or "mcq_single"
 	if validator.is_configured():
-		import asyncio
-		validation_result = asyncio.run(validator.validate_answer_deviation(
-			question_text=source_text,  # Original question text
+		validation_result = validator.validate_answer_deviation(
+			question_text=f"{modified}\n\n[Manipulation focus: {strategy_validation_focus}]",
 			question_type=question_type,
 			gold_answer=question.gold_answer or "",
-			test_answer=None,  # Let GPT-5.1 generate it from manipulated question
-			manipulated_question_text=modified,  # Pass manipulated question
+			test_answer=test_answer,
 			options_data=question.options_data,
-			target_option=None,
-			target_option_text=None,
-			signal_metadata=None,
 			run_id=run_id,
-		))
-		# Extract test_answer from validation result
-		test_answer = validation_result.test_answer or ""
+		)
 	else:
-		# Fallback to offline heuristic if GPT-5.1 not configured
-		test_answer = ""
 		deviation = 0.8 if (question.gold_answer or "").strip().lower() != test_answer.strip().lower() else 0.2
 		confidence = 0.65 if deviation >= 0.5 else 0.3
 		validation_result = ValidationResult(
@@ -331,12 +361,11 @@ def validate_mapping(run_id: str, question_id: int):
 		)
 
 	# Step 4: Create comprehensive validation record
-	strategy_info = (question.ai_model_results or {}).get("auto_generated", {}).get("strategy")
 	validation_record = {
-		"model": "gpt-5.1" if validator.is_configured() else "offline",
+		"model": model,
 		"response": test_answer,
 		"gold": question.gold_answer,
-		"prompt_len": len(modified),
+		"prompt_len": len(prompt),
 		"strategy": strategy_info,
 		"strategy_focus": strategy_validation_focus,
 		"gpt5_validation": {
@@ -394,9 +423,9 @@ def validate_mapping(run_id: str, question_id: int):
 			"run_id": run_id,
 			"question_id": question.id,
 			"gold_answer": question.gold_answer,
-			"model": "gpt-5.1" if validator.is_configured() else "offline",
+			"model": model,
 			"modified_question": modified,
-			"model_response": {"provider": "gpt-5.1", "response": test_answer},
+			"model_response": result,
 			"substring_mappings": question.substring_mappings or [],
 			"gpt5_validation": {
 				"is_valid": validation_result.is_valid,
@@ -421,75 +450,63 @@ def auto_generate_mappings(run_id: str, question_id: int):
 		return jsonify({"error": "Question manipulation not found"}), HTTPStatus.NOT_FOUND
 
 	payload = request.json or {}
-	# Use GPT-5.1 explicitly for mapping generation, not fusion which defaults to gpt-4o
-	model = payload.get("model", "openai:gpt-5.1")
+	model = payload.get("model", "openai:fusion")
 	force_refresh = bool(payload.get("force"))
-	# Use new streamlined service instead of old auto_generate_for_question
-	from ..services.mapping.streamlined_mapping_service import StreamlinedMappingService
-	import asyncio
-	import threading
-	from flask import current_app
-	
-	service = StreamlinedMappingService()
-	app = current_app._get_current_object()
-	
-	# Run async generation synchronously for this endpoint
-	result = None
-	error = None
-	
-	def run_generation():
-		nonlocal result, error
-		with app.app_context():
-			try:
-				# Create a new event loop for this thread
-				loop = asyncio.new_event_loop()
-				asyncio.set_event_loop(loop)
-				try:
-					result = loop.run_until_complete(service.generate_mappings_for_single_question(run_id, question_id))
-				finally:
-					# Ensure all pending tasks complete before closing
-					pending = asyncio.all_tasks(loop)
-					if pending:
-						loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
-					loop.close()
-			except Exception as e:
-				error = e
-	
-	thread = threading.Thread(target=run_generation)
-	thread.start()
-	thread.join()
-	
-	if error:
-		logger.error(f"Auto-generation failed for question {question_id}: {error}", exc_info=True)
-		return jsonify({"error": str(error)}), HTTPStatus.INTERNAL_SERVER_ERROR
-	
-	if not result or result.get("status") != "success":
-		return jsonify({
-			"run_id": run_id,
-			"question_id": question.id,
-			"error": result.get("error") if result else "Unknown error",
-			"failure_rationales": result.get("failure_rationales", []) if result else [],
-		}), HTTPStatus.INTERNAL_SERVER_ERROR
-	
-	valid_mapping = result.get("valid_mapping")
-	if not valid_mapping:
-		return jsonify({
-			"run_id": run_id,
-			"question_id": question.id,
-			"error": "No valid mapping generated",
-		}), HTTPStatus.INTERNAL_SERVER_ERROR
-	
-	# Update question with valid mapping
-	question.substring_mappings = [valid_mapping]
+	service = SmartSubstitutionService()
+
+	try:
+		auto_outcome = service.auto_generate_for_question(
+			run_id=run_id,
+			question_model=question,
+			provider=model,
+			force_refresh=force_refresh,
+		)
+	except ValueError as exc:
+		logger.warning(
+			"auto_generate validation error",
+			run_id=run_id,
+			question_id=question_id,
+			error=str(exc),
+		)
+		return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+	except Exception as exc:  # noqa: BLE001
+		logger.error(
+			"auto_generate call failed",
+			run_id=run_id,
+			question_id=question_id,
+			error=str(exc),
+			exc_info=True,
+		)
+		return jsonify({"error": "Auto-generate failed"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
 	question.manipulation_method = question.manipulation_method or "smart_substitution"
-	
+	question.substring_mappings = auto_outcome.enriched_mappings
+	question.ai_model_results = question.ai_model_results or {}
+	question.ai_model_results["auto_generated"] = {
+		"model": auto_outcome.provider,
+		"prompt": auto_outcome.prompt,
+		"raw_response": auto_outcome.raw_response,
+		"raw_content": auto_outcome.raw_content,
+		"content": auto_outcome.parsed_payload,
+		"fallback_used": auto_outcome.fallback_used,
+		"mappings_returned": len((auto_outcome.parsed_payload or {}).get("mappings", [])),
+		"mappings_used": len(auto_outcome.enriched_mappings),
+		"indices_inferred": auto_outcome.inferred_ranges,
+		"dropped_mappings": auto_outcome.skipped_entries,
+		"strategy": auto_outcome.strategy_used,
+		"strategy_focus": auto_outcome.strategy_validation_focus,
+		"prompt_history": auto_outcome.prompt_history,
+		"candidate_attempts": auto_outcome.attempt_logs,
+		"selected_candidate_rank": auto_outcome.selected_candidate_rank,
+		"selected_round": auto_outcome.selected_round,
+		"retries_used": auto_outcome.retries_used,
+	}
+
 	db.session.add(question)
 	db.session.commit()
-	
-	# Sync to structured.json
-	smart_service = SmartSubstitutionService()
+
 	try:
-		smart_service.sync_structured_mappings(run_id)
+		service.sync_structured_mappings(run_id)
 	except Exception as sync_exc:  # noqa: BLE001
 		logger.warning(
 			"auto_generate sync failed",
@@ -497,13 +514,29 @@ def auto_generate_mappings(run_id: str, question_id: int):
 			question_id=question_id,
 			error=str(sync_exc),
 		)
-	
+
+	try:
+		service.ai_client.close()
+	except Exception:
+		pass
+
 	return jsonify(
 		{
 			"run_id": run_id,
 			"question_id": question.id,
-			"substring_mappings": [valid_mapping],
-			"status": "success",
+			"substring_mappings": auto_outcome.enriched_mappings,
+			"model": auto_outcome.provider,
+			"raw_response": auto_outcome.parsed_payload,
+			"raw_model_response": auto_outcome.raw_response,
+			"inferred_indices": auto_outcome.inferred_ranges,
+			"dropped_mappings": auto_outcome.skipped_entries,
+			"strategy": auto_outcome.strategy_used,
+			"fallback_used": auto_outcome.fallback_used,
+			"candidate_attempts": auto_outcome.attempt_logs,
+			"prompt_history": auto_outcome.prompt_history,
+			"selected_candidate_rank": auto_outcome.selected_candidate_rank,
+			"selected_round": auto_outcome.selected_round,
+			"retries_used": auto_outcome.retries_used,
 		}
 	)
 
@@ -598,101 +631,77 @@ def bulk_save_mappings(run_id: str):
 
 @bp.post("/<run_id>/generate-mappings")
 def generate_mappings_for_all(run_id: str):
-	"""Generate mappings for all questions asynchronously using streamlined service."""
+	"""Generate mappings for all questions asynchronously."""
 	run = PipelineRun.query.get(run_id)
 	if not run:
 		return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
 	
+	payload = request.json or {}
+	k = payload.get("k", MAPPINGS_PER_QUESTION)
+	strategy_name = payload.get("strategy", "replacement")
 	try:
-		from ..services.mapping.streamlined_mapping_service import StreamlinedMappingService
-		import threading
-		from flask import current_app
-		
-		service = StreamlinedMappingService()
-		app = current_app._get_current_object()
-		
-		# Run async generation in background thread with proper event loop management
-		def run_generation():
-			with app.app_context():
-				import asyncio
-				# Create a new event loop for this thread
-				loop = asyncio.new_event_loop()
-				asyncio.set_event_loop(loop)
-				try:
-					loop.run_until_complete(service.generate_mappings_for_all_questions(run_id))
-				finally:
-					# Ensure all pending tasks complete before closing
-					pending = asyncio.all_tasks(loop)
-					if pending:
-						loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
-					loop.close()
-		
-		thread = threading.Thread(target=run_generation, daemon=True)
-		thread.start()
-		
-		return jsonify({"run_id": run_id, "status": "started"}), HTTPStatus.ACCEPTED
+		k = int(k)
+	except (TypeError, ValueError):
+		k = MAPPINGS_PER_QUESTION
+	
+	try:
+		coordinator = get_mapping_generation_coordinator()
+		job_id = coordinator.submit_bulk_generation(
+			run_id,
+			k=k,
+			strategy_name=strategy_name,
+		)
+		return jsonify({"run_id": run_id, "job_id": job_id}), HTTPStatus.ACCEPTED
 	except Exception as e:  # pragma: no cover - defensive
-		logger.error(f"Failed to start mapping generation for run {run_id}: {e}")
+		logger.error(f"Failed to queue mapping generation for run {run_id}: {e}")
 		return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 @bp.post("/<run_id>/<int:question_id>/generate-mappings")
 def generate_mappings_for_question(run_id: str, question_id: int):
-	"""Generate mappings for a single question using streamlined service."""
-	run = PipelineRun.query.get(run_id)
-	if not run:
-		return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
+	"""Generate mappings for a single question."""
+	payload = request.json or {}
+	k = payload.get("k", MAPPINGS_PER_QUESTION)
+	strategy_name = payload.get("strategy", "replacement")
+	try:
+		k = int(k)
+	except (TypeError, ValueError):
+		k = MAPPINGS_PER_QUESTION
 	
 	try:
-		from ..services.mapping.streamlined_mapping_service import StreamlinedMappingService
-		import threading
-		from flask import current_app
-		
-		service = StreamlinedMappingService()
-		app = current_app._get_current_object()
-		
-		# Run async generation in background thread with proper event loop management
-		def run_generation():
-			with app.app_context():
-				import asyncio
-				# Create a new event loop for this thread
-				loop = asyncio.new_event_loop()
-				asyncio.set_event_loop(loop)
-				try:
-					loop.run_until_complete(service.generate_mappings_for_single_question(run_id, question_id))
-				finally:
-					# Ensure all pending tasks complete before closing
-					pending = asyncio.all_tasks(loop)
-					if pending:
-						loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
-					loop.close()
-		
-		thread = threading.Thread(target=run_generation, daemon=True)
-		thread.start()
-		
-		return jsonify({"run_id": run_id, "question_id": question_id, "status": "started"}), HTTPStatus.ACCEPTED
+		coordinator = get_mapping_generation_coordinator()
+		job_id = coordinator.submit_question_generation(
+			run_id,
+			question_id,
+			k=k,
+			strategy_name=strategy_name,
+		)
+		return jsonify({"run_id": run_id, "job_id": job_id, "question_id": question_id}), HTTPStatus.ACCEPTED
 	except ValueError as e:
 		return jsonify({"error": str(e)}), HTTPStatus.NOT_FOUND
 	except Exception as e:  # pragma: no cover - defensive
-		logger.error(f"Failed to start mapping generation for question {question_id}: {e}")
+		logger.error(f"Failed to queue mapping generation for question {question_id}: {e}")
 		return jsonify({"error": str(e)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 @bp.get("/<run_id>/generation-status")
 def get_generation_status(run_id: str):
-	"""Get status of mapping generation using streamlined service."""
-	from ..services.mapping.streamlined_mapping_service import StreamlinedMappingService
+	"""Get status of mapping generation."""
+	from ..services.mapping.mapping_generation_logger import get_mapping_logger
 	
 	run = PipelineRun.query.get(run_id)
 	if not run:
 		return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
 	
 	try:
-		service = StreamlinedMappingService()
-		all_statuses = service.get_all_statuses(run_id)
-		logs = service.get_logs(run_id)
+		logger_service = get_mapping_logger()
+		logger_service.load_logs(run_id)
+		logs = logger_service.get_logs(run_id)
+		coordinator = get_mapping_generation_coordinator()
+		staging_service = MappingStagingService()
+		staged_snapshot = staging_service.load(run_id)
 
-		# Calculate status summary from streamlined service
+		# Calculate status summary
 		questions = (
 			QuestionManipulation.query.filter_by(pipeline_run_id=run_id)
 			.order_by(QuestionManipulation.sequence_index.asc(), QuestionManipulation.id.asc())
@@ -701,98 +710,42 @@ def get_generation_status(run_id: str):
 		status_summary = {}
 		
 		for question in questions:
-			key = str(question.id)
-			status = all_statuses.get(question.id)
+			question_logs = logger_service.get_question_logs(run_id, question.id)
+			generation_log = next(
+				(log for log in question_logs if log.get("stage") == "generation"),
+				None
+			)
 			
-			if status:
-				# Compute mappings_generated from mapping_sets_generated
-				mappings_generated = sum(ms.mappings_count for ms in status.mapping_sets_generated)
-				
-				# Compute mappings_validated from validation_outcomes
-				mappings_validated = len(status.validation_outcomes)
-				
-				# Map status to display status (for frontend compatibility)
-				status_display = status.status
-				if status.status in ["generating", "validating", "retrying"]:
-					status_display = "running"
-				
-				# Convert dataclass to dict
-				status_dict = {
-					"question_id": status.question_id,
-					"question_number": status.question_number,
-					"status": status.status,
-					"status_display": status_display,  # For frontend compatibility
-					"retry_count": status.retry_count,
-					"current_attempt": status.current_attempt,
-					"mapping_sets_generated": [
-						{
-							"attempt": ms.attempt,
-							"set_index": ms.set_index,
-							"target_option": ms.target_option,
-							"signal_strategy": ms.signal_strategy,
-							"mappings_count": ms.mappings_count,
-							"generated_at": ms.generated_at,
-						}
-						for ms in status.mapping_sets_generated
-					],
-					"validation_outcomes": [
-						{
-							"attempt": vo.attempt,
-							"set_index": vo.set_index,
-							"mapping_index": vo.mapping_index,
-							"is_valid": vo.is_valid,
-							"confidence": vo.confidence,
-							"deviation_score": vo.deviation_score,
-							"reasoning": vo.reasoning,
-							"test_answer": vo.test_answer,
-							"target_matched": vo.target_matched,
-							"validated_at": vo.validated_at,
-						}
-						for vo in status.validation_outcomes
-					],
-					"failure_rationales": status.failure_rationales,
-					"generation_exceptions": status.generation_exceptions,
-					"valid_mapping": status.valid_mapping,
-					"error": status.error,
-					"started_at": status.started_at,
-					"completed_at": status.completed_at,
-					# Computed fields for frontend compatibility
-					"mappings_generated": mappings_generated,
-					"mappings_validated": mappings_validated,
-				}
-				status_summary[key] = status_dict
-			else:
-				# Question not yet started
+			key = str(question.id)
+			if generation_log:
+				details = generation_log.get("details") or {}
 				status_summary[key] = {
-					"question_id": question.id,
 					"question_number": question.question_number,
+					"sequence_index": question.sequence_index,
+					"status": generation_log.get("status", "pending"),
+					"mappings_generated": generation_log.get("mappings_generated", 0),
+					"mappings_validated": generation_log.get("mappings_validated", 0),
+					"first_valid_mapping_index": generation_log.get("first_valid_mapping_index"),
+					"job_id": details.get("job_id"),
+				}
+			else:
+				status_summary[key] = {
+					"question_number": question.question_number,
+					"sequence_index": question.sequence_index,
 					"status": "pending",
-					"status_display": "pending",
-					"retry_count": 0,
-					"current_attempt": 0,
-					"mapping_sets_generated": [],
-					"validation_outcomes": [],
-					"failure_rationales": [],
-					"generation_exceptions": [],
-					"valid_mapping": None,
-					"error": None,
-					"started_at": None,
-					"completed_at": None,
 					"mappings_generated": 0,
 					"mappings_validated": 0,
+					"first_valid_mapping_index": None,
+					"job_id": None,
 				}
-		
-		# Load staged mappings
-		from ..services.mapping.mapping_staging_service import MappingStagingService
-		staging_service = MappingStagingService()
-		staged = staging_service.load(run_id)
 		
 		return jsonify({
 			"run_id": run_id,
 			"total_questions": len(questions),
 			"status_summary": status_summary,
 			"logs": logs,
-			"staged": staged.get("questions", {}),
+			"job": coordinator.get_latest_job_snapshot_for_run(run_id),
+			"staged": staged_snapshot.get("questions", {}),
 		})
 	except Exception as e:
 		logger.error(f"Failed to get generation status for run {run_id}: {e}")

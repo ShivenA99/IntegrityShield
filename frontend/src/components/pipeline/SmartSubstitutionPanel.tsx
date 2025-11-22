@@ -1,129 +1,29 @@
 import * as React from "react";
 import { useState, useCallback, useEffect, useMemo } from "react";
-import clsx from "clsx";
 
 import { usePipeline } from "@hooks/usePipeline";
 import { useQuestions } from "@hooks/useQuestions";
-import { updateQuestionManipulation, generateMappingsForAll, generateMappingsForQuestion, getGenerationStatus } from "@services/api/questionApi";
-import type { QuestionManipulation } from "@services/types/questions";
+import { autoGenerateMappings, updateQuestionManipulation, validateQuestion } from "@services/api/questionApi";
+import type { QuestionManipulation, SubstringMapping } from "@services/types/questions";
 import { formatDuration } from "@services/utils/formatters";
 import EnhancedQuestionViewer from "@components/question-level/EnhancedQuestionViewer";
-import { ArrowRight, FileSpreadsheet, ListChecks, ScrollText } from "lucide-react";
-
-const LATEX_ATTACK_METHODS = [
-  "latex_dual_layer",
-  "latex_font_attack",
-  "latex_icw",
-  "latex_icw_dual_layer",
-  "latex_icw_font_attack",
-] as const;
-
-type LatexAttackMethod = (typeof LATEX_ATTACK_METHODS)[number];
-
-const LATEX_ATTACK_SET = new Set<LatexAttackMethod>(LATEX_ATTACK_METHODS);
-
-const isLatexAttackMethod = (value: string): value is LatexAttackMethod =>
-  LATEX_ATTACK_SET.has(value as LatexAttackMethod);
 
 const SmartSubstitutionPanel: React.FC = () => {
-  const { activeRunId, resumeFromStage, status, refreshStatus, setPreferredStage } = usePipeline();
+  const { activeRunId, resumeFromStage, status, refreshStatus } = usePipeline();
   const { questions, isLoading, refresh, mutate } = useQuestions(activeRunId);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
+  const [isAddingRandomMappings, setIsAddingRandomMappings] = useState(false);
   const [generatingQuestionId, setGeneratingQuestionId] = useState<number | null>(null);
+  const [isBulkValidating, setIsBulkValidating] = useState(false);
+  const [validatingQuestionId, setValidatingQuestionId] = useState<number | null>(null);
   const [bulkMessage, setBulkMessage] = useState<string | null>(null);
   const [bulkError, setBulkError] = useState<string | null>(null);
-  const [isGeneratingMappings, setIsGeneratingMappings] = useState(false);
-  const [isFinalizing, setIsFinalizing] = useState(false);
-  const [generationStatus, setGenerationStatus] = useState<Record<number, any>>({});
-  const [generationLogs, setGenerationLogs] = useState<any[]>([]);
-  const [stagedMappings, setStagedMappings] = useState<Record<number, any>>({});
-  const [showLogs, setShowLogs] = useState(false);
   const stage = status?.stages.find((item) => item.name === "smart_substitution");
+  const totalMappings = useMemo(() => questions.reduce((acc, q) => acc + (q.substring_mappings?.length ?? 0), 0), [questions]);
+  const validatedMappings = useMemo(() => questions.reduce((acc, q) => acc + ((q.substring_mappings || []).filter((m) => m.validated === true).length ?? 0), 0), [questions]);
+
   const runId = status?.run_id ?? activeRunId ?? null;
   const structuredData = (status?.structured_data ?? {}) as Record<string, any>;
-  const enhancementMethods = useMemo(() => {
-    const raw = status?.pipeline_config?.["enhancement_methods"] as unknown;
-    if (Array.isArray(raw)) {
-      return raw.map((entry) => String(entry));
-    }
-    return [];
-  }, [status?.pipeline_config]);
-  const manipulationResults = (structuredData?.manipulation_results ?? {}) as Record<string, any>;
-  const enhancedPdfs = (manipulationResults.enhanced_pdfs ?? {}) as Record<string, any>;
-  const overlayKey = useMemo(() => {
-    const preference = [
-      "latex_dual_layer",
-      "latex_icw_dual_layer",
-      "latex_icw_font_attack",
-      "latex_font_attack",
-      "latex_icw",
-    ];
-    for (const candidate of preference) {
-      if (enhancedPdfs[candidate]) {
-        return candidate;
-      }
-    }
-    const fallback = Object.keys(enhancedPdfs)[0];
-    return fallback || "latex_dual_layer";
-  }, [enhancedPdfs]);
-  const overlayRenderStats = (enhancedPdfs[overlayKey]?.render_stats ?? {}) as Record<string, any>;
-  const artifactsMap = (manipulationResults.artifacts ?? {}) as Record<string, any>;
-  const overlayArtifactsKey = useMemo(() => {
-    if (artifactsMap[overlayKey]) {
-      return overlayKey;
-    }
-    if (artifactsMap.latex_dual_layer) {
-      return "latex_dual_layer";
-    }
-    const keys = Object.keys(artifactsMap);
-    return keys.length ? keys[0] : overlayKey;
-  }, [artifactsMap, overlayKey]);
-  const debugMap = (manipulationResults.debug ?? {}) as Record<string, any>;
-  const overlayDebugKey = useMemo(() => {
-    if (debugMap[overlayKey]) {
-      return overlayKey;
-    }
-    if (debugMap.latex_dual_layer) {
-      return "latex_dual_layer";
-    }
-    const keys = Object.keys(debugMap);
-    return keys.length ? keys[0] : overlayKey;
-  }, [debugMap, overlayKey]);
-  const logsByQuestion = useMemo(() => {
-    const grouped = new Map<string, any[]>();
-    generationLogs.forEach((entry) => {
-      const key = String(entry?.question_number ?? entry?.question_id ?? entry?.question ?? "unknown");
-      if (!grouped.has(key)) {
-        grouped.set(key, []);
-      }
-      grouped.get(key)!.push(entry);
-    });
-    grouped.forEach((entries) =>
-      entries.sort((a, b) => {
-        const aTime = a?.timestamp ? new Date(a.timestamp).getTime() : 0;
-        const bTime = b?.timestamp ? new Date(b.timestamp).getTime() : 0;
-        return aTime - bTime;
-      })
-    );
-    return grouped;
-  }, [generationLogs]);
-
-  const orderedQuestions = useMemo(() => {
-    return [...questions].sort((a, b) => {
-      const aIndex = typeof a.sequence_index === "number" ? a.sequence_index : 0;
-      const bIndex = typeof b.sequence_index === "number" ? b.sequence_index : 0;
-      if (aIndex !== bIndex) {
-        return aIndex - bIndex;
-      }
-      return a.id - b.id;
-    });
-  }, [questions]);
-
-  const logKeyOrder = useMemo(() => {
-    const orderedNumbers = orderedQuestions.map((question) => String(question.question_number ?? question.id));
-    const extraKeys = Array.from(logsByQuestion.keys()).filter((key) => !orderedNumbers.includes(key));
-    return [...orderedNumbers, ...extraKeys];
-  }, [orderedQuestions, logsByQuestion]);
 
   const resolveRelativePath = useMemo(() => {
     if (!runId) {
@@ -146,194 +46,66 @@ const SmartSubstitutionPanel: React.FC = () => {
   }, [runId]);
 
   const spanPlanRelativePath = useMemo(() => {
-    const artifacts = overlayRenderStats.artifact_rel_paths ?? overlayRenderStats.artifacts ?? {};
-    const artifactSection = artifactsMap[overlayArtifactsKey] ?? {};
-    const rawPath: string | undefined = artifacts.span_plan ?? artifactSection?.span_plan ?? artifactSection?.span_plan_path;
+    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.content_stream_span_overlay?.render_stats ?? {};
+    const artifacts = renderStats.artifact_rel_paths ?? renderStats.artifacts ?? {};
+    const rawPath: string | undefined = artifacts.span_plan ?? structuredData?.manipulation_results?.artifacts?.content_stream_span_overlay?.span_plan;
     return resolveRelativePath(rawPath);
-  }, [artifactsMap, overlayArtifactsKey, overlayRenderStats, resolveRelativePath]);
+  }, [resolveRelativePath, structuredData]);
 
   const spanPlanUrl = runId && spanPlanRelativePath ? `/api/files/${runId}/${spanPlanRelativePath}` : null;
 
   const spanPlanStatsByQuestion = useMemo(() => {
-    const stats: Record<number, { spans: number }> = {};
-    const spanPlanSource = debugMap[overlayDebugKey]?.span_plan ?? overlayRenderStats.span_plan ?? {};
-    if (spanPlanSource && typeof spanPlanSource === "object") {
-      Object.values(spanPlanSource).forEach((entryList: any) => {
+    const stats: Record<string, { spans: number }> = {};
+    const debugPlan = structuredData?.manipulation_results?.debug?.content_stream_span_overlay?.span_plan ?? null;
+    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.content_stream_span_overlay?.render_stats ?? {};
+    const spanPlan = debugPlan || renderStats.span_plan || {};
+    if (spanPlan && typeof spanPlan === "object") {
+      Object.values(spanPlan).forEach((entryList: any) => {
         if (!Array.isArray(entryList)) return;
         entryList.forEach((entry: any) => {
           const mappings: any[] = Array.isArray(entry?.mappings) ? entry.mappings : [];
           if (!mappings.length) return;
-          const seen = new Set<number>();
+          const seen = new Set<string>();
           mappings.forEach((mapping) => {
-            const manipulationId = typeof mapping?.manipulation_id === "number" ? mapping.manipulation_id : null;
-            if (manipulationId == null || seen.has(manipulationId)) return;
-            seen.add(manipulationId);
-            stats[manipulationId] = stats[manipulationId] || { spans: 0 };
-            stats[manipulationId].spans += 1;
+            const qNumber = mapping?.q_number != null ? String(mapping.q_number) : null;
+            if (!qNumber || seen.has(qNumber)) return;
+            seen.add(qNumber);
+            stats[qNumber] = stats[qNumber] || { spans: 0 };
+            stats[qNumber].spans += 1;
           });
         });
       });
     }
     return stats;
-  }, [debugMap, overlayDebugKey, overlayRenderStats]);
+  }, [structuredData]);
 
   const spanSummary = useMemo(() => {
-    const summary = overlayRenderStats.span_plan_summary || {};
+    const renderStats = structuredData?.manipulation_results?.enhanced_pdfs?.content_stream_span_overlay?.render_stats ?? {};
+    const summary = renderStats.span_plan_summary || {};
     const totalEntries = typeof summary.entries === "number" ? summary.entries : null;
-    const scaledEntries =
-      typeof summary.scaled_entries === "number"
-        ? summary.scaled_entries
-        : typeof overlayRenderStats.scaled_spans === "number"
-        ? overlayRenderStats.scaled_spans
-        : null;
+    const scaledEntries = typeof summary.scaled_entries === "number"
+      ? summary.scaled_entries
+      : (typeof renderStats.scaled_spans === "number" ? renderStats.scaled_spans : null);
     const pageCount = typeof summary.pages === "number" ? summary.pages : null;
     return { totalEntries, scaledEntries, pageCount };
-  }, [overlayRenderStats]);
-
-  const getEffectiveMappingStats = useCallback((question: QuestionManipulation) => {
-    const stagedEntry = stagedMappings[question.id];
-    if (stagedEntry?.status === "validated" && stagedEntry.staged_mapping) {
-      return {
-        mappings: [stagedEntry.staged_mapping],
-        total: 1,
-        validated: 1,
-        staged: stagedEntry,
-        status: stagedEntry.status,
-      };
-    }
-
-    const mappings = question.substring_mappings || [];
-    const validated = mappings.filter((m) => m.validated === true).length;
-    return {
-      mappings,
-      total: mappings.length,
-      validated,
-      staged: stagedEntry,
-      status: stagedEntry?.status,
-    };
-  }, [stagedMappings]);
+  }, [structuredData]);
 
   const questionMappingStats = useMemo(() => {
-    return questions.reduce<Record<number, ReturnType<typeof getEffectiveMappingStats>>>((acc, q) => {
-      acc[q.id] = getEffectiveMappingStats(q);
+    return questions.reduce<Record<number, { total: number; validated: number }>>((acc, q) => {
+      const mappings = q.substring_mappings || [];
+      const validated = mappings.filter((m) => m.validated === true).length;
+      acc[q.id] = { total: mappings.length, validated };
       return acc;
     }, {});
-  }, [questions, getEffectiveMappingStats]);
+  }, [questions]);
 
-  const aggregateStats = useMemo(() => {
-    return questions.reduce(
-      (acc, question) => {
-        const stats = getEffectiveMappingStats(question);
-        acc.totalMappings += stats.total;
-        acc.validatedMappings += stats.validated;
-        if (stats.total > 0 || stats.status === "validated") {
-          acc.questionsWithMappings += 1;
-        }
-        if (stats.validated > 0 || stats.status === "validated") {
-          acc.questionsWithValidated += 1;
-        }
-        if (stats.status === "no_valid_mapping") {
-          acc.questionsSkipped += 1;
-        }
-        return acc;
-      },
-      { totalMappings: 0, validatedMappings: 0, questionsWithMappings: 0, questionsWithValidated: 0, questionsSkipped: 0 }
-    );
-  }, [questions, getEffectiveMappingStats]);
-
-  const { totalMappings, validatedMappings, questionsWithMappings, questionsWithValidated, questionsSkipped } = aggregateStats;
-
-  const applyGenerationSnapshot = useCallback((snapshot: any) => {
-    const rawSummary = snapshot?.status_summary || {};
-    const normalizedSummary: Record<number, any> = {};
-    Object.entries(rawSummary).forEach(([key, value]: [string, any]) => {
-      const status = value as any;
-      // Compute mappings_generated and mappings_validated if not present
-      if (status.mappings_generated === undefined && status.mapping_sets_generated) {
-        status.mappings_generated = status.mapping_sets_generated.reduce(
-          (sum: number, ms: any) => sum + (ms.mappings_count || 0),
-          0
-        );
-      }
-      if (status.mappings_validated === undefined && status.validation_outcomes) {
-        status.mappings_validated = status.validation_outcomes.length;
-      }
-      // Use status_display if available, else map status values
-      if (!status.status_display) {
-        if (status.status === "generating" || status.status === "validating" || status.status === "retrying") {
-          status.status_display = "running";
-        } else {
-          status.status_display = status.status || "pending";
-        }
-      }
-      normalizedSummary[Number(key)] = status;
-    });
-    setGenerationStatus(normalizedSummary);
-
-    setGenerationLogs(snapshot?.logs || []);
-
-    const rawStaged = snapshot?.staged || {};
-    const normalizedStaged: Record<number, any> = {};
-    Object.entries(rawStaged).forEach(([key, value]) => {
-      normalizedStaged[Number(key)] = value;
-    });
-    setStagedMappings(normalizedStaged);
-  }, []);
-
-  const pollGenerationStatus = useCallback(
-    (options?: { questionId?: number; onComplete?: () => void }) => {
-      if (!activeRunId) {
-        options?.onComplete?.();
-        return () => undefined;
-      }
-
-      let cancelled = false;
-      let timeoutRef: number | undefined;
-      const doneStatuses = new Set(["success", "failed", "no_valid_mapping"]);
-
-      const poll = async () => {
-        if (cancelled || !activeRunId) {
-          return;
-        }
-
-        try {
-          const status = await getGenerationStatus(activeRunId);
-          applyGenerationSnapshot(status);
-
-          const normalizedSummary = Object.entries(status.status_summary || {}).reduce<Record<number, any>>((acc, [key, value]) => {
-            acc[Number(key)] = value;
-            return acc;
-          }, {});
-
-          const checkQuestionId = options?.questionId;
-          const isComplete = checkQuestionId != null
-            ? doneStatuses.has(normalizedSummary[checkQuestionId]?.status_display ?? normalizedSummary[checkQuestionId]?.status)
-            : Object.values(normalizedSummary).every((entry: any) => doneStatuses.has(entry?.status_display ?? entry?.status));
-
-          if (!isComplete && !cancelled) {
-            timeoutRef = window.setTimeout(poll, 2000);
-          } else if (!cancelled) {
-            options?.onComplete?.();
-          }
-        } catch (err) {
-          console.error("Failed to poll generation status:", err);
-          options?.onComplete?.();
-        }
-      };
-
-      poll();
-
-      return () => {
-        cancelled = true;
-        if (timeoutRef) {
-          window.clearTimeout(timeoutRef);
-        }
-      };
-    },
-    [activeRunId, applyGenerationSnapshot]
+  const questionsWithMappings = useMemo(() => questions.filter((q) => (q.substring_mappings || []).length > 0).length, [questions]);
+  const questionsWithValidated = useMemo(
+    () => questions.filter((q) => (q.substring_mappings || []).some((m) => m.validated)).length,
+    [questions]
   );
 
-  const handleQuestionUpdated = useCallback((updated: any, options?: { revalidate?: boolean }) => {
+  const handleQuestionUpdated = useCallback((updated: any) => {
     mutate((current) => {
       if (!current) return current;
       const next = { ...current } as any;
@@ -350,110 +122,224 @@ const SmartSubstitutionPanel: React.FC = () => {
       return next;
     }, { revalidate: false });
 
-    if (options?.revalidate !== false) {
-      setTimeout(() => mutate(), 100);
-    }
+    setTimeout(() => mutate(), 100);
   }, [mutate]);
 
-  const readyForPdf = questionsWithValidated > 0;
-
-  const onFinalize = async () => {
-    if (!activeRunId || !readyForPdf || isFinalizing) return;
-    setIsFinalizing(true);
+  const handleValidateQuestionMappings = useCallback(async (questionId: number) => {
+    if (!activeRunId) return;
+    const question = questions.find((q) => q.id === questionId);
+    if (!question) return;
+    const mappings = question.substring_mappings || [];
+    if (mappings.length === 0) {
+      setBulkError(`Question ${question.question_number} has no mappings to validate.`);
+      setTimeout(() => setBulkError(null), 3000);
+      return;
+    }
+    setValidatingQuestionId(questionId);
     setBulkError(null);
-    setBulkMessage("Preparing PDF creation...");
-    
     try {
-      // Show progress message - detection report will be generated in backend
-      setBulkMessage("Generating detection report and starting PDF creation...");
-      
-      const result = await resumeFromStage(activeRunId, "pdf_creation", {
-        targetStages: ["document_enhancement", "pdf_creation", "results_generation"],
-      });
-      
+      const res = await validateQuestion(activeRunId, questionId, { substring_mappings: mappings });
+      const serverMappings = res?.substring_mappings ?? mappings;
+      handleQuestionUpdated({ ...question, substring_mappings: serverMappings });
       await refresh();
-      await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
-      setPreferredStage("pdf_creation");
-
-      const promoted = result?.promotion_summary?.promoted?.length ?? 0;
-      const skipped = result?.promotion_summary?.skipped?.length ?? 0;
-      const messageParts: string[] = [];
-      if (promoted > 0) {
-        messageParts.push(`${promoted} question${promoted === 1 ? "" : "s"} promoted`);
+      if (activeRunId) {
+        await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
       }
-      if (skipped > 0) {
-        messageParts.push(`${skipped} skipped`);
-      }
-      const successMessage = messageParts.length 
-        ? `PDF creation started (${messageParts.join(", ")})` 
-        : "PDF creation started. Detection report generated.";
-      setBulkMessage(successMessage);
-      setTimeout(() => setBulkMessage(null), 8000);
+      setBulkMessage(`Validated question ${question.question_number}.`);
+      setTimeout(() => setBulkMessage(null), 3000);
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || String(err);
-      setBulkError(`Failed to proceed to PDF creation: ${message}`);
-      setBulkMessage(null);
+      setBulkError(message);
     } finally {
-      setIsFinalizing(false);
+      setValidatingQuestionId(null);
     }
+  }, [activeRunId, handleQuestionUpdated, questions, refresh, refreshStatus]);
+
+  const DEFAULT_CANONICAL_MAPPINGS: Record<string, Array<{ original: string; replacement: string }>> = {
+    "1": [{ original: "the", replacement: "not" }],
+    "2": [{ original: "the", replacement: "not" }],
+    "3": [{ original: "LSTM", replacement: "CNN" }],
+    "4": [{ original: "LSTM", replacement: "RNN" }],
+    "5": [{ original: "LSTMs", replacement: "RNNs" }],
+    "6": [{ original: "RNNs", replacement: "CNNs" }],
+    "7": [{ original: "bidirectional", replacement: "unidirectional" }],
+    "8": [{ original: "RNN", replacement: "CNN" }],
+  };
+
+  const buildCanonicalMappings = (question: QuestionManipulation) => {
+    const questionText = question.stem_text || question.original_text || "";
+    const entries = DEFAULT_CANONICAL_MAPPINGS[question.question_number];
+    if (!entries || !questionText) return null;
+
+    const selectionPage = typeof question.positioning?.page === "number"
+      ? Math.max(0, question.positioning!.page - 1)
+      : undefined;
+    const selectionBbox = Array.isArray(question.positioning?.bbox) && question.positioning!.bbox.length === 4
+      ? question.positioning!.bbox
+      : undefined;
+
+    const result = entries.map((entry) => {
+      const start = questionText.indexOf(entry.original);
+      if (start === -1) return null;
+      return {
+        id: Math.random().toString(36).substr(2, 9),
+        original: entry.original,
+        replacement: entry.replacement,
+        start_pos: start,
+        end_pos: start + entry.original.length,
+        context: "question_stem",
+        selection_page: selectionPage,
+        selection_bbox: selectionBbox,
+      };
+    }).filter((val): val is SubstringMapping => Boolean(val));
+
+    return result.length ? result : null;
+  };
+
+  const generateFallbackMapping = (question: QuestionManipulation) => {
+    const questionText = question.stem_text || question.original_text || "";
+    if (!questionText) return null;
+
+    const commonWords = ['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'];
+    const words = questionText.split(/\s+/);
+    const candidates = words.filter(word =>
+      word.length > 2 &&
+      !commonWords.includes(word.toLowerCase()) &&
+      /^[a-zA-Z]+$/.test(word)
+    );
+
+    if (candidates.length === 0) return null;
+
+    const targetWord = candidates[Math.floor(Math.random() * candidates.length)];
+    const startPos = questionText.indexOf(targetWord);
+    if (startPos === -1) return null;
+
+    const selectionPage = typeof question.positioning?.page === "number"
+      ? Math.max(0, question.positioning!.page - 1)
+      : undefined;
+    const selectionBbox = Array.isArray(question.positioning?.bbox) && question.positioning!.bbox.length === 4
+      ? question.positioning!.bbox
+      : undefined;
+
+    return [{
+      id: Math.random().toString(36).substr(2, 9),
+      original: targetWord,
+      replacement: "not",
+      start_pos: startPos,
+      end_pos: startPos + targetWord.length,
+      context: "question_stem",
+      selection_page: selectionPage,
+      selection_bbox: selectionBbox,
+    }];
+  };
+
+  // Add random mappings to all questions for testing
+  const addRandomMappingsToAll = useCallback(async () => {
+    if (!activeRunId || isAddingRandomMappings) return;
+
+    setIsAddingRandomMappings(true);
+    try {
+      for (const question of questions) {
+        // Skip if question already has mappings
+        if (question.substring_mappings && question.substring_mappings.length > 0) {
+          continue;
+        }
+
+        const canonicalMappings = buildCanonicalMappings(question);
+        const fallbackMappings = canonicalMappings ?? generateFallbackMapping(question);
+
+        if (fallbackMappings && fallbackMappings.length) {
+          const mappings = fallbackMappings;
+
+          // Save to backend
+          const response = await updateQuestionManipulation(activeRunId, question.id, {
+            method: question.manipulation_method || "smart_substitution",
+            substring_mappings: mappings
+          });
+
+          // Update local cache
+          const serverMappings = response?.substring_mappings ?? mappings;
+          handleQuestionUpdated({ ...question, substring_mappings: serverMappings });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to add random mappings:", error);
+    } finally {
+      setIsAddingRandomMappings(false);
+    }
+  }, [activeRunId, questions, isAddingRandomMappings, handleQuestionUpdated]);
+
+  const canValidateAll = questions.length > 0 && questionsWithMappings === questions.length;
+  const readyForPdf = questions.length > 0 && questionsWithMappings === questions.length;
+
+  const onFinalize = async () => {
+    if (!activeRunId || !readyForPdf) return;
+    await resumeFromStage(activeRunId, "pdf_creation");
   };
 
   const handleGenerateQuestion = useCallback(async (question: QuestionManipulation) => {
-    if (!activeRunId || generatingQuestionId === question.id || isGeneratingMappings) return;
+    if (!activeRunId || generatingQuestionId === question.id) return;
     setBulkError(null);
     setBulkMessage(null);
     setGeneratingQuestionId(question.id);
     try {
-      await generateMappingsForQuestion(activeRunId, question.id, { k: 1, strategy: "replacement" });
-
-      pollGenerationStatus({
-        questionId: question.id,
-        onComplete: async () => {
-          setGeneratingQuestionId(null);
-          await refresh();
-          if (activeRunId) {
-            await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
-          }
-          setBulkMessage(`Mapping job finished for question ${question.question_number}.`);
-          setTimeout(() => setBulkMessage(null), 4000);
-        },
-      });
-    } catch (err: any) {
-      console.error("generateMappingsForQuestion", err);
-      const message = err?.response?.data?.error || err?.message || String(err);
-      setBulkError(`Failed to generate mappings for question ${question.question_number}: ${message}`);
+      const res = await autoGenerateMappings(activeRunId, question.id, { force: true });
+      const serverMappings = res?.substring_mappings ?? [];
+      handleQuestionUpdated({ ...question, substring_mappings: serverMappings });
+      await refresh();
+      if (activeRunId) {
+        await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
+      }
+      setBulkMessage(`Generated mappings for question ${question.question_number}.`);
+      setTimeout(() => setBulkMessage(null), 4000);
+    } catch (err) {
+      console.error("autoGenerate", err);
+      setBulkError(`Failed to generate mappings for question ${question.question_number}.`);
+    } finally {
       setGeneratingQuestionId(null);
     }
-  }, [activeRunId, generatingQuestionId, isGeneratingMappings, pollGenerationStatus, refresh, refreshStatus]);
+  }, [activeRunId, generatingQuestionId, handleQuestionUpdated, refresh, refreshStatus]);
 
-  const handleGenerateMappings = useCallback(async () => {
-    if (!activeRunId || isGeneratingMappings || generatingQuestionId !== null) return;
-    
-    setIsGeneratingMappings(true);
+  const validateAll = useCallback(async () => {
+    if (!activeRunId || isBulkValidating) return;
     setBulkError(null);
     setBulkMessage(null);
-    
-    try {
-      await generateMappingsForAll(activeRunId, { k: 1, strategy: "replacement" });
-
-      pollGenerationStatus({
-        onComplete: async () => {
-          setIsGeneratingMappings(false);
-          await refresh();
-          if (activeRunId) {
-            await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
-          }
-          setBulkMessage("Mapping generation completed for all questions.");
-          setTimeout(() => setBulkMessage(null), 5000);
-        },
-      });
-    } catch (err: any) {
-      console.error("Failed to generate mappings:", err);
-      const message = err?.response?.data?.error || err?.message || String(err);
-      setBulkError(`Failed to generate mappings: ${message}`);
-      setIsGeneratingMappings(false);
+    setIsBulkValidating(true);
+    const defaultModel = "openai:gpt-4o-mini";
+    let success = 0;
+    let skipped = 0;
+    let failed = 0;
+    for (const question of questions) {
+      const mappings = question.substring_mappings || [];
+      if (mappings.length === 0) {
+        skipped += 1;
+        continue;
+      }
+      try {
+        const res = await validateQuestion(activeRunId, question.id, {
+          substring_mappings: mappings,
+          model: defaultModel,
+        });
+        const serverMappings = res?.substring_mappings ?? mappings;
+        handleQuestionUpdated({ ...question, substring_mappings: serverMappings });
+        success += 1;
+      } catch (err) {
+        console.error("validateAll", err);
+        failed += 1;
+      }
     }
-  }, [activeRunId, generatingQuestionId, isGeneratingMappings, pollGenerationStatus, refresh, refreshStatus]);
+    await refresh();
+    if (activeRunId) {
+      await refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
+    }
+    setIsBulkValidating(false);
+    if (failed > 0) {
+      setBulkError(`Validation completed with ${failed} failure${failed === 1 ? "" : "s"}.`);
+    }
+    setBulkMessage(`Validated ${success} question${success === 1 ? "" : "s"}${skipped ? `, ${skipped} skipped` : ""}.`);
+    setTimeout(() => setBulkMessage(null), 4000);
+  }, [activeRunId, handleQuestionUpdated, isBulkValidating, questions, refresh, refreshStatus]);
+
   const handleQuestionSelect = useCallback((questionId: number) => {
     setSelectedQuestionId(prev => prev === questionId ? null : questionId);
   }, []);
@@ -464,334 +350,57 @@ const SmartSubstitutionPanel: React.FC = () => {
     }
   }, [status?.current_stage]);
 
-  useEffect(() => {
-    if (!activeRunId) {
-      setGenerationStatus({});
-      setStagedMappings({});
-      setGenerationLogs([]);
-      return;
-    }
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const snapshot = await getGenerationStatus(activeRunId);
-        if (!cancelled) {
-          applyGenerationSnapshot(snapshot);
-        }
-      } catch (err) {
-        console.warn("Failed to load generation status", err);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [activeRunId, applyGenerationSnapshot]);
-
   if (isLoading) {
     return (
       <div className="panel smart-substitution">
-        <div className="panel-loading">
-          <div className="panel-loading__indicator" aria-hidden="true" />
-          <span>Loading questions…</span>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <div style={{ fontSize: '18px', color: 'var(--muted)' }}>🔄 Loading questions...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="panel smart-substitution">
-      <header className="panel-header panel-header--tight">
-        <div className="panel-title">
-          <h1>Strategy</h1>
-          <p>Generate, review, and validate manipulations before PDF creation.</p>
-        </div>
-        <div className="panel-actions">
+    <div className="panel smart-substitution" style={{ display: 'grid', gap: '1.5rem' }}>
+      {/* Header Section */}
+      <div style={{ display: 'grid', gap: '0.75rem' }}>
+        <h1 style={{
+          fontSize: '28px',
+          fontWeight: 'bold',
+          color: 'var(--text)',
+          margin: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          🎯 Smart Substitution
+        </h1>
+        <p style={{ fontSize: '16px', color: 'var(--muted)', margin: 0 }}>
+          Create targeted text substitutions for each question. Click on a card to expand and edit mappings.
+        </p>
+
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <button
-            className="ghost-button button-with-icon"
-            onClick={handleGenerateMappings}
-            disabled={!questions.length || isGeneratingMappings || generatingQuestionId !== null}
-            title="Generate mappings for all questions"
+            className="pill-button"
+            onClick={validateAll}
+            disabled={!questions.length || isBulkValidating || !canValidateAll || generatingQuestionId !== null}
+            title={!canValidateAll && !isBulkValidating ? 'Add mappings for every question before validating all.' : undefined}
           >
-            <ListChecks size={16} aria-hidden="true" />
-            <span>{isGeneratingMappings ? "Generating…" : "Generate"}</span>
+            {isBulkValidating ? 'Validating…' : 'Validate all'}
           </button>
-          {spanPlanUrl ? (
-            <a className="ghost-button button-with-icon" href={spanPlanUrl} target="_blank" rel="noopener noreferrer">
-              <FileSpreadsheet size={16} aria-hidden="true" />
-              <span>Span Plan</span>
-            </a>
-          ) : null}
-          {runId ? (
-            <button
-              className="ghost-button button-with-icon"
-              onClick={() => setShowLogs(!showLogs)}
-              disabled={isGeneratingMappings}
+          {spanPlanUrl && (
+            <a
+              className="pill-button"
+              href={spanPlanUrl}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <ScrollText size={16} aria-hidden="true" />
-              <span>{showLogs ? "Hide Logs" : "Show Logs"}</span>
-            </button>
-          ) : null}
-          <button
-            onClick={onFinalize}
-            disabled={!readyForPdf || generatingQuestionId !== null || isGeneratingMappings || isFinalizing}
-            className={clsx("primary-button button-with-icon", isFinalizing && "is-loading")}
-            aria-busy={isFinalizing}
-            title={readyForPdf ? "Generate detection report and create PDFs" : "Validate a mapping to continue"}
-          >
-            <ArrowRight size={16} aria-hidden="true" />
-            <span>{isFinalizing ? "Preparing…" : "Create PDFs"}</span>
-          </button>
+              🗂 span_plan.json
+            </a>
+          )}
         </div>
-      </header>
-      {bulkMessage ? <div className="panel-flash panel-flash--success">{bulkMessage}</div> : null}
-      {bulkError ? <div className="panel-flash panel-flash--error">{bulkError}</div> : null}
-
-      {isGeneratingMappings && Object.keys(generationStatus).length > 0 ? (
-        <section className="strategy-progress">
-          <header>
-            <span>Generation progress</span>
-          </header>
-          <div className="strategy-progress__grid">
-            {Object.entries(generationStatus).map(([questionId, progress]: [string, any]) => {
-              const question = questions.find((q) => q.id === parseInt(questionId, 10));
-              if (!question) return null;
-              // Use status_display if available, else use status
-              const statusValue = progress?.status_display ?? progress?.status ?? "pending";
-              const questionKey = String(progress.question_number ?? question.question_number ?? question.id);
-              const questionLogs = logsByQuestion.get(questionKey) ?? [];
-              
-              // Get generation attempts from retry_count or current_attempt
-              const generationLoops = progress?.retry_count 
-                ? progress.retry_count + 1 
-                : progress?.current_attempt 
-                ? progress.current_attempt 
-                : questionLogs.filter((entry) => entry?.stage === "generation").length ||
-                  Math.max(progress?.mappings_generated ?? 0, statusValue === "success" ? 1 : 0);
-              
-              const validationLogs = questionLogs.filter((entry) => entry?.stage === "validation");
-              const hasValidationFailure =
-                statusValue === "failed" || 
-                progress?.status === "failed" ||
-                validationLogs.some((entry) => entry?.status === "failed");
-              const hasValidationSuccess =
-                statusValue === "success" ||
-                progress?.status === "success" ||
-                progress?.mappings_validated > 0 || 
-                validationLogs.some((entry) => entry?.status === "success");
-
-              const stateClass = hasValidationFailure
-                ? "is-error"
-                : hasValidationSuccess
-                ? "is-success"
-                : statusValue === "running"
-                ? "is-running"
-                : "is-pending";
-
-              return (
-                <div key={questionId} className={clsx("strategy-progress__row", stateClass)}>
-                  <span className="strategy-progress__id" title={`Question ${questionKey}`}>
-                    Q{questionKey}
-                  </span>
-                  <span className="strategy-progress__meta">
-                    <span className="status-chip status-chip--generation" title="Generation attempts">
-                      Gen {Math.max(0, generationLoops)}×
-                    </span>
-                    <span
-                      className={clsx(
-                        "status-chip",
-                        "status-chip--validation",
-                        hasValidationFailure ? "is-error" : hasValidationSuccess ? "is-success" : "is-pending"
-                      )}
-                      title={
-                        hasValidationFailure
-                          ? "Latest validation failed"
-                          : hasValidationSuccess
-                          ? "Validation succeeded"
-                          : "Awaiting validation results"
-                      }
-                    >
-                      {hasValidationFailure
-                        ? "Validation ✕"
-                        : hasValidationSuccess
-                        ? "Validation ✓"
-                        : "Validation …"}
-                    </span>
-                    <span className="status-chip status-chip--totals" title="Generated vs validated mappings">
-                      {progress.mappings_generated || 0} gen · {progress.mappings_validated || 0} val
-                    </span>
-                    {progress.retry_count > 0 && (
-                      <span className="status-chip status-chip--retry" title={`Retry attempts: ${progress.retry_count}`}>
-                        Retry {progress.retry_count}
-                      </span>
-                    )}
-                    {progress.mapping_sets_generated && progress.mapping_sets_generated.length > 0 && (
-                      <span className="status-chip status-chip--sets" title={`Mapping sets generated: ${progress.mapping_sets_generated.length}`}>
-                        Sets: {progress.mapping_sets_generated.length}
-                      </span>
-                    )}
-                    {progress.generation_exceptions && progress.generation_exceptions.length > 0 && (
-                      <span className="status-chip status-chip--error" title={`Generation exceptions: ${progress.generation_exceptions.length}`} style={{ color: 'var(--error)', backgroundColor: 'rgba(248,113,113,0.1)' }}>
-                        {progress.generation_exceptions.length} error{progress.generation_exceptions.length !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      ) : null}
-
-      {/* Generation Logs Viewer */}
-        {showLogs && (
-          <div style={{ 
-            padding: '1rem', 
-            backgroundColor: 'var(--bg-secondary)', 
-            borderRadius: '8px',
-            border: '1px solid var(--border)',
-            maxHeight: '420px',
-            overflowY: 'auto'
-          }}>
-            <h3 style={{ fontSize: '16px', margin: '0 0 0.75rem 0' }}>Mapping Logs</h3>
-            <div style={{ display: 'grid', gap: '0.75rem' }}>
-              {logKeyOrder.length === 0 ? (
-                <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>No questions available.</div>
-              ) : logKeyOrder.map((key) => {
-                const logs = logsByQuestion.get(key) ?? [];
-                const question = orderedQuestions.find((q) => String(q.question_number ?? q.id) === key)
-                  ?? questions.find((q) => String(q.question_number ?? q.id) === key);
-                const heading = question ? `Question ${question.question_number}` : `Question ${key}`;
-                const snippet = question?.stem_text
-                  ? `${question.stem_text.slice(0, 110)}${question.stem_text.length > 110 ? '...' : ''}`
-                  : null;
-                const questionStatus = Object.values(generationStatus).find((s: any) => 
-                  String(s?.question_number ?? s?.question_id) === key
-                ) as any;
-                const hasGenerationErrors = questionStatus?.generation_exceptions && questionStatus.generation_exceptions.length > 0;
-                const hasNoMappings = (questionStatus?.mappings_generated ?? 0) === 0 && (questionStatus?.mapping_sets_generated?.length ?? 0) === 0;
-                
-                return (
-                  <div key={key} style={{ 
-                    padding: '0.75rem',
-                    backgroundColor: 'var(--bg)',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(148,163,184,0.2)',
-                    display: 'grid',
-                    gap: '0.5rem'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'center' }}>
-                      <div style={{ fontWeight: 600 }}>{heading}</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{logs.length ? `${logs.length} event${logs.length === 1 ? '' : 's'}` : 'No events'}</div>
-                    </div>
-                    {snippet ? <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>{snippet}</div> : null}
-                    <div style={{ display: 'grid', gap: '0.45rem' }}>
-                      {(hasGenerationErrors || (hasNoMappings && questionStatus?.error)) && (
-                        <div style={{
-                          padding: '0.65rem',
-                          borderRadius: '6px',
-                          border: '1px solid rgba(248,113,113,0.3)',
-                          backgroundColor: 'rgba(248,113,113,0.1)',
-                          display: 'grid',
-                          gap: '0.35rem',
-                          marginBottom: '0.5rem'
-                        }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 600, color: 'var(--error)' }}>Generation Failed</span>
-                            <span style={{ color: 'var(--error)', fontSize: '0.85rem' }}>Error</span>
-                          </div>
-                          <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
-                            {questionStatus?.error || 'Failed to generate mappings'}
-                          </div>
-                          {hasGenerationErrors && (
-                            <div style={{ display: 'grid', gap: '0.25rem', marginTop: '0.25rem' }}>
-                              {questionStatus.generation_exceptions.map((exc: any, excIdx: number) => (
-                                <div key={excIdx} style={{
-                                  padding: '0.45rem',
-                                  borderRadius: '4px',
-                                  backgroundColor: 'rgba(15,23,42,0.6)',
-                                  fontSize: '0.8rem'
-                                }}>
-                                  <div style={{ fontWeight: 600, marginBottom: '0.15rem' }}>
-                                    Set {exc.set_index} (Attempt {exc.attempt}): {exc.error_type}
-                                  </div>
-                                  <div style={{ color: 'var(--muted)', fontSize: '0.75rem', wordBreak: 'break-word' }}>
-                                    {exc.error}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {logs.length ? logs.map((log, idx) => {
-                        const stageLabel = log.stage === 'generation' ? 'Generate' : log.stage === 'validation' ? 'Validate' : String(log.stage || 'Stage');
-                        const statusText = (log.status ?? 'unknown').toString();
-                        const timestamp = log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '';
-                        const statusColor = (statusText === 'success'
-                          ? 'rgba(52,211,153,0.85)'
-                          : statusText === 'failed'
-                            ? 'rgba(248,113,113,0.85)'
-                            : 'rgba(250,204,21,0.85)');
-                        return (
-                          <div key={`${key}-${idx}`} style={{
-                            padding: '0.65rem',
-                            borderRadius: '6px',
-                            border: '1px solid rgba(148,163,184,0.2)',
-                            backgroundColor: 'rgba(15,23,42,0.45)',
-                            display: 'grid',
-                            gap: '0.35rem'
-                          }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
-                              <span style={{ fontWeight: 600 }}>{stageLabel}</span>
-                              <span style={{ color: statusColor, fontSize: '0.85rem' }}>{statusText}{timestamp ? ` · ${timestamp}` : ''}</span>
-                            </div>
-                            <div style={{ fontSize: '0.85rem', color: 'var(--muted)', display: 'grid', gap: '0.25rem' }}>
-                              {log.mappings_generated != null && <span>Generated: {log.mappings_generated}</span>}
-                              {log.mappings_validated != null && <span>Validated: {log.mappings_validated}</span>}
-                              {log.details?.strategy && <span>Strategy: {log.details.strategy}</span>}
-                              {log.details?.job_id && <span style={{ fontSize: '0.75rem' }}>Job ID: {log.details.job_id}</span>}
-                            </div>
-                            {Array.isArray(log.validation_logs) && log.validation_logs.length > 0 && (
-                              <div style={{ display: 'grid', gap: '0.35rem' }}>
-                                {log.validation_logs.map((validation: any, validationIdx: number) => {
-                                  const validationStatus = validation?.status ?? 'unknown';
-                                  const reason = validation?.details?.validation_result?.reasoning;
-                                  return (
-                                    <div key={validationIdx} style={{
-                                      padding: '0.55rem',
-                                      borderRadius: '6px',
-                                      backgroundColor: 'rgba(22, 33, 58, 0.7)',
-                                      border: '1px solid rgba(148,163,184,0.15)',
-                                      fontSize: '0.8rem'
-                                    }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem' }}>
-                                        <strong>Validation #{(validation?.mapping_index ?? validationIdx) + 1}</strong>
-                                        <span>{validationStatus}</span>
-                                      </div>
-                                      {reason ? (
-                                        <div style={{ marginTop: '0.25rem', color: 'var(--muted)' }}>
-                                          {reason.slice(0, 160)}{reason.length > 160 ? '...' : ''}
-                                        </div>
-                                      ) : null}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      }) : (
-                        <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>No log entries captured yet.</div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        {bulkMessage && <div style={{ color: 'var(--success)', fontSize: '0.9rem' }}>{bulkMessage}</div>}
+        {bulkError && <div style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>{bulkError}</div>}
 
         <div className="info-grid">
           <div className="info-card">
@@ -806,10 +415,6 @@ const SmartSubstitutionPanel: React.FC = () => {
             <span className="info-label">Questions validated</span>
             <span className="info-value">{questionsWithValidated}/{questions.length}</span>
           </div>
-        <div className="info-card">
-          <span className="info-label">Questions skipped</span>
-          <span className="info-value">{questionsSkipped}</span>
-        </div>
           <div className="info-card">
             <span className="info-label">Mappings</span>
             <span className="info-value">{totalMappings}</span>
@@ -833,63 +438,45 @@ const SmartSubstitutionPanel: React.FC = () => {
             </div>
           )}
         </div>
+      </div>
 
       {/* Questions Grid */}
       <div style={{ display: 'grid', gap: '20px' }}>
-        {orderedQuestions.map((question) => {
-          const stats = questionMappingStats[question.id] ?? getEffectiveMappingStats(question);
-          const stagedEntry = stats.staged;
-          const mappings = stats.mappings;
-          const hasMappings = stats.total > 0 || stagedEntry?.status === "validated";
+        {questions.map((question) => {
+          const mappings = question.substring_mappings || [];
+          const computedStats = questionMappingStats[question.id] ?? {
+            total: mappings.length,
+            validated: mappings.filter((m) => m.validated === true).length,
+          };
+          const hasMappings = computedStats.total > 0;
           const isSelected = selectedQuestionId === question.id;
           const isGeneratingThis = generatingQuestionId === question.id;
-          const spanInfo = spanPlanStatsByQuestion[question.id];
+          const spanInfo = spanPlanStatsByQuestion[String(question.question_number ?? question.id)];
 
-          const allValidatedForQuestion = stats.validated > 0 || stagedEntry?.status === "validated";
-          const hasSkip = stagedEntry?.status === "no_valid_mapping";
-          const hasFailure = stagedEntry?.status === "failed";
-
-          const effectiveQuestion = stagedEntry?.status === "validated" && stagedEntry.staged_mapping
-            ? { ...question, substring_mappings: mappings }
-            : question;
-
+          const allValidatedForQuestion = computedStats.total > 0 && computedStats.validated === computedStats.total;
           const validationBadgeStyle = allValidatedForQuestion
             ? { backgroundColor: 'rgba(52,211,153,0.18)', color: '#34d399' }
             : { backgroundColor: 'rgba(250,204,21,0.22)', color: '#fbbf24' };
 
-          const cardBorderColor = isGeneratingThis
-            ? 'rgba(56,189,248,0.7)'
-            : hasFailure
-              ? 'rgba(248,113,113,0.65)'
-              : hasSkip
-                ? 'rgba(250,204,21,0.45)'
-                : hasMappings
-                  ? 'rgba(52,211,153,0.65)'
-                  : 'rgba(148,163,184,0.22)';
-
-          const cardBackground = isSelected
-            ? 'rgba(15,23,42,0.35)'
-            : isGeneratingThis
-              ? 'rgba(15,23,42,0.55)'
-              : hasFailure
-                ? 'rgba(127,29,29,0.35)'
-                : hasSkip
-                  ? 'rgba(120,53,15,0.35)'
-                  : 'rgba(15,23,42,0.45)';
-
           return (
             <div key={question.id} style={{
-              border: `2px solid ${isSelected && !isGeneratingThis ? 'rgba(56,189,248,0.65)' : cardBorderColor}`,
+              border: `2px solid ${isGeneratingThis
+                ? 'rgba(56,189,248,0.7)'
+                : isSelected
+                  ? 'rgba(56,189,248,0.65)'
+                  : hasMappings
+                    ? 'rgba(52,211,153,0.65)'
+                    : 'rgba(148,163,184,0.22)'}`,
               borderRadius: '12px',
-              backgroundColor: cardBackground,
+              backgroundColor: isSelected
+                ? 'rgba(15,23,42,0.35)'
+                : isGeneratingThis
+                  ? 'rgba(15,23,42,0.55)'
+                  : 'rgba(15,23,42,0.45)',
               boxShadow: isSelected
                 ? '0 4px 12px rgba(0,123,255,0.15)'
                 : isGeneratingThis
                   ? '0 8px 20px rgba(56,189,248,0.18)'
-                  : hasFailure
-                    ? '0 6px 16px rgba(248,113,113,0.2)'
-                    : hasSkip
-                      ? '0 6px 16px rgba(251,191,36,0.2)'
                   : '0 2px 10px rgba(8,12,24,0.25)',
               transition: 'all 0.2s ease',
               overflow: 'hidden'
@@ -921,7 +508,7 @@ const SmartSubstitutionPanel: React.FC = () => {
                         gap: '6px'
                       }}>
                         <span role="img" aria-label="sparkles">✨</span>
-                        Mapping in progress...
+                        Mapping in progress…
                       </div>
                     )}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
@@ -944,7 +531,7 @@ const SmartSubstitutionPanel: React.FC = () => {
                       }}>
                         {question.question_type?.replace('_', ' ')}
                       </span>
-                      {allValidatedForQuestion && (
+                      {hasMappings && (
                         <span style={{
                           padding: '4px 8px',
                           borderRadius: '4px',
@@ -955,37 +542,7 @@ const SmartSubstitutionPanel: React.FC = () => {
                           gap: '6px',
                           ...validationBadgeStyle
                         }}>
-                          ✅ {stats.validated || 1}/{stats.total || 1} validated
-                        </span>
-                      )}
-                      {hasSkip && (
-                        <span style={{
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontWeight: 'bold',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          backgroundColor: 'rgba(250,204,21,0.22)',
-                          color: '#fbbf24'
-                        }}>
-                          ⚠️ No valid mapping
-                        </span>
-                      )}
-                      {hasFailure && (
-                        <span style={{
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontWeight: 'bold',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          backgroundColor: 'rgba(248,113,113,0.22)',
-                          color: '#f87171'
-                        }}>
-                          ❌ Generation error
+                          ✅ {computedStats.validated}/{computedStats.total} validated
                         </span>
                       )}
                       {spanInfo && (
@@ -1016,6 +573,11 @@ const SmartSubstitutionPanel: React.FC = () => {
                         </div>
                         <div style={{ color: 'var(--muted)', fontWeight: 'bold' }}>
                           {question.gold_answer}
+                          {question.gold_confidence && (
+                            <span style={{ fontSize: '12px', marginLeft: '8px', opacity: 0.8 }}>
+                              (Confidence: {Math.round(question.gold_confidence * 100)}%)
+                            </span>
+                          )}
                         </div>
                       </div>
                     )}
@@ -1033,20 +595,10 @@ const SmartSubstitutionPanel: React.FC = () => {
 
                     {/* Mapping Count */}
                     <div style={{ fontSize: '14px', color: 'var(--muted)' }}>
-                      {stats.total} mapping{stats.total !== 1 ? 's' : ''} configured
-                      {stats.total > 0 && (
+                      {computedStats.total} mapping{computedStats.total !== 1 ? 's' : ''} configured
+                      {computedStats.total > 0 && (
                         <span style={{ marginLeft: '6px' }}>
-                          · {stats.validated} validated
-                        </span>
-                      )}
-                      {hasSkip && (
-                        <span style={{ marginLeft: '6px', color: '#fbbf24' }}>
-                          · awaiting new target
-                        </span>
-                      )}
-                      {hasFailure && (
-                        <span style={{ marginLeft: '6px', color: '#f87171' }}>
-                          · error
+                          · {computedStats.validated} validated
                         </span>
                       )}
                     </div>
@@ -1058,7 +610,7 @@ const SmartSubstitutionPanel: React.FC = () => {
                         event.stopPropagation();
                         handleGenerateQuestion(question);
                       }}
-                      disabled={generatingQuestionId === question.id || isGeneratingMappings}
+                      disabled={generatingQuestionId === question.id}
                       style={{
                         fontSize: '12px',
                         padding: '4px 10px',
@@ -1066,10 +618,30 @@ const SmartSubstitutionPanel: React.FC = () => {
                         border: '1px solid rgba(59,130,246,0.35)',
                         color: '#bfdbfe'
                       }}
-                      title="Queue GPT-5 generation for this question"
+                      title="Generate mappings with GPT-5"
                     >
-                      {generatingQuestionId === question.id ? 'Generating...' : 'Generate'}
+                      {generatingQuestionId === question.id ? 'Generating…' : 'Generate'}
                     </button>
+                    {hasMappings && (
+                      <button
+                        className="pill-button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleValidateQuestionMappings(question.id);
+                        }}
+                        disabled={validatingQuestionId === question.id || generatingQuestionId === question.id}
+                        style={{
+                          fontSize: '12px',
+                          padding: '4px 10px',
+                          backgroundColor: 'rgba(56,189,248,0.25)',
+                          border: '1px solid rgba(56,189,248,0.35)',
+                          color: '#e0f2fe'
+                        }}
+                        title="Validate all mappings for this question"
+                      >
+                        {validatingQuestionId === question.id ? 'Validating…' : 'Validate question'}
+                      </button>
+                    )}
                     <div style={{
                       fontSize: '24px',
                       transform: isSelected ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -1085,49 +657,9 @@ const SmartSubstitutionPanel: React.FC = () => {
               {/* Expanded Question Editor */}
               {isSelected && (
                 <div style={{ padding: '0 20px 20px 20px' }}>
-                  {hasSkip && stagedEntry?.skip_reason && (
-                    <div style={{
-                      marginBottom: '12px',
-                      padding: '10px 12px',
-                      backgroundColor: 'rgba(250,204,21,0.18)',
-                      border: '1px solid rgba(250,204,21,0.35)',
-                      borderRadius: '8px',
-                      color: '#fbbf24',
-                      fontSize: '13px'
-                    }}>
-                      ⚠️ {stagedEntry.skip_reason}
-                    </div>
-                  )}
-                  {hasFailure && stagedEntry?.error && (
-                    <div style={{
-                      marginBottom: '12px',
-                      padding: '10px 12px',
-                      backgroundColor: 'rgba(248,113,113,0.18)',
-                      border: '1px solid rgba(248,113,113,0.35)',
-                      borderRadius: '8px',
-                      color: '#f87171',
-                      fontSize: '13px'
-                    }}>
-                      ❌ {stagedEntry.error}
-                    </div>
-                  )}
-
-                  {stagedEntry?.validation_summary && (
-                    <div style={{
-                      marginBottom: '12px',
-                      padding: '10px 12px',
-                      backgroundColor: 'rgba(52,211,153,0.12)',
-                      border: '1px solid rgba(52,211,153,0.3)',
-                      borderRadius: '8px',
-                      color: '#34d399',
-                      fontSize: '13px'
-                    }}>
-                      ✅ Confidence {Math.round((stagedEntry.validation_summary.confidence ?? 0) * 100)}% · Deviation {Math.round((stagedEntry.validation_summary.deviation_score ?? 0) * 100) / 100}
-                    </div>
-                  )}
                   <EnhancedQuestionViewer
                     runId={activeRunId!}
-                    question={effectiveQuestion}
+                    question={question}
                     onUpdated={handleQuestionUpdated}
                   />
                 </div>
@@ -1135,6 +667,56 @@ const SmartSubstitutionPanel: React.FC = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Action Buttons */}
+      <div style={{
+        marginTop: '32px',
+        padding: '20px',
+        backgroundColor: 'var(--surface)' ,
+        borderRadius: '12px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '16px',
+        border: '1px solid rgba(148,163,184,0.18)'
+      }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={refresh}
+            className="pill-button"
+            title="Reload questions from backend"
+          >
+            🔄 Refresh Questions
+          </button>
+
+          <button
+            onClick={addRandomMappingsToAll}
+            disabled={isAddingRandomMappings}
+            className="pill-button"
+            style={{
+              backgroundColor: isAddingRandomMappings ? 'rgba(148,163,184,0.18)' : 'rgba(250,204,21,0.25)',
+              border: '1px solid rgba(250,204,21,0.35)',
+              color: isAddingRandomMappings ? 'var(--muted)' : '#0f172a'
+            }}
+            title="Populate sample mappings for quick experimentation"
+          >
+            {isAddingRandomMappings ? '⏳ Adding...' : '🎲 Add Random Mappings'}
+          </button>
+        </div>
+
+        <button
+          onClick={onFinalize}
+          disabled={!readyForPdf || generatingQuestionId !== null || isBulkValidating}
+          className="pill-button"
+          style={{
+            backgroundColor: readyForPdf ? '#34d399' : 'rgba(148,163,184,0.18)',
+            color: readyForPdf ? '#0f172a' : 'var(--muted)'
+          }}
+          title={readyForPdf ? 'Advance to PDF creation' : 'Add mappings for each question to continue'}
+        >
+          ➡️ Proceed to PDF Creation
+        </button>
       </div>
     </div>
   );

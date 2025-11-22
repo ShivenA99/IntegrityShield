@@ -44,16 +44,6 @@ class EvaluationReportService:
         self._guard_required_stages(run)
 
         structured = self.structured_manager.load(run_id) or {}
-        
-        # Validate detection report exists FIRST (before expensive PDF evaluation)
-        # This provides better error messages and avoids wasting time
-        try:
-            detection_reference = self._load_detection_reference(run_id, structured)
-        except ValueError as exc:
-            raise ValueError(
-                f"Detection report is required for evaluation reports. {str(exc)}"
-            )
-        
         method_name = method or self._default_method(structured)
         if not method_name:
             raise ValueError("No attacked PDF available to evaluate. Generate PDFs first.")
@@ -72,7 +62,7 @@ class EvaluationReportService:
         evaluator = PDFQuestionEvaluator(prompts=prompts)
         evaluation = evaluator.evaluate(str(pdf_path), questions)
 
-        # Detection reference already loaded above, reuse it
+        detection_reference = self._load_detection_reference(run_id, structured)
         vulnerability_reference = self._load_vulnerability_reference(run_id, structured)
 
         scored_questions = self._augment_answers(
@@ -90,16 +80,6 @@ class EvaluationReportService:
             "questions": scored_questions,
             "summary": summary,
             "providers": evaluation["providers"],
-            "context": {
-                "detection": {
-                    "generated_at": detection_reference.get("generated_at"),
-                    "summary": detection_reference.get("summary"),
-                },
-                "vulnerability": {
-                    "generated_at": (vulnerability_reference or {}).get("generated_at"),
-                    "summary": (vulnerability_reference or {}).get("summary"),
-                },
-            },
         }
 
         directory = evaluation_report_directory(run_id, method_name)
@@ -194,57 +174,28 @@ class EvaluationReportService:
             for entry in vulnerability_reference.get("questions", []):
                 vulnerability_index[entry["question_number"]] = entry
 
-        for entry in sorted(questions, key=self._question_sort_key):
+        for entry in questions:
             question_number = entry.get("question_number")
             detection_info = detection_index.get(question_number, {})
             baseline_entry = vulnerability_index.get(question_number, {})
-            detection_context = self._build_detection_context(detection_info)
-
-            candidates = []
-            for answer in entry.get("answers", []):
-                candidates.append(
-                    {
-                        "provider": answer.get("provider"),
-                        "answer_label": answer.get("answer_label"),
-                        "answer_text": answer.get("answer_text") or answer.get("answer"),
-                    }
-                )
-
-            scored_batch = self.scoring_service.score_batch(
-                question_text=entry.get("question_text", ""),
-                question_type=entry.get("question_type"),
-                gold_answer=entry.get("gold_answer"),
-                provider_answers=candidates,
-                options=entry.get("options"),
-                detection_context=detection_context,
-            )
-            score_lookup = {item["provider"]: item for item in scored_batch}
-
             per_model = []
             for answer in entry.get("answers", []):
-                provider = answer.get("provider")
-                scorecard = score_lookup.get(provider) or {
-                    "provider": provider,
-                    "score": 0.0,
-                    "verdict": "missing",
-                    "confidence": 0.0,
-                    "rationale": "Scoring unavailable.",
-                    "source": "heuristic",
-                }
-                detection_hit = scorecard.get("hit_detection_target")
-                if detection_hit is None:
-                    detection_hit = self._matches_detection(answer.get("answer_text"), detection_info)
-                baseline_score = self._lookup_baseline_score(baseline_entry, provider)
+                scorecard = self.scoring_service.score(
+                    question_text=entry.get("question_text", ""),
+                    question_type=entry.get("question_type"),
+                    gold_answer=entry.get("gold_answer"),
+                    candidate_answer=answer.get("answer"),
+                    options=entry.get("options"),
+                )
+                match_target = self._matches_detection(answer.get("answer"), detection_info)
+                baseline_score = self._lookup_baseline_score(baseline_entry, answer.get("provider"))
                 per_model.append(
                     {
                         **answer,
                         "scorecard": scorecard,
-                        "matches_detection_target": detection_hit,
+                        "matches_detection_target": match_target,
                         "baseline_score": baseline_score,
-                        "delta_from_baseline": (
-                            scorecard.get("score", 0.0) - baseline_score if baseline_score is not None else None
-                        ),
-                        "scoring_source": scorecard.get("source"),
+                        "delta_from_baseline": scorecard["score"] - baseline_score if baseline_score is not None else None,
                     }
                 )
             scored.append(
@@ -259,48 +210,9 @@ class EvaluationReportService:
     def _matches_detection(self, answer: str | None, detection_info: Dict[str, Any]) -> bool | None:
         if not answer or not detection_info:
             return None
-        target = detection_info.get("target_answer", {}) or {}
-        labels = target.get("labels") or []
+        labels = detection_info.get("target_answer", {}).get("labels") or []
         normalized_answer = self._normalize_label(answer)
-        normalized_labels = {self._normalize_label(label) for label in labels if label}
-        normalized_labels = {label for label in normalized_labels if label}
-        if normalized_labels and normalized_answer:
-            return normalized_answer in normalized_labels
-        signal = target.get("signal") or {}
-        phrase = (signal.get("phrase") or "").strip()
-        if phrase:
-            return phrase.lower() in (answer or "").lower()
-        return None
-
-    @staticmethod
-    def _build_detection_context(detection_info: Dict[str, Any]) -> Dict[str, Any] | None:
-        if not detection_info:
-            return None
-        target = detection_info.get("target_answer") or {}
-        context = {
-            "risk_level": detection_info.get("risk_level"),
-            "target_labels": target.get("labels") or [],
-            "target_texts": target.get("texts") or [],
-            "raw_replacements": target.get("raw_replacements") or [],
-        }
-        signal = target.get("signal") or {}
-        if signal.get("phrase"):
-            context["signal_phrase"] = signal.get("phrase")
-            if signal.get("type"):
-                context["signal_type"] = signal.get("type")
-            if signal.get("notes"):
-                context["signal_notes"] = signal.get("notes")
-        return context
-
-    @staticmethod
-    def _question_sort_key(entry: Dict[str, Any]) -> tuple[int, int]:
-        number = entry.get("question_number")
-        try:
-            primary = int(number)
-        except (TypeError, ValueError):
-            primary = 10**9
-        secondary = entry.get("question_id") or 0
-        return (primary, secondary)
+        return normalized_answer in {self._normalize_label(label) for label in labels if label}
 
     def _normalize_label(self, value: Any) -> str | None:
         if value is None:
@@ -410,3 +322,4 @@ class EvaluationReportService:
             "method": payload["method"],
         }
         self.structured_manager.save(run_id, structured)
+

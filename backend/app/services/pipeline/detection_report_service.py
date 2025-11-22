@@ -24,9 +24,6 @@ class MappingInsight:
     deviation_score: Optional[float]
     confidence: Optional[float]
     validation_reason: Optional[str]
-    signal_phrase: Optional[str] = None
-    signal_type: Optional[str] = None
-    signal_notes: Optional[str] = None
 
 
 class DetectionReportService:
@@ -104,21 +101,9 @@ class DetectionReportService:
 
             replacements = mapping_stats["replacements"]
             target_texts = self._resolve_target_texts(target_labels, replacements, option_lookup)
-            signal_entry = self._select_signal_entry(mapping_stats.get("signals", []))
-            target_answer_payload = {
-                "labels": sorted(target_labels),
-                "texts": target_texts,
-                "raw_replacements": sorted(replacements),
-            }
-            if signal_entry:
-                target_answer_payload["signal"] = {
-                    "phrase": signal_entry.get("phrase"),
-                    "type": signal_entry.get("type"),
-                    "notes": signal_entry.get("notes"),
-                }
 
             risk_level = self._assess_risk(mapping_stats, bool(options))
-            if risk_level == "high":
+            if risk_level in {"high", "critical"}:
                 high_risk_questions += 1
 
             compiled_questions.append(
@@ -133,7 +118,11 @@ class DetectionReportService:
                         "label": gold_label,
                         "text": gold_entry["text"] if gold_entry else structured_info.get("gold_answer") or question.gold_answer,
                     },
-                    "target_answer": target_answer_payload,
+                    "target_answer": {
+                        "labels": sorted(target_labels),
+                        "texts": target_texts,
+                        "raw_replacements": sorted(replacements),
+                    },
                     "mappings": [insight.__dict__ for insight in mapping_insights],
                     "risk_level": risk_level,
                     "risk_factors": mapping_stats,
@@ -173,7 +162,6 @@ class DetectionReportService:
             **result_payload,
             "file_path": str(report_path),
             "relative_path": relative_path,
-            "status": "completed",
         }
         manipulation_results["detection_report"] = detection_payload
 
@@ -185,7 +173,6 @@ class DetectionReportService:
             "generated_at": generated_at,
             "summary": summary,
             "artifact": relative_path,
-            "status": "completed",
         }
 
         self.structured_manager.save(run_id, structured)
@@ -199,9 +186,8 @@ class DetectionReportService:
         stage_status = {stage.stage_name: stage.status for stage in run.stages}
         missing = sorted(stage for stage in self.REQUIRED_STAGES if stage_status.get(stage) != "completed")
         if missing:
-            missing_list = ", ".join(missing)
             raise ValueError(
-                f"Cannot generate detection report until prerequisite stages are completed ({missing_list})."
+                "Cannot generate detection report until prerequisite stages are completed.",
             )
 
     def _compile_mappings(self, mappings: List[Dict[str, Any]]) -> Tuple[List[MappingInsight], Dict[str, Any]]:
@@ -212,7 +198,6 @@ class DetectionReportService:
         replacements: set[str] = set()
         deviations: List[float] = []
         confidences: List[float] = []
-        signal_entries: List[Dict[str, Any]] = []
 
         for mapping in mappings:
             total += 1
@@ -220,10 +205,7 @@ class DetectionReportService:
             if is_validated:
                 validated += 1
 
-            # Check both target_wrong_answer and target_option fields
-            target_label = self._normalize_label(
-                mapping.get("target_wrong_answer") or mapping.get("target_option")
-            )
+            target_label = self._normalize_label(mapping.get("target_wrong_answer"))
             if target_label:
                 target_labels.add(target_label)
 
@@ -231,7 +213,6 @@ class DetectionReportService:
             if replacement:
                 replacements.add(str(replacement))
 
-            # Extract deviation_score from mapping (check both direct field and validation object)
             deviation = mapping.get("deviation_score") or mapping.get("validation", {}).get("deviation_score")
             if isinstance(deviation, (int, float)):
                 deviations.append(float(deviation))
@@ -240,48 +221,23 @@ class DetectionReportService:
             if isinstance(confidence, (int, float)):
                 confidences.append(float(confidence))
 
-            # Extract target_wrong_answer from either field
-            target_wrong_answer_value = mapping.get("target_wrong_answer") or mapping.get("target_option")
-            if mapping.get("signal_phrase"):
-                signal_entries.append(
-                    {
-                        "phrase": self._safe_strip(mapping.get("signal_phrase")),
-                        "type": self._safe_strip(mapping.get("signal_type")),
-                        "notes": self._safe_strip(mapping.get("signal_notes")),
-                        "validated": is_validated,
-                    }
-                )
-
             insights.append(
                 MappingInsight(
                     original=self._safe_strip(mapping.get("original")),
                     replacement=self._safe_strip(mapping.get("replacement")),
                     context=mapping.get("context"),
                     validated=is_validated,
-                    target_wrong_answer=self._normalize_label(target_wrong_answer_value),
+                    target_wrong_answer=target_label,
                     deviation_score=float(deviation) if isinstance(deviation, (int, float)) else None,
                     confidence=float(confidence) if isinstance(confidence, (int, float)) else None,
                     validation_reason=(
                         mapping.get("validation", {}).get("reasoning")
                         or mapping.get("validation_reasoning")
                     ),
-                    signal_phrase=self._safe_strip(mapping.get("signal_phrase")),
-                    signal_type=self._safe_strip(mapping.get("signal_type")),
-                    signal_notes=self._safe_strip(mapping.get("signal_notes")),
                 )
             )
 
-        # For deviation_score: use the first validated mapping's score, or max if multiple
-        # Most questions have one mapping, so averaging doesn't add value
-        # If multiple mappings, use the maximum deviation (most effective attack)
-        question_deviation_score = None
-        if deviations:
-            if len(deviations) == 1:
-                question_deviation_score = deviations[0]
-            else:
-                # Multiple mappings: use the maximum deviation (most effective attack)
-                question_deviation_score = max(deviations)
-        
+        average_deviation = sum(deviations) / len(deviations) if deviations else None
         average_confidence = sum(confidences) / len(confidences) if confidences else None
 
         stats = {
@@ -289,9 +245,8 @@ class DetectionReportService:
             "validated": validated,
             "target_labels": sorted(target_labels),
             "replacements": sorted(replacements),
-            "average_deviation_score": question_deviation_score,  # Actually the primary/max deviation score
+            "average_deviation_score": average_deviation,
             "average_confidence": average_confidence,
-            "signals": signal_entries,
         }
 
         return insights, stats
@@ -393,15 +348,6 @@ class DetectionReportService:
         return [self._safe_strip(value) for value in replacements if self._safe_strip(value)]
 
     @staticmethod
-    def _select_signal_entry(entries: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
-        if not entries:
-            return None
-        for entry in entries:
-            if entry.get("validated"):
-                return entry
-        return entries[0]
-
-    @staticmethod
     def _normalize_label(label: Any) -> Optional[str]:
         if label is None:
             return None
@@ -424,30 +370,15 @@ class DetectionReportService:
 
     @staticmethod
     def _assess_risk(mapping_stats: Dict[str, Any], has_options: bool) -> str:
-        """
-        Assess risk level based on mapping statistics.
-        
-        Note: High deviation_score means the attack is EFFECTIVE (successfully changes the answer),
-        which translates to HIGH RISK of cheating. So high deviation = high risk.
-        """
         total = mapping_stats.get("total", 0)
         validated = mapping_stats.get("validated", 0)
         average_deviation = mapping_stats.get("average_deviation_score")
         if total == 0:
-            return "skipped"
+            return "insufficient-data"
+        if isinstance(average_deviation, (int, float)) and average_deviation >= 0.85:
+            return "critical"
         if validated == 0:
             return "needs-review"
-        # High deviation_score (>= 0.7) = attack works well = HIGH RISK of successful cheating
-        # Medium deviation_score (0.5-0.7) = moderate attack effectiveness = MEDIUM RISK
-        # Low deviation_score (< 0.5) = attack less effective = LOW RISK
-        if isinstance(average_deviation, (int, float)):
-            if average_deviation >= 0.7:
-                return "high"
-            elif average_deviation >= 0.5:
-                return "medium"
-            else:
-                return "low"
-        # Fallback: if no deviation score but has target labels, mark as medium
         if has_options and mapping_stats.get("target_labels"):
-            return "medium"
-        return "low"
+            return "high"
+        return "medium"

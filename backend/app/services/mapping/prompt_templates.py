@@ -10,11 +10,6 @@ Given:
 - Strategy: replacement
 - Reasoning steps:
 {reasoning_steps}
-- Copyable text (use this exact text when selecting substrings):
-<<<COPY
-{copyable_text}
->>>
-{prefix_note}{answer_guidance}{retry_instructions}
 
 Your task:
 Generate {k} valid mappings that satisfy the replacement strategy. Each mapping should:
@@ -37,11 +32,7 @@ IMPORTANT:
 - The original_substring MUST be an exact substring of latex_stem_text
 - The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)
 - The target_wrong_answer MUST be different from the gold answer
-- CRITICAL: The replacement_substring MUST be DIFFERENT from the original_substring. Do NOT generate mappings where original_substring == replacement_substring (e.g., "power" → "power" is INVALID). The replacement MUST change the text to create actual manipulation.
-- CRITICAL: Neither original_substring nor replacement_substring can be empty strings. Both must contain actual text.
-- LENGTH CONSTRAINT: The replacement_substring MUST be smaller or equal in length to the original_substring (len(replacement_substring) <= len(original_substring)). This is critical for maintaining document layout and preventing text overflow.
 - latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.
-- The latex_stem_text may include \item tokens from enumerate environments. Keep the \item token intact and operate on the descriptive text that follows it whenever possible.
 - The replacement should be natural and semantically meaningful
 
 Return as JSON array:
@@ -70,11 +61,6 @@ Given:
 - Strategy: replacement
 - Reasoning steps:
 {reasoning_steps}
-- Copyable text (use this exact text when selecting substrings):
-<<<COPY
-{copyable_text}
->>>
-{prefix_note}{answer_guidance}{retry_instructions}
 
 Your task:
 Generate {k} valid mappings that satisfy the replacement strategy. Each mapping should:
@@ -97,11 +83,7 @@ IMPORTANT:
 - The original_substring MUST be an exact substring of latex_stem_text
 - The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)
 - The target_wrong_answer MUST be the opposite of the gold answer
-- CRITICAL: The replacement_substring MUST be DIFFERENT from the original_substring. Do NOT generate mappings where original_substring == replacement_substring (e.g., "force" → "force" is INVALID). The replacement MUST change the text to create actual manipulation.
-- CRITICAL: Neither original_substring nor replacement_substring can be empty strings. Both must contain actual text.
-- LENGTH CONSTRAINT: The replacement_substring MUST be smaller or equal in length to the original_substring (len(replacement_substring) <= len(original_substring)). This is critical for maintaining document layout and preventing text overflow.
 - latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.
-- The latex_stem_text may include \item tokens from enumerate environments. Keep the \item token intact and operate on the descriptive text that follows it whenever possible.
 - The replacement should be natural and semantically meaningful
 
 Return as JSON array:
@@ -130,11 +112,6 @@ Given:
 - Strategy: replacement
 - Reasoning steps:
 {reasoning_steps}
-- Copyable text (use this exact text when selecting substrings):
-<<<COPY
-{copyable_text}
->>>
-{prefix_note}{answer_guidance}{retry_instructions}
 
 Your task:
 Generate {k} valid mappings that satisfy the replacement strategy. Each mapping should:
@@ -157,11 +134,7 @@ IMPORTANT:
 - The original_substring MUST be an exact substring of latex_stem_text
 - The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)
 - The replacement should cause a verifiable deviation in the answer
-- CRITICAL: The replacement_substring MUST be DIFFERENT from the original_substring. Do NOT generate mappings where original_substring == replacement_substring. The replacement MUST change the text to create actual manipulation.
-- CRITICAL: Neither original_substring nor replacement_substring can be empty strings. Both must contain actual text.
-- LENGTH CONSTRAINT: The replacement_substring MUST be smaller or equal in length to the original_substring (len(replacement_substring) <= len(original_substring)). This is critical for maintaining document layout and preventing text overflow.
 - latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.
-- The latex_stem_text may include \item tokens from enumerate environments. Keep the \item token intact and operate on the descriptive text that follows it whenever possible.
 - The replacement should be natural and semantically meaningful
 
 Return as JSON array:
@@ -180,3 +153,4 @@ Return as JSON array:
 ]
 
 Return ONLY valid JSON, no markdown or additional text."""
+

@@ -640,27 +640,6 @@ def resume_pipeline(run_id: str, stage_name: str):
                 "skipped_mappings": promotion_summary.get("skipped"),
             },
         )
-        
-        # Generate detection report before starting PDF creation
-        # This ensures the report is available for evaluation reports
-        try:
-            detection_service = DetectionReportService()
-            detection_result = detection_service.generate(run_id)
-            current_app.logger.info(
-                "Detection report generated before PDF creation",
-                extra={
-                    "run_id": run_id,
-                    "report_path": detection_result.get("output_files", {}).get("json"),
-                },
-            )
-        except Exception as exc:
-            # Log but don't fail - detection report generation is best-effort
-            # User can regenerate it later if needed
-            current_app.logger.warning(
-                "Failed to generate detection report before PDF creation",
-                extra={"run_id": run_id, "error": str(exc)},
-            )
-        
         target_stages.append(PipelineStageEnum.RESULTS_GENERATION.value)
 
     config = PipelineConfig(
@@ -1349,21 +1328,11 @@ def generate_vulnerability_report(run_id: str):
         return jsonify({"error": str(exc)}), HTTPStatus.NOT_FOUND
     except ValueError as exc:
         db.session.rollback()
-        error_msg = str(exc)
-        current_app.logger.warning(
-            "Vulnerability report generation failed with ValueError",
-            extra={"run_id": run_id, "error": error_msg}
-        )
-        return jsonify({"error": error_msg}), HTTPStatus.BAD_REQUEST
-    except Exception as exc:  # pragma: no cover
+        return jsonify({"error": str(exc)}), HTTPStatus.BAD_REQUEST
+    except Exception:  # pragma: no cover
         db.session.rollback()
-        error_type = type(exc).__name__
-        error_msg = str(exc)
-        current_app.logger.exception(
-            "Failed to generate vulnerability report",
-            extra={"run_id": run_id, "error_type": error_type, "error": error_msg}
-        )
-        return jsonify({"error": f"Failed to generate vulnerability report: {error_msg}"}), HTTPStatus.INTERNAL_SERVER_ERROR
+        current_app.logger.exception("Failed to generate vulnerability report", extra={"run_id": run_id})
+        return jsonify({"error": "Failed to generate vulnerability report"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
     return jsonify(result), HTTPStatus.OK
 

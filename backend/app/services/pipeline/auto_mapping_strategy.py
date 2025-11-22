@@ -283,8 +283,6 @@ def build_generation_prompt(
         "Each mapping object must include: original, replacement, start_pos, end_pos, context (always \"question_stem\").",
         "Use 0-based character offsets from the exact Stem text below (end_pos exclusive).",
         "The substring stem_text[start_pos:end_pos] MUST match the \"original\" value exactly (including case).",
-        "CRITICAL: The replacement MUST be DIFFERENT from the original. Do NOT generate mappings where original == replacement (e.g., \"power\" → \"power\" is INVALID). The replacement MUST change the text to create actual manipulation.",
-        "CRITICAL: Neither original nor replacement can be empty strings. Both must contain actual text.",
         "Keep each mapping within a single contiguous span of characters; do not skip over other words or newlines.",
         "Never overlap mappings and prefer one precise change over many scattered edits.",
         "If you introduce spaces in the replacement, include them explicitly so the surrounding words remain intact.",
