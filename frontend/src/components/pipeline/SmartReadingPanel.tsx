@@ -11,7 +11,9 @@ const SmartReadingPanel: React.FC = () => {
   const { push } = useNotifications();
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [answerKeyDragging, setAnswerKeyDragging] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [answerKeyFile, setAnswerKeyFile] = useState<File | null>(null);
 
   const previewUrl = useMemo(() => {
     if (!file) return null;
@@ -36,14 +38,35 @@ const SmartReadingPanel: React.FC = () => {
     setFile(nextFile);
   };
 
+  const handleAnswerKeyFiles = (files: FileList | null) => {
+    const nextFile = files?.[0];
+    if (!nextFile) return;
+    const validationError = validatePdfFile(nextFile);
+    if (validationError) {
+      push({ title: "Answer key upload failed", description: validationError, intent: "error" });
+      return;
+    }
+    setAnswerKeyFile(nextFile);
+  };
+
   const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     handleFiles(event.target.files);
+  };
+
+  const handleAnswerKeyInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleAnswerKeyFiles(event.target.files);
   };
 
   const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     setIsDragging(false);
     handleFiles(event.dataTransfer.files);
+  };
+
+  const handleAnswerKeyDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    setAnswerKeyDragging(false);
+    handleAnswerKeyFiles(event.dataTransfer.files);
   };
 
   const handleStart = async () => {
@@ -54,6 +77,7 @@ const SmartReadingPanel: React.FC = () => {
 
     const runId = await startPipeline({
       file: file ?? undefined,
+      answerKeyFile: answerKeyFile ?? undefined,
       config: {
         targetStages,
         aiModels: [],
@@ -126,6 +150,43 @@ const SmartReadingPanel: React.FC = () => {
         {previewUrl ? (
           <div className="upload-panel__preview">
             <iframe title="pdf-preview" src={previewUrl} />
+          </div>
+        ) : null}
+      </section>
+
+      <section className="panel-card upload-panel upload-panel--secondary">
+        <header className="upload-panel__header">
+          <h2>Answer Key (optional)</h2>
+          <p>Provide an answer key PDF to populate gold answers directly from the source.</p>
+        </header>
+        <label
+          onDragOver={(event) => {
+            event.preventDefault();
+            setAnswerKeyDragging(true);
+          }}
+          onDragLeave={() => setAnswerKeyDragging(false)}
+          onDrop={handleAnswerKeyDrop}
+          className={`upload-panel__dropzone ${answerKeyDragging ? "is-dragging" : ""}`}
+        >
+          <input type="file" accept="application/pdf" onChange={handleAnswerKeyInput} hidden />
+          <span className="upload-panel__cta">Select Answer Key PDF</span>
+          <span className="upload-panel__hint">Optional but recommended for demos</span>
+        </label>
+
+        {answerKeyFile ? (
+          <div className="upload-panel__summary">
+            <div>
+              <strong>{answerKeyFile.name}</strong>
+              <span>{(answerKeyFile.size / (1024 * 1024)).toFixed(2)} MB</span>
+            </div>
+            <button
+              type="button"
+              className="ghost-button"
+              onClick={() => setAnswerKeyFile(null)}
+              title="Remove answer key"
+            >
+              Clear
+            </button>
           </div>
         ) : null}
       </section>

@@ -15,6 +15,13 @@ class FileManager:
         file.save(destination)
         return destination
 
+    def save_answer_key_pdf(self, run_id: str, file: FileStorage) -> Path:
+        filename = file.filename or "answer_key.pdf"
+        destination = pdf_input_path(run_id, f"answer_key_{filename}")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        file.save(destination)
+        return destination
+
     def import_manual_pdf(self, run_id: str, source_pdf: Path) -> Path:
         if not source_pdf.exists():
             raise FileNotFoundError(f"Manual input PDF not found at {source_pdf}")

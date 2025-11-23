@@ -96,6 +96,9 @@ class ContentDiscoveryService:
             question["sequence_index"] = i
             question["source_identifier"] = derive_source_identifier(question, i)
 
+        answer_key_lookup = self._build_answer_key_lookup(structured)
+        answer_key_matches = 0
+
         if preserve_manipulations:
             self.logger.info(
                 "Preserving existing manipulations during content discovery",
@@ -148,6 +151,10 @@ class ContentDiscoveryService:
                     question["sequence_index"] = existing.sequence_index
                     question["source_identifier"] = existing.source_identifier
 
+                    if answer_key_lookup:
+                        if self._apply_answer_key_to_question(question, existing, answer_key_lookup):
+                            answer_key_matches += 1
+
                     if existing.source_identifier:
                         existing_by_source[existing.source_identifier] = existing
                     if q_number:
@@ -199,6 +206,10 @@ class ContentDiscoveryService:
                     question["manipulation_id"] = manipulation.id
                     question["sequence_index"] = manipulation.sequence_index
                     question["source_identifier"] = manipulation.source_identifier
+
+                    if answer_key_lookup:
+                        if self._apply_answer_key_to_question(question, manipulation, answer_key_lookup):
+                            answer_key_matches += 1
 
                     if manipulation.source_identifier:
                         existing_by_source[manipulation.source_identifier] = manipulation
@@ -258,6 +269,10 @@ class ContentDiscoveryService:
                 question["sequence_index"] = manipulation.sequence_index
                 question["source_identifier"] = manipulation.source_identifier
 
+                if answer_key_lookup:
+                    if self._apply_answer_key_to_question(question, manipulation, answer_key_lookup):
+                        answer_key_matches += 1
+
                 new_rows.append(manipulation)
 
             db.session.commit()
@@ -265,6 +280,18 @@ class ContentDiscoveryService:
             existing_by_id = {row.id: row for row in existing_rows}
 
         structured["questions"] = questions
+
+        if answer_key_lookup:
+            answer_key_section = structured.setdefault("answer_key", {})
+            coverage = answer_key_section.setdefault("coverage", {})
+            coverage.update(
+                {
+                    "matched_questions": answer_key_matches,
+                    "provided_entries": len(answer_key_lookup),
+                    "updated_at": isoformat(utc_now()),
+                }
+            )
+            answer_key_section.setdefault("status", "parsed")
 
         metadata = structured.setdefault("pipeline_metadata", metadata)
         total_questions = len(questions)
@@ -281,13 +308,15 @@ class ContentDiscoveryService:
         metadata["gold_generation"] = gold_progress
         self.structured_manager.save(run_id, structured)
 
-        gold_generator = GoldAnswerGenerationService()
         needs_gold = satisfied_count < total_questions
-        if needs_gold and not gold_generator.is_configured():
-            raise ValueError(
-                "Gold answer generation requires GPT-5 configuration. "
-                "Set OPENAI_API_KEY and FAIRTESTAI_GOLD_ANSWER_MODEL to continue."
-            )
+        gold_generator: GoldAnswerGenerationService | None = None
+        if needs_gold:
+            gold_generator = GoldAnswerGenerationService()
+            if not gold_generator.is_configured():
+                raise ValueError(
+                    "Gold answer generation requires GPT-5 configuration. "
+                    "Set OPENAI_API_KEY and FAIRTESTAI_GOLD_ANSWER_MODEL to continue."
+                )
 
         processed_updates: set[tuple[int | None, str | None]] = set()
 
@@ -323,7 +352,7 @@ class ContentDiscoveryService:
             self.structured_manager.save(run_id, structured)
 
         gold_updates: List[Dict[str, Any]] = []
-        if gold_generator.is_configured():
+        if needs_gold and gold_generator is not None and gold_generator.is_configured():
             try:
                 structured, gold_updates = gold_generator.populate_gold_answers(
                     run_id,
@@ -455,6 +484,102 @@ class ContentDiscoveryService:
         self.structured_manager.save(run_id, structured)
 
         return {"questions_detected": len(questions)}
+
+    def _build_answer_key_lookup(self, structured: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+        section = structured.get("answer_key") or {}
+        responses = section.get("responses") or {}
+        lookup: Dict[str, Dict[str, Any]] = {}
+        if isinstance(responses, dict):
+            for key, value in responses.items():
+                q_num = str(key).strip()
+                if q_num and isinstance(value, dict):
+                    lookup[q_num] = value
+        elif isinstance(responses, list):
+            for entry in responses:
+                if not isinstance(entry, dict):
+                    continue
+                q_num = str(entry.get("question_number") or entry.get("q_number") or "").strip()
+                if q_num:
+                    lookup[q_num] = entry
+        return lookup
+
+    def _apply_answer_key_to_question(
+        self,
+        question: Dict[str, Any],
+        question_model: QuestionManipulation,
+        lookup: Dict[str, Dict[str, Any]],
+    ) -> bool:
+        q_number = str(question.get("q_number") or question.get("question_number") or "").strip()
+        if not q_number:
+            return False
+        entry = lookup.get(q_number)
+        if not entry:
+            return False
+
+        answer_label = entry.get("answer_label")
+        if isinstance(answer_label, str):
+            answer_label = answer_label.strip()
+        answer_text = entry.get("answer_text")
+        confidence = entry.get("confidence")
+
+        normalized_label = answer_label or ""
+        q_type = (question.get("question_type") or "").lower()
+
+        if q_type in {"true_false", "boolean"} and normalized_label:
+            normalized_label = self._normalize_boolean_label(normalized_label)
+        elif q_type.startswith("mcq") and normalized_label:
+            normalized_label = normalized_label.strip().upper()
+
+        if q_type.startswith("mcq") and not normalized_label and isinstance(answer_text, str):
+            # Attempt to derive label from option text
+            options = question.get("options") or {}
+            for label, text in options.items():
+                if isinstance(text, str) and text.strip() == answer_text.strip():
+                    normalized_label = str(label).strip().upper()
+                    break
+
+        gold_value: str | None
+        if q_type.startswith("mcq") and normalized_label:
+            gold_value = normalized_label
+        elif q_type in {"true_false", "boolean"} and normalized_label:
+            gold_value = normalized_label
+        else:
+            gold_value = answer_text.strip() if isinstance(answer_text, str) else None
+
+        if not gold_value:
+            return False
+
+        answer_metadata = question.setdefault("answer_metadata", {})
+        answer_metadata.update(
+            {
+                "generator": "answer_key_parser",
+                "answer_label": normalized_label or None,
+                "answer_text": answer_text,
+                "confidence": confidence,
+                "rationale": entry.get("rationale"),
+                "gold_source": "answer_key",
+            }
+        )
+        question["gold_source"] = "answer_key"
+        question["gold_answer"] = gold_value
+        if confidence is not None:
+            question["gold_confidence"] = float(confidence)
+
+        question_model.gold_answer = gold_value
+        question_model.gold_confidence = float(confidence) if confidence is not None else question_model.gold_confidence
+        ai_meta = question_model.ai_model_results or {}
+        ai_meta["gold_source"] = "answer_key"
+        question_model.ai_model_results = ai_meta
+        db.session.add(question_model)
+        return True
+
+    def _normalize_boolean_label(self, value: str) -> str:
+        normalized = value.strip().lower()
+        if normalized in {"t", "true", "1", "yes"}:
+            return "True"
+        if normalized in {"f", "false", "0", "no"}:
+            return "False"
+        return value.strip()
 
     def _fallback_question_detection(self, elements: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Simple fallback question detection when AI extraction fails."""

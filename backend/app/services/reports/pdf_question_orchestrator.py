@@ -219,11 +219,35 @@ class PDFQuestionEvaluator:
             closing = text.rfind("```")
             if closing != -1:
                 text = text[:closing]
+        text = text.strip()
+        if not text:
+            return text
+
+        start_char = None
+        start_idx = -1
+        for candidate in ("{", "["):
+            idx = text.find(candidate)
+            if idx != -1 and (start_idx == -1 or idx < start_idx):
+                start_idx = idx
+                start_char = candidate
+        if start_idx > 0:
+            text = text[start_idx:]
+        elif start_idx == -1:
+            return text
+
+        end_char = "}" if start_char == "{" else "]" if start_char == "[" else None
+        if end_char:
+            end_idx = text.rfind(end_char)
+            if end_idx != -1:
+                text = text[: end_idx + 1]
+
         return text.strip()
 
     def _build_batch_prompt(self, provider_name: str, questions: list[QuestionPrompt]) -> dict[str, Any]:
         prompt_lines = [
-            "You will analyze an attached PDF assessment and answer multiple questions.",
+            "You will analyze an attached PDF assessment and answer multiple questions as accurately as possible.",
+            "Work through the questions sequentially: first solve each question one by one using the PDF, then format your final responses in the required JSON schema.",
+            "Answer every question; do not skip any.",
             "",
             "REQUIRED JSON SCHEMA:",
             "{",

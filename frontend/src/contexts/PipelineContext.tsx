@@ -32,7 +32,7 @@ interface PipelineContextValue {
     runId?: string,
     options?: { quiet?: boolean; retries?: number; retryDelayMs?: number }
   ) => Promise<void>;
-  startPipeline: (payload: { file?: File; config?: Partial<StartPipelineConfig> }) => Promise<string | null>;
+  startPipeline: (payload: { file?: File; answerKeyFile?: File; config?: Partial<StartPipelineConfig> }) => Promise<string | null>;
   resumeFromStage: (runId: string, stage: PipelineStageName, options?: { targetStages?: PipelineStageName[] }) => Promise<void>;
   deleteRun: (runId: string) => Promise<void>;
   resetActiveRun: (options?: { softDelete?: boolean }) => Promise<void>;
@@ -125,13 +125,16 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
   );
 
   const startPipeline = useCallback(
-    async ({ file, config }: { file?: File; config?: Partial<StartPipelineConfig> }) => {
+    async ({ file, answerKeyFile, config }: { file?: File; answerKeyFile?: File; config?: Partial<StartPipelineConfig> }) => {
       setIsLoading(true);
       setError(null);
       try {
         const formData = new FormData();
         if (file) {
           formData.append("original_pdf", file);
+        }
+        if (answerKeyFile) {
+          formData.append("answer_key_pdf", answerKeyFile);
         }
         if (config?.targetStages) {
           config.targetStages.forEach((stage) => formData.append("target_stages", stage));

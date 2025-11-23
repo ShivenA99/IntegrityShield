@@ -1618,9 +1618,21 @@ class SmartSubstitutionService:
 		return None
 
 	def _sanitize_signal_metadata(self, entry: Dict[str, Any]) -> Optional[Dict[str, str]]:
+		original = str(entry.get("original") or "").strip()
+		replacement = str(entry.get("replacement") or "").strip()
 		signal_phrase = str(entry.get("signal_phrase") or "").strip()
 		signal_type = str(entry.get("signal_type") or "").strip().lower()
 		signal_notes = str(entry.get("signal_notes") or "").strip()
+
+		if not signal_phrase:
+			if original and replacement:
+				signal_phrase = f"{original} -> {replacement}"
+		else:
+			normalized_phrase = signal_phrase.lower()
+			if original and replacement:
+				if normalized_phrase in {original.lower(), replacement.lower()}:
+					signal_phrase = f"{original} -> {replacement}"
+
 		if not signal_phrase:
 			return None
 		metadata = {"signal_phrase": signal_phrase}

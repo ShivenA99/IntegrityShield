@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import clsx from "clsx";
 
 import { ENHANCEMENT_METHOD_LABELS } from "@constants/enhancementMethods";
 import type {

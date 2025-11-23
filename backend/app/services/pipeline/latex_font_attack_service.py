@@ -340,6 +340,7 @@ class LatexFontAttackService:
         self._font_command_registry: Dict[str, set[str]] = {}
 
         replacements: List[Tuple[int, int, str, AttackJob]] = []
+        occupied_ranges: List[Tuple[int, int, Optional[str]]] = []
         diagnostics: List[MappingDiagnostic] = []
         attack_jobs: List[AttackJob] = []
         counter = 0
@@ -372,6 +373,16 @@ class LatexFontAttackService:
                     continue
 
                 start, end = location
+
+                overlap = self._find_range_overlap(occupied_ranges, start, end)
+                if overlap:
+                    diagnostic.status = "overlap_conflict"
+                    conflict_id = overlap[2] or "unknown"
+                    diagnostic.notes = (
+                        f"Overlaps mapping {conflict_id} ({overlap[0]}-{overlap[1]})"
+                    )
+                    diagnostics.append(diagnostic)
+                    continue
 
                 try:
                     plan = planner.plan(replacement, original)
@@ -423,6 +434,8 @@ class LatexFontAttackService:
                     latex_replacement=latex_replacement,
                     font_results=font_results,
                 )))
+
+                occupied_ranges.append((start, end, mapping.get("id")))
 
                 diagnostic.status = "replaced"
                 diagnostic.location = location
@@ -596,6 +609,17 @@ class LatexFontAttackService:
         direct_index = tex_content.find(original)
         if direct_index != -1:
             return direct_index, direct_index + len(original)
+        return None
+
+    def _find_range_overlap(
+        self,
+        occupied_ranges: Sequence[Tuple[int, int, Optional[str]]],
+        start: int,
+        end: int,
+    ) -> Optional[Tuple[int, int, Optional[str]]]:
+        for existing_start, existing_end, mapping_id in occupied_ranges:
+            if start < existing_end and end > existing_start:
+                return (existing_start, existing_end, mapping_id)
         return None
 
     def _compile_tex(

@@ -105,6 +105,7 @@ class OpenAIClient(BaseLLMClient):
 
             final_prompt = prompt
 
+            max_completion_tokens = 3200
             completion_payload = {
                 "model": self.model,
                 "messages": [
@@ -121,7 +122,7 @@ class OpenAIClient(BaseLLMClient):
                     }
                 ],
                 "temperature": 0.2,
-                "max_tokens": 800,
+                "max_tokens": max_completion_tokens,
             }
 
             async with session.post(
@@ -385,6 +386,7 @@ class GoogleClient(BaseLLMClient):
         payload = {
             "contents": [
                 {
+                    "role": "user",
                     "parts": [
                         {
                             "file_data": {

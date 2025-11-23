@@ -12,6 +12,7 @@ from flask import Blueprint, current_app, jsonify, request
 from werkzeug.datastructures import FileStorage
 
 from ..models import PipelineRun, PipelineStage, QuestionManipulation, AnswerSheetRun
+from ..services.pipeline.answer_key_extraction_service import AnswerKeyExtractionService
 from ..services.pipeline.pipeline_orchestrator import (
     PipelineConfig,
     PipelineOrchestrator,
@@ -92,6 +93,7 @@ def start_pipeline():
     mapping_strategy = request.form.get("mapping_strategy", "unicode_steganography")
 
     uploaded_file: FileStorage | None = request.files.get("original_pdf")
+    answer_key_file: FileStorage | None = request.files.get("answer_key_pdf")
     manual_mode = not resume_from_run_id and not uploaded_file
 
     if manual_mode:
@@ -269,6 +271,9 @@ def start_pipeline():
 
         run_id = str(uuid.uuid4())
         pdf_path = file_manager.save_uploaded_pdf(run_id, uploaded_file)
+        answer_key_path: Path | None = None
+        if answer_key_file:
+            answer_key_path = file_manager.save_answer_key_pdf(run_id, answer_key_file)
 
         run = PipelineRun(
             id=run_id,
@@ -279,6 +284,7 @@ def start_pipeline():
             pipeline_config={
                 "ai_models": ai_models,
                 "enhancement_methods": enhancement_methods,
+                "answer_key_provided": bool(answer_key_file),
             },
             structured_data={},
         )
@@ -286,6 +292,19 @@ def start_pipeline():
         db.session.commit()
 
         structured_manager.initialize(run.id, pdf_path)
+        if answer_key_path:
+            structured = structured_manager.load(run.id) or {}
+            structured.setdefault("document", {})["answer_key_path"] = str(answer_key_path)
+            structured.setdefault("answer_key", {
+                "source_pdf": str(answer_key_path),
+                "status": "pending",
+                "responses": {},
+            })
+            structured_manager.save(run.id, structured)
+            try:
+                AnswerKeyExtractionService().extract(run.id, answer_key_path)
+            except Exception as exc:  # noqa: BLE001
+                current_app.logger.error("Answer key extraction failed for run %s: %s", run.id, exc, exc_info=True)
 
     config = PipelineConfig(
         target_stages=target_stages or [stage.value for stage in orchestrator.pipeline_order],

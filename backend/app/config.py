@@ -119,7 +119,7 @@ class BaseConfig:
         if prompt.strip()
     ]
     LLM_REPORT_MODEL_OVERRIDES = {
-        "openai": os.getenv("FAIRTESTAI_REPORT_OPENAI_MODEL", "gpt-4o-mini"),
+        "openai": os.getenv("FAIRTESTAI_REPORT_OPENAI_MODEL", "gpt-4.1"),
         "anthropic": os.getenv("FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
         "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "models/gemini-1.5-pro"),
     }
