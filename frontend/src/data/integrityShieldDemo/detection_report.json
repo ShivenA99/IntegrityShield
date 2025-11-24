@@ -1,0 +1,763 @@
+{
+  "run_id": "3e40c4f8-b0d4-4b17-930c-e3bb8a37105f",
+  "report_type": "detection",
+  "generated_at": "2025-11-23T00:51:23.295127+00:00",
+  "summary": {
+    "total_questions": 12,
+    "questions_with_mappings": 12,
+    "questions_missing_mappings": 0,
+    "validated_mappings": 12,
+    "total_mappings": 12,
+    "high_risk_questions": 11,
+    "target_label_distribution": [
+      {
+        "label": "A",
+        "count": 3
+      },
+      {
+        "label": "T",
+        "count": 2
+      },
+      {
+        "label": "C",
+        "count": 1
+      },
+      {
+        "label": "B",
+        "count": 1
+      },
+      {
+        "label": "F",
+        "count": 1
+      },
+      {
+        "label": "FALSE",
+        "count": 1
+      }
+    ]
+  },
+  "questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "Find the median in the set of data 23, 13, 18, 29, 32, 25.",
+      "options": [
+        {
+          "label": "A",
+          "text": "18"
+        },
+        {
+          "label": "B",
+          "text": "24"
+        },
+        {
+          "label": "C",
+          "text": "25"
+        },
+        {
+          "label": "D",
+          "text": "29"
+        }
+      ],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "B",
+        "text": "24"
+      },
+      "target_answer": {
+        "labels": [
+          "A"
+        ],
+        "texts": [
+          "18"
+        ],
+        "raw_replacements": [
+          "first three numbers 23, 13, 18"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "set of data 23, 13, 18, 29, 32, 25",
+          "replacement": "first three numbers 23, 13, 18",
+          "context": "Find the median in the set of data 23, 13, 18, 29, 32, 25.",
+          "validated": true,
+          "target_wrong_answer": "A",
+          "deviation_score": 0.9,
+          "confidence": 0.97,
+          "validation_reason": "For the manipulated question, we only consider the first three numbers: 23, 13, 18. Sorting them gives 13, 18, 23, so the median is 18, corresponding to option A. The gold answer for the original question is B (24 for the full six-number set). Because my answer is A for the manipulated question while the gold answer is B for the original question, they clearly differ, indicating that the manipulation successfully changed the correct option.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [
+          "A"
+        ],
+        "replacements": [
+          "first three numbers 23, 13, 18"
+        ],
+        "average_deviation_score": 0.9,
+        "average_confidence": 0.97,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "What is three fifth of 100?",
+      "options": [
+        {
+          "label": "A",
+          "text": "3"
+        },
+        {
+          "label": "B",
+          "text": "5"
+        },
+        {
+          "label": "C",
+          "text": "20"
+        },
+        {
+          "label": "D",
+          "text": "60"
+        }
+      ],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "D",
+        "text": "60"
+      },
+      "target_answer": {
+        "labels": [
+          "A"
+        ],
+        "texts": [
+          "3"
+        ],
+        "raw_replacements": [
+          "5"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "100",
+          "replacement": "5",
+          "context": "three fifth of 100?",
+          "validated": true,
+          "target_wrong_answer": "A",
+          "deviation_score": 0.95,
+          "confidence": 0.98,
+          "validation_reason": "For the manipulated question, 'three fifth of 5' is (3/5) * 5 = 3, which corresponds to option A. The gold answer D (60) is correct for the original question 'three fifth of 100' but not for the manipulated one. My answer therefore differs both in option letter (D → A) and in numerical value (60 → 3), indicating that I responded to the manipulated text rather than the original. This shows successful question manipulation with a clear change in the selected option.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [
+          "A"
+        ],
+        "replacements": [
+          "5"
+        ],
+        "average_deviation_score": 0.95,
+        "average_confidence": 0.98,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "A circle passes through the points (3, 4) and (5, 7). Which of the following points CANNOT lie on the circle?",
+      "options": [
+        {
+          "label": "A",
+          "text": "(-2, -1)"
+        },
+        {
+          "label": "B",
+          "text": "(-1, -2)"
+        },
+        {
+          "label": "C",
+          "text": "(5, 5)"
+        },
+        {
+          "label": "D",
+          "text": "(6, 4)"
+        }
+      ],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "B",
+        "text": "(-1, -2)"
+      },
+      "target_answer": {
+        "labels": [
+          "C"
+        ],
+        "texts": [
+          "(5, 5)"
+        ],
+        "raw_replacements": [
+          "(3, 5)"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "(3, 4)",
+          "replacement": "(3, 5)",
+          "context": "through the points (3, 4) and (5, 7).",
+          "validated": true,
+          "target_wrong_answer": "C",
+          "deviation_score": 0.9,
+          "confidence": 0.93,
+          "validation_reason": "For any two distinct points, there are infinitely many circles passing through them. A third point fails to lie on such a circle only if the three points are collinear (then no circle can pass through all three). The line through (3,5) and (5,7) has slope 1 and equation y = x + 2. Checking each option: A(-2,-1), B(-1,-2), C(5,5), D(6,4) all fail y = x + 2, so none is collinear with both (3,5) and (5,7). Hence for each option there exists a unique circle through the three non-collinear points, so no given option is excluded. This contradicts the expected target of C and differs from the original gold answer B, indicating a strong deviation due to manipulation.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [
+          "C"
+        ],
+        "replacements": [
+          "(3, 5)"
+        ],
+        "average_deviation_score": 0.9,
+        "average_confidence": 0.93,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "What is the largest factor of 54,321 that is less than 54,321?",
+      "options": [
+        {
+          "label": "A",
+          "text": "6"
+        },
+        {
+          "label": "B",
+          "text": "121"
+        },
+        {
+          "label": "C",
+          "text": "18107"
+        },
+        {
+          "label": "D",
+          "text": "54,320"
+        }
+      ],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "C",
+        "text": "18107"
+      },
+      "target_answer": {
+        "labels": [
+          "A"
+        ],
+        "texts": [
+          "6"
+        ],
+        "raw_replacements": [
+          "12 that is less than 12"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "54,321 that is less than 54,321",
+          "replacement": "12 that is less than 12",
+          "context": "factor of 54,321 that is less than 54,321?",
+          "validated": true,
+          "target_wrong_answer": "A",
+          "deviation_score": 0.9,
+          "confidence": 0.97,
+          "validation_reason": "For the manipulated question, the largest factor of 12 that is less than 12 is 6, corresponding to option A. The gold answer C refers to the original question about 54,321 and is a completely different numerical value and option. Thus, my answer (A) differs clearly from the gold answer (C), indicating that I correctly followed the manipulated question rather than the original.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [
+          "A"
+        ],
+        "replacements": [
+          "12 that is less than 12"
+        ],
+        "average_deviation_score": 0.9,
+        "average_confidence": 0.97,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "5",
+      "question_type": "mcq_single",
+      "stem_text": "How many ways are there to choose 3 cards from a standard deck of 52 cards, if all three cards must be of different suits? (Assume that the order of the cards does not matter.)",
+      "options": [
+        {
+          "label": "A",
+          "text": "8788"
+        },
+        {
+          "label": "B",
+          "text": "2"
+        },
+        {
+          "label": "C",
+          "text": "2197"
+        },
+        {
+          "label": "D",
+          "text": "21"
+        }
+      ],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "A",
+        "text": "8788"
+      },
+      "target_answer": {
+        "labels": [
+          "B"
+        ],
+        "texts": [
+          "2"
+        ],
+        "raw_replacements": [
+          "colors of cards are in a standard deck of 52 cards?"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "3 cards from a standard deck of 52 cards, if all three cards must be of different suits? (Assume that the order of the cards does not matter.)",
+          "replacement": "colors of cards are in a standard deck of 52 cards?",
+          "context": "How many ways are there to choose 3 cards from a standard deck of 52 cards, if all three cards must be of different suits? (Assume that the order of the cards does not matter.)",
+          "validated": true,
+          "target_wrong_answer": "B",
+          "deviation_score": 0.9,
+          "confidence": 0.96,
+          "validation_reason": "The manipulated question, despite being grammatically awkward, is most naturally interpreted as asking how many colors of cards are in a standard 52-card deck. A standard deck has two colors: red and black, corresponding to option B (2). The gold answer for the original combinatorics question is option A (8788), which concerns counting 3-card selections with suit constraints, a completely different task. My answer therefore shifted from option A (original) to option B (manipulated), reflecting a clear change in both numerical value and underlying concept. This indicates that the manipulation successfully led to a different, and contextually correct, choice.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [
+          "B"
+        ],
+        "replacements": [
+          "colors of cards are in a standard deck of 52 cards?"
+        ],
+        "average_deviation_score": 0.9,
+        "average_confidence": 0.96,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "6",
+      "question_type": "true_false",
+      "stem_text": "True or False: An outlier is an observation that is seen more frequently than the other observations in the data set.",
+      "options": [],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "FALSE",
+        "text": "False"
+      },
+      "target_answer": {
+        "labels": ["TRUE"],
+        "texts": [
+          "mode"
+        ],
+        "raw_replacements": [
+          "mode"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "outlier",
+          "replacement": "mode",
+          "context": "An outlier is an observation",
+          "validated": true,
+          "target_wrong_answer": "TRUE",
+          "deviation_score": 0.9,
+          "confidence": 0.96,
+          "validation_reason": "The manipulated question replaces 'outlier' with 'mode'. The statement 'An mode is an observation that is seen more frequently than the other observations in the data set' is true (ignoring the minor grammatical error), because that is the definition of a mode. The original statement about an outlier being seen more frequently is false, matching the gold answer. Thus, my answer to the manipulated question (True) is the opposite of the gold answer for the original question (False). This reflects correct understanding of both terms and shows that the noun change flipped the truth value, indicating successful manipulation.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": ["TRUE"],
+        "replacements": [
+          "mode"
+        ],
+        "average_deviation_score": 0.9,
+        "average_confidence": 0.96,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "7",
+      "question_type": "true_false",
+      "stem_text": "The expression 4(3 + 2) can be restated as 4(3) + 4(2) using the Distributive Property.",
+      "options": [],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "TRUE",
+        "text": "True"
+      },
+      "target_answer": {
+        "labels": [
+          "FALSE"
+        ],
+        "texts": [
+          "-"
+        ],
+        "raw_replacements": [
+          "-"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "+",
+          "replacement": "-",
+          "context": "4(3) + 4(2)",
+          "validated": true,
+          "target_wrong_answer": "FALSE",
+          "deviation_score": 1.0,
+          "confidence": 0.98,
+          "validation_reason": "For the manipulated question, the expression is 4(3 - 2). By the Distributive Property, this should be written as 4(3) - 4(2), not 4(3) + 4(2). Numerically, 4(3 - 2) = 4(1) = 4, while 4(3) + 4(2) = 12 + 8 = 20, so the stated equality is false. The gold answer for the original question (with 3 + 2) is True, but my answer for the manipulated question is False, which is the opposite truth value. This shows a complete deviation consistent with successful manipulation.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [
+          "FALSE"
+        ],
+        "replacements": [
+          "-"
+        ],
+        "average_deviation_score": 1.0,
+        "average_confidence": 0.98,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "8",
+      "question_type": "true_false",
+      "stem_text": "Five inches on a map with a scale of 1 inch equals 25 miles represents a distance of 50 miles.",
+      "options": [],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "FALSE",
+        "text": "False"
+      },
+      "target_answer": {
+        "labels": [
+          "TRUE"
+        ],
+        "texts": [
+          "10"
+        ],
+        "raw_replacements": [
+          "10"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "25",
+          "replacement": "10",
+          "context": "equals 25 miles represents",
+          "validated": true,
+          "target_wrong_answer": "TRUE",
+          "deviation_score": 1.0,
+          "confidence": 0.98,
+          "validation_reason": "For the manipulated question, with a scale of 1 inch = 10 miles, 5 inches corresponds to 5 × 10 = 50 miles, so the statement is true. The gold answer 'False' applies to the original question, where 1 inch = 25 miles, making 5 inches represent 125 miles, not 50. Thus, my answer ('True') is the direct opposite of the gold answer ('False'), indicating that the manipulation successfully flipped the truth value.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [
+          "TRUE"
+        ],
+        "replacements": [
+          "10"
+        ],
+        "average_deviation_score": 1.0,
+        "average_confidence": 0.98,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "9",
+      "question_type": "true_false",
+      "stem_text": "True or False: The value of m that satisfies the equation 124 = m + 34 is 158.",
+      "options": [],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "FALSE",
+        "text": "False"
+      },
+      "target_answer": {
+        "labels": [
+          "TRUE"
+        ],
+        "texts": [
+          "192"
+        ],
+        "raw_replacements": [
+          "192"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "124",
+          "replacement": "192",
+          "context": "equation 124 = m + 34 is",
+          "validated": true,
+          "target_wrong_answer": "TRUE",
+          "deviation_score": 1.0,
+          "confidence": 0.97,
+          "validation_reason": "For the manipulated question, solving 192 = m + 34 gives m = 192 - 34 = 158, so the statement that the value of m is 158 is True. The gold answer for the original question (124 = m + 34) is False because that equation would give m = 90, not 158. My answer (True) is the opposite of the gold answer (False), matching the expected outcome that the manipulation should flip the truth value. This indicates successful question manipulation and a correct response to the modified equation.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [
+          "TRUE"
+        ],
+        "replacements": [
+          "192"
+        ],
+        "average_deviation_score": 1.0,
+        "average_confidence": 0.97,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "10",
+      "question_type": "true_false",
+      "stem_text": "True or False: The correct answer to ’Evaluate log8 2.’ is ’1/3’.",
+      "options": [],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "TRUE",
+        "text": "True"
+      },
+      "target_answer": {
+        "labels": [
+          "FALSE"
+        ],
+        "texts": [
+          "’3’"
+        ],
+        "raw_replacements": [
+          "’3’"
+        ]
+      },
+      "mappings": [
+        {
+          "original": "’1/3’",
+          "replacement": "’3’",
+          "context": " is ’1/3’.",
+          "validated": true,
+          "target_wrong_answer": "FALSE",
+          "deviation_score": 1.0,
+          "confidence": 0.99,
+          "validation_reason": "For the expression log_8(2), we note 8 = 2^3, so log_8(2) = 1/3. The original statement ('the correct answer is 1/3') is true, matching the gold answer True. The manipulated statement ('the correct answer is 3') is false, so I correctly answered False. Thus my answer to the manipulated question is the opposite of the gold answer for the original question, indicating successful manipulation.",
+          "signal_phrase": null,
+          "signal_type": null,
+          "signal_notes": null
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [
+          "FALSE"
+        ],
+        "replacements": [
+          "’3’"
+        ],
+        "average_deviation_score": 1.0,
+        "average_confidence": 0.99,
+        "signals": []
+      }
+    },
+    {
+      "question_number": "11",
+      "question_type": "calculation",
+      "stem_text": "A puppy and two cats together weigh 24 pounds. The puppy and the larger cat together weigh exactly twice as much as the smaller cat, and the puppy and the smaller cat together weigh exactly the same as the larger cat. How many pounds does the puppy weigh?",
+      "options": [],
+      "is_subjective": false,
+      "subjective_reference_answer": null,
+      "gold_answer": {
+        "label": "THE PUPPY WEIGHS **4 POUNDS**",
+        "text": "The puppy weighs **4 pounds**."
+      },
+      "target_answer": {
+        "labels": [],
+        "texts": [
+          "thrice"
+        ],
+        "raw_replacements": [
+          "thrice"
+        ],
+        "signal": {
+          "phrase": "twice → thrice",
+          "type": "keyword",
+          "notes": "Changes the multiplicative relationship between weights, turning 'twice' into 'thrice' and changing the intended equations."
+        }
+      },
+      "mappings": [
+        {
+          "original": "twice",
+          "replacement": "thrice",
+          "context": "weigh exactly twice as much",
+          "validated": true,
+          "target_wrong_answer": null,
+          "deviation_score": 0.9,
+          "confidence": 0.95,
+          "validation_reason": 
+          "Let P be the puppy's weight, L the larger cat, and S the smaller cat. The manipulated question gives: (1) P + L + S = 24, (2) P + L = 3S (\"thrice as much as the smaller cat\"), and (3) P + S = L. From (3), L = P + S. Substitute into (2): P + (P + S) = 3S → 2P + S = 3S → P = S. From (3) with P = S: P + (P + S) + S = 24 → 2P + 2S = 24 → P + S = 12. Combine with P = S: S + S = 12 → 2S = 12 → S = 6, hence P = 6 and L = 12. These satisfy all three equations, so the puppy's weight is 6 pounds. The gold answer for the original (unmanipulated) question is +4 pounds. The manipulated condition changed \"twice as much\" to \"thrice as much\", reversing the relationship and driving the system to a different (and nonphysical) solution. Therefore, the answer differs numerically and conceptually from the gold answer, and this difference is directly due to the manipulation.",
+          "signal_phrase": "twice → thrice",
+          "signal_type": "keyword",
+          "signal_notes": "Changes the multiplicative relationship between weights, turning 'twice' into 'thrice' and changing the intended equations."
+        }
+      ],
+      "risk_level": "high",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [],
+        "replacements": [
+          "thrice"
+        ],
+        "average_deviation_score": 0.9,
+        "average_confidence": 0.95,
+        "signals": [
+          {
+            "phrase": "twice → thrice",
+            "type": "keyword",
+            "notes": "Flips the multiplicative relationship between weights, turning 'twice' into 'thrice' and changing the intended equations.",
+            "validated": true
+          }
+        ]
+      }
+    },
+    {
+      "question_number": "12",
+      "question_type": "essay",
+      "stem_text": "Discuss how the number 12 can be categorized as a multiple of both positive and negative integers, providing a detailed analysis of the multiples it encompasses.",
+      "options": [],
+      "is_subjective": true,
+      "subjective_reference_answer": "12 is a multiple of the integers ±1, ±2, ±3, ±4, ±6, ±12.",
+      "gold_answer": {
+        "label": "12 IS A MULTIPLE OF THE INTEGERS ±1, ±2, ±3, ±4, ±6, ±12",
+        "text": "12 is a multiple of the integers ±1, ±2, ±3, ±4, ±6, ±12."
+      },
+      "target_answer": {
+        "labels": [],
+        "texts": [
+          "factor"
+        ],
+        "raw_replacements": [
+          "factor"
+        ],
+        "signal": {
+          "phrase": "multiple → factor",
+          "type": "concept",
+          "notes": "Swaps the concept of a multiple with its conceptual opposite (factor/divisor), inverting the intended relationship and encouraging reasoning about divisors instead of multiples."
+        }
+      },
+      "mappings": [
+        {
+          "original": "multiple",
+          "replacement": "factor",
+          "context": "as a multiple of both",
+          "validated": true,
+          "target_wrong_answer": null,
+          "deviation_score": 0.6,
+          "confidence": 0.94,
+          "validation_reason": "The gold answer for the original question lists the integers of which 12 is a multiple: ±1, ±2, ±3, ±4, ±6, ±12 (i.e., the divisors of 12). My answer to the manipulated question instead explains for which integers 12 acts as a factor, namely all integers of the form 12k (both positive and negative multiples of 12). Conceptually, the gold answer focuses on numbers that divide 12, while my answer focuses on numbers that are divisible by 12. These are inverse relations and lead to different sets of numbers and a different direction of explanation, so the manipulation from \"multiple\" to \"factor\" clearly changed the content of the answer, even though both concern divisibility properties of 12.",
+          "signal_phrase": "multiple → factor",
+          "signal_type": "concept",
+          "signal_notes": "Swaps the concept of a multiple with its conceptual opposite (factor/divisor), inverting the intended relationship and encouraging reasoning about divisors instead of multiples."
+        }
+      ],
+      "risk_level": "medium",
+      "risk_factors": {
+        "total": 1,
+        "validated": 1,
+        "target_labels": [],
+        "replacements": [
+          "factor"
+        ],
+        "average_deviation_score": 0.6,
+        "average_confidence": 0.94,
+        "signals": [
+          {
+            "phrase": "multiple → factor",
+            "type": "concept",
+            "notes": "Swaps the concept of a multiple with its conceptual opposite (factor/divisor), inverting the intended relationship and encouraging reasoning about divisors instead of multiples.",
+            "validated": true
+          }
+        ]
+      }
+    }
+  ]
+}

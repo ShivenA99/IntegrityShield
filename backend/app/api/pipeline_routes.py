@@ -8,7 +8,7 @@ import shutil
 import copy
 from typing import Any, Dict, Optional
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, jsonify, request, send_file
 from werkzeug.datastructures import FileStorage
 
 from ..models import PipelineRun, PipelineStage, QuestionManipulation, AnswerSheetRun
@@ -37,12 +37,76 @@ from ..utils.storage_paths import (
 from ..utils.time import isoformat, utc_now
 from sqlalchemy.orm import selectinload
 
+try:  # Optional dependency for thumbnails
+    import fitz  # type: ignore
+except Exception:  # noqa: BLE001
+    fitz = None
+
 
 bp = Blueprint("pipeline", __name__, url_prefix="/pipeline")
 
 
 def init_app(api_bp: Blueprint) -> None:
     api_bp.register_blueprint(bp)
+
+
+def _pipeline_thumbnail_path(run_id: str, kind: str) -> Path:
+    return run_directory(run_id) / f"{kind}_thumb.png"
+
+
+def _resolve_pdf_for_thumbnail(run: PipelineRun, kind: str) -> Optional[Path]:
+    structured = run.structured_data or {}
+    document_info = structured.get("document") or {}
+    answer_key_info = structured.get("answer_key") or {}
+
+    if kind == "input":
+        if run.original_pdf_path:
+            return Path(run.original_pdf_path)
+        source_path = document_info.get("source_path")
+        return Path(source_path) if source_path else None
+
+    if kind == "answer":
+        candidates = [
+            document_info.get("answer_key_path"),
+            answer_key_info.get("source_pdf"),
+        ]
+        for candidate in candidates:
+            if candidate:
+                path = Path(candidate)
+                if path.exists():
+                    return path
+        return None
+
+    if kind == "attacked":
+        for enhanced in run.enhanced_pdfs or []:
+            candidate = enhanced.file_path
+            if candidate:
+                path = Path(candidate)
+                if path.exists():
+                    return path
+        return None
+
+    return None
+
+
+def _generate_thumbnail(pdf_path: Path, thumb_path: Path) -> bool:
+    if fitz is None:
+        return False
+    try:
+        with fitz.open(pdf_path) as doc:  # type: ignore[call-arg]
+            if doc.page_count == 0:
+                return False
+            page = doc.load_page(0)
+            matrix = fitz.Matrix(0.6, 0.6)  # type: ignore[attr-defined]
+            pix = page.get_pixmap(matrix=matrix, alpha=False)
+            pix.save(thumb_path)
+        return True
+    except Exception as exc:  # noqa: BLE001
+        current_app.logger.warning(
+            "Failed to generate pipeline thumbnail",
+            extra={"run_id": thumb_path.parent.name, "pdf_path": str(pdf_path), "error": str(exc)},
+        )
+        return False
 
 
 def _serialize_classroom(classroom: AnswerSheetRun) -> dict:
@@ -525,6 +589,36 @@ def get_status(run_id: str):
             },
         }
     )
+
+
+@bp.get("/<run_id>/pdf/<kind>/thumbnail")
+def get_pipeline_pdf_thumbnail(run_id: str, kind: str):
+    target_kind = (kind or "input").lower()
+    if target_kind not in {"input", "answer", "attacked"}:
+        return jsonify({"error": "unknown_pdf_kind"}), HTTPStatus.NOT_FOUND
+    run = (
+        PipelineRun.query.options(selectinload(PipelineRun.enhanced_pdfs))
+        .filter_by(id=run_id)
+        .one_or_none()
+    )
+    if not run:
+        return jsonify({"error": "pipeline_run_not_found"}), HTTPStatus.NOT_FOUND
+    pdf_path = _resolve_pdf_for_thumbnail(run, target_kind)
+    if not pdf_path or not pdf_path.exists():
+        return jsonify({"error": "file_not_found"}), HTTPStatus.NOT_FOUND
+    thumb_path = _pipeline_thumbnail_path(run_id, target_kind)
+    needs_refresh = (
+        not thumb_path.exists()
+        or thumb_path.stat().st_mtime < pdf_path.stat().st_mtime
+    )
+    if needs_refresh:
+        if fitz is None:
+            return jsonify({"error": "thumbnail_not_supported"}), HTTPStatus.SERVICE_UNAVAILABLE
+        thumb_path.parent.mkdir(parents=True, exist_ok=True)
+        generated = _generate_thumbnail(pdf_path, thumb_path)
+        if not generated or not thumb_path.exists():
+            return jsonify({"error": "thumbnail_unavailable"}), HTTPStatus.NOT_FOUND
+    return send_file(thumb_path, mimetype="image/png")
 
 
 @bp.patch("/<run_id>/config")
