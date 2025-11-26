@@ -32,7 +32,9 @@ export const DemoRunProvider: React.FC<{ children?: React.ReactNode }> = ({ chil
   const location = useLocation();
 
   useEffect(() => {
-    if (!location.pathname.startsWith("/demo")) {
+    const allowedPrefixes = ["/demo", "/classrooms"];
+    const isAllowed = allowedPrefixes.some((prefix) => location.pathname.startsWith(prefix));
+    if (!isAllowed) {
       setDemoRun(null);
     }
   }, [location.pathname]);

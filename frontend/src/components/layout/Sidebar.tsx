@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 import {
   History,
@@ -28,6 +28,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
+  const location = useLocation();
   const { activeRunId, status } = usePipeline();
   const { demoRun } = useDemoRun();
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
@@ -145,6 +146,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
   const documentTitle = documentFilename ?? (isReady ? "Processing assessment…" : "—");
   const runTitle = isDemoActive ? demoRun?.runId ?? "Demo assessment" : activeRunId ?? "Upload an assessment to begin";
 
+  const hideRunCard = location.pathname.startsWith("/classrooms");
+
   return (
     <aside className={["app-sidebar", collapsed ? "app-sidebar--collapsed" : ""].join(" ").trim()}>
       <div className="app-sidebar__inner">
@@ -164,7 +167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
           </button>
         </div>
 
-        {!collapsed ? (
+        {!collapsed && !hideRunCard ? (
           <div className="app-sidebar__run-card">
             <div className="app-sidebar__run-heading">
               <span className="app-sidebar__run-title">Active assessment</span>

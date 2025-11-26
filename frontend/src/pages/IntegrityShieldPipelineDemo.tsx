@@ -1681,6 +1681,9 @@ const IntegrityShieldPipelineDemo: React.FC = () => {
     }
     navigate(`/demo/pipeline/${upcomingStage.id}`);
   }, [manipulationState, navigate, reportState, resolvedStage]);
+  const handleProceedToClassrooms = React.useCallback(() => {
+    navigate("/classrooms");
+  }, [navigate]);
 
   const renderStageContent = () => {
     if (resolvedStage.id === "ingestion") {
@@ -2107,7 +2110,7 @@ const IntegrityShieldPipelineDemo: React.FC = () => {
             </button>
           </div>
           <div className="ishield-demo__top-actions-right">
-            <button className="pill-button ishield-demo__classroom-btn">
+            <button className="pill-button ishield-demo__classroom-btn" onClick={handleProceedToClassrooms}>
               <Layers size={14} />
               <span>Proceed to classroom</span>
               <ChevronRight size={14} />
