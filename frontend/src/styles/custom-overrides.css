@@ -1,0 +1,325 @@
+/*
+ * IntegrityShield Custom Overrides
+ *
+ * This file replaces 8,357 lines of CSS (global.css + light-theme.css)
+ * with only what InstUI can't provide out-of-the-box.
+ *
+ * IMPORTANT: Minimize additions here. Most styling should come from InstUI components.
+ */
+
+@import './theme-tokens.css';
+
+/* ========================================
+   RESET AND BASE
+   ======================================== */
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: var(--is-font-family-sans);
+  background: var(--is-color-bg-primary);
+  color: var(--is-color-text-primary);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.is-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.is-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.is-text-center {
+  text-align: center;
+}
+
+.is-text-right {
+  text-align: right;
+}
+
+.is-flex {
+  display: flex;
+}
+
+.is-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.is-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.is-grid {
+  display: grid;
+}
+
+/* ========================================
+   CUSTOM STATUS PILLS
+   (InstUI Pill doesn't support all our status types)
+   ======================================== */
+
+.is-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--is-space-2xs);
+  padding: var(--is-space-3xs) var(--is-space-sm);
+  border-radius: var(--is-radius-full);
+  font-size: var(--is-font-size-sm);
+  font-weight: var(--is-font-weight-medium);
+  line-height: var(--is-line-height-normal);
+  white-space: nowrap;
+}
+
+.is-status-pill--pending {
+  background: var(--is-color-info-light);
+  color: var(--is-color-info);
+}
+
+.is-status-pill--running {
+  background: var(--is-color-brand-light);
+  color: var(--is-color-brand-primary);
+}
+
+.is-status-pill--completed {
+  background: var(--is-color-success-light);
+  color: var(--is-color-success);
+}
+
+.is-status-pill--failed {
+  background: var(--is-color-danger-light);
+  color: var(--is-color-danger);
+}
+
+.is-status-pill--paused {
+  background: var(--is-color-warning-light);
+  color: var(--is-color-warning);
+}
+
+/* ========================================
+   LOADING ANIMATIONS
+   ======================================== */
+
+@keyframes is-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.is-spin {
+  animation: is-spin 1s linear infinite;
+}
+
+@keyframes is-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.is-pulse {
+  animation: is-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes is-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-25%);
+  }
+}
+
+.is-bounce {
+  animation: is-bounce 1s infinite;
+}
+
+/* ========================================
+   FOCUS INDICATORS (Accessibility)
+   ======================================== */
+
+*:focus-visible {
+  outline: 2px solid var(--is-color-brand-primary);
+  outline-offset: 2px;
+}
+
+/* Ensure InstUI components don't override our focus styles */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--is-color-brand-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   SMOOTH SCROLLING
+   ======================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION (Accessibility)
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ========================================
+   CUSTOM SCROLLBAR (Webkit browsers only)
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--is-color-bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--is-color-border-default);
+  border-radius: var(--is-radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--is-color-border-strong);
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+
+  img {
+    max-width: 100% !important;
+  }
+
+  @page {
+    margin: 2cm;
+  }
+
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}
+
+/* ========================================
+   TRANSITION UTILITIES
+   ======================================== */
+
+.is-transition-all {
+  transition: all var(--is-transition-base);
+}
+
+.is-transition-colors {
+  transition: background-color var(--is-transition-base),
+              color var(--is-transition-base),
+              border-color var(--is-transition-base);
+}
+
+.is-transition-fast {
+  transition-duration: var(--is-transition-fast);
+}
+
+.is-transition-slow {
+  transition-duration: var(--is-transition-slow);
+}
+
+/* ========================================
+   BACKDROP UTILITIES
+   ======================================== */
+
+.is-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--is-z-modal-backdrop);
+}
+
+.is-backdrop--light {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.is-backdrop--dark {
+  background: rgba(0, 0, 0, 0.7);
+}

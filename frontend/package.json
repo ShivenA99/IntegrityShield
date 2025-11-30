@@ -9,12 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@instructure/canvas-theme": "^10.26.4",
+    "@instructure/emotion": "^10.26.4",
+    "@instructure/ui": "^10.26.4",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "lucide-react": "^0.473.0",
     "pdfjs-dist": "^5.4.394",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-router-dom": "^7.1.1",
     "recharts": "^2.11.0",
     "swr": "^2.2.6",
@@ -22,8 +25,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/react": "^18.2.75",
+    "@types/react-dom": "^18.2.24",
     "@vitejs/plugin-react": "^5.0.3",
     "autoprefixer": "^10.4.20",
     "playwright": "^1.56.1",
