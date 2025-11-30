@@ -19,7 +19,8 @@
       "@pages/*": ["pages/*"],
       "@styles/*": ["styles/*"],
       "@constants/*": ["constants/*"],
-      "@data/*": ["data/*"]
+      "@data/*": ["data/*"],
+      "@layout/*": ["layout/*"]
     }
   },
   "include": ["src"],

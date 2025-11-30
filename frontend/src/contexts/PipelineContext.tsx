@@ -32,7 +32,12 @@ interface PipelineContextValue {
     runId?: string,
     options?: { quiet?: boolean; retries?: number; retryDelayMs?: number }
   ) => Promise<void>;
-  startPipeline: (payload: { file?: File; answerKeyFile?: File; config?: Partial<StartPipelineConfig> }) => Promise<string | null>;
+  startPipeline: (payload: {
+    file?: File;
+    answerKeyFile?: File;
+    config?: Partial<StartPipelineConfig>;
+    apiKey?: string;
+  }) => Promise<string | null>;
   resumeFromStage: (runId: string, stage: PipelineStageName, options?: { targetStages?: PipelineStageName[] }) => Promise<void>;
   deleteRun: (runId: string) => Promise<void>;
   resetActiveRun: (options?: { softDelete?: boolean }) => Promise<void>;
@@ -125,7 +130,17 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
   );
 
   const startPipeline = useCallback(
-    async ({ file, answerKeyFile, config }: { file?: File; answerKeyFile?: File; config?: Partial<StartPipelineConfig> }) => {
+    async ({
+      file,
+      answerKeyFile,
+      config,
+      apiKey,
+    }: {
+      file?: File;
+      answerKeyFile?: File;
+      config?: Partial<StartPipelineConfig>;
+      apiKey?: string;
+    }) => {
       setIsLoading(true);
       setError(null);
       try {
@@ -150,6 +165,9 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
         }
         if (config?.parallelProcessing !== undefined) {
           formData.append("parallel_processing", String(config.parallelProcessing));
+        }
+        if (apiKey) {
+          formData.append("openai_api_key", apiKey);
         }
 
         const { run_id } = await pipelineApi.startPipeline(formData);
