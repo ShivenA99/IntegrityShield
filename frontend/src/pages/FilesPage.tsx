@@ -1,0 +1,203 @@
+import React, { useMemo, useState } from "react";
+import clsx from "clsx";
+import { Button } from "@instructure/ui-buttons";
+import { Table } from "@instructure/ui-table";
+import { ScreenReaderContent } from "@instructure/ui-a11y-content";
+
+import LTIShell from "@layout/LTIShell";
+import ArtifactPreviewModal, { ArtifactPreview } from "@components/shared/ArtifactPreviewModal";
+import { usePipeline } from "@hooks/usePipeline";
+import { ENHANCEMENT_METHOD_LABELS } from "@constants/enhancementMethods";
+
+interface ArtifactRow extends ArtifactPreview {
+  category: "original" | "shielded" | "assessment" | "report";
+}
+
+const FILTERS = [
+  { id: "all", label: "All files" },
+  { id: "assessments", label: "Assessments" },
+  { id: "shielded", label: "Shielded" },
+  { id: "reports", label: "Reports" },
+] as const;
+
+const FilesPage: React.FC = () => {
+  const { status } = usePipeline();
+  const [selected, setSelected] = useState<ArtifactPreview | null>(null);
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
+
+  const artifactRows = useMemo<ArtifactRow[]>(() => {
+    if (!status?.structured_data) return [];
+    const structured = status.structured_data as Record<string, any>;
+    const manipulation = (structured.manipulation_results as Record<string, any>) ?? {};
+    const reports = (structured.reports as Record<string, any>) ?? {};
+    const documentInfo = structured.document as Record<string, any>;
+
+    const rows: ArtifactRow[] = [];
+    if (documentInfo?.original_path) {
+      rows.push({
+        key: "original",
+        label: "Original",
+        kind: "assessment",
+        category: "original",
+        status: "completed",
+        relativePath: documentInfo.original_path,
+        sizeBytes: documentInfo.size_bytes,
+        variant: null,
+        method: null,
+      });
+    }
+    const enhanced = (manipulation.enhanced_pdfs as Record<string, any>) ?? {};
+    Object.entries(enhanced).forEach(([method, meta]) => {
+      if (!meta) return;
+      rows.push({
+        key: `shielded-${method}`,
+        label: "Shielded",
+        kind: "assessment",
+        category: "shielded",
+        variant: ENHANCEMENT_METHOD_LABELS[method as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? method.replace(/_/g, " "),
+        method: ENHANCEMENT_METHOD_LABELS[method as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? method.replace(/_/g, " "),
+        status: meta.relative_path ? "completed" : "pending",
+        relativePath: meta.relative_path || meta.path || meta.file_path,
+        sizeBytes: meta.size_bytes ?? meta.file_size_bytes,
+      });
+    });
+    if (reports.vulnerability) {
+      rows.push({
+        key: "vulnerability",
+        label: "Vulnerability",
+        kind: "report",
+        category: "report",
+        status: reports.vulnerability.artifact ? "completed" : "pending",
+        relativePath: reports.vulnerability.artifact,
+        sizeBytes: reports.vulnerability.output_files?.size_bytes,
+        method: null,
+        variant: null,
+      });
+    }
+    if (manipulation.detection_report) {
+      rows.push({
+        key: "detection",
+        label: "Detection",
+        kind: "report",
+        category: "report",
+        status: manipulation.detection_report.relative_path ? "completed" : "pending",
+        relativePath:
+          manipulation.detection_report.relative_path ||
+          manipulation.detection_report.output_files?.json ||
+          manipulation.detection_report.file_path,
+        sizeBytes: manipulation.detection_report.output_files?.size_bytes,
+        method: null,
+        variant: null,
+      });
+    }
+    const evaluations = (reports.evaluation as Record<string, any>) ?? {};
+    Object.entries(evaluations).forEach(([method, meta]) => {
+      rows.push({
+        key: `evaluation-${method}`,
+        label: "Evaluation",
+        kind: "report",
+        category: "report",
+        variant: ENHANCEMENT_METHOD_LABELS[method as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? method.replace(/_/g, " "),
+        method: ENHANCEMENT_METHOD_LABELS[method as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? method.replace(/_/g, " "),
+        status: meta.artifact ? "completed" : "pending",
+        relativePath: meta.artifact,
+        sizeBytes: meta.output_files?.size_bytes,
+      });
+    });
+    return rows;
+  }, [status?.structured_data]);
+
+  const filteredRows = useMemo(() => {
+    switch (filter) {
+      case "assessments":
+        return artifactRows.filter((row) => row.kind === "assessment");
+      case "shielded":
+        return artifactRows.filter((row) => row.category === "shielded");
+      case "reports":
+        return artifactRows.filter((row) => row.kind === "report");
+      default:
+        return artifactRows;
+    }
+  }, [artifactRows, filter]);
+
+  const formatSize = (bytes?: number | null) => {
+    if (!bytes) return "—";
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  return (
+    <LTIShell title="Files" subtitle="Browse the latest artifacts generated by IntegrityShield.">
+      <div className="canvas-card">
+        <div className="table-header">
+          <div>
+            <h2>Artifacts</h2>
+            <p>{artifactRows.length ? `${artifactRows.length} files from the active run.` : "No files found for the active run."}</p>
+          </div>
+          <div className="filter-tabs">
+            {FILTERS.map((entry) => (
+              <Button
+                key={entry.id}
+                color={filter === entry.id ? "primary" : "secondary"}
+                withBackground={filter === entry.id}
+                size="small"
+                onClick={() => setFilter(entry.id)}
+              >
+                {entry.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+        {filteredRows.length ? (
+          <Table hover caption={<ScreenReaderContent>Artifacts table</ScreenReaderContent>}>
+            <Table.Head>
+              <Table.Row>
+                <Table.ColHeader id="artifact-name">Name</Table.ColHeader>
+                <Table.ColHeader id="artifact-type">Type</Table.ColHeader>
+                <Table.ColHeader id="artifact-variant">Variant</Table.ColHeader>
+                <Table.ColHeader id="artifact-status">Status</Table.ColHeader>
+                <Table.ColHeader id="artifact-size">Size</Table.ColHeader>
+                <Table.ColHeader id="artifact-actions">Actions</Table.ColHeader>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {filteredRows.map((row) => (
+                <Table.Row key={row.key}>
+                  <Table.Cell>{row.label}</Table.Cell>
+                  <Table.Cell>{row.kind === "assessment" ? "Assessment" : "Report"}</Table.Cell>
+                  <Table.Cell>{row.variant ?? row.method ?? "—"}</Table.Cell>
+                  <Table.Cell>
+                    <span className={["status-pill", row.status === "completed" ? "completed" : row.status === "failed" ? "failed" : "running"].join(" ")}>
+                      {row.status}
+                    </span>
+                  </Table.Cell>
+                  <Table.Cell>{formatSize(row.sizeBytes)}</Table.Cell>
+                  <Table.Cell>
+                    <div className="table-actions">
+                      <Button color="secondary" withBackground={false} interaction={!row.relativePath ? "disabled" : "enabled"} onClick={() => setSelected(row)}>
+                        Preview
+                      </Button>
+                      <Button
+                        color="secondary"
+                        withBackground={false}
+                        href={row.relativePath ? `/api/files/${status?.run_id}/${row.relativePath}` : undefined}
+                        interaction={!row.relativePath ? "disabled" : "enabled"}
+                        download
+                      >
+                        Download
+                      </Button>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        ) : (
+          <p className="table-empty">No artifacts available yet. Start a run to generate shielded assessments and reports.</p>
+        )}
+      </div>
+      <ArtifactPreviewModal artifact={selected} runId={status?.run_id} onClose={() => setSelected(null)} />
+    </LTIShell>
+  );
+};
+
+export default FilesPage;
