@@ -43,6 +43,9 @@ class PipelineConfig:
     skip_if_exists: bool = True
     parallel_processing: bool = True
     mapping_strategy: str = "unicode_steganography"
+    mode: str = "detection"
+    auto_vulnerability_report: bool = False
+    auto_evaluation_reports: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -52,6 +55,9 @@ class PipelineConfig:
             "skip_if_exists": self.skip_if_exists,
             "parallel_processing": self.parallel_processing,
             "mapping_strategy": self.mapping_strategy,
+            "mode": self.mode,
+            "auto_vulnerability_report": self.auto_vulnerability_report,
+            "auto_evaluation_reports": self.auto_evaluation_reports,
         }
 
 
@@ -86,8 +92,13 @@ class PipelineOrchestrator:
             return
 
         raw_targets = list(config.target_stages or [])
+        self.logger.info(f"[{run_id}] execute_pipeline - config.target_stages: {config.target_stages}")
+        self.logger.info(f"[{run_id}] execute_pipeline - raw_targets: {raw_targets}")
+        self.logger.info(f"[{run_id}] execute_pipeline - config.skip_if_exists: {config.skip_if_exists}")
+
         if not raw_targets or "all" in raw_targets:
             target_stage_sequence = [stage for stage in self.pipeline_order]
+            self.logger.info(f"[{run_id}] Using default pipeline_order: {[s.value for s in target_stage_sequence]}")
         else:
             target_stage_sequence = []
             seen: set[PipelineStageEnum] = set()
@@ -112,11 +123,16 @@ class PipelineOrchestrator:
 
         executed_stages: list[PipelineStageEnum] = []
 
+        self.logger.info(f"[{run_id}] target_stage_sequence: {[s.value for s in target_stage_sequence]}")
+
         for stage in target_stage_sequence:
+            self.logger.info(f"[{run_id}] Checking stage: {stage.value}, skip_if_exists={config.skip_if_exists}")
             if config.skip_if_exists and self._stage_already_completed(run_id, stage.value):
+                self.logger.info(f"[{run_id}] Skipping {stage.value} - already completed")
                 live_logging_service.emit(run_id, stage.value, "INFO", "Stage already completed, skipping")
                 continue
 
+            self.logger.info(f"[{run_id}] Executing stage: {stage.value}")
             try:
                 await self._execute_stage(run_id, stage, config)
                 executed_stages.append(stage)
@@ -198,6 +214,9 @@ class PipelineOrchestrator:
 
         db.session.commit()
 
+        # Auto-generate reports after stage completion (if configured)
+        self._auto_generate_reports_for_stage(run_id, stage, config)
+
         # Sync mappings to structured.json after smart_substitution completes
         # This ensures any manually generated mappings are synced to structured.json
         if stage == PipelineStageEnum.SMART_SUBSTITUTION:
@@ -228,3 +247,65 @@ class PipelineOrchestrator:
     def _stage_already_completed(self, run_id: str, stage_name: str) -> bool:
         stage = PipelineStageModel.query.filter_by(pipeline_run_id=run_id, stage_name=stage_name).first()
         return stage is not None and stage.status == "completed"
+
+    def _auto_generate_reports_for_stage(self, run_id: str, stage: PipelineStageEnum, config: PipelineConfig) -> None:
+        """Auto-generate reports after specific stages complete (if configured)."""
+        run = PipelineRun.query.get(run_id)
+        if not run:
+            return
+
+        pipeline_config = run.pipeline_config or {}
+        auto_vuln_report = pipeline_config.get("auto_vulnerability_report", False)
+        auto_eval_reports = pipeline_config.get("auto_evaluation_reports", False)
+
+        # Vulnerability report: after smart_reading (reconstruction complete)
+        if stage == PipelineStageEnum.SMART_READING and auto_vuln_report:
+            try:
+                from ...reports.vulnerability_report_service import VulnerabilityReportService
+                self.logger.info(f"[{run_id}] Auto-generating vulnerability report after smart_reading")
+                vuln_service = VulnerabilityReportService()
+                vuln_service.generate(run_id)
+                self.logger.info(f"[{run_id}] Vulnerability report generated successfully")
+            except Exception as e:
+                self.logger.warning(
+                    f"[{run_id}] Failed to auto-generate vulnerability report: {e}",
+                    exc_info=True
+                )
+                # Non-blocking: Continue pipeline even if report fails
+
+        # Detection report: after smart_substitution (mapping validation complete)
+        if stage == PipelineStageEnum.SMART_SUBSTITUTION and auto_vuln_report:
+            try:
+                from ...reports.detection_report_service import DetectionReportService
+                self.logger.info(f"[{run_id}] Auto-generating detection report after smart_substitution")
+                detection_service = DetectionReportService()
+                detection_service.generate(run_id)
+                self.logger.info(f"[{run_id}] Detection report generated successfully")
+            except Exception as e:
+                self.logger.warning(
+                    f"[{run_id}] Failed to auto-generate detection report: {e}",
+                    exc_info=True
+                )
+                # Non-blocking: Continue pipeline even if report fails
+
+        # Evaluation reports: after pdf_creation (PDFs created)
+        if stage == PipelineStageEnum.PDF_CREATION and auto_eval_reports:
+            enhancement_methods = pipeline_config.get("enhancement_methods", [])
+            self.logger.info(
+                f"[{run_id}] Auto-generating {len(enhancement_methods)} evaluation reports after pdf_creation"
+            )
+
+            from ...reports.evaluation_report_service import EvaluationReportService
+            eval_service = EvaluationReportService()
+
+            for method in enhancement_methods:
+                try:
+                    self.logger.info(f"[{run_id}] Generating evaluation report for method: {method}")
+                    eval_service.generate(run_id, method=method)
+                    self.logger.info(f"[{run_id}] Evaluation report for {method} generated successfully")
+                except Exception as e:
+                    self.logger.warning(
+                        f"[{run_id}] Failed to generate evaluation report for {method}: {e}",
+                        exc_info=True
+                    )
+                    # Non-blocking: Continue with other methods even if one fails

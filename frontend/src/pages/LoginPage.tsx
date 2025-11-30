@@ -110,7 +110,7 @@ const LoginPage: React.FC = () => {
           ))}
         </div>
         <span className={clsx("connection-banner", connectionHealthy ? "is-online" : "is-offline")}>
-          {connectionHealthy ? "Pipeline API reachable" : "Pipeline API unreachable — check server"}
+          {connectionHealthy ? "API reachable" : "API unreachable — check server"}
         </span>
         {currentStep === 1 ? (
           <section className="canvas-card wizard-card">

@@ -53,4 +53,5 @@ class ResultsGenerationService:
             db.session.add(run)
             db.session.commit()
 
+        # Auto-report generation now handled by orchestrator post-stage hooks
         return summary

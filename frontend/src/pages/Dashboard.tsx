@@ -1,33 +1,47 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import clsx from "clsx";
-import { Loader2, RefreshCcw, Shield, UploadCloud } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { Loader2, RefreshCcw, Shield, Eye, X, CheckCircle2, AlertTriangle, Clock } from "lucide-react";
 
 import LTIShell from "@layout/LTIShell";
 import ArtifactPreviewModal, { ArtifactPreview } from "@components/shared/ArtifactPreviewModal";
+import { PageSection } from "@components/layout/PageSection";
+import { StatusPill } from "@components/shared/StatusPill";
+import { ProgressBar } from "@components/shared/ProgressBar";
+import { FileUploadField } from "@components/shared/FileUploadField";
 import { Button } from "@instructure/ui-buttons";
 import { Table } from "@instructure/ui-table";
 import { ScreenReaderContent } from "@instructure/ui-a11y-content";
+import { Grid } from "@instructure/ui-grid";
+import { Flex } from "@instructure/ui-flex";
+import { View } from "@instructure/ui-view";
+import { Text } from "@instructure/ui-text";
 import { usePipeline } from "@hooks/usePipeline";
+import { usePipelineContext } from "@contexts/PipelineContext";
 import { useNotifications } from "@contexts/NotificationContext";
 import { validatePdfFile } from "@services/utils/validators";
-import { listRuns, updatePipelineConfig } from "@services/api/pipelineApi";
+import { updatePipelineConfig } from "@services/api/pipelineApi";
 import type { CorePipelineStageName } from "@services/types/pipeline";
 import { ENHANCEMENT_METHOD_LABELS } from "@constants/enhancementMethods";
 
 type ModeOption = "detection" | "prevention";
 
-const MODE_PRESETS: Record<ModeOption, { label: string; methods: string[] }> = {
-  detection: { label: "Detection", methods: ["latex_dual_layer", "latex_font_attack", "pymupdf_overlay"] },
-  prevention: { label: "Prevention", methods: ["latex_icw", "latex_icw_dual_layer", "latex_icw_font_attack", "pymupdf_overlay"] },
+const MODE_PRESETS: Record<ModeOption, { label: string; description: string }> = {
+  detection: {
+    label: "Detection",
+    description: "5 LaTeX-based detection variants to test mapping effectiveness",
+  },
+  prevention: {
+    label: "Prevention",
+    description: "3 prevention attacks: fixed watermark, font gibberish, and hybrid",
+  },
 };
 
 const STAGE_FLOW: { key: string; label: string; sources: CorePipelineStageName[] }[] = [
   { key: "extraction", label: "Extraction", sources: ["smart_reading"] },
-  { key: "vulnerability", label: "Vulnerability generation", sources: ["content_discovery"] },
-  { key: "manipulation", label: "Manipulation engine", sources: ["smart_substitution"] },
-  { key: "detection", label: "Detection", sources: ["results_generation"] },
-  { key: "evaluation", label: "Evaluation", sources: ["effectiveness_testing"] },
-  { key: "output", label: "Shielded output", sources: ["document_enhancement", "pdf_creation"] },
+  { key: "vulnerability", label: "Vulnerability Analysis", sources: ["content_discovery"] },
+  { key: "manipulation", label: "Mapping Generation", sources: ["smart_substitution", "effectiveness_testing"] },
+  { key: "output", label: "Shielded PDFs & Evaluation", sources: ["document_enhancement", "pdf_creation"] },
+  { key: "detection", label: "Detection Report", sources: ["results_generation"] },
 ];
 
 type ArtifactGroup = {
@@ -39,17 +53,19 @@ type ArtifactGroup = {
 const TARGET_STAGES: CorePipelineStageName[] = ["smart_reading", "content_discovery", "smart_substitution", "effectiveness_testing", "document_enhancement", "pdf_creation", "results_generation"];
 
 const Dashboard: React.FC = () => {
-  const { status, startPipeline, refreshStatus, isLoading } = usePipeline();
+  const location = useLocation();
+  const { status, activeRunId, startPipeline, refreshStatus, isLoading, viewMode, setViewMode, setActiveRunId, resetActiveRun } = usePipeline();
   const { push } = useNotifications();
 
   const [mode, setMode] = useState<ModeOption>("detection");
   const [questionFile, setQuestionFile] = useState<File | null>(null);
   const [answerKeyFile, setAnswerKeyFile] = useState<File | null>(null);
+  const [assessmentName, setAssessmentName] = useState<string>("");
   const [isStarting, setIsStarting] = useState(false);
-  const [recentRuns, setRecentRuns] = useState<any[]>([]);
   const [selectedArtifact, setSelectedArtifact] = useState<ArtifactPreview | null>(null);
+  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [fileFilter, setFileFilter] = useState<"all" | "assessments" | "shielded" | "reports">("all");
 
-  const runId = status?.run_id ?? null;
   const structured = (status?.structured_data as Record<string, any>) ?? {};
   const manipulationBucket = (structured.manipulation_results as Record<string, any>) ?? {};
   const reports = (structured.reports as Record<string, any>) ?? {};
@@ -61,35 +77,36 @@ const Dashboard: React.FC = () => {
     }
   }, [status?.pipeline_config]);
 
+  // Handle readonly mode from URL params
   useEffect(() => {
-    const fetchRuns = async () => {
-      try {
-        const response = await listRuns({ limit: 8, sortBy: "created_at", sortDir: "desc" });
-        setRecentRuns(response.runs ?? []);
-      } catch (error) {
-        push({ title: "Unable to load history", description: error instanceof Error ? error.message : "Unknown error", intent: "error" });
+    const params = new URLSearchParams(location.search);
+    const runParam = params.get("run");
+    const modeParam = params.get("mode");
+
+    // Only update if the runParam is different from current activeRunId
+    if (runParam && runParam !== activeRunId) {
+      if (modeParam === "readonly") {
+        setViewMode("readonly");
+      } else {
+        setViewMode("edit");
       }
-    };
-    fetchRuns();
-  }, [push]);
+      setActiveRunId(runParam);
+      refreshStatus(runParam).catch(() => undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   useEffect(() => {
-    if (!runId) return;
+    if (!activeRunId) return;
     const interval = setInterval(() => {
-      refreshStatus(runId, { quiet: true }).catch(() => undefined);
+      refreshStatus(activeRunId, { quiet: true }).catch(() => undefined);
     }, 10000);
     return () => clearInterval(interval);
-  }, [runId, refreshStatus]);
+  }, [activeRunId, refreshStatus]);
 
-  const handleToggleMode = async (nextMode: ModeOption) => {
+  const handleToggleMode = (nextMode: ModeOption) => {
     setMode(nextMode);
-    if (!runId) return;
-    try {
-      await updatePipelineConfig(runId, { enhancement_methods: MODE_PRESETS[nextMode].methods });
-      await refreshStatus(runId, { quiet: true }).catch(() => undefined);
-    } catch (error) {
-      push({ title: "Failed to update mode", description: error instanceof Error ? error.message : "Unknown error", intent: "error" });
-    }
+    // Mode selection only affects new pipeline runs, not existing ones
   };
 
   const handleFileSelect = useCallback((file: File | null, setFile: React.Dispatch<React.SetStateAction<File | null>>) => {
@@ -115,16 +132,16 @@ const Dashboard: React.FC = () => {
       await startPipeline({
         file: questionFile,
         answerKeyFile,
+        assessmentName: assessmentName || undefined,
+        mode,
         config: {
           targetStages: TARGET_STAGES,
           aiModels: [],
-          enhancementMethods: MODE_PRESETS[mode].methods,
           skipIfExists: true,
           parallelProcessing: true,
         },
       });
-      setQuestionFile(null);
-      setAnswerKeyFile(null);
+      // Keep files in state so they can be previewed anytime
     } finally {
       setIsStarting(false);
     }
@@ -150,8 +167,26 @@ const Dashboard: React.FC = () => {
   const completedStages = stageTimeline.filter((stage) => stage.status === "completed").length;
   const progressPercent = stageTimeline.length ? Math.round((completedStages / stageTimeline.length) * 100) : 0;
 
-const formatMethodLabel = (key?: string | null) =>
-  key ? ENHANCEMENT_METHOD_LABELS[key as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? key.replace(/_/g, " ") : null;
+  // Map detection methods to variant numbers
+  const DETECTION_VARIANT_MAP: Record<string, number> = {
+    latex_icw: 1,
+    latex_font_attack: 2,
+    latex_dual_layer: 3,
+    latex_icw_font_attack: 4,
+    latex_icw_dual_layer: 5,
+  };
+
+  const formatMethodLabel = (key?: string | null) => {
+    if (!key) return null;
+
+    // If in detection mode and method is a detection variant, show "Detection Variant N"
+    if (mode === "detection" && key in DETECTION_VARIANT_MAP) {
+      return `Detection Variant ${DETECTION_VARIANT_MAP[key]}`;
+    }
+
+    // Otherwise, use the existing label mapping or fallback
+    return ENHANCEMENT_METHOD_LABELS[key as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? key.replace(/_/g, " ");
+  };
 
 const artifactGroups = useMemo<ArtifactGroup[]>(() => {
     const assessments: ArtifactPreview[] = [];
@@ -198,15 +233,26 @@ const artifactGroups = useMemo<ArtifactGroup[]>(() => {
         relativePath: detectionReport.relative_path || detectionReport.output_files?.json,
       });
     }
+    // Show evaluation reports for all configured enhancement methods
     const evaluationEntries = (reports.evaluation as Record<string, any>) ?? {};
-    Object.entries(evaluationEntries).forEach(([method, meta]) => {
+    const configuredMethods = (status?.pipeline_config?.enhancement_methods as string[]) ?? [];
+
+    // Create a set of methods we should show evaluation reports for
+    const methodsToShow = new Set(configuredMethods);
+
+    // Also include any methods that already have evaluation reports
+    Object.keys(evaluationEntries).forEach(method => methodsToShow.add(method));
+
+    // Show evaluation report for each method
+    methodsToShow.forEach((method) => {
+      const meta = evaluationEntries[method];
       reportRows.push({
         key: `evaluation-${method}`,
         label: "Evaluation",
         kind: "report",
         method: formatMethodLabel(method),
-        status: meta.artifact ? "completed" : "pending",
-        relativePath: meta.artifact,
+        status: meta?.artifact ? "completed" : "pending",
+        relativePath: meta?.artifact,
       });
     });
     return [
@@ -215,193 +261,486 @@ const artifactGroups = useMemo<ArtifactGroup[]>(() => {
     ];
   }, [reports, structured, manipulationBucket]);
 
-  const recentRunRows = useMemo(
-    () =>
-      recentRuns.map((run) => ({
-        run_id: run.run_id ?? run.id ?? "unknown",
-        status: run.status ?? "pending",
-        created_at: run.created_at ? new Date(run.created_at).toLocaleString() : "—",
-      })),
-    [recentRuns]
-  );
+  // Filter artifacts based on selected filter
+  const filteredArtifacts = useMemo(() => {
+    const allRows = artifactGroups.flatMap(g => g.rows);
+    switch (fileFilter) {
+      case "assessments":
+        return allRows.filter(r => r.kind === "assessment" && r.label === "Original");
+      case "shielded":
+        return allRows.filter(r => r.kind === "assessment" && r.label === "Shielded");
+      case "reports":
+        return allRows.filter(r => r.kind === "report");
+      default:
+        return allRows;
+    }
+  }, [artifactGroups, fileFilter]);
+
+  // Create blob URL for local file preview
+  const previewUrl = useMemo(() => {
+    if (!previewFile) return null;
+    return URL.createObjectURL(previewFile);
+  }, [previewFile]);
+
+  // Cleanup blob URL when modal closes
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   return (
-    <LTIShell title="Dashboard" subtitle="Upload, configure, and monitor runs.">
-      <section className="canvas-grid side">
-        <div className="canvas-card run-builder">
-          <h2>Run builder</h2>
-          <p>Provide the required files and start the Canvas-ready Shielded workflow.</p>
-          <div className="run-builder__mode">
-            <label>Mode</label>
-            <div className="mode-toggle">
-              {(["detection", "prevention"] as ModeOption[]).map((option) => (
-                <Button
-                  key={option}
-                  color={mode === option ? "primary" : "secondary"}
-                  withBackground
-                  margin="0 xx-small 0 0"
-                  onClick={() => handleToggleMode(option)}
-                  interaction={isLoading ? "disabled" : "enabled"}
-                  aria-pressed={mode === option}
-                >
-                  {MODE_PRESETS[option].label}
-                </Button>
-              ))}
-            </div>
-            <p className="mode-hint">{mode === "detection" ? "Detection compares baseline vs perturbed runs to surface risk." : "Prevention generates ICW-friendly shielded assessments for LMS delivery."}</p>
-          </div>
-          <div className="dropzone-grid">
-            <label
-              className={clsx("dropzone", questionFile && "has-file")}
-              onDragOver={(event) => {
-                event.preventDefault();
-              }}
-              onDrop={(event) => {
-                event.preventDefault();
-                handleFileSelect(event.dataTransfer.files?.[0] ?? null, setQuestionFile);
-              }}
-            >
-              <UploadCloud size={24} />
-              <span>Assessment PDF</span>
-              <input type="file" accept="application/pdf" onChange={(event) => handleFileSelect(event.target.files?.[0] ?? null, setQuestionFile)} />
-              {questionFile ? <small>{questionFile.name}</small> : <small>Required</small>}
-            </label>
-            <label
-              className={clsx("dropzone", answerKeyFile && "has-file")}
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={(event) => {
-                event.preventDefault();
-                handleFileSelect(event.dataTransfer.files?.[0] ?? null, setAnswerKeyFile);
-              }}
-            >
-              <UploadCloud size={24} />
-              <span>Answer key PDF</span>
-              <input type="file" accept="application/pdf" onChange={(event) => handleFileSelect(event.target.files?.[0] ?? null, setAnswerKeyFile)} />
-              {answerKeyFile ? <small>{answerKeyFile.name}</small> : <small>Required</small>}
-            </label>
-          </div>
-          <div className="run-action-row">
-            <Button color="primary" onClick={handleRun} interaction={!questionFile || !answerKeyFile || isStarting ? "disabled" : "enabled"}>
-              {isStarting ? <Loader2 className="spin" size={16} /> : <Shield size={16} />}
-              {isStarting ? "Starting…" : "Run"}
-            </Button>
-            <Button color="secondary" withBackground={false} onClick={() => { setQuestionFile(null); setAnswerKeyFile(null); }}>
-              Clear
-            </Button>
-          </div>
-        </div>
-
-        <div className="canvas-card">
-          <div className="stage-progress__header">
-            <div>
-              <h2>Pipeline telemetry</h2>
-              <p>{progressPercent}% complete • {completedStages} of {stageTimeline.length} stages</p>
-            </div>
-            <Button color="secondary" withBackground={false} onClick={() => runId && refreshStatus(runId)}>
-              <RefreshCcw size={16} /> Refresh
-            </Button>
-          </div>
-          <div className="stage-progress__bar">
-            <div style={{ width: `${progressPercent}%` }} />
-          </div>
-          <ul className="stage-progress__list">
-            {stageTimeline.map((stage) => (
-              <li key={stage.key} className={clsx(stage.status)}>
-                <div className="stage-progress__meta">
-                  <span className="stage-progress__index">{stage.index + 1}</span>
-                  <div>
-                    <p>{stage.label}</p>
-                    <small>{stage.status === "running" ? "In progress" : stage.status === "completed" ? "Complete" : stage.status === "failed" ? "Check logs" : "Queued"}</small>
-                  </div>
+    <LTIShell title="Dashboard">
+      {/* Local File Preview Modal */}
+      {previewFile && previewUrl && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem'
+          }}
+          onClick={() => setPreviewFile(null)}
+        >
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '0.5rem',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              width: '900px',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '1rem 1.5rem',
+              borderBottom: '1px solid #e0e0e0'
+            }}>
+              <div>
+                <Text size="large" weight="bold">{previewFile.name}</Text>
+                <div style={{ marginTop: '0.25rem' }}>
+                  <Text size="small" color="secondary">
+                    {(previewFile.size / (1024 * 1024)).toFixed(2)} MB
+                  </Text>
                 </div>
-                <span className={clsx("status-pill", stage.status === "completed" ? "completed" : stage.status === "failed" ? "failed" : stage.status === "running" ? "running" : "pending")}>
-                  {stage.status}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="canvas-grid two">
-        <div className="canvas-card">
-          <div className="table-header">
-            <h2>Files</h2>
-          </div>
-          {artifactGroups.map((group) => (
-            <div key={group.key} className="artifact-subsection">
-              <div className="artifact-subsection__header">
-                <h3>{group.label}</h3>
               </div>
-              {group.rows.length ? (
-                <Table hover layout="auto" caption={<ScreenReaderContent>{group.label} files</ScreenReaderContent>}>
-                  <Table.Head>
-                    <Table.Row>
-                      <Table.ColHeader id={`${group.key}-name`}>Name</Table.ColHeader>
-                      <Table.ColHeader id={`${group.key}-variant`}>Variant</Table.ColHeader>
-                      <Table.ColHeader id={`${group.key}-status`}>Status</Table.ColHeader>
-                      <Table.ColHeader id={`${group.key}-actions`}>Actions</Table.ColHeader>
-                    </Table.Row>
-                  </Table.Head>
-                  <Table.Body>
-                    {group.rows.map((row) => (
-                      <Table.Row key={row.key}>
-                        <Table.Cell>{row.label}</Table.Cell>
-                        <Table.Cell>{row.method ?? row.variant ?? "—"}</Table.Cell>
-                        <Table.Cell>
-                          <span className={clsx("status-pill", row.status === "completed" ? "completed" : row.status === "failed" ? "failed" : row.status === "running" ? "running" : "pending")}>
-                            {row.status}
-                          </span>
-                        </Table.Cell>
-                        <Table.Cell>
-                          <Button color="secondary" withBackground={false} onClick={() => setSelectedArtifact(row)} interaction={!row.relativePath ? "disabled" : "enabled"}>
+              <Button
+                color="secondary"
+                withBackground={false}
+                onClick={() => setPreviewFile(null)}
+              >
+                <X size={20} />
+              </Button>
+            </div>
+
+            {/* PDF Preview */}
+            <div style={{ flex: 1, overflow: 'auto', padding: '1rem' }}>
+              <iframe
+                src={previewUrl}
+                style={{
+                  width: '100%',
+                  height: '600px',
+                  border: 'none',
+                  borderRadius: '0.375rem'
+                }}
+                title={`Preview of ${previewFile.name}`}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Readonly Mode Banner */}
+      {viewMode === "readonly" && (
+        <div style={{
+          backgroundColor: '#e8f4fd',
+          border: '1px solid #b3d9f2',
+          borderRadius: '0.5rem',
+          padding: '1rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div>
+            <Text weight="bold" size="medium" style={{ color: '#1a5490' }}>
+              Viewing Historical Assessment
+            </Text>
+            <div style={{ marginTop: '0.25rem' }}>
+              <Text size="small" style={{ color: '#1a5490' }}>
+                This is a read-only view. To run a new assessment, click "Start New Assessment".
+              </Text>
+            </div>
+          </div>
+          <Button
+            color="primary"
+            size="medium"
+            onClick={() => {
+              resetActiveRun();
+              window.history.pushState({}, '', '/dashboard');
+            }}
+          >
+            Start New Assessment
+          </Button>
+        </div>
+      )}
+
+      <Grid colSpacing="small" rowSpacing="small">
+        <Grid.Row>
+          {viewMode !== "readonly" && (
+            <Grid.Col width={{ small: 12, medium: 12, large: 6, xlarge: 6 }}>
+            <PageSection
+              title="Start"
+            >
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <Text size="small" weight="normal" color="secondary">Mode</Text>
+                </div>
+                <div style={{
+                  display: 'inline-flex',
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '0.5rem',
+                  padding: '0.25rem',
+                  gap: '0.25rem'
+                }}>
+                  <button
+                    onClick={() => handleToggleMode("detection")}
+                    disabled={isLoading}
+                    style={{
+                      padding: '0.5rem 1.25rem',
+                      border: 'none',
+                      borderRadius: '0.375rem',
+                      backgroundColor: mode === "detection" ? '#FF7F32' : 'transparent',
+                      color: mode === "detection" ? '#ffffff' : '#666666',
+                      fontWeight: mode === "detection" ? '600' : '400',
+                      fontSize: '0.875rem',
+                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      fontFamily: 'inherit'
+                    }}
+                  >
+                    Detection
+                  </button>
+                  <button
+                    onClick={() => handleToggleMode("prevention")}
+                    disabled={isLoading}
+                    style={{
+                      padding: '0.5rem 1.25rem',
+                      border: 'none',
+                      borderRadius: '0.375rem',
+                      backgroundColor: mode === "prevention" ? '#FF7F32' : 'transparent',
+                      color: mode === "prevention" ? '#ffffff' : '#666666',
+                      fontWeight: mode === "prevention" ? '600' : '400',
+                      fontSize: '0.875rem',
+                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      fontFamily: 'inherit'
+                    }}
+                  >
+                    Prevention
+                  </button>
+                </div>
+              </div>
+
+              {/* Assessment Name Field */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <Text size="small" weight="normal" color="secondary">
+                    Assessment Name <span style={{ fontWeight: 'normal', opacity: 0.7 }}>(Optional)</span>
+                  </Text>
+                </div>
+                <input
+                  type="text"
+                  value={assessmentName}
+                  onChange={(e) => setAssessmentName(e.target.value)}
+                  placeholder={questionFile?.name || "Enter assessment name or leave empty to use filename"}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem 0.75rem',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    fontFamily: 'inherit',
+                    transition: 'border-color 0.2s ease'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#FF7F32'}
+                  onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+                />
+              </div>
+
+              {/* Side-by-side Upload Fields */}
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                {/* Assessment PDF Upload */}
+                <div style={{ flex: 1, minWidth: '250px' }}>
+                  <FileUploadField
+                    label="Assessment PDF"
+                    description="Upload the assessment document to process"
+                    accept="application/pdf"
+                    file={questionFile}
+                    onFileSelect={(file) => handleFileSelect(file, setQuestionFile)}
+                    required
+                  />
+                  {questionFile && (
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <Button
+                        color="secondary"
+                        size="small"
+                        withBackground={false}
+                        onClick={() => setPreviewFile(questionFile)}
+                      >
+                        <Eye size={14} /> Preview
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Answer Key PDF Upload */}
+                <div style={{ flex: 1, minWidth: '250px' }}>
+                  <FileUploadField
+                    label="Answer key PDF"
+                    description="Upload the answer key document"
+                    accept="application/pdf"
+                    file={answerKeyFile}
+                    onFileSelect={(file) => handleFileSelect(file, setAnswerKeyFile)}
+                    required
+                  />
+                  {answerKeyFile && (
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <Button
+                        color="secondary"
+                        size="small"
+                        withBackground={false}
+                        onClick={() => setPreviewFile(answerKeyFile)}
+                      >
+                        <Eye size={14} /> Preview
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <Flex gap="small">
+                <Button
+                  color="primary"
+                  onClick={handleRun}
+                  interaction={!questionFile || !answerKeyFile || isStarting ? "disabled" : "enabled"}
+                >
+                  {isStarting ? <Loader2 className="spin" size={16} /> : <Shield size={16} />}
+                  {isStarting ? " Starting…" : " Run Assessment"}
+                </Button>
+                <Button
+                  color="secondary"
+                  onClick={() => {
+                    setQuestionFile(null);
+                    setAnswerKeyFile(null);
+                  }}
+                >
+                  Clear
+                </Button>
+              </Flex>
+            </PageSection>
+          </Grid.Col>
+          )}
+
+          <Grid.Col width={viewMode === "readonly" ? 12 : { small: 12, medium: 12, large: 6, xlarge: 6 }}>
+            <PageSection
+              title="Progress"
+              subtitle={`${completedStages} of ${stageTimeline.length} stages`}
+              actions={
+                <Button
+                  color="secondary"
+                  withBackground={false}
+                  onClick={() => activeRunId && refreshStatus(activeRunId)}
+                >
+                  <RefreshCcw size={16} /> Refresh
+                </Button>
+              }
+            >
+              <View margin="0 0 large">
+                <ProgressBar
+                  label="Overall progress"
+                  valueNow={completedStages}
+                  valueMax={stageTimeline.length}
+                  formatDisplayedValue={(now, max) => `${now}/${max} stages (${progressPercent}%)`}
+                  color="brand"
+                  size="small"
+                />
+              </View>
+
+              <View as="div">
+                {stageTimeline.map((stage) => (
+                  <View
+                    key={stage.key}
+                    as="div"
+                    padding="x-small small"
+                    margin="0 0 xx-small"
+                    background="primary"
+                    borderRadius="small"
+                    borderWidth="small"
+                  >
+                    <Flex alignItems="center" justifyItems="space-between">
+                      <Flex alignItems="center" gap="x-small">
+                        <div
+                          style={{
+                            minWidth: '1.5rem',
+                            height: '1.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          {stage.status === "running" ? (
+                            <Loader2
+                              size={18}
+                              style={{
+                                animation: 'spin 1s linear infinite',
+                                color: '#FF7F32'
+                              }}
+                            />
+                          ) : stage.status === "completed" ? (
+                            <CheckCircle2 size={18} color="#22c55e" />
+                          ) : stage.status === "failed" ? (
+                            <AlertTriangle size={18} color="#ef4444" />
+                          ) : (
+                            <Clock size={18} color="#94a3b8" />
+                          )}
+                        </div>
+                        <View>
+                          <Text weight="normal" size="small">{stage.label}</Text>
+                          <br />
+                          <Text size="x-small" color="secondary">
+                            {stage.status === "running"
+                              ? "In progress"
+                              : stage.status === "completed"
+                              ? "Complete"
+                              : stage.status === "failed"
+                              ? "Check logs"
+                              : "Queued"}
+                          </Text>
+                        </View>
+                      </Flex>
+                      <StatusPill status={stage.status as any} />
+                    </Flex>
+                  </View>
+                ))}
+              </View>
+            </PageSection>
+
+            <div style={{ marginTop: '1rem' }}>
+              <PageSection title="Files">
+                {/* File Filters */}
+                <div style={{
+                  display: 'inline-flex',
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '0.5rem',
+                  padding: '0.25rem',
+                  gap: '0.25rem',
+                  marginBottom: '1.5rem'
+                }}>
+                  {[
+                    { id: 'all', label: 'All files' },
+                    { id: 'assessments', label: 'Assessments' },
+                    { id: 'shielded', label: 'Shielded' },
+                    { id: 'reports', label: 'Reports' }
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => setFileFilter(option.id as typeof fileFilter)}
+                      style={{
+                        padding: '0.5rem 1.25rem',
+                        border: 'none',
+                        borderRadius: '0.375rem',
+                        backgroundColor: fileFilter === option.id ? '#FF7F32' : 'transparent',
+                        color: fileFilter === option.id ? '#ffffff' : '#666666',
+                        fontWeight: fileFilter === option.id ? '600' : '400',
+                        fontSize: '0.875rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        fontFamily: 'inherit'
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+
+                {filteredArtifacts.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {filteredArtifacts.map((row) => (
+                      <div
+                        key={row.key}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.75rem 1rem',
+                          backgroundColor: '#f9f9f9',
+                          borderRadius: '0.5rem',
+                          border: '1px solid #e0e0e0',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <Text weight="normal" size="small" style={{ color: '#333333' }}>
+                              {row.label}
+                            </Text>
+                            {row.method && (
+                              <span style={{
+                                fontSize: '0.75rem',
+                                color: '#666666',
+                                backgroundColor: '#e0e0e0',
+                                padding: '0.125rem 0.5rem',
+                                borderRadius: '0.25rem'
+                              }}>
+                                {row.method}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <StatusPill status={row.status as any} />
+                          <Button
+                            color="secondary"
+                            size="small"
+                            withBackground={false}
+                            onClick={() => setSelectedArtifact(row)}
+                            interaction={!row.relativePath ? "disabled" : "enabled"}
+                          >
                             Preview
                           </Button>
-                        </Table.Cell>
-                      </Table.Row>
+                        </div>
+                      </div>
                     ))}
-                  </Table.Body>
-                </Table>
-              ) : (
-                <p className="table-empty">No {group.label.toLowerCase()} available yet.</p>
-              )}
+                  </div>
+                ) : (
+                  <div style={{ padding: '2rem', textAlign: 'center' }}>
+                    <Text color="secondary" size="small">No files available yet</Text>
+                  </div>
+                )}
+              </PageSection>
             </div>
-          ))}
-        </div>
-        <div className="canvas-card">
-          <div className="table-header">
-            <h2>Recent activity</h2>
-          </div>
-          {recentRunRows.length ? (
-            <Table hover caption={<ScreenReaderContent>Recent runs</ScreenReaderContent>}>
-              <Table.Head>
-                <Table.Row>
-                  <Table.ColHeader id="recent-run-id">Run ID</Table.ColHeader>
-                  <Table.ColHeader id="recent-started">Started</Table.ColHeader>
-                  <Table.ColHeader id="recent-status">Status</Table.ColHeader>
-                </Table.Row>
-              </Table.Head>
-              <Table.Body>
-                {recentRunRows.map((run) => (
-                  <Table.Row key={run.run_id}>
-                    <Table.Cell>{run.run_id}</Table.Cell>
-                    <Table.Cell>{run.created_at}</Table.Cell>
-                    <Table.Cell>
-                      <span className={clsx("status-pill", run.status === "completed" ? "completed" : run.status === "failed" ? "failed" : "running")}>
-                        {run.status}
-                      </span>
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-          ) : (
-            <p>No history yet.</p>
-          )}
-        </div>
-      </section>
+          </Grid.Col>
+        </Grid.Row>
+      </Grid>
 
-      <ArtifactPreviewModal artifact={selectedArtifact} runId={runId ?? undefined} onClose={() => setSelectedArtifact(null)} />
+      <ArtifactPreviewModal artifact={selectedArtifact} runId={activeRunId ?? undefined} onClose={() => setSelectedArtifact(null)} />
     </LTIShell>
   );
 };

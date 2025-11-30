@@ -155,10 +155,46 @@ def start_pipeline():
     skip_if_exists = request.form.get("skip_if_exists", "true").lower() == "true"
     parallel_processing = request.form.get("parallel_processing", "true").lower() == "true"
     mapping_strategy = request.form.get("mapping_strategy", "unicode_steganography")
+    assessment_name = request.form.get("assessment_name")
 
     uploaded_file: FileStorage | None = request.files.get("original_pdf")
     answer_key_file: FileStorage | None = request.files.get("answer_key_pdf")
     manual_mode = not resume_from_run_id and not uploaded_file
+
+    # Determine mode based on whether this is a resume or new run
+    if resume_from_run_id:
+        # RESUMING: Fetch existing run and preserve its mode configuration
+        temp_run = PipelineRun.query.get(resume_from_run_id)
+        if not temp_run:
+            return jsonify({"error": "Invalid resume_from_run_id"}), HTTPStatus.NOT_FOUND
+
+        # Extract mode settings from existing run's pipeline_config
+        existing_config = temp_run.pipeline_config or {}
+        mode = existing_config.get("mode", current_app.config["PIPELINE_DEFAULT_MODE"])
+
+        # Validate mode still exists in presets
+        if mode not in current_app.config["PIPELINE_MODE_PRESETS"]:
+            mode = current_app.config["PIPELINE_DEFAULT_MODE"]
+
+        preset = current_app.config["PIPELINE_MODE_PRESETS"][mode]
+        enhancement_methods = preset["methods"]
+        auto_vulnerability_report = preset["auto_vulnerability_report"]
+        auto_evaluation_reports = preset["auto_evaluation_reports"]
+    else:
+        # NEW RUN: Get mode from request (default to detection)
+        mode = request.form.get("mode", current_app.config["PIPELINE_DEFAULT_MODE"])
+
+        # Validate mode
+        if mode not in current_app.config["PIPELINE_MODE_PRESETS"]:
+            return jsonify({"error": f"Invalid mode: {mode}. Valid modes: detection, prevention"}), HTTPStatus.BAD_REQUEST
+
+        # Get preset configuration
+        preset = current_app.config["PIPELINE_MODE_PRESETS"][mode]
+
+        # Override enhancement_methods with mode preset (ignore user-provided methods for security)
+        enhancement_methods = preset["methods"]
+        auto_vulnerability_report = preset["auto_vulnerability_report"]
+        auto_evaluation_reports = preset["auto_evaluation_reports"]
 
     if manual_mode:
         manual_dir: Path = current_app.config.get("MANUAL_INPUT_DIR")
@@ -216,6 +252,7 @@ def start_pipeline():
             id=run_id,
             original_pdf_path=str(destination_pdf),
             original_filename=destination_pdf.name,
+            assessment_name=assessment_name or destination_pdf.name,
             current_stage=PipelineStageEnum.RESULTS_GENERATION.value,
             status="completed",
             pipeline_config={
@@ -224,6 +261,9 @@ def start_pipeline():
                 "skip_if_exists": skip_if_exists,
                 "parallel_processing": parallel_processing,
                 "mapping_strategy": mapping_strategy,
+                "mode": mode,
+                "auto_vulnerability_report": auto_vulnerability_report,
+                "auto_evaluation_reports": auto_evaluation_reports,
                 "manual_input": True,
                 "manual_source_paths": payload.source_paths,
             },
@@ -326,9 +366,8 @@ def start_pipeline():
         )
 
     if resume_from_run_id:
-        run = PipelineRun.query.get(resume_from_run_id)
-        if not run:
-            return jsonify({"error": "Invalid resume_from_run_id"}), HTTPStatus.NOT_FOUND
+        # Already fetched and validated temp_run earlier for mode preservation
+        run = temp_run
     else:
         if not uploaded_file:
             return jsonify({"error": "original_pdf file required"}), HTTPStatus.BAD_REQUEST
@@ -343,11 +382,18 @@ def start_pipeline():
             id=run_id,
             original_pdf_path=str(pdf_path),
             original_filename=uploaded_file.filename or "uploaded.pdf",
+            assessment_name=assessment_name or uploaded_file.filename or "uploaded.pdf",
             current_stage="smart_reading",
             status="pending",
             pipeline_config={
                 "ai_models": ai_models,
                 "enhancement_methods": enhancement_methods,
+                "skip_if_exists": skip_if_exists,
+                "parallel_processing": parallel_processing,
+                "mapping_strategy": mapping_strategy,
+                "mode": mode,
+                "auto_vulnerability_report": auto_vulnerability_report,
+                "auto_evaluation_reports": auto_evaluation_reports,
                 "answer_key_provided": bool(answer_key_file),
             },
             structured_data={},
@@ -377,6 +423,9 @@ def start_pipeline():
         skip_if_exists=skip_if_exists,
         parallel_processing=parallel_processing,
         mapping_strategy=mapping_strategy,
+        mode=mode,
+        auto_vulnerability_report=auto_vulnerability_report,
+        auto_evaluation_reports=auto_evaluation_reports,
     )
 
     orchestrator.start_background(run.id, config)
@@ -432,6 +481,7 @@ def list_runs():
         .with_entities(
             PipelineRun.id,
             PipelineRun.original_filename,
+            PipelineRun.assessment_name,
             PipelineRun.status,
             PipelineRun.current_stage,
             PipelineRun.created_at,
@@ -481,13 +531,14 @@ def list_runs():
     for row in rows:
         run_id = row[0]
         filename = row[1]
-        status_val = row[2]
-        current_stage = row[3]
-        created_at = row[4]
-        updated_at = row[5]
-        completed_at = row[6]
-        processing_stats = _as_dict(row[7])
-        structured = _as_dict(row[8])
+        assessment_name = row[2]
+        status_val = row[3]
+        current_stage = row[4]
+        created_at = row[5]
+        updated_at = row[6]
+        completed_at = row[7]
+        processing_stats = _as_dict(row[8])
+        structured = _as_dict(row[9])
 
         deleted = bool(processing_stats.get("deleted"))
         if deleted and not include_deleted:
@@ -495,7 +546,7 @@ def list_runs():
         if status_filter and (status_val or "").lower() not in status_filter:
             continue
         if q:
-            hay = f"{run_id} {filename}".lower()
+            hay = f"{run_id} {filename} {assessment_name or ''}".lower()
             if q not in hay:
                 continue
 
@@ -511,6 +562,7 @@ def list_runs():
             {
                 "run_id": run_id,
                 "filename": filename,
+                "assessment_name": assessment_name,
                 "status": status_val,
                 "parent_run_id": processing_stats.get("parent_run_id"),
                 "current_stage": current_stage,
@@ -563,6 +615,7 @@ def get_status(run_id: str):
     return jsonify(
         {
             "run_id": run.id,
+            "assessment_name": run.assessment_name,
             "status": run.status,
             "current_stage": run.current_stage,
             "parent_run_id": processing_stats.get("parent_run_id"),
@@ -784,6 +837,9 @@ def resume_pipeline(run_id: str, stage_name: str):
         ),
         skip_if_exists=False,
         parallel_processing=True,
+        mode=run.pipeline_config.get("mode", current_app.config["PIPELINE_DEFAULT_MODE"]),
+        auto_vulnerability_report=run.pipeline_config.get("auto_vulnerability_report", False),
+        auto_evaluation_reports=run.pipeline_config.get("auto_evaluation_reports", False),
     )
 
     orchestrator = PipelineOrchestrator()

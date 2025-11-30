@@ -26,6 +26,8 @@ interface PipelineContextValue {
   error: string | null;
   preferredStage: PipelineStageName | null;
   preferredStageToken: number;
+  viewMode: "edit" | "readonly";
+  setViewMode: (mode: "edit" | "readonly") => void;
   setPreferredStage: (stage: PipelineStageName | null) => void;
   setActiveRunId: (runId: string | null) => void;
   refreshStatus: (
@@ -76,6 +78,7 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
   const [preferredStage, setPreferredStageState] = useState<PipelineStageName | null>(null);
   const [preferredStageToken, bumpPreferredStageToken] = useState(0);
   const [selectedClassroomId, setSelectedClassroomId] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<"edit" | "readonly">("edit");
   const setPreferredStage = useCallback((stage: PipelineStageName | null) => {
     setPreferredStageState(stage);
     bumpPreferredStageToken((value) => value + 1);
@@ -135,11 +138,15 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       answerKeyFile,
       config,
       apiKey,
+      assessmentName,
+      mode,
     }: {
       file?: File;
       answerKeyFile?: File;
       config?: Partial<StartPipelineConfig>;
       apiKey?: string;
+      assessmentName?: string;
+      mode?: string;
     }) => {
       setIsLoading(true);
       setError(null);
@@ -150,6 +157,9 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
         }
         if (answerKeyFile) {
           formData.append("answer_key_pdf", answerKeyFile);
+        }
+        if (assessmentName) {
+          formData.append("assessment_name", assessmentName);
         }
         if (config?.targetStages) {
           config.targetStages.forEach((stage) => formData.append("target_stages", stage));
@@ -168,6 +178,9 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
         }
         if (apiKey) {
           formData.append("openai_api_key", apiKey);
+        }
+        if (mode) {
+          formData.append("mode", mode);
         }
 
         const { run_id } = await pipelineApi.startPipeline(formData);
@@ -229,6 +242,7 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       setError(null);
       setPreferredStage(null);
       setSelectedClassroomId(null);
+      setViewMode("edit");
     }
   }, [activeRunId]);
 
@@ -374,10 +388,27 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
     []
   );
 
-  // Bootstrap last active run from localStorage if none is set
+  // Bootstrap last active run from localStorage on mount
   useEffect(() => {
-    // Intentionally no-op to avoid auto-loading previous runs
+    const savedRunId = localStorage.getItem('activeRunId');
+    if (savedRunId && !activeRunId) {
+      setActiveRunId(savedRunId);
+      refreshStatus(savedRunId).catch(() => {
+        // If load fails, clear the saved run
+        localStorage.removeItem('activeRunId');
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Save activeRunId to localStorage whenever it changes
+  useEffect(() => {
+    if (activeRunId) {
+      localStorage.setItem('activeRunId', activeRunId);
+    } else {
+      localStorage.removeItem('activeRunId');
+    }
+  }, [activeRunId]);
 
   useEffect(() => {
     if (!activeRunId) return;
@@ -406,6 +437,8 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       error,
       preferredStage,
       preferredStageToken,
+      viewMode,
+      setViewMode,
       setPreferredStage,
       selectedClassroomId,
       setSelectedClassroomId,
@@ -431,6 +464,7 @@ export const PipelineProvider: React.FC<{ children?: React.ReactNode }> = (props
       error,
       preferredStage,
       preferredStageToken,
+      viewMode,
       selectedClassroomId,
       refreshStatus,
       startPipeline,

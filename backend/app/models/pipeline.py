@@ -26,6 +26,7 @@ class PipelineRun(db.Model, TimestampMixin):
     id: Mapped[str] = mapped_column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     original_pdf_path: Mapped[str] = mapped_column(db.Text, nullable=False)
     original_filename: Mapped[str] = mapped_column(db.Text, nullable=False)
+    assessment_name: Mapped[Optional[str]] = mapped_column(db.String(255), nullable=True)
     current_stage: Mapped[str] = mapped_column(db.String(64), nullable=False, default="smart_reading")
     status: Mapped[str] = mapped_column(db.String(32), nullable=False, default="pending")
     structured_data: Mapped[dict] = mapped_column(json_type, default=dict)
