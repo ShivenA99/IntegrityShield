@@ -5,7 +5,7 @@ import re
 from typing import Any, Dict, List, Optional
 
 from ...extensions import db
-from ...models import QuestionManipulation
+from ...models import PipelineRun, QuestionManipulation
 from ...services.data_management.structured_data_manager import StructuredDataManager
 from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
@@ -483,6 +483,9 @@ class ContentDiscoveryService:
         )
         self.structured_manager.save(run_id, structured)
 
+        # AUTO-GENERATE VULNERABILITY REPORT if enabled
+        pipeline_run = PipelineRun.query.get(run_id)
+        # Auto-report generation moved to results_generation_service to avoid timing conflicts
         return {"questions_detected": len(questions)}
 
     def _build_answer_key_lookup(self, structured: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:

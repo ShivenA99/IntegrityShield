@@ -565,7 +565,7 @@ class PdfCreationService:
                 },
             },
         )
-
+        # Auto-report generation moved to results_generation_service to avoid timing conflicts
         return {
             "enhanced_count": len(enhanced_records),
             "methods": [r.method_name for r in enhanced_records],

@@ -132,7 +132,8 @@ body,
   }
 }
 
-.is-spin {
+.is-spin,
+.spin {
   animation: is-spin 1s linear infinite;
 }
 
