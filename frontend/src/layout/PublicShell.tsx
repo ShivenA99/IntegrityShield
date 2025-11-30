@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { View } from "@instructure/ui-view";
 import { Flex } from "@instructure/ui-flex";
@@ -19,15 +19,18 @@ interface PublicShellProps {
   hideNav?: boolean;
 }
 
+/**
+ * PublicShell - Layout for public-facing pages (Landing, Login, Video)
+ *
+ * Features:
+ * - Clean navigation with IntegrityShield branding
+ * - Responsive design (stacks on mobile)
+ * - ASU Orange brand color via InstUI theme
+ * - No brittle body class toggles (uses unified theme)
+ */
 const PublicShell: React.FC<PublicShellProps> = ({ children, hideNav }) => {
   const location = useLocation();
 
-  useEffect(() => {
-    document.body.classList.add("light-theme");
-    return () => {
-      document.body.classList.remove("light-theme");
-    };
-  }, []);
 
   const renderNavButton = (item: (typeof NAV_ITEMS)[number]) => {
     if (item.href) {
@@ -64,42 +67,113 @@ const PublicShell: React.FC<PublicShellProps> = ({ children, hideNav }) => {
   };
 
   return (
-    <View as="div" className="public-shell" background="primary" minHeight="100vh">
+    <View
+      as="div"
+      background="primary"
+      minHeight="100vh"
+      display="flex"
+      flexDirection="column"
+    >
       {!hideNav ? (
-        <View as="header" className="public-shell__nav" background="secondary" padding="small" shadow="resting">
-          <Flex alignItems="center" justifyItems="space-between" wrap="wrap" gap="medium">
+        <View
+          as="header"
+          background="secondary"
+          padding="small medium"
+          shadow="resting"
+          borderWidth="0 0 small 0"
+        >
+          <Flex
+            alignItems="center"
+            justifyItems="space-between"
+            wrap="wrap"
+            gap="medium"
+            maxWidth="80rem"
+            margin="0 auto"
+            width="100%"
+          >
             <Flex alignItems="center" gap="small">
-              <View as="div" padding="x-small" background="brand" borderRadius="medium" aria-hidden="true">
+              <View
+                as="div"
+                padding="x-small"
+                background="brand"
+                borderRadius="medium"
+                aria-hidden="true"
+              >
+
                 <Heading level="h3" color="primary-inverse" margin="0">
                   IS
                 </Heading>
               </View>
-              <div>
-                <Text size="small" color="secondary" fontWeight="bold" transform="uppercase" letterSpacing="expanded">
+              <View>
+                <Text
+                  size="small"
+                  color="secondary"
+                  fontWeight="bold"
+                  transform="uppercase"
+                  letterSpacing="expanded"
+                >
                   IntegrityShield
                 </Text>
-              </div>
+              </View>
             </Flex>
-            <Flex alignItems="center" gap="small" wrap="wrap">
+            <Flex
+              as="nav"
+              alignItems="center"
+              gap="small"
+              wrap="wrap"
+              role="navigation"
+              aria-label="Main navigation"
+            >
+
               {NAV_ITEMS.map((item) => renderNavButton(item))}
             </Flex>
           </Flex>
         </View>
       ) : (
-        <View as="header" className="public-shell__nav hero-top">
-          <div className="hero-logo" aria-hidden="true">
-            IS
-          </div>
-          <Heading level="h1" margin="small 0" textAlign="center">
+        <View
+          as="header"
+          padding="large"
+          textAlign="center"
+        >
+          <View
+            as="div"
+            padding="small"
+            background="brand"
+            borderRadius="large"
+            display="inline-block"
+            margin="0 0 medium"
+            aria-hidden="true"
+          >
+            <Heading level="h2" color="primary-inverse" margin="0">
+              IS
+            </Heading>
+          </View>
+          <Heading level="h1" margin="0 0 medium">
             IntegrityShield
           </Heading>
-          <Flex alignItems="center" gap="small" wrap="wrap" justifyItems="center">
+          <Flex
+            as="nav"
+            alignItems="center"
+            gap="small"
+            wrap="wrap"
+            justifyItems="center"
+            role="navigation"
+            aria-label="Main navigation"
+          >
+
             {NAV_ITEMS.map((item) => renderNavButton(item))}
           </Flex>
         </View>
       )}
-      <View as="main" className="public-shell__content" padding="large">
-        <View maxWidth="80rem" margin="0 auto">
+      <View
+        as="main"
+        padding="large"
+        display="flex"
+        flexDirection="column"
+        flexGrow={1}
+      >
+        <View maxWidth="80rem" margin="0 auto" width="100%">
+
           {children}
         </View>
       </View>

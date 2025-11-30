@@ -19,7 +19,6 @@ import {
 
 import answerSheets from "@data/classroomSimulation/answer_sheets.json";
 import classroomEvaluation from "@data/classroomSimulation/evaluation.json";
-import detectionSignals from "@data/integrityShieldDemo/detection_report.json";
 import assessmentPdf from "@data/integrityShieldDemo/Mathematics_K12_Assessment.pdf";
 import vulnerabilityReport from "@data/integrityShieldDemo/vulnerability_report.json";
 import { useDemoRun } from "@contexts/DemoRunContext";
@@ -257,33 +256,6 @@ const buildGoldAnswerMap = () => {
   return map;
 };
 
-const buildTargetSignalMap = () => {
-  const map: Record<
-    string,
-    {
-      target: string;
-      signal?: string | null;
-    }
-  > = {};
-  (detectionSignals.questions ?? []).forEach((question: any) => {
-    const targetLabels = question.target_answer?.labels ?? [];
-    const targetTexts = question.target_answer?.texts ?? [];
-    const targetDisplay = targetLabels.length
-      ? `${targetLabels.join(", ")}${targetTexts.length ? ` · ${targetTexts.join(", ")}` : ""}`
-      : targetTexts.join(", ");
-    const primarySignal =
-      question.signal?.signal_phrase ??
-      question.signal?.signal_notes ??
-      (question.signals && question.signals[0]?.signal_phrase) ??
-      null;
-    map[String(question.question_number)] = {
-      target: targetDisplay || "—",
-      signal: primarySignal,
-    };
-  });
-  return map;
-};
-
 const computeOutcome = (student: SimulationStudent, policy: PolicyPreset): "tp" | "tn" | "fp" | "fn" => {
   const threshold = POLICY_THRESHOLDS[policy];
   const predicted = student.detectionScore >= threshold;
@@ -374,7 +346,6 @@ const ClassroomSimulationPage: React.FC = () => {
   }, []);
   const rawStudents = (classroomEvaluation.students ?? []) as StudentDetail[];
   const goldAnswerMap = React.useMemo(() => buildGoldAnswerMap(), []);
-  const targetSignalMap = React.useMemo(() => buildTargetSignalMap(), []);
   const students = React.useMemo(() => buildStudents(rawStudents, groundStudentMap), [rawStudents, groundStudentMap]);
 
   const startGroundLoader = React.useCallback(() => {
@@ -839,7 +810,6 @@ const ClassroomSimulationPage: React.FC = () => {
               policyPreset={policyPreset}
               detectorState={detectorState}
               goldAnswerMap={goldAnswerMap}
-              targetSignalMap={targetSignalMap}
               onClose={() => {
                 setDetailOpen(false);
                 setSelectedStudentKey(null);
@@ -1758,7 +1728,6 @@ interface StudentDetailPanelProps {
   policyPreset: PolicyPreset;
   detectorState: "idle" | "running" | "complete";
   goldAnswerMap: Record<string, string>;
-  targetSignalMap: Record<string, { target: string; signal?: string | null }>;
   onClose: () => void;
 }
 
@@ -1768,7 +1737,6 @@ const StudentDetailPanel: React.FC<StudentDetailPanelProps> = ({
   policyPreset,
   detectorState,
   goldAnswerMap,
-  targetSignalMap,
   onClose,
 }) => {
   const outcome = computeOutcome(student, policyPreset);
@@ -1936,17 +1904,10 @@ const StudentDetailPanel: React.FC<StudentDetailPanelProps> = ({
                 type: "Type",
                 answer: "Answer",
                 key: "Key",
-                target: "Target",
-                signal: "Signal",
                 confidence: "Detector conf.",
                 result: "Result",
               };
               const columnMeta = (response: any) => {
-                const targetInfo = targetSignalMap[String(response.question_number)] ?? {};
-                const targetValue = targetInfo.target ?? "—";
-                const signalValue =
-                  targetInfo.signal ??
-                  (response.matches_target_wrong ? "Target match" : response.cheating_source ?? "—");
                 const detectorConfidence = typeof response.confidence === "number" ? response.confidence.toFixed(2) : "—";
                 const answerKey = goldAnswerMap[String(response.question_number)] ?? "Answer key";
                 const answerText = response.answer_text ?? "—";
@@ -1955,18 +1916,16 @@ const StudentDetailPanel: React.FC<StudentDetailPanelProps> = ({
                   type: formatQuestionType(response.question_type),
                   key: answerKey,
                   answer: answerText,
-                  target: targetValue,
-                  signal: signalValue,
                   confidence: detectorConfidence,
                   result: response.answer_text ? (response.is_correct ? <Check size={12} /> : <X size={12} />) : <Slash size={12} />,
                 };
               };
               const baseColumns = isGroundStage
                 ? ["question", "type", "answer", "key", "result"]
-                : ["question", "type", "key", "answer", "target", "signal", "confidence", "result"];
+                : ["question", "type", "key", "answer", "confidence", "result"];
               const gridTemplateColumns = isGroundStage
                 ? "46px 110px minmax(0, 1fr) 150px 90px"
-                : "46px 110px 130px minmax(0, 1fr) 160px 160px 130px 90px";
+                : "46px 110px 140px minmax(0, 1fr) 150px 90px";
               const renderColumn = (columnKey: string, value: any, resultClass: string) => {
                 if (columnKey === "result") {
                   return (
@@ -1980,9 +1939,6 @@ const StudentDetailPanel: React.FC<StudentDetailPanelProps> = ({
                 }
                 if (columnKey === "key") {
                   return <span className="student-detail__key">{value}</span>;
-                }
-                if (columnKey === "target") {
-                  return <span className="student-detail__target">{value}</span>;
                 }
                 return <span>{value}</span>;
               };
