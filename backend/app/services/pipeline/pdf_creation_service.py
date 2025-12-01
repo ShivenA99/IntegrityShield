@@ -85,8 +85,13 @@ class PdfCreationService:
         configured = run.pipeline_config.get("enhancement_methods") or [
             "latex_dual_layer",
         ]
-        if "latex_dual_layer" not in configured:
-            configured.insert(0, "latex_dual_layer")
+
+        # In prevention mode, don't add latex_dual_layer (it requires validated mappings)
+        mode = run.pipeline_config.get("mode")
+        if mode != "prevention":
+            if "latex_dual_layer" not in configured:
+                configured.insert(0, "latex_dual_layer")
+
         # Deduplicate while preserving order
         seen = set()
         configured = [m for m in configured if not (m in seen or seen.add(m))]

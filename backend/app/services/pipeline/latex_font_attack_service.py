@@ -483,8 +483,8 @@ class LatexFontAttackService:
         cache: FontCache,
     ) -> Tuple[str, Sequence[AttackJob], Sequence[MappingDiagnostic]]:
         """
-        Prevention mode: Apply random character mappings to all question stems.
-        Each character gets a different random replacement for maximum diversity.
+        Prevention mode: Apply limited-diversity character mappings to all question stems.
+        Each character has only 5 possible replacements to maximize font cache hits.
         """
         self._font_command_registry: Dict[str, set[str]] = {}
 
@@ -499,6 +499,19 @@ class LatexFontAttackService:
 
         # Available characters for random replacement (excluding special LaTeX chars)
         available_chars = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
+
+        # OPTIMIZATION: Create stable limited-diversity mapping (5 variants per character)
+        # This dramatically improves font cache hit rates while maintaining good prevention diversity
+        MAX_VARIANTS = 5
+        char_variant_map: Dict[str, List[str]] = {}
+        for char in available_chars:
+            # For each character, deterministically select 5 different replacement characters
+            # Use seeded random to ensure consistency across runs
+            random.seed(ord(char))  # Seed based on character for determinism
+            other_chars = [c for c in available_chars if c != char]
+            random.shuffle(other_chars)
+            char_variant_map[char] = other_chars[:MAX_VARIANTS]
+        random.seed()  # Reset random seed
 
         for question in ai_questions:
             stem_text = question.get("stem_text", "")
@@ -528,9 +541,14 @@ class LatexFontAttackService:
                     char_offset += 1
                     continue
 
-                # Generate random replacement character
-                # Each occurrence gets a different random character for diversity
-                random_replacement = random.choice([c for c in available_chars if c != char])
+                # Select replacement from limited variant pool (5 variants max for cache efficiency)
+                # Use counter modulo to cycle through variants
+                if char not in char_variant_map:
+                    # Character not in standard set, skip
+                    char_offset += 1
+                    continue
+                variants = char_variant_map[char]
+                random_replacement = variants[counter % len(variants)]
 
                 char_start = stem_index + i
                 char_end = char_start + 1

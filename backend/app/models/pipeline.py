@@ -133,6 +133,7 @@ class EnhancedPDF(db.Model, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     pipeline_run_id: Mapped[str] = mapped_column(db.String(36), db.ForeignKey("pipeline_runs.id", ondelete="CASCADE"))
     method_name: Mapped[str] = mapped_column(db.String(64), nullable=False)
+    display_name: Mapped[Optional[str]] = mapped_column(db.String(128), nullable=True)
     file_path: Mapped[str] = mapped_column(db.Text, nullable=False)
     file_size_bytes: Mapped[Optional[int]] = mapped_column(db.Integer)
     generation_config: Mapped[dict] = mapped_column(json_type, default=dict)
