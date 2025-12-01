@@ -1,0 +1,99 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Introduction to Statistics}}\\[0.25em]
+  {\large \textbf{Probability and Inference Quiz -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item \textbf{(B) 0.12.} For independent events, P(A $\cap$ B) = P(A) $\times$ P(B) = 0.3 $\times$ 0.4 = 0.12.
+
+  \item \textbf{(B) Sample means approach a normal distribution as sample size increases.} Regardless of the population distribution, the sampling distribution of the mean becomes approximately normal for large n (typically n $\geq$ 30).
+
+  \item \textbf{(B) Rejecting a true null hypothesis.} Type I error (false positive) occurs when we incorrectly conclude there is an effect. Type II error is failing to reject a false null hypothesis.
+
+  \item \textbf{(B) Median.} The median is the middle value and is not affected by extreme values. The mean is pulled toward outliers, and range is directly determined by extremes.
+
+  \item \textbf{(C) 95\% of similarly constructed intervals would contain the true parameter.} This is the frequentist interpretation—the procedure captures the parameter 95\% of the time, not probability statements about any single interval.
+
+  \item \textbf{True.} The standard error (SE) is the standard deviation of a sampling distribution. For sample means: SE = $\sigma/\sqrt{n}$.
+
+  \item \textbf{False.} The p-value is the probability of observing data this extreme or more extreme, assuming the null hypothesis is true. It is not the probability that the null hypothesis is true.
+
+  \item \textbf{False.} Correlation measures linear association but does not establish causation. Causation requires controlled experiments, temporal precedence, and elimination of confounding variables.
+
+  \item \textbf{Descriptive Statistics:}
+  \begin{itemize}
+    \item Summarizes and describes data characteristics
+    \item Measures: mean, median, mode, standard deviation, range, percentiles
+    \item Visualizations: histograms, box plots, scatter plots
+    \item Example: Calculating average test scores for a class, creating a frequency distribution of survey responses
+  \end{itemize}
+  
+  \textbf{Inferential Statistics:}
+  \begin{itemize}
+    \item Makes generalizations about populations from samples
+    \item Techniques: hypothesis testing, confidence intervals, regression
+    \item Accounts for sampling variability and uncertainty
+    \item Example: Using a sample of 500 voters to estimate support for a candidate in the entire population
+  \end{itemize}
+  
+  \textbf{Role of sampling:}
+  \begin{itemize}
+    \item Random sampling ensures representativeness
+    \item Larger samples reduce sampling error
+    \item Sampling distributions allow probability calculations
+    \item Enables generalization from sample statistics to population parameters
+  \end{itemize}
+
+  \item \textbf{Hypothesis Testing Steps:}
+  
+  \textbf{(1) State hypotheses:}
+  \begin{itemize}
+    \item Null hypothesis (H$_0$): No effect or no difference (status quo)
+    \item Alternative hypothesis (H$_a$): Effect exists or difference present
+    \item Example: H$_0$: $\mu$ = 100 (mean IQ unchanged); H$_a$: $\mu$ $\neq$ 100 (mean IQ differs)
+  \end{itemize}
+  
+  \textbf{(2) Set significance level ($\alpha$):}
+  \begin{itemize}
+    \item Typically $\alpha$ = 0.05 (5\% chance of Type I error)
+    \item Determines critical region for rejection
+  \end{itemize}
+  
+  \textbf{(3) Collect data and calculate test statistic:}
+  \begin{itemize}
+    \item Example: Sample of n=36 students, $\bar{x}$ = 105, s = 15
+    \item t = ($\bar{x}$ - $\mu_0$)/(s/$\sqrt{n}$) = (105 - 100)/(15/$\sqrt{36}$) = 5/2.5 = 2.0
+  \end{itemize}
+  
+  \textbf{(4) Calculate p-value:}
+  \begin{itemize}
+    \item Probability of observing test statistic this extreme under H$_0$
+    \item For t = 2.0 with df = 35, two-tailed p $\approx$ 0.053
+  \end{itemize}
+  
+  \textbf{(5) Make decision:}
+  \begin{itemize}
+    \item If p $\leq$ $\alpha$: Reject H$_0$ (statistically significant)
+    \item If p > $\alpha$: Fail to reject H$_0$ (not statistically significant)
+    \item Example: p = 0.053 > 0.05, so fail to reject H$_0$
+  \end{itemize}
+  
+  \textbf{(6) State conclusion in context:}
+  \begin{itemize}
+    \item Example: ``There is insufficient evidence at the 0.05 level to conclude that mean IQ differs from 100.''
+  \end{itemize}
+
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,1 @@
+- Use of the run sh file for running backend with correct env var setup and dependencies and virtual env use

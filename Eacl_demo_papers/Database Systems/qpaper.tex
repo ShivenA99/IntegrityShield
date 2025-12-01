@@ -1,0 +1,83 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Database Systems}}\\[0.25em]
+  {\large \textbf{SQL and Relational Model Quiz}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--5, choose the best option.
+  \item For Questions 6--8, mark True or False.
+  \item For Questions 9--10, write detailed answers with SQL examples where appropriate.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item Which normal form eliminates transitive dependencies?
+  \begin{enumerate}[label=(\Alph*)]
+    \item First Normal Form (1NF)
+    \item Second Normal Form (2NF)
+    \item Third Normal Form (3NF)
+    \item Boyce-Codd Normal Form (BCNF)
+  \end{enumerate}
+
+  \item Which SQL clause is used to filter groups created by GROUP BY?
+  \begin{enumerate}[label=(\Alph*)]
+    \item WHERE
+    \item HAVING
+    \item ORDER BY
+    \item FILTER
+  \end{enumerate}
+
+  \item A foreign key constraint ensures:
+  \begin{enumerate}[label=(\Alph*)]
+    \item All values in a column are unique
+    \item Values reference existing values in another table
+    \item No NULL values exist in the column
+    \item The column is indexed automatically
+  \end{enumerate}
+
+  \item Which type of JOIN returns all rows from both tables, matching where possible?
+  \begin{enumerate}[label=(\Alph*)]
+    \item INNER JOIN
+    \item LEFT JOIN
+    \item RIGHT JOIN
+    \item FULL OUTER JOIN
+  \end{enumerate}
+
+  \item The ACID property ``Isolation'' ensures:
+  \begin{enumerate}[label=(\Alph*)]
+    \item Transactions are permanent once committed
+    \item Database remains consistent after transactions
+    \item Concurrent transactions don't interfere with each other
+    \item Transactions complete entirely or not at all
+  \end{enumerate}
+
+  \item A primary key can contain NULL values. (True/False)
+
+  \item The DELETE statement can be rolled back if within a transaction. (True/False)
+
+  \item An index always improves query performance. (True/False)
+
+  \item Explain database normalization and its purpose. Describe First, Second, and Third Normal Forms with examples of tables that violate each form and how to correct them.
+  \vspace{8em}
+
+  \item Discuss the ACID properties of database transactions. Explain each property and describe mechanisms databases use to ensure these properties are maintained.
+  \vspace{8em}
+
+\end{enumerate}
+
+\end{document}

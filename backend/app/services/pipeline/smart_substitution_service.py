@@ -1310,11 +1310,12 @@ class SmartSubstitutionService:
 	async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
 		strategy = config.get("mapping_strategy", "unicode_steganography")
 		result = await asyncio.to_thread(self._apply_mappings, run_id, strategy)
-		
-		# Mapping generation is now only triggered manually via UI "Generate All" button
-		# No automatic generation during pipeline execution (neither initial run nor rerun)
-		# Users must explicitly click "Generate All" to trigger mapping generation
-		
+
+		# Automatically generate mappings for all questions during pipeline execution
+		self.logger.info("Auto-generating mappings for all questions", run_id=run_id)
+		generation_result = await self.auto_generate_all_questions(run_id)
+		result["auto_generation"] = generation_result
+
 		return result
 
 	def _apply_mappings(self, run_id: str, strategy: str) -> Dict[str, Any]:

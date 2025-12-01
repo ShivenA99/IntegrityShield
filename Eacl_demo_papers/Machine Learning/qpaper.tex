@@ -1,0 +1,83 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Machine Learning}}\\[0.25em]
+  {\large \textbf{Supervised Learning Fundamentals Quiz}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--5, choose the best option.
+  \item For Questions 6--8, mark True or False.
+  \item For Questions 9--10, write detailed answers with mathematical formulations where appropriate.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item Which of the following is NOT a symptom of overfitting?
+  \begin{enumerate}[label=(\Alph*)]
+    \item High training accuracy but low test accuracy
+    \item Model captures noise in the training data
+    \item High bias and high training error
+    \item Complex model with too many parameters
+  \end{enumerate}
+
+  \item In gradient descent, the learning rate determines:
+  \begin{enumerate}[label=(\Alph*)]
+    \item The direction of parameter updates
+    \item The size of steps taken toward the minimum
+    \item The number of iterations required
+    \item The final accuracy of the model
+  \end{enumerate}
+
+  \item Which regularization technique adds the sum of squared weights to the loss function?
+  \begin{enumerate}[label=(\Alph*)]
+    \item L1 regularization (Lasso)
+    \item L2 regularization (Ridge)
+    \item Dropout
+    \item Batch normalization
+  \end{enumerate}
+
+  \item The precision metric measures:
+  \begin{enumerate}[label=(\Alph*)]
+    \item True positives divided by all actual positives
+    \item True positives divided by all predicted positives
+    \item True negatives divided by all actual negatives
+    \item Correct predictions divided by total predictions
+  \end{enumerate}
+
+  \item K-fold cross-validation helps to:
+  \begin{enumerate}[label=(\Alph*)]
+    \item Increase training data size
+    \item Reduce model complexity
+    \item Provide more reliable performance estimates
+    \item Speed up training time
+  \end{enumerate}
+
+  \item A decision tree with unlimited depth will always overfit the training data. (True/False)
+
+  \item The softmax function is typically used in the output layer for binary classification. (True/False)
+
+  \item Feature scaling is essential for all machine learning algorithms. (True/False)
+
+  \item Explain the bias-variance tradeoff in machine learning. How do model complexity, training data size, and regularization affect this tradeoff? Provide examples.
+  \vspace{8em}
+
+  \item Describe how logistic regression works for binary classification. Explain the sigmoid function, the loss function used, and how gradient descent optimizes the model parameters.
+  \vspace{8em}
+
+\end{enumerate}
+
+\end{document}
