@@ -149,6 +149,37 @@ class PipelineOrchestrator:
                     target_stage_sequence.append(enum_value)
                     seen.add(enum_value)
 
+        # Prevention mode: Skip unnecessary stages
+        if config.mode == "prevention":
+            # Prevention mode needs:
+            # - smart_reading: extract document structure
+            # - content_discovery: identify question stems and locations (REQUIRED!)
+            # - document_enhancement: apply attacks (ICW fixed watermark, Font random chars)
+            # - pdf_creation: generate PDFs
+            # - results_generation: generate reports
+            # Skip: smart_substitution (no mapping generation needed), effectiveness_testing
+            stages_to_skip = {
+                PipelineStageEnum.SMART_SUBSTITUTION,
+                PipelineStageEnum.EFFECTIVENESS_TESTING,
+            }
+            original_length = len(target_stage_sequence)
+            target_stage_sequence = [
+                stage for stage in target_stage_sequence if stage not in stages_to_skip
+            ]
+            skipped_count = original_length - len(target_stage_sequence)
+            if skipped_count > 0:
+                self.logger.info(
+                    f"[{run_id}] Prevention mode: Skipped {skipped_count} stages "
+                    f"(smart_substitution, effectiveness_testing)"
+                )
+                live_logging_service.emit(
+                    run_id,
+                    "pipeline",
+                    "INFO",
+                    f"Prevention mode: Skipping {skipped_count} unnecessary stages (smart_substitution, effectiveness_testing)",
+                    context={"skipped_stages": [s.value for s in stages_to_skip]}
+                )
+
         run.status = "running"
         db.session.add(run)
         db.session.commit()
@@ -324,21 +355,30 @@ class PipelineOrchestrator:
         # Evaluation reports: after pdf_creation (PDFs created)
         if stage == PipelineStageEnum.PDF_CREATION and auto_eval_reports:
             enhancement_methods = pipeline_config.get("enhancement_methods", [])
+            mode = pipeline_config.get("mode", "detection")
             self.logger.info(
-                f"[{run_id}] Auto-generating {len(enhancement_methods)} evaluation reports after pdf_creation"
+                f"[{run_id}] Auto-generating {len(enhancement_methods)} evaluation reports "
+                f"after pdf_creation (mode: {mode})"
             )
 
-            from ..reports.evaluation_report_service import EvaluationReportService
-            eval_service = EvaluationReportService()
+            # Use appropriate evaluation service based on mode
+            if mode == "prevention":
+                from ..reports.prevention_evaluation_report_service import PreventionEvaluationReportService
+                eval_service = PreventionEvaluationReportService()
+                report_type = "prevention evaluation"
+            else:
+                from ..reports.evaluation_report_service import EvaluationReportService
+                eval_service = EvaluationReportService()
+                report_type = "detection evaluation"
 
             for method in enhancement_methods:
                 try:
-                    self.logger.info(f"[{run_id}] Generating evaluation report for method: {method}")
+                    self.logger.info(f"[{run_id}] Generating {report_type} report for method: {method}")
                     eval_service.generate(run_id, method=method)
-                    self.logger.info(f"[{run_id}] Evaluation report for {method} generated successfully")
+                    self.logger.info(f"[{run_id}] {report_type.capitalize()} report for {method} generated successfully")
                 except Exception as e:
                     self.logger.warning(
-                        f"[{run_id}] Failed to generate evaluation report for {method}: {e}",
+                        f"[{run_id}] Failed to generate {report_type} report for {method}: {e}",
                         exc_info=True
                     )
                     # Non-blocking: Continue with other methods even if one fails
