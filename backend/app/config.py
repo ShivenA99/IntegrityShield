@@ -18,6 +18,7 @@ def _parse_cors_origins() -> str | list[str]:
 
 
 class BaseConfig:
+    BASE_DIR = Path.cwd()  # Base directory for logs and data
     SECRET_KEY = os.getenv("FAIRTESTAI_SECRET_KEY", "dev-secret-key")
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "FAIRTESTAI_DATABASE_URL",
@@ -36,7 +37,7 @@ class BaseConfig:
     PIPELINE_STORAGE_ROOT = Path(
         os.getenv("FAIRTESTAI_PIPELINE_ROOT", Path.cwd() / "data" / "pipeline_runs")
     )
-    LOG_LEVEL = os.getenv("FAIRTESTAI_LOG_LEVEL", "INFO")
+    LOG_LEVEL = os.getenv("FAIRTESTAI_LOG_LEVEL", "DEBUG")  # Set to DEBUG for pipeline logging
     FILE_STORAGE_BUCKET = os.getenv("FAIRTESTAI_FILE_STORAGE_BUCKET")
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")

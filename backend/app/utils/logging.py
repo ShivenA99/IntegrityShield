@@ -39,3 +39,33 @@ def configure_logging(app: Any | None = None) -> None:
 
 def get_logger(name: str | None = None) -> structlog.stdlib.BoundLogger:
     return structlog.get_logger(name)
+
+
+def configure_pipeline_logging(app: Any) -> None:
+    """Configure file-based logging for background pipeline execution."""
+    from logging.handlers import RotatingFileHandler
+    from pathlib import Path
+
+    # Create logs directory
+    base_dir = Path(app.config.get("BASE_DIR", Path.cwd()))
+    log_dir = base_dir / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create rotating file handler
+    log_file = log_dir / "pipeline_execution.log"
+    file_handler = RotatingFileHandler(
+        str(log_file),
+        maxBytes=10_000_000,  # 10MB
+        backupCount=5
+    )
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(
+        "[%(asctime)s] %(name)s - %(levelname)s - %(message)s"
+    ))
+
+    # Add to pipeline-related loggers
+    pipeline_logger = logging.getLogger("app.services.pipeline")
+    pipeline_logger.addHandler(file_handler)
+    pipeline_logger.setLevel(logging.DEBUG)
+
+    app.logger.info(f"Pipeline logging configured: {log_file}")
