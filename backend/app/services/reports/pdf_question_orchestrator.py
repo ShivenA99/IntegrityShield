@@ -32,8 +32,11 @@ class PDFQuestionEvaluator:
             raise ValueError("At least one prompt is required for LLM evaluation.")
         self.prompts = prompts
 
-    def _clients(self) -> dict[str, BaseLLMClient]:
-        cfg = current_app.config
+    def _clients(self, config_dict: dict[str, Any] | None = None) -> dict[str, BaseLLMClient]:
+        if config_dict is None:
+            cfg = current_app.config
+        else:
+            cfg = config_dict
         clients = build_available_clients(
             openai_key=cfg.get("OPENAI_API_KEY"),
             anthropic_key=cfg.get("ANTHROPIC_API_KEY"),
@@ -48,16 +51,58 @@ class PDFQuestionEvaluator:
         return clients
 
     def evaluate(self, pdf_path: str, questions: list[QuestionPrompt]) -> dict[str, Any]:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            return loop.run_until_complete(self._evaluate_async(pdf_path, questions))
-        finally:
-            asyncio.set_event_loop(None)
-            loop.close()
+        # Extract Flask config before threading to avoid "Working outside of application context" error
+        config_dict = {
+            "OPENAI_API_KEY": current_app.config.get("OPENAI_API_KEY"),
+            "ANTHROPIC_API_KEY": current_app.config.get("ANTHROPIC_API_KEY"),
+            "GOOGLE_AI_KEY": current_app.config.get("GOOGLE_AI_KEY"),
+            "LLM_REPORT_MODEL_OVERRIDES": current_app.config.get("LLM_REPORT_MODEL_OVERRIDES") or {},
+            "LLM_REPORT_MODEL_FALLBACKS": current_app.config.get("LLM_REPORT_MODEL_FALLBACKS") or {},
+        }
 
-    async def _evaluate_async(self, pdf_path: str, questions: list[QuestionPrompt]) -> dict[str, Any]:
-        clients = self._clients()
+        try:
+            # Check if there's already a running event loop
+            asyncio.get_running_loop()
+            # We're in an async context - run in a separate thread to avoid blocking
+            import threading
+
+            result_container = {}
+            error_container = {}
+
+            def run_in_thread():
+                # Create new event loop for this thread
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    result = loop.run_until_complete(self._evaluate_async(pdf_path, questions, config_dict))
+                    result_container['result'] = result
+                except Exception as e:
+                    error_container['error'] = e
+                finally:
+                    loop.close()
+
+            thread = threading.Thread(target=run_in_thread, daemon=True)
+            thread.start()
+            thread.join(timeout=300)  # 5 minute timeout
+
+            if thread.is_alive():
+                raise TimeoutError("LLM evaluation timed out after 5 minutes")
+            if 'error' in error_container:
+                raise error_container['error']
+            return result_container.get('result', {})
+
+        except RuntimeError:
+            # No running loop, create a new one
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                return loop.run_until_complete(self._evaluate_async(pdf_path, questions, config_dict))
+            finally:
+                asyncio.set_event_loop(None)
+                loop.close()
+
+    async def _evaluate_async(self, pdf_path: str, questions: list[QuestionPrompt], config_dict: dict[str, Any] | None = None) -> dict[str, Any]:
+        clients = self._clients(config_dict)
         uploads = await self._upload_to_providers(clients, pdf_path)
         question_responses: dict[str, list[dict[str, Any]]] = {q.question_number: [] for q in questions}
 

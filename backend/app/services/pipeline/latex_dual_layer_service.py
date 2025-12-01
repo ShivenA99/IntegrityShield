@@ -132,7 +132,7 @@ class LatexAttackService:
         self.logger = get_logger(self.__class__.__name__)
         self.structured_manager = StructuredDataManager()
 
-    def execute(self, run_id: str, *, method_name: str = "latex_dual_layer", force: bool = False) -> Dict[str, Any]:
+    def execute(self, run_id: str, *, method_name: str = "latex_dual_layer", force: bool = False, tex_override: Optional[Path] = None) -> Dict[str, Any]:
         structured = self.structured_manager.load(run_id) or {}
         manual_meta = structured.get("manual_input") or {}
         document_meta = structured.get("document") or {}
@@ -145,11 +145,14 @@ class LatexAttackService:
         overlay_dirname = self._method_overlay_folder(method_key)
         log_method = method_key.replace("_", "-")
 
-        tex_path_str = manual_meta.get("tex_path") or document_meta.get("latex_path")
-        if not tex_path_str:
-            raise ValueError("Manual LaTeX path not present in structured data")
+        if tex_override is not None:
+            tex_path = Path(tex_override)
+        else:
+            tex_path_str = manual_meta.get("tex_path") or document_meta.get("latex_path")
+            if not tex_path_str:
+                raise ValueError("Manual LaTeX path not present in structured data")
+            tex_path = Path(tex_path_str)
 
-        tex_path = Path(tex_path_str)
         if not tex_path.exists():
             raise FileNotFoundError(f"Manual LaTeX source not found at {tex_path}")
 

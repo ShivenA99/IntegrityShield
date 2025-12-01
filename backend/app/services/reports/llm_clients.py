@@ -505,15 +505,16 @@ def build_available_clients(
     else:
         logger.info("Skipping Anthropic report client - API key missing.")
 
-    # For v1beta API with file uploads, gemini-2.0-flash-exp is the recommended model
-    # Note: v1beta has limited model support - only certain models support file uploads
-    # Model name should be without "models/" prefix when passed to client
-    # The URL will add "models/" prefix automatically
-    default_model = model_overrides.get("google", "gemini-2.0-flash-exp")
-    google_client = GoogleClient(google_key, default_model)
-    if google_client.is_configured():
-        clients[google_client.name] = google_client
-    else:
-        logger.info("Skipping Google report client - API key missing.")
+    # Google/Gemini is currently disabled - only using OpenAI and Anthropic
+    # # For v1beta API with file uploads, gemini-2.0-flash-exp is the recommended model
+    # # Note: v1beta has limited model support - only certain models support file uploads
+    # # Model name should be without "models/" prefix when passed to client
+    # # The URL will add "models/" prefix automatically
+    # default_model = model_overrides.get("google", "gemini-2.0-flash-exp")
+    # google_client = GoogleClient(google_key, default_model)
+    # if google_client.is_configured():
+    #     clients[google_client.name] = google_client
+    # else:
+    #     logger.info("Skipping Google report client - API key missing.")
 
     return clients

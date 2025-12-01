@@ -290,11 +290,11 @@ class PipelineOrchestrator:
         auto_vuln_report = pipeline_config.get("auto_vulnerability_report", False)
         auto_eval_reports = pipeline_config.get("auto_evaluation_reports", False)
 
-        # Vulnerability report: after smart_reading (reconstruction complete)
-        if stage == PipelineStageEnum.SMART_READING and auto_vuln_report:
+        # Vulnerability report: after content_discovery (questions and gold answers available)
+        if stage == PipelineStageEnum.CONTENT_DISCOVERY and auto_vuln_report:
             try:
-                from ...reports.vulnerability_report_service import VulnerabilityReportService
-                self.logger.info(f"[{run_id}] Auto-generating vulnerability report after smart_reading")
+                from ..reports.vulnerability_report_service import VulnerabilityReportService
+                self.logger.info(f"[{run_id}] Auto-generating vulnerability report after content_discovery")
                 vuln_service = VulnerabilityReportService()
                 vuln_service.generate(run_id)
                 self.logger.info(f"[{run_id}] Vulnerability report generated successfully")
@@ -307,8 +307,9 @@ class PipelineOrchestrator:
 
         # Detection report: after smart_substitution (mapping validation complete)
         if stage == PipelineStageEnum.SMART_SUBSTITUTION and auto_vuln_report:
+
             try:
-                from ...reports.detection_report_service import DetectionReportService
+                from .detection_report_service import DetectionReportService
                 self.logger.info(f"[{run_id}] Auto-generating detection report after smart_substitution")
                 detection_service = DetectionReportService()
                 detection_service.generate(run_id)
@@ -327,7 +328,7 @@ class PipelineOrchestrator:
                 f"[{run_id}] Auto-generating {len(enhancement_methods)} evaluation reports after pdf_creation"
             )
 
-            from ...reports.evaluation_report_service import EvaluationReportService
+            from ..reports.evaluation_report_service import EvaluationReportService
             eval_service = EvaluationReportService()
 
             for method in enhancement_methods:

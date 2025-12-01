@@ -70,10 +70,9 @@ class LatexICWDualLayerRenderer(BaseRenderer):
 
         dual_result = self.dual_service.execute(
             run_id,
+            method_name="latex_icw_dual_layer",
             force=False,
             tex_override=Path(icw_tex_path) if icw_tex_path else None,
-            artifact_label="latex-icw-dual-layer",
-            record_method="latex_icw_dual_layer",
         )
 
         artifacts = dual_result.get("artifacts") or {}
