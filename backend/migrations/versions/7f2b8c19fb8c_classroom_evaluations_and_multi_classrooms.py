@@ -23,27 +23,27 @@ json_type = sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), "pos
 
 def upgrade() -> None:
     # answer_sheet_runs enhacements
-    op.drop_constraint("answer_sheet_runs_pipeline_run_id_key", "answer_sheet_runs", type_="unique")
-    op.add_column("answer_sheet_runs", sa.Column("classroom_key", sa.String(length=64), nullable=True))
-    op.add_column("answer_sheet_runs", sa.Column("classroom_label", sa.String(length=128), nullable=True))
-    op.add_column("answer_sheet_runs", sa.Column("notes", sa.Text(), nullable=True))
-    op.add_column("answer_sheet_runs", sa.Column("attacked_pdf_method", sa.String(length=64), nullable=True))
-    op.add_column("answer_sheet_runs", sa.Column("attacked_pdf_path", sa.Text(), nullable=True))
-    op.add_column("answer_sheet_runs", sa.Column("origin", sa.String(length=32), nullable=False, server_default=sa.text("'generated'")))
-    op.add_column("answer_sheet_runs", sa.Column("status", sa.String(length=32), nullable=False, server_default=sa.text("'ready'")))
-    op.add_column("answer_sheet_runs", sa.Column("artifacts", json_type, nullable=False, server_default=sa.text("'{}'")))
-    op.add_column("answer_sheet_runs", sa.Column("last_evaluated_at", sa.DateTime(timezone=True), nullable=True))
-    op.create_unique_constraint(
-        "uq_answer_sheet_runs_pipeline_classroom",
-        "answer_sheet_runs",
-        ["pipeline_run_id", "classroom_key"],
-    )
-    op.create_index(
-        op.f("ix_answer_sheet_runs_classroom_key"),
-        "answer_sheet_runs",
-        ["classroom_key"],
-        unique=False,
-    )
+    # Use batch mode for SQLite compatibility (copy-and-move strategy)
+    with op.batch_alter_table("answer_sheet_runs", schema=None) as batch_op:
+        batch_op.drop_constraint("answer_sheet_runs_pipeline_run_id_key", type_="unique")
+        batch_op.add_column(sa.Column("classroom_key", sa.String(length=64), nullable=True))
+        batch_op.add_column(sa.Column("classroom_label", sa.String(length=128), nullable=True))
+        batch_op.add_column(sa.Column("notes", sa.Text(), nullable=True))
+        batch_op.add_column(sa.Column("attacked_pdf_method", sa.String(length=64), nullable=True))
+        batch_op.add_column(sa.Column("attacked_pdf_path", sa.Text(), nullable=True))
+        batch_op.add_column(sa.Column("origin", sa.String(length=32), nullable=False, server_default=sa.text("'generated'")))
+        batch_op.add_column(sa.Column("status", sa.String(length=32), nullable=False, server_default=sa.text("'ready'")))
+        batch_op.add_column(sa.Column("artifacts", json_type, nullable=False, server_default=sa.text("'{}'")))
+        batch_op.add_column(sa.Column("last_evaluated_at", sa.DateTime(timezone=True), nullable=True))
+        batch_op.create_unique_constraint(
+            "uq_answer_sheet_runs_pipeline_classroom",
+            ["pipeline_run_id", "classroom_key"],
+        )
+        batch_op.create_index(
+            op.f("ix_answer_sheet_runs_classroom_key"),
+            ["classroom_key"],
+            unique=False,
+        )
 
     # classroom evaluations table
     op.create_table(
@@ -83,15 +83,17 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_classroom_evaluations_pipeline_run_id"), table_name="classroom_evaluations")
     op.drop_table("classroom_evaluations")
 
-    op.drop_index(op.f("ix_answer_sheet_runs_classroom_key"), table_name="answer_sheet_runs")
-    op.drop_constraint("uq_answer_sheet_runs_pipeline_classroom", "answer_sheet_runs", type_="unique")
-    op.drop_column("answer_sheet_runs", "last_evaluated_at")
-    op.drop_column("answer_sheet_runs", "artifacts")
-    op.drop_column("answer_sheet_runs", "status")
-    op.drop_column("answer_sheet_runs", "origin")
-    op.drop_column("answer_sheet_runs", "attacked_pdf_path")
-    op.drop_column("answer_sheet_runs", "attacked_pdf_method")
-    op.drop_column("answer_sheet_runs", "notes")
-    op.drop_column("answer_sheet_runs", "classroom_label")
-    op.drop_column("answer_sheet_runs", "classroom_key")
-    op.create_unique_constraint("answer_sheet_runs_pipeline_run_id_key", "answer_sheet_runs", ["pipeline_run_id"])
+    # Use batch mode for SQLite compatibility
+    with op.batch_alter_table("answer_sheet_runs", schema=None) as batch_op:
+        batch_op.drop_index(op.f("ix_answer_sheet_runs_classroom_key"))
+        batch_op.drop_constraint("uq_answer_sheet_runs_pipeline_classroom", type_="unique")
+        batch_op.drop_column("last_evaluated_at")
+        batch_op.drop_column("artifacts")
+        batch_op.drop_column("status")
+        batch_op.drop_column("origin")
+        batch_op.drop_column("attacked_pdf_path")
+        batch_op.drop_column("attacked_pdf_method")
+        batch_op.drop_column("notes")
+        batch_op.drop_column("classroom_label")
+        batch_op.drop_column("classroom_key")
+        batch_op.create_unique_constraint("answer_sheet_runs_pipeline_run_id_key", ["pipeline_run_id"])

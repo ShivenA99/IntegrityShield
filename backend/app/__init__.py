@@ -12,7 +12,7 @@ from .config import get_config
 from .extensions import db, init_extensions
 from .utils.json import ORJSONProvider
 from .utils.migrations import ensure_database_schema
-from .utils.logging import configure_logging
+from .utils.logging import configure_logging, configure_pipeline_logging
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -23,6 +23,7 @@ def create_app(config_name: str | None = None) -> Flask:
     app.json = ORJSONProvider(app)
 
     configure_logging(app)
+    configure_pipeline_logging(app)  # Add file-based logging for pipeline
     init_extensions(app)
 
     from .api import register_blueprints
@@ -33,6 +34,11 @@ def create_app(config_name: str | None = None) -> Flask:
 
     with app.app_context():
         ensure_database_schema()
+
+        # Validate pipeline services are properly initialized
+        from app.services.pipeline.pipeline_orchestrator import PipelineOrchestrator
+        orchestrator = PipelineOrchestrator()
+        app.logger.info(f"Pipeline orchestrator initialized with {len(orchestrator.stage_services)} services")
 
     return app
 

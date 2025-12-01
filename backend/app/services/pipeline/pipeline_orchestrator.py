@@ -76,11 +76,43 @@ class PipelineOrchestrator:
         }
 
     def start_background(self, run_id: str, config: PipelineConfig) -> None:
+        """Start pipeline execution in background thread with error handling."""
         app = current_app._get_current_object()
 
         def runner():
-            with app.app_context():
-                asyncio.run(self.execute_pipeline(run_id, config))
+            try:
+                with app.app_context():
+                    asyncio.run(self.execute_pipeline(run_id, config))
+            except Exception as exc:
+                # Critical: Catch all exceptions from pipeline execution
+                self.logger.error(
+                    f"Pipeline execution failed for run {run_id}: {exc}",
+                    exc_info=True
+                )
+
+                # Update database with failure status
+                try:
+                    with app.app_context():
+                        run = PipelineRun.query.get(run_id)
+                        if run:
+                            run.status = "failed"
+                            run.error_details = f"Background thread exception: {str(exc)}"
+                            run.completed_at = utc_now()
+                            db.session.add(run)
+                            db.session.commit()
+
+                        # Emit error to live logging
+                        live_logging_service.emit(
+                            run_id,
+                            "pipeline",
+                            "ERROR",
+                            f"Pipeline execution failed: {str(exc)}"
+                        )
+                except Exception as db_exc:
+                    self.logger.error(
+                        f"Failed to update run status after exception: {db_exc}",
+                        exc_info=True
+                    )
 
         thread = threading.Thread(target=runner, name=f"pipeline-{run_id}", daemon=True)
         thread.start()
