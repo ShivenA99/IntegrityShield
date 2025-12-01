@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import random
 import re
 import shutil
+import string
 import subprocess
 import tempfile
 from dataclasses import asdict, dataclass
@@ -82,6 +84,8 @@ class LatexFontAttackService:
         artifact_label: Optional[str] = None,
         record_method: Optional[str] = None,
     ) -> Dict[str, Any]:
+        from ...models import PipelineRun
+
         self.logger.info("Starting LaTeX font attack", extra={"run_id": run_id})
         self._needs_enumitem_patch = False
         structured = self.structured_manager.load(run_id) or {}
@@ -89,6 +93,11 @@ class LatexFontAttackService:
         document_meta = structured.get("document") or {}
         artifact_dir_name = artifact_label or "latex-font-attack"
         method_key = record_method or artifact_dir_name.replace("-", "_")
+
+        # Check if we're in prevention mode
+        run = PipelineRun.query.get(run_id)
+        mode = run.pipeline_config.get("mode", "detection") if run else "detection"
+        is_prevention_mode = mode == "prevention"
 
         if tex_override is not None:
             tex_path = Path(tex_override)
@@ -145,9 +154,16 @@ class LatexFontAttackService:
         planner = ChunkPlanner(builder.glyph_lookup)
         cache = FontCache(cache_dir)
 
-        mutated_tex, jobs, diagnostics = self._apply_font_attack(
-            original_tex, questions, planner, builder, fonts_dir, cache
-        )
+        if is_prevention_mode:
+            # Prevention mode: random character mappings for all question stems
+            mutated_tex, jobs, diagnostics = self._apply_prevention_font_attack(
+                original_tex, structured, planner, builder, fonts_dir, cache
+            )
+        else:
+            # Detection mode: mapping-based font attack
+            mutated_tex, jobs, diagnostics = self._apply_font_attack(
+                original_tex, questions, planner, builder, fonts_dir, cache
+            )
 
         attacked_tex_path = artifacts_dir / "latex_font_attack_attacked.tex"
         attacked_tex_path.write_text(mutated_tex, encoding="utf-8")
@@ -444,6 +460,170 @@ class LatexFontAttackService:
         if not replacements:
             return tex_content, tuple(), tuple(diagnostics)
 
+        mutated = tex_content
+        for start, end, replacement_text, job in sorted(
+            replacements, key=lambda item: item[0], reverse=True
+        ):
+            mutated = mutated[:start] + replacement_text + mutated[end:]
+            attack_jobs.append(job)
+
+        attack_jobs.reverse()
+
+        mutated = self._normalize_tex_dependencies(mutated)
+        mutated = self._ensure_preamble(mutated, attack_jobs)
+        return mutated, tuple(attack_jobs), tuple(diagnostics)
+
+    def _apply_prevention_font_attack(
+        self,
+        tex_content: str,
+        structured: Dict[str, Any],
+        planner: ChunkPlanner,
+        builder: FontAttackBuilder,
+        fonts_dir: Path,
+        cache: FontCache,
+    ) -> Tuple[str, Sequence[AttackJob], Sequence[MappingDiagnostic]]:
+        """
+        Prevention mode: Apply random character mappings to all question stems.
+        Each character gets a different random replacement for maximum diversity.
+        """
+        self._font_command_registry: Dict[str, set[str]] = {}
+
+        replacements: List[Tuple[int, int, str, AttackJob]] = []
+        occupied_ranges: List[Tuple[int, int, Optional[str]]] = []
+        diagnostics: List[MappingDiagnostic] = []
+        attack_jobs: List[AttackJob] = []
+        counter = 0
+
+        # Get all question stems from structured data
+        ai_questions = structured.get("ai_questions", [])
+
+        # Available characters for random replacement (excluding special LaTeX chars)
+        available_chars = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
+
+        for question in ai_questions:
+            stem_text = question.get("stem_text", "")
+            if not stem_text:
+                continue
+
+            question_number = str(question.get("question_number") or question.get("q_number") or "")
+
+            # Find the stem in the LaTeX
+            stem_index = tex_content.find(stem_text)
+            if stem_index == -1:
+                # Stem not found exactly, log diagnostic
+                diagnostics.append(MappingDiagnostic(
+                    mapping_id=None,
+                    question_number=question_number,
+                    status="stem_not_found",
+                    original=stem_text[:50],  # First 50 chars
+                    replacement="",
+                    notes=f"Stem text not found in LaTeX for Q{question_number}"
+                ))
+                continue
+
+            # Process each alphanumeric character in the stem
+            char_offset = 0
+            for i, char in enumerate(stem_text):
+                if not char.isalnum():
+                    char_offset += 1
+                    continue
+
+                # Generate random replacement character
+                # Each occurrence gets a different random character for diversity
+                random_replacement = random.choice([c for c in available_chars if c != char])
+
+                char_start = stem_index + i
+                char_end = char_start + 1
+
+                # Check for overlaps
+                overlap = self._find_range_overlap(occupied_ranges, char_start, char_end)
+                if overlap:
+                    char_offset += 1
+                    continue
+
+                try:
+                    # Plan font attack: visual shows original char, hidden text is random char
+                    plan = planner.plan(random_replacement, char)
+                except (KeyError, ValueError) as exc:
+                    diagnostics.append(MappingDiagnostic(
+                        mapping_id=None,
+                        question_number=question_number,
+                        status="planning_failed",
+                        original=char,
+                        replacement=random_replacement,
+                        location=(char_start, char_end),
+                        notes=str(exc)
+                    ))
+                    char_offset += 1
+                    continue
+
+                attack_id = f"pfa{counter:04d}"  # Prevention Font Attack ID
+                counter += 1
+
+                # Build fonts
+                try:
+                    raw_font_results = builder.build_fonts(
+                        plan, fonts_dir / attack_id, cache_lookup=cache
+                    )
+                except FontBuildError as exc:
+                    diagnostics.append(MappingDiagnostic(
+                        mapping_id=None,
+                        question_number=question_number,
+                        status="font_build_failed",
+                        original=char,
+                        replacement=random_replacement,
+                        location=(char_start, char_end),
+                        notes=str(exc)
+                    ))
+                    char_offset += 1
+                    continue
+
+                font_results: List[FontBuildResult] = []
+                attack_font_dir = fonts_dir / attack_id
+                attack_font_dir.mkdir(parents=True, exist_ok=True)
+                for raw in raw_font_results:
+                    target_name = f"{attack_id}_pos{raw.index}.ttf"
+                    target_path = attack_font_dir / target_name
+                    if raw.font_path != target_path:
+                        shutil.copy2(raw.font_path, target_path)
+                    font_results.append(
+                        FontBuildResult(
+                            index=raw.index,
+                            hidden_char=raw.hidden_char,
+                            visual_text=raw.visual_text,
+                            font_path=target_path,
+                            used_cache=raw.used_cache,
+                        )
+                    )
+
+                latex_replacement = self._render_replacement(attack_id, plan, font_results)
+
+                replacements.append((char_start, char_end, latex_replacement, AttackJob(
+                    attack_id=attack_id,
+                    mapping_id=None,
+                    question_number=question_number,
+                    visual_text=char,
+                    hidden_text=random_replacement,
+                    plan=plan,
+                    latex_replacement=latex_replacement,
+                    font_results=font_results,
+                )))
+
+                occupied_ranges.append((char_start, char_end, None))
+
+                diagnostics.append(MappingDiagnostic(
+                    mapping_id=None,
+                    question_number=question_number,
+                    status="replaced",
+                    original=char,
+                    replacement=random_replacement,
+                    location=(char_start, char_end)
+                ))
+
+        if not replacements:
+            return tex_content, tuple(), tuple(diagnostics)
+
+        # Apply all replacements (reverse order to preserve indices)
         mutated = tex_content
         for start, end, replacement_text, job in sorted(
             replacements, key=lambda item: item[0], reverse=True
