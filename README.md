@@ -1,6 +1,10 @@
-# AntiCheatAI – LLM Assessment Vulnerability Simulator
+# Integrity Shield – LLM Assessment Vulnerability Simulator
 
 This repository hosts the end-to-end simulator we use to probe grading vulnerabilities in LLM-assisted educational workflows. It ingests instructor PDFs, weaponises subtle content manipulations, renders multiple attacked variants, and now models whole-class cheating behaviour through synthetic classroom datasets and evaluation analytics.
+
+## 🎥 Demo Video
+
+**[Watch the full demonstration](https://youtu.be/77W_fWW2Agg)** to see Integrity Shield in action.
 
 ## Repository Layout
 
