@@ -22,6 +22,7 @@ import classroomEvaluation from "@data/classroomSimulation/evaluation.json";
 import assessmentPdf from "@data/integrityShieldDemo/Mathematics_K12_Assessment.pdf";
 import vulnerabilityReport from "@data/integrityShieldDemo/vulnerability_report.json";
 import { useDemoRun } from "@contexts/DemoRunContext";
+import { getAssetUrl } from "@utils/basePath";
 
 type StageId = "simulate" | "detector" | "evaluation";
 type SourceMode = "simulation" | "lms";
@@ -596,7 +597,7 @@ const ClassroomSimulationPage: React.FC = () => {
       <header className="ishield-demo__top-nav">
         <div className="ishield-demo__brand-stack">
           <div className="ishield-demo__brand">
-            <img src="/icons/logo.png" alt="IntegrityShield" className="ishield-demo__brand-logo" />
+            <img src={getAssetUrl("/icons/logo.png")} alt="IntegrityShield" className="ishield-demo__brand-logo" />
             <div className="ishield-demo__brand-title">INTEGRITYSHIELD</div>
           </div>
           <div className="ishield-demo__meta-bar">
