@@ -44,7 +44,7 @@ const Header: React.FC = () => {
     <header className="app-header">
       <div className="app-header__brand">
         <span className="app-header__logo">
-          <ShieldCheckIcon className="app-header__shield-icon" aria-hidden="true" />
+          <img src="/IS_logo.png?v=3" alt="IntegrityShield" className="app-header__logo-image" />
           INTEGRITYSHIELD
         </span>
         <div className="app-header__run">

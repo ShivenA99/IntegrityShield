@@ -2,6 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { usePipeline } from "@hooks/usePipeline";
+import { ReportHeader, SummaryCard, RiskBadge, MappingCard } from "@components/reports";
+
+import "@styles/reports.css";
 
 const encodeRelativePath = (relativePath: string) =>
   relativePath.split(/[\\/]+/).filter(Boolean).map(encodeURIComponent).join("/");
@@ -95,17 +98,16 @@ const DetectionReportPage: React.FC = () => {
     }
   }, [generateDetectionReport, isRegenerating, refreshStatus, runId]);
 
+  const mode = status?.pipeline_config?.mode;
+
   return (
     <div className="page report-page">
-      <div className="panel">
-        <header className="panel-header panel-header--tight">
-          <div>
-            <h1>Detection Report</h1>
-            <p className="muted">
-              Run {runId} · {formattedTimestamp ? `Generated ${formattedTimestamp}` : "Not generated"}
-            </p>
-          </div>
-          <div className="panel-actions">
+      <ReportHeader
+        title="Detection Report"
+        subtitle={`Run ${runId} · ${formattedTimestamp ? `Generated ${formattedTimestamp}` : "Not generated"}`}
+        mode={mode}
+        actions={
+          <>
             <button type="button" className="ghost-button" onClick={() => navigate(-1)}>
               Back
             </button>
@@ -120,154 +122,114 @@ const DetectionReportPage: React.FC = () => {
             <button type="button" className="ghost-button" onClick={handleDownload} disabled={!artifactUrl}>
               Download JSON
             </button>
-          </div>
-        </header>
+          </>
+        }
+      />
 
-        {!detectionPayload ? (
-          <p className="empty-state">
-            No detection report is available yet. Generate one from the PDF Creation panel.
-          </p>
-        ) : (
-          <>
-            <section className="report-toolbar">
-              <span className="report-tag report-tag--status">
-                Status: {detectionMeta?.status ?? detectionPayload?.status ?? "completed"}
-              </span>
-              {formattedTimestamp ? <span className="report-tag">Generated {formattedTimestamp}</span> : null}
+      {!detectionPayload ? (
+        <div className="report-empty-state">
+          <h3>No Report Available</h3>
+          <p>No detection report is available yet. Generate one from the PDF Creation panel.</p>
+        </div>
+      ) : (
+        <>
+          {summary ? (
+            <section className="detection-summary-dashboard">
+              <SummaryCard
+                title="Total Questions"
+                value={summary.total_questions ?? questions.length}
+                icon={<span style={{ fontSize: "2.5rem" }}>📊</span>}
+              />
+              <SummaryCard
+                title="With Mappings"
+                value={summary.questions_with_mappings ?? 0}
+                icon={<span style={{ fontSize: "2.5rem" }}>🎯</span>}
+              />
+              <SummaryCard
+                title="High Risk"
+                value={summary.high_risk_questions ?? 0}
+                variant="danger"
+                icon={<span style={{ fontSize: "2.5rem" }}>⚠️</span>}
+              />
             </section>
-            {summary ? (
-              <section className="report-summary-grid">
-                <div>
-                  <span>Total questions</span>
-                  <strong>{summary.total_questions ?? questions.length}</strong>
-                </div>
-                <div>
-                  <span>With mappings</span>
-                  <strong>{summary.questions_with_mappings ?? "—"}</strong>
-                </div>
-                <div>
-                  <span>Missing mappings</span>
-                  <strong>{summary.questions_missing_mappings ?? "—"}</strong>
-                </div>
-                <div>
-                  <span>High risk</span>
-                  <strong>{summary.high_risk_questions ?? "—"}</strong>
-                </div>
-              </section>
-            ) : null}
+          ) : null}
             {regenMessage ? <p className="panel-flash panel-flash--success">{regenMessage}</p> : null}
             {regenError ? <p className="panel-flash panel-flash--error">{regenError}</p> : null}
 
-            <section className="report-question-list">
-              {questions.length ? (
-                questions.map((question) => {
-                  const mappings = Array.isArray(question.mappings) ? question.mappings : [];
-                  const limitedMappings = mappings.slice(0, 3);
-                  const signalPhrase = question.target_answer?.signal?.phrase ?? null;
-                  return (
-                    <article
-                      key={question.question_number}
-                      className={`report-question-card risk-${question.risk_level ?? "low"}`}
-                    >
-                      <div className="report-question-card__header">
-                        <div>
-                          <strong>Q{question.question_number}</strong> · {question.question_type ?? "Unknown"}
-                        </div>
-                        <span className={`risk-badge risk-${question.risk_level ?? "low"}`}>
-                          {riskLabel(question.risk_level)}
+          <section className="report-question-list">
+            {questions.length ? (
+              questions.map((question) => {
+                const mappings = Array.isArray(question.mappings) ? question.mappings : [];
+                const limitedMappings = mappings.slice(0, 3);
+                const signalPhrase = question.target_answer?.signal?.phrase ?? null;
+                return (
+                  <article
+                    key={question.question_number}
+                    className="report-question-card"
+                    data-risk={question.risk_level ?? "low"}
+                  >
+                    <div className="card-header">
+                      <span className="question-number">Q{question.question_number}</span>
+                      <RiskBadge risk={question.risk_level ?? "low"} />
+                    </div>
+                    <p className="question-stem">{question.stem_text}</p>
+                    <div className="target-info">
+                      <span className="gold-answer">
+                        Gold: {question.gold_answer?.label ?? "—"}
+                      </span>
+                      <span className="target-answer">
+                        Target: {question.target_answer?.labels?.length
+                          ? question.target_answer.labels.join(", ")
+                          : "—"}
+                      </span>
+                      {signalPhrase ? (
+                        <span className="signal-phrase">
+                          📡 Signal: "{signalPhrase}"
                         </span>
-                      </div>
-                      <p className="report-question-card__stem">{question.stem_text}</p>
-                      <div className="report-question-card__chips">
-                        <span className="report-tag report-tag--gold">
-                          Gold {question.gold_answer?.label ?? "—"}
-                        </span>
-                        {question.target_answer?.labels?.length ? (
-                          question.target_answer.labels.map((label: string) => (
-                            <span key={label} className="report-tag report-tag--target">
-                              Target {label}
-                            </span>
-                          ))
-                        ) : !signalPhrase ? (
-                          <span className="report-tag report-tag--muted">No target</span>
-                        ) : null}
-                        {signalPhrase ? (
-                          <span className="report-tag report-tag--target">
-                            Signal “{signalPhrase}”
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="report-question-card__meta">
-                        <span>Gold: {question.gold_answer?.label ?? "—"}</span>
-                        <span>
-                          Target:{" "}
-                          {question.target_answer?.labels?.length
-                            ? question.target_answer.labels.join(", ")
-                            : "—"}
-                        </span>
-                        <span>
-                          Signal: {question.target_answer?.signal?.phrase ?? "—"}
-                        </span>
-                        <span>Mappings: {mappings.length}</span>
-                      </div>
-                      {limitedMappings.length ? (
-                        <div className="report-question-card__answers">
-                          {limitedMappings.map((mapping, index) => (
-                            <div
-                              key={mapping.id ?? index}
-                              className={`report-answer-chip ${
-                                mapping.validated
-                                  ? "report-answer-chip--validated"
-                                  : "report-answer-chip--pending"
-                              }`}
-                            >
-                              <div className="report-answer-chip__header">
-                                <span>{mapping.context ?? "stem"}</span>
-                                <strong>{mapping.deviation_score != null ? mapping.deviation_score.toFixed(2) : "—"}</strong>
-                              </div>
-                              <small className="muted">
-                                {mapping.original ?? "—"} → {mapping.replacement ?? "—"}
-                              </small>
-                              {mapping.signal_phrase ? (
-                                <small className="muted">
-                                  Signal: {mapping.signal_phrase}
-                                </small>
-                              ) : null}
-                              {mapping.validation_reason ? (
-                                <p>{mapping.validation_reason}</p>
-                              ) : mapping.reasoning ? (
-                                <p>{mapping.reasoning}</p>
-                              ) : null}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="muted">No mappings recorded for this question.</p>
-                      )}
-                      {mappings.length > limitedMappings.length ? (
-                        <small className="muted">
-                          +{mappings.length - limitedMappings.length} additional mapping
-                          {mappings.length - limitedMappings.length === 1 ? "" : "s"} in JSON export
-                        </small>
                       ) : null}
-                    </article>
-                  );
-                })
-              ) : (
-                <p className="muted">No question-level details available.</p>
-              )}
-            </section>
+                    </div>
+                    {limitedMappings.length ? (
+                      <div className="mappings-grid">
+                        {limitedMappings.map((mapping, index) => (
+                          <MappingCard
+                            key={mapping.id ?? index}
+                            context={mapping.context ?? "stem"}
+                            original={mapping.original ?? "—"}
+                            replacement={mapping.replacement ?? "—"}
+                            deviationScore={mapping.deviation_score}
+                            validated={mapping.validated ?? false}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="muted">No mappings recorded for this question.</p>
+                    )}
+                    {mappings.length > limitedMappings.length ? (
+                      <button className="show-more-btn">
+                        +{mappings.length - limitedMappings.length} more mapping
+                        {mappings.length - limitedMappings.length === 1 ? "" : "s"}
+                      </button>
+                    ) : null}
+                  </article>
+                );
+              })
+            ) : (
+              <div className="report-empty-state">
+                <h3>No Questions Found</h3>
+                <p>No question-level details available.</p>
+              </div>
+            )}
+          </section>
 
-            <section className="report-json">
-              <header>
-                <h2>Raw Summary</h2>
-              </header>
-              <pre>{JSON.stringify(summary ?? {}, null, 2)}</pre>
-            </section>
-          </>
-        )}
-        {downloadError ? <p className="panel-flash panel-flash--error">{downloadError}</p> : null}
-      </div>
+          <section className="report-json">
+            <header>
+              <h2>Raw Summary</h2>
+            </header>
+            <pre>{JSON.stringify(summary ?? {}, null, 2)}</pre>
+          </section>
+        </>
+      )}
+      {downloadError ? <div className="panel-flash panel-flash--error">{downloadError}</div> : null}
     </div>
   );
 };

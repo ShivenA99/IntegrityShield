@@ -2,6 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { usePipeline } from "@hooks/usePipeline";
+import { ReportHeader, SummaryCard, ProviderBadge, OptionCard } from "@components/reports";
+
+import "@styles/reports.css";
 
 const encodeRelativePath = (relativePath: string) =>
   relativePath.split(/[\\/]+/).filter(Boolean).map(encodeURIComponent).join("/");
@@ -147,65 +150,99 @@ const EvaluationReportPage: React.FC = () => {
     }
   }, [artifactPath, runId, selectedMethod]);
 
+  const mode = status?.pipeline_config?.mode;
+
   return (
     <div className="page report-page">
-      <div className="panel">
-        <header className="panel-header panel-header--tight">
-          <div>
-            <h1>Evaluation Report</h1>
-            <p className="muted">
-              Run {runId}
-              {selectedMethod ? ` · Variant ${selectedMethod}` : null}
-              {formattedTimestamp ? ` · Generated ${formattedTimestamp}` : null}
-            </p>
-          </div>
-          <div className="panel-actions">
+      <ReportHeader
+        title="Evaluation Report"
+        subtitle={`Run ${runId}${selectedMethod ? ` · Variant ${selectedMethod}` : ""}${formattedTimestamp ? ` · Generated ${formattedTimestamp}` : ""}`}
+        mode={mode}
+        actions={
+          <>
             <button type="button" className="ghost-button" onClick={() => navigate(-1)}>
               Back
             </button>
             <button type="button" className="ghost-button" onClick={handleDownload} disabled={!artifactPath}>
               Download JSON
             </button>
-          </div>
-        </header>
+          </>
+        }
+      />
 
-        {!evaluationEntries.length ? (
-          <p className="empty-state">No evaluation reports yet. Run evaluation from PDF Creation.</p>
-        ) : (
-          <>
-            <section className="report-variant-grid">
-              {evaluationEntries.map(([method, meta]) => (
-                <button
-                  key={method}
-                  type="button"
-                  className={`report-variant ${selectedMethod === method ? "is-selected" : ""}`}
-                  onClick={() => setSelectedMethod(method)}
-                >
-                  <strong>{method}</strong>
+      {!evaluationEntries.length ? (
+        <div className="report-empty-state">
+          <h3>No Reports Available</h3>
+          <p>No evaluation reports yet. Run evaluation from PDF Creation.</p>
+        </div>
+      ) : (
+        <>
+          <section className="variant-selector-grid">
+            {evaluationEntries.map(([method, meta]) => (
+              <button
+                key={method}
+                type="button"
+                className={`variant-card ${selectedMethod === method ? "active" : ""}`}
+                onClick={() => setSelectedMethod(method)}
+              >
+                <div className="variant-header">
+                  <h4>{method}</h4>
+                  {selectedMethod === method && <span className="active-indicator">●</span>}
+                </div>
+                <div className="variant-stats">
                   <span>{meta.summary?.providers?.length ?? 0} providers</span>
-                </button>
-              ))}
-            </section>
-            {isLoading ? (
-              <p className="muted">Loading report…</p>
-            ) : error ? (
-              <p className="panel-flash panel-flash--error">{error}</p>
-            ) : (
-              <>
-                <section className="report-summary-grid">
-                  {providerSummary.map((entry) => (
-                    <div key={entry.provider}>
-                      <span>{entry.provider}</span>
-                      <strong>{(entry.average_score ?? 0).toFixed(2)}</strong>
-                      <small className="muted">
-                        {entry.questions_evaluated ?? 0} q · Δ{" "}
-                        {entry.average_delta_from_baseline != null
-                          ? entry.average_delta_from_baseline.toFixed(2)
-                          : "—"}
-                      </small>
+                  <span>{meta.summary?.total_questions ?? 0} questions</span>
+                </div>
+              </button>
+            ))}
+          </section>
+          {isLoading ? (
+            <div className="report-loading">
+              <p>Loading report…</p>
+            </div>
+          ) : error ? (
+            <div className="panel-flash panel-flash--error">{error}</div>
+          ) : (
+            <>
+              <section className="provider-performance-grid">
+                {providerSummary.map((entry) => {
+                  const delta = entry.average_delta_from_baseline ?? 0;
+                  const deltaClass = delta >= 0 ? "positive" : "negative";
+                  return (
+                    <div key={entry.provider} className="provider-performance-card">
+                      <div className="provider-header">
+                        <ProviderBadge provider={entry.provider} />
+                        <h4>{entry.provider}</h4>
+                      </div>
+                      <div className="performance-metrics">
+                        <div className="metric">
+                          <span className="metric-value">
+                            {((entry.average_score ?? 0) * 100).toFixed(1)}%
+                          </span>
+                          <span className="metric-label">Accuracy</span>
+                        </div>
+                        <div className="metric">
+                          <span className={`metric-value ${deltaClass}`}>
+                            {delta >= 0 ? "+" : ""}
+                            {(delta * 100).toFixed(1)}%
+                          </span>
+                          <span className="metric-label">Δ from Baseline</span>
+                        </div>
+                        <div className="metric">
+                          <span className="metric-value">{entry.questions_evaluated ?? 0}</span>
+                          <span className="metric-label">Questions</span>
+                        </div>
+                      </div>
+                      {entry.hit_detection_target_count > 0 && (
+                        <div className="detection-targets-alert">
+                          ⚠️ Hit {entry.hit_detection_target_count} detection target
+                          {entry.hit_detection_target_count > 1 ? "s" : ""}
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </section>
+                  );
+                })}
+              </section>
 
                 {detectionContext?.summary ? (
                   <section className="report-context-card">
@@ -224,138 +261,105 @@ const EvaluationReportPage: React.FC = () => {
                   </section>
                 ) : null}
 
-                <section className="report-question-list">
-                  {sortedQuestions.length ? (
-                    sortedQuestions.map((question) => {
-                      const options = normalizeOptions(question.options);
-                      const optionLookup = options.reduce<Record<string, string>>((acc, opt) => {
-                        acc[opt.label] = opt.text;
-                        return acc;
-                      }, {});
-                      const detectionTarget = question.detection_target?.labels || [];
-                      const detectionSignal = question.detection_target?.signal;
-                      return (
-                        <article
-                          key={question.question_number}
-                          className={`report-question-card risk-${question.risk_level ?? "low"}`}
-                        >
-                          <div className="report-question-card__header">
-                            <div>
-                              <strong>Q{question.question_number}</strong> ·{" "}
-                              {question.question_type ?? "Unknown"}
-                            </div>
-                          </div>
-                          <p className="report-question-card__stem">{question.question_text}</p>
-                          <div className="report-question-card__chips">
-                            <span className="report-tag report-tag--gold">
-                              Gold {question.gold_answer ?? "—"}
+              <section className="report-question-list">
+                {sortedQuestions.length ? (
+                  sortedQuestions.map((question) => {
+                    const options = normalizeOptions(question.options);
+                    const detectionTarget = question.detection_target?.labels || [];
+                    const detectionSignal = question.detection_target?.signal;
+                    return (
+                      <article key={question.question_number} className="report-question-card">
+                        <div className="card-header">
+                          <span className="question-number">Q{question.question_number}</span>
+                          {detectionTarget.length > 0 && (
+                            <span className="has-detection-target">
+                              🎯 Detection Target
                             </span>
-                            {detectionTarget.length ? (
-                              detectionTarget.map((label: string) => (
-                                <span key={label} className="report-tag report-tag--target">
-                                  Target {label}
-                                </span>
-                              ))
-                            ) : detectionSignal?.phrase ? (
-                              <span className="report-tag report-tag--target">
-                                Signal “{detectionSignal.phrase}”
-                              </span>
-                            ) : (
-                              <span className="report-tag report-tag--muted">No detection target</span>
-                            )}
+                          )}
+                        </div>
+                        <p className="question-stem">{question.question_text}</p>
+                        {options.length ? (
+                          <div className="options-grid">
+                            {options.map((opt) => (
+                              <OptionCard
+                                key={`${question.question_number}-${opt.label}`}
+                                label={opt.label}
+                                text={opt.text}
+                                isCorrect={opt.label === question.gold_answer}
+                              />
+                            ))}
                           </div>
-                          {options.length ? (
-                            <ul className="report-question-card__options">
-                              {options.map((opt) => (
-                                <li key={`${question.question_number}-${opt.label}`}>
-                                  <span className="report-question-card__option-label">
-                                    {opt.label}
+                        ) : null}
+                        <div className="answers-comparison">
+                          {(question.answers as any[])?.map((answer) => {
+                            const scorecard = answer.scorecard || {};
+                            const detectionHit =
+                              answer.matches_detection_target ?? scorecard.hit_detection_target;
+                            const delta = answer.delta_from_baseline;
+                            const deltaClass = delta && delta >= 0 ? "positive" : "negative";
+                            return (
+                              <div
+                                key={`${question.question_number}-${answer.provider}`}
+                                className="provider-answer-card"
+                                data-hit-target={detectionHit}
+                              >
+                                <div className="provider-header">
+                                  <ProviderBadge provider={answer.provider || "Unknown"} />
+                                  <span className="provider-name">
+                                    {answer.provider || "Unknown"}
                                   </span>
-                                  <span>{opt.text}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : null}
-                          <div className="report-question-card__answers">
-                            {(question.answers as any[])?.map((answer) => {
-                              const providerKey = (answer.provider || "").toLowerCase();
-                              const providerMeta = PROVIDER_META[providerKey];
-                              const scorecard = answer.scorecard || {};
-                              const detectionHit =
-                                answer.matches_detection_target ?? scorecard.hit_detection_target;
-                              const baselineScore = answer.baseline_score;
-                              const delta = answer.delta_from_baseline;
-                              return (
-                                <div
-                                  key={`${question.question_number}-${answer.provider}`}
-                                  className="report-answer-chip"
-                                >
-                                  <div className="report-answer-chip__header">
-                                    <div className="provider-chip">
-                                      <span className={providerMeta?.className ?? "provider-badge"}>
-                                        {providerMeta?.glyph ??
-                                          answer.provider?.charAt(0)?.toUpperCase() ??
-                                          "?"}
-                                      </span>
-                                      <span>{providerMeta?.label ?? answer.provider ?? "Unknown"}</span>
-                                    </div>
-                                    <strong>
-                                      {scorecard.score != null ? scorecard.score.toFixed(2) : "—"}
-                                    </strong>
-                                  </div>
-                                  <div className="report-answer-chip__meta">
-                                    <span
-                                      className={`score-source score-source--${
-                                        (scorecard.source || "llm").toLowerCase()
-                                      }`}
-                                    >
-                                      {scorecard.source === "heuristic" ? "Heuristic" : "LLM scorer"}
-                                    </span>
-                                    {detectionHit ? (
-                                      <span className="report-tag report-tag--target">
-                                        Target hit
-                                      </span>
-                                    ) : null}
-                                  </div>
-                                  <small className="report-answer-chip__label">
-                                    {answer.answer_label
-                                      ? `${answer.answer_label}${
-                                          optionLookup[answer.answer_label]
-                                            ? ` · ${optionLookup[answer.answer_label]}`
-                                            : ""
-                                        }`
-                                      : "Answer label unknown"}
-                                  </small>
-                                  <small className="muted">
-                                    {baselineScore != null
-                                      ? `Δ ${
-                                          delta != null ? delta.toFixed(2) : "0.00"
-                                        } vs baseline ${baselineScore.toFixed(2)}`
-                                      : "No baseline"}
-                                  </small>
-                                  <p>{answer.answer_text || answer.error || "No answer returned."}</p>
                                 </div>
-                              );
-                            })}
-                          </div>
-                        </article>
-                      );
-                    })
-                  ) : (
-                    <p className="muted">No question-level details were found in this artifact.</p>
-                  )}
-                </section>
-                <section className="report-json">
-                  <header>
-                    <h2>Summary JSON</h2>
-                  </header>
-                  <pre>{JSON.stringify(reportData?.summary ?? {}, null, 2)}</pre>
-                </section>
-              </>
-            )}
-          </>
-        )}
-      </div>
+                                <div className="answer-info">
+                                  <span className="answer-label">{answer.answer_label || "?"}</span>
+                                  {scorecard.score != null && (
+                                    <div className="scorecard">
+                                      <span className="score">{scorecard.score.toFixed(2)}</span>
+                                      {scorecard.verdict && (
+                                        <span className="verdict">{scorecard.verdict}</span>
+                                      )}
+                                      {scorecard.confidence != null && (
+                                        <span className="confidence">
+                                          {(scorecard.confidence * 100).toFixed(0)}% confident
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                                {detectionHit && (
+                                  <div className="detection-hit-alert">
+                                    ⚠️ Hit detection target!
+                                  </div>
+                                )}
+                                {delta != null && (
+                                  <div className={`delta ${deltaClass}`}>
+                                    Δ {delta >= 0 ? "+" : ""}
+                                    {(delta * 100).toFixed(1)}%
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </article>
+                    );
+                  })
+                ) : (
+                  <div className="report-empty-state">
+                    <h3>No Questions Found</h3>
+                    <p>No question-level details were found in this artifact.</p>
+                  </div>
+                )}
+              </section>
+              <section className="report-json">
+                <header>
+                  <h2>Summary JSON</h2>
+                </header>
+                <pre>{JSON.stringify(reportData?.summary ?? {}, null, 2)}</pre>
+              </section>
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 };

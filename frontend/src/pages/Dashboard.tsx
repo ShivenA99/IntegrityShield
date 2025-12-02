@@ -36,12 +36,18 @@ const MODE_PRESETS: Record<ModeOption, { label: string; description: string }> =
   },
 };
 
-const STAGE_FLOW: { key: string; label: string; sources: CorePipelineStageName[] }[] = [
+const DETECTION_STAGE_FLOW: { key: string; label: string; sources: CorePipelineStageName[] }[] = [
   { key: "extraction", label: "Extraction", sources: ["smart_reading"] },
   { key: "vulnerability", label: "Vulnerability Analysis", sources: ["content_discovery"] },
   { key: "manipulation", label: "Mapping Generation", sources: ["smart_substitution", "effectiveness_testing"] },
   { key: "output", label: "Shielded PDFs & Evaluation", sources: ["document_enhancement", "pdf_creation"] },
   { key: "detection", label: "Detection Report", sources: ["results_generation"] },
+];
+
+const PREVENTION_STAGE_FLOW: { key: string; label: string; sources: CorePipelineStageName[] }[] = [
+  { key: "extraction", label: "Extraction", sources: ["smart_reading"] },
+  { key: "vulnerability", label: "Vulnerability Analysis", sources: ["content_discovery"] },
+  { key: "output", label: "Shielded PDFs & Evaluation", sources: ["document_enhancement", "pdf_creation"] },
 ];
 
 type ArtifactGroup = {
@@ -104,7 +110,13 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, [activeRunId, refreshStatus]);
 
+  // Check if mode toggle should be disabled (only allow on fresh runs)
+  const isModeDisabled = useMemo(() => {
+    return !!activeRunId && !!status && (status.status === 'running' || status.status === 'completed' || status.status === 'failed');
+  }, [activeRunId, status]);
+
   const handleToggleMode = (nextMode: ModeOption) => {
+    if (isModeDisabled) return; // Don't allow mode change during active run
     setMode(nextMode);
     // Mode selection only affects new pipeline runs, not existing ones
   };
@@ -157,12 +169,14 @@ const Dashboard: React.FC = () => {
       if (statuses.every((value) => value === "completed")) return "completed";
       return "pending";
     };
-    return STAGE_FLOW.map((entry, index) => ({
+    // Use mode-specific stage flow
+    const stageFlow = mode === "prevention" ? PREVENTION_STAGE_FLOW : DETECTION_STAGE_FLOW;
+    return stageFlow.map((entry, index) => ({
       ...entry,
       index,
       status: deriveStatus(entry.sources),
     }));
-  }, [status?.stages]);
+  }, [status?.stages, mode]);
 
   const completedStages = stageTimeline.filter((stage) => stage.status === "completed").length;
   const progressPercent = stageTimeline.length ? Math.round((completedStages / stageTimeline.length) * 100) : 0;
@@ -421,7 +435,7 @@ const artifactGroups = useMemo<ArtifactGroup[]>(() => {
                 }}>
                   <button
                     onClick={() => handleToggleMode("detection")}
-                    disabled={isLoading}
+                    disabled={isLoading || isModeDisabled}
                     style={{
                       padding: '0.5rem 1.25rem',
                       border: 'none',
@@ -430,7 +444,8 @@ const artifactGroups = useMemo<ArtifactGroup[]>(() => {
                       color: mode === "detection" ? '#ffffff' : '#666666',
                       fontWeight: mode === "detection" ? '600' : '400',
                       fontSize: '0.875rem',
-                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      cursor: (isLoading || isModeDisabled) ? 'not-allowed' : 'pointer',
+                      opacity: (isLoading || isModeDisabled) ? 0.6 : 1,
                       transition: 'all 0.2s ease',
                       fontFamily: 'inherit'
                     }}
@@ -439,7 +454,7 @@ const artifactGroups = useMemo<ArtifactGroup[]>(() => {
                   </button>
                   <button
                     onClick={() => handleToggleMode("prevention")}
-                    disabled={isLoading}
+                    disabled={isLoading || isModeDisabled}
                     style={{
                       padding: '0.5rem 1.25rem',
                       border: 'none',
@@ -448,7 +463,8 @@ const artifactGroups = useMemo<ArtifactGroup[]>(() => {
                       color: mode === "prevention" ? '#ffffff' : '#666666',
                       fontWeight: mode === "prevention" ? '600' : '400',
                       fontSize: '0.875rem',
-                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      cursor: (isLoading || isModeDisabled) ? 'not-allowed' : 'pointer',
+                      opacity: (isLoading || isModeDisabled) ? 0.6 : 1,
                       transition: 'all 0.2s ease',
                       fontFamily: 'inherit'
                     }}

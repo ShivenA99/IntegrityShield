@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import threading
 import time
 from dataclasses import dataclass, field
@@ -14,6 +15,7 @@ from ...models import PipelineRun, PipelineStage as PipelineStageModel
 from ...utils.exceptions import StageExecutionFailed
 from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
+from ..data_management.structured_data_manager import StructuredDataManager
 from ..developer.live_logging_service import live_logging_service
 from ..developer.performance_monitor import record_metric
 from ..pipeline.content_discovery_service import ContentDiscoveryService
@@ -371,14 +373,50 @@ class PipelineOrchestrator:
                 eval_service = EvaluationReportService()
                 report_type = "detection evaluation"
 
-            for method in enhancement_methods:
-                try:
-                    self.logger.info(f"[{run_id}] Generating {report_type} report for method: {method}")
-                    eval_service.generate(run_id, method=method)
-                    self.logger.info(f"[{run_id}] {report_type.capitalize()} report for {method} generated successfully")
-                except Exception as e:
-                    self.logger.warning(
-                        f"[{run_id}] Failed to generate {report_type} report for {method}: {e}",
-                        exc_info=True
-                    )
+            # Parallel execution: Generate reports for all methods concurrently
+            # Use ThreadPoolExecutor since eval_service.generate() is synchronous (handles async internally)
+
+            # Get actual Flask app instance (not proxy) for use in worker threads
+            app = current_app._get_current_object()
+
+            def generate_report(method: str) -> tuple[str, bool, str | None]:
+                """Generate report for a single method. Returns (method, success, error_msg)."""
+                # Flask application context required for database access in worker threads
+                with app.app_context():
+                    try:
+                        self.logger.info(f"[{run_id}] Generating {report_type} report for method: {method}")
+                        eval_service.generate(run_id, method=method)
+                        self.logger.info(f"[{run_id}] {report_type.capitalize()} report for {method} generated successfully")
+                        return (method, True, None)
+                    except Exception as e:
+                        self.logger.warning(
+                            f"[{run_id}] Failed to generate {report_type} report for {method}: {e}",
+                            exc_info=True
+                        )
+                        return (method, False, str(e))
+
+            # Conservative concurrency: max 3 parallel method generations
+            # Each method internally handles parallel provider queries
+            max_workers = min(len(enhancement_methods), 3)
+            self.logger.info(f"[{run_id}] Generating {len(enhancement_methods)} reports in parallel (max {max_workers} workers)")
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = {executor.submit(generate_report, method): method for method in enhancement_methods}
+
+                for future in concurrent.futures.as_completed(futures):
+                    method, success, error = future.result()
+                    if success:
+                        self.logger.info(f"[{run_id}] ✓ Report for {method} completed")
+                    else:
+                        self.logger.warning(f"[{run_id}] ✗ Report for {method} failed: {error}")
                     # Non-blocking: Continue with other methods even if one fails
+
+            # Update structured data to signal UI that evaluation reports are complete
+            try:
+                structured_manager = StructuredDataManager()
+                structured = structured_manager.load(run_id) or {}
+                structured.setdefault("pipeline_metadata", {})["evaluation_reports_generated"] = True
+                structured_manager.save(run_id, structured)
+                self.logger.info(f"[{run_id}] Set evaluation_reports_generated flag in structured data")
+            except Exception as e:
+                self.logger.warning(f"[{run_id}] Failed to update evaluation_reports_generated flag: {e}")

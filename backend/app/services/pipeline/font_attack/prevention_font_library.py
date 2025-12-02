@@ -39,7 +39,9 @@ class PreventionFontLibrary:
         """
         if library_dir is None:
             # Default to data/font_library/prevention relative to backend root
-            backend_root = Path(__file__).parent.parent.parent.parent
+            # From: app/services/pipeline/font_attack/prevention_font_library.py
+            # Go up 5 levels: font_attack -> pipeline -> services -> app -> backend
+            backend_root = Path(__file__).parent.parent.parent.parent.parent
             library_dir = backend_root / "data" / "font_library" / "prevention"
 
         self.library_dir = Path(library_dir)

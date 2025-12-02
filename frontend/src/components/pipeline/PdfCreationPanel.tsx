@@ -689,7 +689,14 @@ useEffect(() => {
                       : "Run multi-model evaluation for this attacked PDF."
                   }
                 >
-                  {evaluationStatus?.isLoading ? "Evaluating…" : "Evaluate"}
+                  {evaluationStatus?.isLoading ? (
+                    <>
+                      <span className="spinner spinner--inline" aria-hidden="true"></span>
+                      Evaluating…
+                    </>
+                  ) : (
+                    "Evaluate"
+                  )}
                 </button>
 
                 {hasMeta && artifactEntries.length ? (

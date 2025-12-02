@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Download, ExternalLink, Info, X } from "lucide-react";
 import clsx from "clsx";
 import { Button } from "@instructure/ui-buttons";
+import ReportPreview from "@components/reports/ReportPreview";
+
+import "@styles/reports.css";
 
 export interface ArtifactPreview {
   key: string;
@@ -86,6 +89,16 @@ const ArtifactPreviewModal: React.FC<ArtifactPreviewModalProps> = ({ artifact, r
     { label: "Size", value: formatSize(artifact.sizeBytes) },
     { label: "Path", value: artifact.relativePath ?? "—" },
   ];
+
+  // Determine if this is a report that should use card-based display
+  // artifact.key is "vulnerability", "detection", or "evaluation-{method}"
+  const artifactKey = artifact.key?.toLowerCase() || "";
+  const isReport = artifactKey === "vulnerability" || artifactKey === "detection" || artifactKey.startsWith("evaluation");
+  const reportType: "vulnerability" | "detection" | "evaluation" | undefined =
+    artifactKey === "vulnerability" ? "vulnerability" :
+    artifactKey === "detection" ? "detection" :
+    artifactKey.startsWith("evaluation") ? "evaluation" :
+    undefined;
 
   return (
     <div className="artifact-modal" role="dialog" aria-modal="true" aria-label={`${artifact.label} preview`} style={{
@@ -208,16 +221,20 @@ const ArtifactPreviewModal: React.FC<ArtifactPreviewModalProps> = ({ artifact, r
         }}>
           {activeTab === "preview" ? (
             fileUrl ? (
-              <iframe
-                title={`${artifact.label} preview`}
-                src={fileUrl}
-                className="artifact-preview__frame"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  border: 'none'
-                }}
-              />
+              isReport && reportType ? (
+                <ReportPreview reportType={reportType} fileUrl={fileUrl} />
+              ) : (
+                <iframe
+                  title={`${artifact.label} preview`}
+                  src={fileUrl}
+                  className="artifact-preview__frame"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none'
+                  }}
+                />
+              )
             ) : (
               <div className="artifact-preview__empty" style={{
                 display: 'flex',

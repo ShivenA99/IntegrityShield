@@ -28,7 +28,9 @@ const PublicShell: React.FC<PublicShellProps> = ({ children, hideNav }) => {
         <header className="public-header">
           <div className="public-header__container">
             <div className="public-header__branding">
-              <div className="public-header__logo">IS</div>
+              <div className="public-header__logo">
+                <img src="/IS_logo.png?v=3" alt="IntegrityShield Logo" className="logo-image" />
+              </div>
               <h1 className="public-header__title">INTEGRITYSHIELD</h1>
             </div>
 

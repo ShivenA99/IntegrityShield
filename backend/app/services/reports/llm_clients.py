@@ -11,6 +11,7 @@ import uuid
 import aiohttp
 
 from ...utils.logging import get_logger
+from ..llm_clients.rate_limiter import with_exponential_backoff
 
 try:
     import certifi
@@ -55,12 +56,14 @@ class OpenAIClient(BaseLLMClient):
         super().__init__(api_key, model)
         self.base_url = "https://api.openai.com/v1"
 
+    @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
     async def upload_file(self, pdf_path: str) -> str:
         # OpenAI combines upload + query; we return the original path
         if not Path(pdf_path).exists():
             raise LLMClientError(f"PDF not found at {pdf_path}")
         return pdf_path
 
+    @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
     async def query_with_file(
         self,
         file_id: str | None,
@@ -149,6 +152,7 @@ class AnthropicClient(BaseLLMClient):
         self.file_id: Optional[str] = None
         self.fallback_model = fallback_model if fallback_model and fallback_model != model else None
 
+    @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
     async def upload_file(self, pdf_path: str) -> Optional[str]:
         if not self.api_key:
             raise LLMClientError("Anthropic API key missing")
@@ -239,6 +243,7 @@ class AnthropicClient(BaseLLMClient):
             raise last_error
         raise LLMClientError("Anthropic completion failed without a clear error.")
 
+    @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
     async def _dispatch_completion(self, payload: dict[str, object], headers: dict[str, str]) -> str:
         connector = aiohttp.TCPConnector(ssl=SSL_CONTEXT)
         async with aiohttp.ClientSession(connector=connector) as session:
@@ -291,6 +296,7 @@ class GoogleClient(BaseLLMClient):
         # Use v1beta API for file uploads support (file_data requires v1beta)
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
 
+    @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
     async def upload_file(self, pdf_path: str) -> Optional[str]:
         if not self.api_key:
             raise LLMClientError("Google API key missing")
@@ -326,6 +332,7 @@ class GoogleClient(BaseLLMClient):
                 await self._wait_for_processing(file_id, session=session)
                 return file_id
 
+    @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
     async def _wait_for_processing(self, file_id: str, *, session: aiohttp.ClientSession | None = None) -> None:
         # File status check must use v1beta (same as upload API)
         status_base = "https://generativelanguage.googleapis.com/v1beta"
@@ -358,6 +365,7 @@ class GoogleClient(BaseLLMClient):
 
         raise LLMClientError("Google file processing timeout")
 
+    @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
     async def query_with_file(
         self,
         file_id: str | None,
