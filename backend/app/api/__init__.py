@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from flask import Blueprint, Flask
 
-from . import demo_routes, developer_routes, pipeline_routes, questions_routes, settings_routes
+from . import demo_routes, developer_routes, pipeline_routes, questions_routes, settings_routes, auth_routes
 
 
 def register_blueprints(app: Flask) -> None:
     api_bp = Blueprint("api", __name__, url_prefix="/api")
+    auth_routes.init_app(api_bp)
     pipeline_routes.init_app(api_bp)
     questions_routes.init_app(api_bp)
     developer_routes.init_app(api_bp)

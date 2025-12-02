@@ -14,6 +14,7 @@ import {
   IconDocumentLine,
   IconSettingsLine,
 } from "@instructure/ui-icons";
+import { getAssetUrl } from "@utils/basePath";
 
 const TOOL_NAV = [
   { label: "Dashboard", to: "/dashboard", icon: IconDashboardLine },

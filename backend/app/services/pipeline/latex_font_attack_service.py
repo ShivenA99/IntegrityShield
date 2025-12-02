@@ -378,6 +378,214 @@ class LatexFontAttackService:
     ) -> Tuple[str, Sequence[AttackJob], Sequence[MappingDiagnostic]]:
         self._font_command_registry: Dict[str, set[str]] = {}
 
+        # Build question segments for relative search
+        segments = self._build_question_segments(tex_content)
+        sorted_questions = sorted(
+            questions,
+            key=lambda q: (getattr(q, "sequence_index", 0), q.id or ""),
+        )
+
+        # If segmentation fails or mismatch, fall back to global processing
+        if not segments or len(segments) != len(sorted_questions):
+            self.logger.warning(
+                "Font attack: question segmentation mismatch (segments=%s, questions=%s); "
+                "falling back to global replacement",
+                len(segments),
+                len(sorted_questions),
+            )
+            return self._apply_font_attack_global(
+                tex_content, sorted_questions, planner, builder, fonts_dir, cache
+            )
+
+        diagnostics: List[MappingDiagnostic] = []
+        attack_jobs: List[AttackJob] = []
+        counter = 0
+
+        # Process each question within its segment
+        new_content_parts: List[str] = []
+        last_index = 0
+
+        for question, (seg_start, seg_end) in zip(sorted_questions, segments):
+            seg_start = max(seg_start, last_index)
+            segment_text = tex_content[seg_start:seg_end]
+
+            updated_segment, _, segment_diagnostics, segment_jobs, segment_counter = (
+                self._apply_font_attack_for_segment(
+                    question,
+                    segment_text,
+                    seg_start,
+                    planner,
+                    builder,
+                    fonts_dir,
+                    cache,
+                    counter,
+                )
+            )
+
+            counter = segment_counter
+            diagnostics.extend(segment_diagnostics)
+            attack_jobs.extend(segment_jobs)
+
+            if seg_start > last_index:
+                new_content_parts.append(tex_content[last_index:seg_start])
+            new_content_parts.append(updated_segment)
+            last_index = seg_end
+
+        if last_index < len(tex_content):
+            new_content_parts.append(tex_content[last_index:])
+
+        # Segments already have replacements applied, just join them
+        mutated = "".join(new_content_parts)
+
+        attack_jobs.reverse()
+
+        mutated = self._normalize_tex_dependencies(mutated)
+        mutated = self._ensure_preamble(mutated, attack_jobs)
+        return mutated, tuple(attack_jobs), tuple(diagnostics)
+
+    def _apply_font_attack_for_segment(
+        self,
+        question: QuestionManipulation,
+        segment_text: str,
+        segment_start: int,
+        planner: ChunkPlanner,
+        builder: FontAttackBuilder,
+        fonts_dir: Path,
+        cache: FontCache,
+        counter_start: int,
+    ) -> Tuple[str, List[Tuple[int, int, str, AttackJob]], List[MappingDiagnostic], List[AttackJob], int]:
+        """Apply font attacks for a single question segment (relative search)."""
+        updated_segment = segment_text
+        replacements: List[Tuple[int, int, str, AttackJob]] = []
+        occupied_ranges: List[Tuple[int, int, Optional[str]]] = []
+        diagnostics: List[MappingDiagnostic] = []
+        attack_jobs: List[AttackJob] = []
+        counter = counter_start
+
+        mappings = list(getattr(question, "substring_mappings", []) or [])
+        if not mappings:
+            return updated_segment, replacements, diagnostics, attack_jobs, counter
+
+        for mapping in mappings:
+            if not mapping.get("validated"):
+                continue
+            original = str(mapping.get("original") or "")
+            replacement = str(mapping.get("replacement") or "")
+            if not original or not replacement:
+                continue
+
+            # Search within segment (relative search)
+            location = self._locate_fragment(updated_segment, mapping, original)
+            diagnostic = MappingDiagnostic(
+                mapping_id=mapping.get("id"),
+                question_number=str(question.question_number or question.id or ""),
+                status="pending",
+                original=original,
+                replacement=replacement,
+            )
+
+            if not location:
+                diagnostic.status = "not_found"
+                diagnostics.append(diagnostic)
+                continue
+
+            local_start, local_end = location
+
+            # Check for overlaps within segment
+            overlap = self._find_range_overlap(occupied_ranges, local_start, local_end)
+            if overlap:
+                diagnostic.status = "overlap_conflict"
+                conflict_id = overlap[2] or "unknown"
+                diagnostic.notes = (
+                    f"Overlaps mapping {conflict_id} ({overlap[0]}-{overlap[1]})"
+                )
+                diagnostics.append(diagnostic)
+                continue
+
+            try:
+                plan = planner.plan(replacement, original)
+            except KeyError as exc:
+                diagnostic.status = "missing_glyph"
+                diagnostic.notes = str(exc)
+                diagnostics.append(diagnostic)
+                continue
+            except ValueError as exc:
+                diagnostic.status = "invalid_mapping"
+                diagnostic.notes = str(exc)
+                diagnostics.append(diagnostic)
+                continue
+
+            attack_id = f"fa{counter:04d}"
+            counter += 1
+
+            raw_font_results = builder.build_fonts(
+                plan, fonts_dir / attack_id, cache_lookup=cache
+            )
+            font_results: List[FontBuildResult] = []
+            attack_font_dir = fonts_dir / attack_id
+            attack_font_dir.mkdir(parents=True, exist_ok=True)
+            for raw in raw_font_results:
+                target_name = f"{attack_id}_pos{raw.index}.ttf"
+                target_path = attack_font_dir / target_name
+                if raw.font_path != target_path:
+                    shutil.copy2(raw.font_path, target_path)
+                font_results.append(
+                    FontBuildResult(
+                        index=raw.index,
+                        hidden_char=raw.hidden_char,
+                        visual_text=raw.visual_text,
+                        font_path=target_path,
+                        used_cache=raw.used_cache,
+                    )
+                )
+            latex_replacement = self._render_replacement(
+                attack_id, plan, font_results
+            )
+
+            replacements.append((local_start, local_end, latex_replacement, AttackJob(
+                attack_id=attack_id,
+                mapping_id=mapping.get("id"),
+                question_number=str(question.question_number or question.id or ""),
+                visual_text=original,
+                hidden_text=replacement,
+                plan=plan,
+                latex_replacement=latex_replacement,
+                font_results=font_results,
+            )))
+
+            occupied_ranges.append((local_start, local_end, mapping.get("id")))
+
+            diagnostic.status = "replaced"
+            diagnostic.location = (local_start, local_end)
+            diagnostics.append(diagnostic)
+
+        # Apply replacements within segment (reverse order)
+        for local_start, local_end, replacement_text, job in sorted(
+            replacements, key=lambda item: item[0], reverse=True
+        ):
+            updated_segment = (
+                updated_segment[:local_start]
+                + replacement_text
+                + updated_segment[local_end:]
+            )
+            attack_jobs.append(job)
+
+        attack_jobs.reverse()
+
+        return updated_segment, replacements, diagnostics, attack_jobs, counter
+
+    def _apply_font_attack_global(
+        self,
+        tex_content: str,
+        questions: Sequence[QuestionManipulation],
+        planner: ChunkPlanner,
+        builder: FontAttackBuilder,
+        fonts_dir: Path,
+        cache: FontCache,
+    ) -> Tuple[str, Sequence[AttackJob], Sequence[MappingDiagnostic]]:
+        """Fallback: Apply font attacks globally (absolute search)."""
+        self._font_command_registry: Dict[str, set[str]] = {}
+
         replacements: List[Tuple[int, int, str, AttackJob]] = []
         occupied_ranges: List[Tuple[int, int, Optional[str]]] = []
         diagnostics: List[MappingDiagnostic] = []
@@ -495,6 +703,50 @@ class LatexFontAttackService:
         mutated = self._normalize_tex_dependencies(mutated)
         mutated = self._ensure_preamble(mutated, attack_jobs)
         return mutated, tuple(attack_jobs), tuple(diagnostics)
+
+    def _build_question_segments(self, content: str) -> List[Tuple[int, int]]:
+        """Build question segments by finding top-level enumerate items."""
+        return self._compute_top_level_item_spans(content)
+
+    def _compute_top_level_item_spans(self, content: str) -> List[Tuple[int, int]]:
+        """Compute spans for top-level enumerate items (questions)."""
+        if not content:
+            return []
+
+        token_pattern = re.compile(
+            r"\\begin\{(?:dlEnumerateAlpha|dlEnumerateArabic|enumerate)\}(?:\[[^\]]*\])?"
+            r"|\\end\{(?:dlEnumerateAlpha|dlEnumerateArabic|enumerate)\}"
+            r"|\\item\b"
+        )
+
+        level = 0
+        segments: List[Tuple[int, int]] = []
+        current_start: Optional[int] = None
+
+        for match in token_pattern.finditer(content):
+            token = match.group()
+            if token.startswith("\\begin"):
+                level += 1
+                continue
+
+            if token.startswith("\\end"):
+                if level == 1 and current_start is not None:
+                    segments.append((current_start, match.start()))
+                    current_start = None
+                level = max(0, level - 1)
+                continue
+
+            if level == 1:
+                if current_start is not None:
+                    segments.append((current_start, match.start()))
+                current_start = match.start()
+
+        if current_start is not None:
+            segments.append((current_start, len(content)))
+
+        segments.sort(key=lambda pair: pair[0])
+        return segments
+
 
     def _apply_prevention_font_attack(
         self,

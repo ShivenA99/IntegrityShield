@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:gh-pages": "GITHUB_PAGES=true vite build",
+    "build:gh-pages:prod": "VITE_API_BASE_URL=https://YOUR-BACKEND-URL.onrender.com/api GITHUB_PAGES=true vite build",
     "preview": "vite preview"
   },
   "dependencies": {
