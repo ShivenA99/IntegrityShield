@@ -65,6 +65,8 @@ const PipelineContainer: React.FC = () => {
   const structuredData = (status?.structured_data as Record<string, any> | undefined) ?? undefined;
   const documentInfo = structuredData?.document;
   const classrooms = status?.classrooms ?? [];
+  const mode = (status?.pipeline_config?.mode as string) ?? "detection";
+  const isPreventionMode = mode === "prevention";
 
   const enhancementMethods = useMemo(() => {
     const raw = status?.pipeline_config?.enhancement_methods;
@@ -242,7 +244,15 @@ const PipelineContainer: React.FC = () => {
     }
   }, [status?.status, status?.current_stage]);
 
-  const trackerStages = useMemo(() => status?.stages ?? [], [status?.stages]);
+  const trackerStages = useMemo(() => {
+    const stages = status?.stages ?? [];
+    // In prevention mode, hide detection-specific stages
+    if (isPreventionMode) {
+      const detectionOnlyStages = ["smart_substitution", "effectiveness_testing", "results_generation"];
+      return stages.filter(stage => !detectionOnlyStages.includes(stage.name));
+    }
+    return stages;
+  }, [status?.stages, isPreventionMode]);
   const reportsBucket = (structuredData?.reports as Record<string, any> | undefined) ?? {};
   const vulnerabilityReportMeta = reportsBucket?.vulnerability ?? null;
   const detectionReportMeta = reportsBucket?.detection ?? null;
@@ -300,19 +310,21 @@ const PipelineContainer: React.FC = () => {
       if (stageName === "pdf_creation") {
         return (
           <>
-            <button
-              type="button"
-              className="progress-tracker__quick-button"
-              disabled={!detectionReportMeta?.artifact}
-              onClick={() => navigate(`/runs/${runId}/reports/detection`)}
-              title={
-                detectionReportMeta?.artifact
-                  ? "Open detection report"
-                  : "Generate a detection report from PDF Creation panel"
-              }
-            >
-              D
-            </button>
+            {!isPreventionMode && (
+              <button
+                type="button"
+                className="progress-tracker__quick-button"
+                disabled={!detectionReportMeta?.artifact}
+                onClick={() => navigate(`/runs/${runId}/reports/detection`)}
+                title={
+                  detectionReportMeta?.artifact
+                    ? "Open detection report"
+                    : "Generate a detection report from PDF Creation panel"
+                }
+              >
+                D
+              </button>
+            )}
             <button
               type="button"
               className="progress-tracker__quick-button"
@@ -336,6 +348,7 @@ const PipelineContainer: React.FC = () => {
       detectionReportMeta?.artifact,
       handleStageSelect,
       hasEvaluationReports,
+      isPreventionMode,
       navigate,
       reconstructedPdfRelative,
       runId,
@@ -468,6 +481,7 @@ const PipelineContainer: React.FC = () => {
             selectedStage={selectedStage}
             currentStage={status?.current_stage}
             renderStageActions={renderStageActions}
+            mode={mode}
           />
         </div>
         <AttackVariantPalette

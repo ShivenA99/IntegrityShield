@@ -69,16 +69,16 @@ const LTIShell: React.FC<LTIShellProps> = ({ title, subtitle, actionSlot, childr
           }}>
             {/* Logo and Brand - Centered */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{
-                padding: '0.375rem 0.75rem',
-                backgroundColor: '#ffffff',
-                borderRadius: '0.375rem',
-                display: 'inline-flex'
-              }}>
-                <Text color="brand" weight="bold" size="medium">
-                  IS
-                </Text>
-              </div>
+              <img
+                src="/IS_logo.png?v=3"
+                alt="IntegrityShield Logo"
+                style={{
+                  width: '3rem',
+                  height: '3rem',
+                  objectFit: 'contain',
+                  transition: 'transform 0.3s ease'
+                }}
+              />
               <Heading level="h1" margin="0">
                 <Text size="large" weight="normal" transform="uppercase" letterSpacing="expanded" color="primary-inverse">
                   IntegrityShield
@@ -198,13 +198,8 @@ const LTIShell: React.FC<LTIShellProps> = ({ title, subtitle, actionSlot, childr
               {(title || subtitle) && (
                 <div>
                   {title && (
-                    <h2 style={{
-                      margin: 0,
-                      marginBottom: subtitle ? '0.25rem' : 0,
-                      fontSize: '1.75rem',
-                      fontWeight: '400',
-                      color: '#333333',
-                      letterSpacing: '-0.03em'
+                    <h2 className="page-title" style={{
+                      marginBottom: subtitle ? '0.25rem' : 0
                     }}>
                       {title}
                     </h2>

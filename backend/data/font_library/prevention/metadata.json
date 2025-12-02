@@ -1,1106 +1,2073 @@
 {
+  "version": "2.0",
   "hidden_char": "a",
   "base_font": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/resources/fonts/Roboto-Regular.ttf",
-  "visual_chars": " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u00b1\u00d7\u00f7\u0391\u0392\u0393\u0394\u0395\u0396\u0397\u0398\u0399\u039a\u039b\u039c\u039d\u039e\u039f\u03a0\u03a1\u03a3\u03a4\u03a5\u03a6\u03a7\u03a8\u03a9\u03b1\u03b2\u03b3\u03b4\u03b5\u03b6\u03b7\u03b8\u03b9\u03ba\u03bb\u03bc\u03bd\u03be\u03bf\u03c0\u03c1\u03c3\u03c4\u03c5\u03c6\u03c7\u03c8\u03c9\u2202\u2207\u220f\u2211\u221a\u221e\u222b\u2248\u2260\u2264\u2265",
+  "total_chars": 555,
+  "visual_chars": " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~¢£¤¥§©¬®±²³¶¹¼½¾ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿĀāĂăĄąĆćČčĎďĐđĒēĖėĘęĚěĞğĪīİıŁłŃńŇňŌōŐőŒœŘřŚśŠšŪūŮůŰűŹźŻżŽžȘșȚțΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω฿–—‚„†‡•‣‰‱′″‴※⁃⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔₕₖₗₘₙₚₛₜ₡₦₨₩₪₫€₱₴₵₸₹₺₼₽₾℃℉№℗℠™⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞←↑→↓↔↕↖↗↘↙⇄⇅⇆⇇⇈⇉⇊⇋⇌⇍⇎⇏⇐⇑⇒⇓⇔⇕⇖⇗⇘⇙⇚⇛⇜⇝⇞⇟∀∂∃∄∅∆∇∈∉∋∌∏∐∑∓∔∕∖∗∘∙√∛∜∝∞∟∠∡∢∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳≃≅≈≠≡≢≤≥≦≧≨≩≪≫⊂⊃⊆⊇⊈⊉⊊⊋⊕⊗⊥⋀⋁⋂⋃─━│┃┌┐└┘├┤┬┴┼═║╔╗╚╝╠╣╦╩╬▀▄█▌▐░▒▓■□▪▫◆◇◈◉◊○◌◍◎●◐◑◒◓◔◕◖◗◦◯★☆☐☑☒☓☼☽☾☿",
   "fonts": {
     " ": {
-      "filename": "hidden_a_visual_space.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_space.ttf",
-      "hidden_char": "a",
-      "visual_char": " ",
-      "index": 0
+      "filename": "pfa0000.ttf",
+      "index": 0,
+      "unicode": "U+0020",
+      "category": "ASCII Symbol"
     },
     "!": {
-      "filename": "hidden_a_visual_!.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_!.ttf",
-      "hidden_char": "a",
-      "visual_char": "!",
-      "index": 1
+      "filename": "pfa0001.ttf",
+      "index": 1,
+      "unicode": "U+0021",
+      "category": "ASCII Symbol"
     },
     "\"": {
-      "filename": "hidden_a_visual_unicode_34.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_34.ttf",
-      "hidden_char": "a",
-      "visual_char": "\"",
-      "index": 2
+      "filename": "pfa0002.ttf",
+      "index": 2,
+      "unicode": "U+0022",
+      "category": "ASCII Symbol"
     },
     "#": {
-      "filename": "hidden_a_visual_#.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_#.ttf",
-      "hidden_char": "a",
-      "visual_char": "#",
-      "index": 3
+      "filename": "pfa0003.ttf",
+      "index": 3,
+      "unicode": "U+0023",
+      "category": "ASCII Symbol"
     },
     "$": {
-      "filename": "hidden_a_visual_$.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_$.ttf",
-      "hidden_char": "a",
-      "visual_char": "$",
-      "index": 4
+      "filename": "pfa0004.ttf",
+      "index": 4,
+      "unicode": "U+0024",
+      "category": "ASCII Symbol"
     },
     "%": {
-      "filename": "hidden_a_visual_%.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_%.ttf",
-      "hidden_char": "a",
-      "visual_char": "%",
-      "index": 5
+      "filename": "pfa0005.ttf",
+      "index": 5,
+      "unicode": "U+0025",
+      "category": "ASCII Symbol"
     },
     "&": {
-      "filename": "hidden_a_visual_&.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_&.ttf",
-      "hidden_char": "a",
-      "visual_char": "&",
-      "index": 6
+      "filename": "pfa0006.ttf",
+      "index": 6,
+      "unicode": "U+0026",
+      "category": "ASCII Symbol"
     },
     "'": {
-      "filename": "hidden_a_visual_'.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_'.ttf",
-      "hidden_char": "a",
-      "visual_char": "'",
-      "index": 7
+      "filename": "pfa0007.ttf",
+      "index": 7,
+      "unicode": "U+0027",
+      "category": "ASCII Symbol"
     },
     "(": {
-      "filename": "hidden_a_visual_(.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_(.ttf",
-      "hidden_char": "a",
-      "visual_char": "(",
-      "index": 8
+      "filename": "pfa0008.ttf",
+      "index": 8,
+      "unicode": "U+0028",
+      "category": "ASCII Symbol"
     },
     ")": {
-      "filename": "hidden_a_visual_).ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_).ttf",
-      "hidden_char": "a",
-      "visual_char": ")",
-      "index": 9
+      "filename": "pfa0009.ttf",
+      "index": 9,
+      "unicode": "U+0029",
+      "category": "ASCII Symbol"
     },
     "*": {
-      "filename": "hidden_a_visual_unicode_42.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_42.ttf",
-      "hidden_char": "a",
-      "visual_char": "*",
-      "index": 10
+      "filename": "pfa0010.ttf",
+      "index": 10,
+      "unicode": "U+002A",
+      "category": "ASCII Symbol"
     },
     "+": {
-      "filename": "hidden_a_visual_+.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_+.ttf",
-      "hidden_char": "a",
-      "visual_char": "+",
-      "index": 11
+      "filename": "pfa0011.ttf",
+      "index": 11,
+      "unicode": "U+002B",
+      "category": "ASCII Symbol"
     },
     ",": {
-      "filename": "hidden_a_visual_,.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_,.ttf",
-      "hidden_char": "a",
-      "visual_char": ",",
-      "index": 12
+      "filename": "pfa0012.ttf",
+      "index": 12,
+      "unicode": "U+002C",
+      "category": "ASCII Symbol"
     },
     "-": {
-      "filename": "hidden_a_visual_-.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_-.ttf",
-      "hidden_char": "a",
-      "visual_char": "-",
-      "index": 13
+      "filename": "pfa0013.ttf",
+      "index": 13,
+      "unicode": "U+002D",
+      "category": "ASCII Symbol"
     },
     ".": {
-      "filename": "hidden_a_visual_..ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_..ttf",
-      "hidden_char": "a",
-      "visual_char": ".",
-      "index": 14
+      "filename": "pfa0014.ttf",
+      "index": 14,
+      "unicode": "U+002E",
+      "category": "ASCII Symbol"
     },
     "/": {
-      "filename": "hidden_a_visual_unicode_47.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_47.ttf",
-      "hidden_char": "a",
-      "visual_char": "/",
-      "index": 15
+      "filename": "pfa0015.ttf",
+      "index": 15,
+      "unicode": "U+002F",
+      "category": "ASCII Symbol"
     },
     "0": {
-      "filename": "hidden_a_visual_0.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_0.ttf",
-      "hidden_char": "a",
-      "visual_char": "0",
-      "index": 16
+      "filename": "pfa0016.ttf",
+      "index": 16,
+      "unicode": "U+0030",
+      "category": "ASCII Digit"
     },
     "1": {
-      "filename": "hidden_a_visual_1.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_1.ttf",
-      "hidden_char": "a",
-      "visual_char": "1",
-      "index": 17
+      "filename": "pfa0017.ttf",
+      "index": 17,
+      "unicode": "U+0031",
+      "category": "ASCII Digit"
     },
     "2": {
-      "filename": "hidden_a_visual_2.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_2.ttf",
-      "hidden_char": "a",
-      "visual_char": "2",
-      "index": 18
+      "filename": "pfa0018.ttf",
+      "index": 18,
+      "unicode": "U+0032",
+      "category": "ASCII Digit"
     },
     "3": {
-      "filename": "hidden_a_visual_3.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_3.ttf",
-      "hidden_char": "a",
-      "visual_char": "3",
-      "index": 19
+      "filename": "pfa0019.ttf",
+      "index": 19,
+      "unicode": "U+0033",
+      "category": "ASCII Digit"
     },
     "4": {
-      "filename": "hidden_a_visual_4.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_4.ttf",
-      "hidden_char": "a",
-      "visual_char": "4",
-      "index": 20
+      "filename": "pfa0020.ttf",
+      "index": 20,
+      "unicode": "U+0034",
+      "category": "ASCII Digit"
     },
     "5": {
-      "filename": "hidden_a_visual_5.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_5.ttf",
-      "hidden_char": "a",
-      "visual_char": "5",
-      "index": 21
+      "filename": "pfa0021.ttf",
+      "index": 21,
+      "unicode": "U+0035",
+      "category": "ASCII Digit"
     },
     "6": {
-      "filename": "hidden_a_visual_6.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_6.ttf",
-      "hidden_char": "a",
-      "visual_char": "6",
-      "index": 22
+      "filename": "pfa0022.ttf",
+      "index": 22,
+      "unicode": "U+0036",
+      "category": "ASCII Digit"
     },
     "7": {
-      "filename": "hidden_a_visual_7.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_7.ttf",
-      "hidden_char": "a",
-      "visual_char": "7",
-      "index": 23
+      "filename": "pfa0023.ttf",
+      "index": 23,
+      "unicode": "U+0037",
+      "category": "ASCII Digit"
     },
     "8": {
-      "filename": "hidden_a_visual_8.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_8.ttf",
-      "hidden_char": "a",
-      "visual_char": "8",
-      "index": 24
+      "filename": "pfa0024.ttf",
+      "index": 24,
+      "unicode": "U+0038",
+      "category": "ASCII Digit"
     },
     "9": {
-      "filename": "hidden_a_visual_9.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_9.ttf",
-      "hidden_char": "a",
-      "visual_char": "9",
-      "index": 25
+      "filename": "pfa0025.ttf",
+      "index": 25,
+      "unicode": "U+0039",
+      "category": "ASCII Digit"
     },
     ":": {
-      "filename": "hidden_a_visual_unicode_58.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_58.ttf",
-      "hidden_char": "a",
-      "visual_char": ":",
-      "index": 26
+      "filename": "pfa0026.ttf",
+      "index": 26,
+      "unicode": "U+003A",
+      "category": "ASCII Symbol"
     },
     ";": {
-      "filename": "hidden_a_visual_;.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_;.ttf",
-      "hidden_char": "a",
-      "visual_char": ";",
-      "index": 27
+      "filename": "pfa0027.ttf",
+      "index": 27,
+      "unicode": "U+003B",
+      "category": "ASCII Symbol"
     },
     "<": {
-      "filename": "hidden_a_visual_unicode_60.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_60.ttf",
-      "hidden_char": "a",
-      "visual_char": "<",
-      "index": 28
+      "filename": "pfa0028.ttf",
+      "index": 28,
+      "unicode": "U+003C",
+      "category": "ASCII Symbol"
     },
     "=": {
-      "filename": "hidden_a_visual_=.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_=.ttf",
-      "hidden_char": "a",
-      "visual_char": "=",
-      "index": 29
+      "filename": "pfa0029.ttf",
+      "index": 29,
+      "unicode": "U+003D",
+      "category": "ASCII Symbol"
     },
     ">": {
-      "filename": "hidden_a_visual_unicode_62.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_62.ttf",
-      "hidden_char": "a",
-      "visual_char": ">",
-      "index": 30
+      "filename": "pfa0030.ttf",
+      "index": 30,
+      "unicode": "U+003E",
+      "category": "ASCII Symbol"
     },
     "?": {
-      "filename": "hidden_a_visual_unicode_63.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_63.ttf",
-      "hidden_char": "a",
-      "visual_char": "?",
-      "index": 31
+      "filename": "pfa0031.ttf",
+      "index": 31,
+      "unicode": "U+003F",
+      "category": "ASCII Symbol"
     },
     "@": {
-      "filename": "hidden_a_visual_@.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_@.ttf",
-      "hidden_char": "a",
-      "visual_char": "@",
-      "index": 32
+      "filename": "pfa0032.ttf",
+      "index": 32,
+      "unicode": "U+0040",
+      "category": "ASCII Symbol"
     },
     "A": {
-      "filename": "hidden_a_visual_A.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_A.ttf",
-      "hidden_char": "a",
-      "visual_char": "A",
-      "index": 33
+      "filename": "pfa0033.ttf",
+      "index": 33,
+      "unicode": "U+0041",
+      "category": "ASCII Letter"
     },
     "B": {
-      "filename": "hidden_a_visual_B.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_B.ttf",
-      "hidden_char": "a",
-      "visual_char": "B",
-      "index": 34
+      "filename": "pfa0034.ttf",
+      "index": 34,
+      "unicode": "U+0042",
+      "category": "ASCII Letter"
     },
     "C": {
-      "filename": "hidden_a_visual_C.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_C.ttf",
-      "hidden_char": "a",
-      "visual_char": "C",
-      "index": 35
+      "filename": "pfa0035.ttf",
+      "index": 35,
+      "unicode": "U+0043",
+      "category": "ASCII Letter"
     },
     "D": {
-      "filename": "hidden_a_visual_D.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_D.ttf",
-      "hidden_char": "a",
-      "visual_char": "D",
-      "index": 36
+      "filename": "pfa0036.ttf",
+      "index": 36,
+      "unicode": "U+0044",
+      "category": "ASCII Letter"
     },
     "E": {
-      "filename": "hidden_a_visual_E.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_E.ttf",
-      "hidden_char": "a",
-      "visual_char": "E",
-      "index": 37
+      "filename": "pfa0037.ttf",
+      "index": 37,
+      "unicode": "U+0045",
+      "category": "ASCII Letter"
     },
     "F": {
-      "filename": "hidden_a_visual_F.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_F.ttf",
-      "hidden_char": "a",
-      "visual_char": "F",
-      "index": 38
+      "filename": "pfa0038.ttf",
+      "index": 38,
+      "unicode": "U+0046",
+      "category": "ASCII Letter"
     },
     "G": {
-      "filename": "hidden_a_visual_G.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_G.ttf",
-      "hidden_char": "a",
-      "visual_char": "G",
-      "index": 39
+      "filename": "pfa0039.ttf",
+      "index": 39,
+      "unicode": "U+0047",
+      "category": "ASCII Letter"
     },
     "H": {
-      "filename": "hidden_a_visual_H.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_H.ttf",
-      "hidden_char": "a",
-      "visual_char": "H",
-      "index": 40
+      "filename": "pfa0040.ttf",
+      "index": 40,
+      "unicode": "U+0048",
+      "category": "ASCII Letter"
     },
     "I": {
-      "filename": "hidden_a_visual_I.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_I.ttf",
-      "hidden_char": "a",
-      "visual_char": "I",
-      "index": 41
+      "filename": "pfa0041.ttf",
+      "index": 41,
+      "unicode": "U+0049",
+      "category": "ASCII Letter"
     },
     "J": {
-      "filename": "hidden_a_visual_J.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_J.ttf",
-      "hidden_char": "a",
-      "visual_char": "J",
-      "index": 42
+      "filename": "pfa0042.ttf",
+      "index": 42,
+      "unicode": "U+004A",
+      "category": "ASCII Letter"
     },
     "K": {
-      "filename": "hidden_a_visual_K.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_K.ttf",
-      "hidden_char": "a",
-      "visual_char": "K",
-      "index": 43
+      "filename": "pfa0043.ttf",
+      "index": 43,
+      "unicode": "U+004B",
+      "category": "ASCII Letter"
     },
     "L": {
-      "filename": "hidden_a_visual_L.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_L.ttf",
-      "hidden_char": "a",
-      "visual_char": "L",
-      "index": 44
+      "filename": "pfa0044.ttf",
+      "index": 44,
+      "unicode": "U+004C",
+      "category": "ASCII Letter"
     },
     "M": {
-      "filename": "hidden_a_visual_M.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_M.ttf",
-      "hidden_char": "a",
-      "visual_char": "M",
-      "index": 45
+      "filename": "pfa0045.ttf",
+      "index": 45,
+      "unicode": "U+004D",
+      "category": "ASCII Letter"
     },
     "N": {
-      "filename": "hidden_a_visual_N.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_N.ttf",
-      "hidden_char": "a",
-      "visual_char": "N",
-      "index": 46
+      "filename": "pfa0046.ttf",
+      "index": 46,
+      "unicode": "U+004E",
+      "category": "ASCII Letter"
     },
     "O": {
-      "filename": "hidden_a_visual_O.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_O.ttf",
-      "hidden_char": "a",
-      "visual_char": "O",
-      "index": 47
+      "filename": "pfa0047.ttf",
+      "index": 47,
+      "unicode": "U+004F",
+      "category": "ASCII Letter"
     },
     "P": {
-      "filename": "hidden_a_visual_P.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_P.ttf",
-      "hidden_char": "a",
-      "visual_char": "P",
-      "index": 48
+      "filename": "pfa0048.ttf",
+      "index": 48,
+      "unicode": "U+0050",
+      "category": "ASCII Letter"
     },
     "Q": {
-      "filename": "hidden_a_visual_Q.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_Q.ttf",
-      "hidden_char": "a",
-      "visual_char": "Q",
-      "index": 49
+      "filename": "pfa0049.ttf",
+      "index": 49,
+      "unicode": "U+0051",
+      "category": "ASCII Letter"
     },
     "R": {
-      "filename": "hidden_a_visual_R.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_R.ttf",
-      "hidden_char": "a",
-      "visual_char": "R",
-      "index": 50
+      "filename": "pfa0050.ttf",
+      "index": 50,
+      "unicode": "U+0052",
+      "category": "ASCII Letter"
     },
     "S": {
-      "filename": "hidden_a_visual_S.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_S.ttf",
-      "hidden_char": "a",
-      "visual_char": "S",
-      "index": 51
+      "filename": "pfa0051.ttf",
+      "index": 51,
+      "unicode": "U+0053",
+      "category": "ASCII Letter"
     },
     "T": {
-      "filename": "hidden_a_visual_T.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_T.ttf",
-      "hidden_char": "a",
-      "visual_char": "T",
-      "index": 52
+      "filename": "pfa0052.ttf",
+      "index": 52,
+      "unicode": "U+0054",
+      "category": "ASCII Letter"
     },
     "U": {
-      "filename": "hidden_a_visual_U.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_U.ttf",
-      "hidden_char": "a",
-      "visual_char": "U",
-      "index": 53
+      "filename": "pfa0053.ttf",
+      "index": 53,
+      "unicode": "U+0055",
+      "category": "ASCII Letter"
     },
     "V": {
-      "filename": "hidden_a_visual_V.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_V.ttf",
-      "hidden_char": "a",
-      "visual_char": "V",
-      "index": 54
+      "filename": "pfa0054.ttf",
+      "index": 54,
+      "unicode": "U+0056",
+      "category": "ASCII Letter"
     },
     "W": {
-      "filename": "hidden_a_visual_W.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_W.ttf",
-      "hidden_char": "a",
-      "visual_char": "W",
-      "index": 55
+      "filename": "pfa0055.ttf",
+      "index": 55,
+      "unicode": "U+0057",
+      "category": "ASCII Letter"
     },
     "X": {
-      "filename": "hidden_a_visual_X.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_X.ttf",
-      "hidden_char": "a",
-      "visual_char": "X",
-      "index": 56
+      "filename": "pfa0056.ttf",
+      "index": 56,
+      "unicode": "U+0058",
+      "category": "ASCII Letter"
     },
     "Y": {
-      "filename": "hidden_a_visual_Y.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_Y.ttf",
-      "hidden_char": "a",
-      "visual_char": "Y",
-      "index": 57
+      "filename": "pfa0057.ttf",
+      "index": 57,
+      "unicode": "U+0059",
+      "category": "ASCII Letter"
     },
     "Z": {
-      "filename": "hidden_a_visual_Z.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_Z.ttf",
-      "hidden_char": "a",
-      "visual_char": "Z",
-      "index": 58
+      "filename": "pfa0058.ttf",
+      "index": 58,
+      "unicode": "U+005A",
+      "category": "ASCII Letter"
     },
     "[": {
-      "filename": "hidden_a_visual_[.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_[.ttf",
-      "hidden_char": "a",
-      "visual_char": "[",
-      "index": 59
+      "filename": "pfa0059.ttf",
+      "index": 59,
+      "unicode": "U+005B",
+      "category": "ASCII Symbol"
     },
     "\\": {
-      "filename": "hidden_a_visual_unicode_92.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_92.ttf",
-      "hidden_char": "a",
-      "visual_char": "\\",
-      "index": 60
+      "filename": "pfa0060.ttf",
+      "index": 60,
+      "unicode": "U+005C",
+      "category": "ASCII Symbol"
     },
     "]": {
-      "filename": "hidden_a_visual_].ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_].ttf",
-      "hidden_char": "a",
-      "visual_char": "]",
-      "index": 61
+      "filename": "pfa0061.ttf",
+      "index": 61,
+      "unicode": "U+005D",
+      "category": "ASCII Symbol"
     },
     "^": {
-      "filename": "hidden_a_visual_^.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_^.ttf",
-      "hidden_char": "a",
-      "visual_char": "^",
-      "index": 62
+      "filename": "pfa0062.ttf",
+      "index": 62,
+      "unicode": "U+005E",
+      "category": "ASCII Symbol"
     },
     "_": {
-      "filename": "hidden_a_visual__.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual__.ttf",
-      "hidden_char": "a",
-      "visual_char": "_",
-      "index": 63
+      "filename": "pfa0063.ttf",
+      "index": 63,
+      "unicode": "U+005F",
+      "category": "ASCII Symbol"
     },
     "`": {
-      "filename": "hidden_a_visual_`.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_`.ttf",
-      "hidden_char": "a",
-      "visual_char": "`",
-      "index": 64
+      "filename": "pfa0064.ttf",
+      "index": 64,
+      "unicode": "U+0060",
+      "category": "ASCII Symbol"
     },
     "a": {
-      "filename": "hidden_a_visual_a.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_a.ttf",
-      "hidden_char": "a",
-      "visual_char": "a",
-      "index": 65
+      "filename": "pfa0065.ttf",
+      "index": 65,
+      "unicode": "U+0061",
+      "category": "ASCII Letter"
     },
     "b": {
-      "filename": "hidden_a_visual_b.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_b.ttf",
-      "hidden_char": "a",
-      "visual_char": "b",
-      "index": 66
+      "filename": "pfa0066.ttf",
+      "index": 66,
+      "unicode": "U+0062",
+      "category": "ASCII Letter"
     },
     "c": {
-      "filename": "hidden_a_visual_c.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_c.ttf",
-      "hidden_char": "a",
-      "visual_char": "c",
-      "index": 67
+      "filename": "pfa0067.ttf",
+      "index": 67,
+      "unicode": "U+0063",
+      "category": "ASCII Letter"
     },
     "d": {
-      "filename": "hidden_a_visual_d.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_d.ttf",
-      "hidden_char": "a",
-      "visual_char": "d",
-      "index": 68
+      "filename": "pfa0068.ttf",
+      "index": 68,
+      "unicode": "U+0064",
+      "category": "ASCII Letter"
     },
     "e": {
-      "filename": "hidden_a_visual_e.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_e.ttf",
-      "hidden_char": "a",
-      "visual_char": "e",
-      "index": 69
+      "filename": "pfa0069.ttf",
+      "index": 69,
+      "unicode": "U+0065",
+      "category": "ASCII Letter"
     },
     "f": {
-      "filename": "hidden_a_visual_f.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_f.ttf",
-      "hidden_char": "a",
-      "visual_char": "f",
-      "index": 70
+      "filename": "pfa0070.ttf",
+      "index": 70,
+      "unicode": "U+0066",
+      "category": "ASCII Letter"
     },
     "g": {
-      "filename": "hidden_a_visual_g.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_g.ttf",
-      "hidden_char": "a",
-      "visual_char": "g",
-      "index": 71
+      "filename": "pfa0071.ttf",
+      "index": 71,
+      "unicode": "U+0067",
+      "category": "ASCII Letter"
     },
     "h": {
-      "filename": "hidden_a_visual_h.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_h.ttf",
-      "hidden_char": "a",
-      "visual_char": "h",
-      "index": 72
+      "filename": "pfa0072.ttf",
+      "index": 72,
+      "unicode": "U+0068",
+      "category": "ASCII Letter"
     },
     "i": {
-      "filename": "hidden_a_visual_i.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_i.ttf",
-      "hidden_char": "a",
-      "visual_char": "i",
-      "index": 73
+      "filename": "pfa0073.ttf",
+      "index": 73,
+      "unicode": "U+0069",
+      "category": "ASCII Letter"
     },
     "j": {
-      "filename": "hidden_a_visual_j.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_j.ttf",
-      "hidden_char": "a",
-      "visual_char": "j",
-      "index": 74
+      "filename": "pfa0074.ttf",
+      "index": 74,
+      "unicode": "U+006A",
+      "category": "ASCII Letter"
     },
     "k": {
-      "filename": "hidden_a_visual_k.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_k.ttf",
-      "hidden_char": "a",
-      "visual_char": "k",
-      "index": 75
+      "filename": "pfa0075.ttf",
+      "index": 75,
+      "unicode": "U+006B",
+      "category": "ASCII Letter"
     },
     "l": {
-      "filename": "hidden_a_visual_l.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_l.ttf",
-      "hidden_char": "a",
-      "visual_char": "l",
-      "index": 76
+      "filename": "pfa0076.ttf",
+      "index": 76,
+      "unicode": "U+006C",
+      "category": "ASCII Letter"
     },
     "m": {
-      "filename": "hidden_a_visual_m.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_m.ttf",
-      "hidden_char": "a",
-      "visual_char": "m",
-      "index": 77
+      "filename": "pfa0077.ttf",
+      "index": 77,
+      "unicode": "U+006D",
+      "category": "ASCII Letter"
     },
     "n": {
-      "filename": "hidden_a_visual_n.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_n.ttf",
-      "hidden_char": "a",
-      "visual_char": "n",
-      "index": 78
+      "filename": "pfa0078.ttf",
+      "index": 78,
+      "unicode": "U+006E",
+      "category": "ASCII Letter"
     },
     "o": {
-      "filename": "hidden_a_visual_o.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_o.ttf",
-      "hidden_char": "a",
-      "visual_char": "o",
-      "index": 79
+      "filename": "pfa0079.ttf",
+      "index": 79,
+      "unicode": "U+006F",
+      "category": "ASCII Letter"
     },
     "p": {
-      "filename": "hidden_a_visual_p.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_p.ttf",
-      "hidden_char": "a",
-      "visual_char": "p",
-      "index": 80
+      "filename": "pfa0080.ttf",
+      "index": 80,
+      "unicode": "U+0070",
+      "category": "ASCII Letter"
     },
     "q": {
-      "filename": "hidden_a_visual_q.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_q.ttf",
-      "hidden_char": "a",
-      "visual_char": "q",
-      "index": 81
+      "filename": "pfa0081.ttf",
+      "index": 81,
+      "unicode": "U+0071",
+      "category": "ASCII Letter"
     },
     "r": {
-      "filename": "hidden_a_visual_r.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_r.ttf",
-      "hidden_char": "a",
-      "visual_char": "r",
-      "index": 82
+      "filename": "pfa0082.ttf",
+      "index": 82,
+      "unicode": "U+0072",
+      "category": "ASCII Letter"
     },
     "s": {
-      "filename": "hidden_a_visual_s.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_s.ttf",
-      "hidden_char": "a",
-      "visual_char": "s",
-      "index": 83
+      "filename": "pfa0083.ttf",
+      "index": 83,
+      "unicode": "U+0073",
+      "category": "ASCII Letter"
     },
     "t": {
-      "filename": "hidden_a_visual_t.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_t.ttf",
-      "hidden_char": "a",
-      "visual_char": "t",
-      "index": 84
+      "filename": "pfa0084.ttf",
+      "index": 84,
+      "unicode": "U+0074",
+      "category": "ASCII Letter"
     },
     "u": {
-      "filename": "hidden_a_visual_u.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_u.ttf",
-      "hidden_char": "a",
-      "visual_char": "u",
-      "index": 85
+      "filename": "pfa0085.ttf",
+      "index": 85,
+      "unicode": "U+0075",
+      "category": "ASCII Letter"
     },
     "v": {
-      "filename": "hidden_a_visual_v.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_v.ttf",
-      "hidden_char": "a",
-      "visual_char": "v",
-      "index": 86
+      "filename": "pfa0086.ttf",
+      "index": 86,
+      "unicode": "U+0076",
+      "category": "ASCII Letter"
     },
     "w": {
-      "filename": "hidden_a_visual_w.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_w.ttf",
-      "hidden_char": "a",
-      "visual_char": "w",
-      "index": 87
+      "filename": "pfa0087.ttf",
+      "index": 87,
+      "unicode": "U+0077",
+      "category": "ASCII Letter"
     },
     "x": {
-      "filename": "hidden_a_visual_x.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_x.ttf",
-      "hidden_char": "a",
-      "visual_char": "x",
-      "index": 88
+      "filename": "pfa0088.ttf",
+      "index": 88,
+      "unicode": "U+0078",
+      "category": "ASCII Letter"
     },
     "y": {
-      "filename": "hidden_a_visual_y.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_y.ttf",
-      "hidden_char": "a",
-      "visual_char": "y",
-      "index": 89
+      "filename": "pfa0089.ttf",
+      "index": 89,
+      "unicode": "U+0079",
+      "category": "ASCII Letter"
     },
     "z": {
-      "filename": "hidden_a_visual_z.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_z.ttf",
-      "hidden_char": "a",
-      "visual_char": "z",
-      "index": 90
+      "filename": "pfa0090.ttf",
+      "index": 90,
+      "unicode": "U+007A",
+      "category": "ASCII Letter"
     },
     "{": {
-      "filename": "hidden_a_visual_{.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_{.ttf",
-      "hidden_char": "a",
-      "visual_char": "{",
-      "index": 91
+      "filename": "pfa0091.ttf",
+      "index": 91,
+      "unicode": "U+007B",
+      "category": "ASCII Symbol"
     },
     "|": {
-      "filename": "hidden_a_visual_unicode_124.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_124.ttf",
-      "hidden_char": "a",
-      "visual_char": "|",
-      "index": 92
+      "filename": "pfa0092.ttf",
+      "index": 92,
+      "unicode": "U+007C",
+      "category": "ASCII Symbol"
     },
     "}": {
-      "filename": "hidden_a_visual_}.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_}.ttf",
-      "hidden_char": "a",
-      "visual_char": "}",
-      "index": 93
+      "filename": "pfa0093.ttf",
+      "index": 93,
+      "unicode": "U+007D",
+      "category": "ASCII Symbol"
     },
     "~": {
-      "filename": "hidden_a_visual_~.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_~.ttf",
-      "hidden_char": "a",
-      "visual_char": "~",
-      "index": 94
+      "filename": "pfa0094.ttf",
+      "index": 94,
+      "unicode": "U+007E",
+      "category": "ASCII Symbol"
     },
-    "\u00b1": {
-      "filename": "hidden_a_visual_\u00b1.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u00b1.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u00b1",
-      "index": 95
+    "¢": {
+      "filename": "pfa0095.ttf",
+      "index": 95,
+      "unicode": "U+00A2",
+      "category": "Currency"
     },
-    "\u00d7": {
-      "filename": "hidden_a_visual_\u00d7.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u00d7.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u00d7",
-      "index": 96
+    "£": {
+      "filename": "pfa0096.ttf",
+      "index": 96,
+      "unicode": "U+00A3",
+      "category": "Currency"
     },
-    "\u00f7": {
-      "filename": "hidden_a_visual_\u00f7.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u00f7.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u00f7",
-      "index": 97
+    "¤": {
+      "filename": "pfa0097.ttf",
+      "index": 97,
+      "unicode": "U+00A4",
+      "category": "Other"
     },
-    "\u0391": {
-      "filename": "hidden_a_visual_\u0391.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0391.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u0391",
-      "index": 98
+    "¥": {
+      "filename": "pfa0098.ttf",
+      "index": 98,
+      "unicode": "U+00A5",
+      "category": "Currency"
     },
-    "\u0392": {
-      "filename": "hidden_a_visual_\u0392.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0392.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u0392",
-      "index": 99
+    "§": {
+      "filename": "pfa0099.ttf",
+      "index": 99,
+      "unicode": "U+00A7",
+      "category": "Other"
     },
-    "\u0393": {
-      "filename": "hidden_a_visual_\u0393.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0393.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u0393",
-      "index": 100
+    "©": {
+      "filename": "pfa0100.ttf",
+      "index": 100,
+      "unicode": "U+00A9",
+      "category": "Other"
     },
-    "\u0394": {
-      "filename": "hidden_a_visual_\u0394.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0394.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u0394",
-      "index": 101
+    "¬": {
+      "filename": "pfa0101.ttf",
+      "index": 101,
+      "unicode": "U+00AC",
+      "category": "Other"
     },
-    "\u0395": {
-      "filename": "hidden_a_visual_\u0395.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0395.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u0395",
-      "index": 102
+    "®": {
+      "filename": "pfa0102.ttf",
+      "index": 102,
+      "unicode": "U+00AE",
+      "category": "Other"
     },
-    "\u0396": {
-      "filename": "hidden_a_visual_\u0396.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0396.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u0396",
-      "index": 103
+    "±": {
+      "filename": "pfa0103.ttf",
+      "index": 103,
+      "unicode": "U+00B1",
+      "category": "Math"
     },
-    "\u0397": {
-      "filename": "hidden_a_visual_\u0397.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0397.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u0397",
-      "index": 104
+    "²": {
+      "filename": "pfa0104.ttf",
+      "index": 104,
+      "unicode": "U+00B2",
+      "category": "Other"
     },
-    "\u0398": {
-      "filename": "hidden_a_visual_\u0398.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0398.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u0398",
-      "index": 105
+    "³": {
+      "filename": "pfa0105.ttf",
+      "index": 105,
+      "unicode": "U+00B3",
+      "category": "Other"
     },
-    "\u0399": {
-      "filename": "hidden_a_visual_\u0399.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0399.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u0399",
-      "index": 106
+    "¶": {
+      "filename": "pfa0106.ttf",
+      "index": 106,
+      "unicode": "U+00B6",
+      "category": "Other"
     },
-    "\u039a": {
-      "filename": "hidden_a_visual_\u039a.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039a.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u039a",
-      "index": 107
+    "¹": {
+      "filename": "pfa0107.ttf",
+      "index": 107,
+      "unicode": "U+00B9",
+      "category": "Other"
     },
-    "\u039b": {
-      "filename": "hidden_a_visual_\u039b.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039b.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u039b",
-      "index": 108
+    "¼": {
+      "filename": "pfa0108.ttf",
+      "index": 108,
+      "unicode": "U+00BC",
+      "category": "Other"
     },
-    "\u039c": {
-      "filename": "hidden_a_visual_\u039c.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039c.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u039c",
-      "index": 109
+    "½": {
+      "filename": "pfa0109.ttf",
+      "index": 109,
+      "unicode": "U+00BD",
+      "category": "Other"
     },
-    "\u039d": {
-      "filename": "hidden_a_visual_\u039d.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039d.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u039d",
-      "index": 110
+    "¾": {
+      "filename": "pfa0110.ttf",
+      "index": 110,
+      "unicode": "U+00BE",
+      "category": "Other"
     },
-    "\u039e": {
-      "filename": "hidden_a_visual_\u039e.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039e.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u039e",
-      "index": 111
+    "À": {
+      "filename": "pfa0111.ttf",
+      "index": 111,
+      "unicode": "U+00C0",
+      "category": "Latin Extended"
     },
-    "\u039f": {
-      "filename": "hidden_a_visual_\u039f.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039f.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u039f",
-      "index": 112
+    "Á": {
+      "filename": "pfa0112.ttf",
+      "index": 112,
+      "unicode": "U+00C1",
+      "category": "Latin Extended"
     },
-    "\u03a0": {
-      "filename": "hidden_a_visual_\u03a0.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a0.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03a0",
-      "index": 113
+    "Â": {
+      "filename": "pfa0113.ttf",
+      "index": 113,
+      "unicode": "U+00C2",
+      "category": "Latin Extended"
     },
-    "\u03a1": {
-      "filename": "hidden_a_visual_\u03a1.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a1.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03a1",
-      "index": 114
+    "Ã": {
+      "filename": "pfa0114.ttf",
+      "index": 114,
+      "unicode": "U+00C3",
+      "category": "Latin Extended"
     },
-    "\u03a3": {
-      "filename": "hidden_a_visual_\u03a3.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a3.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03a3",
-      "index": 115
+    "Ä": {
+      "filename": "pfa0115.ttf",
+      "index": 115,
+      "unicode": "U+00C4",
+      "category": "Latin Extended"
     },
-    "\u03a4": {
-      "filename": "hidden_a_visual_\u03a4.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a4.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03a4",
-      "index": 116
+    "Å": {
+      "filename": "pfa0116.ttf",
+      "index": 116,
+      "unicode": "U+00C5",
+      "category": "Latin Extended"
     },
-    "\u03a5": {
-      "filename": "hidden_a_visual_\u03a5.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a5.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03a5",
-      "index": 117
+    "Æ": {
+      "filename": "pfa0117.ttf",
+      "index": 117,
+      "unicode": "U+00C6",
+      "category": "Latin Extended"
     },
-    "\u03a6": {
-      "filename": "hidden_a_visual_\u03a6.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a6.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03a6",
-      "index": 118
+    "Ç": {
+      "filename": "pfa0118.ttf",
+      "index": 118,
+      "unicode": "U+00C7",
+      "category": "Latin Extended"
     },
-    "\u03a7": {
-      "filename": "hidden_a_visual_\u03a7.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a7.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03a7",
-      "index": 119
+    "È": {
+      "filename": "pfa0119.ttf",
+      "index": 119,
+      "unicode": "U+00C8",
+      "category": "Latin Extended"
     },
-    "\u03a8": {
-      "filename": "hidden_a_visual_\u03a8.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a8.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03a8",
-      "index": 120
+    "É": {
+      "filename": "pfa0120.ttf",
+      "index": 120,
+      "unicode": "U+00C9",
+      "category": "Latin Extended"
     },
-    "\u03a9": {
-      "filename": "hidden_a_visual_\u03a9.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a9.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03a9",
-      "index": 121
+    "Ê": {
+      "filename": "pfa0121.ttf",
+      "index": 121,
+      "unicode": "U+00CA",
+      "category": "Latin Extended"
     },
-    "\u03b1": {
-      "filename": "hidden_a_visual_\u03b1.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b1.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03b1",
-      "index": 122
+    "Ë": {
+      "filename": "pfa0122.ttf",
+      "index": 122,
+      "unicode": "U+00CB",
+      "category": "Latin Extended"
     },
-    "\u03b2": {
-      "filename": "hidden_a_visual_\u03b2.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b2.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03b2",
-      "index": 123
+    "Ì": {
+      "filename": "pfa0123.ttf",
+      "index": 123,
+      "unicode": "U+00CC",
+      "category": "Latin Extended"
     },
-    "\u03b3": {
-      "filename": "hidden_a_visual_\u03b3.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b3.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03b3",
-      "index": 124
+    "Í": {
+      "filename": "pfa0124.ttf",
+      "index": 124,
+      "unicode": "U+00CD",
+      "category": "Latin Extended"
     },
-    "\u03b4": {
-      "filename": "hidden_a_visual_\u03b4.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b4.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03b4",
-      "index": 125
+    "Î": {
+      "filename": "pfa0125.ttf",
+      "index": 125,
+      "unicode": "U+00CE",
+      "category": "Latin Extended"
     },
-    "\u03b5": {
-      "filename": "hidden_a_visual_\u03b5.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b5.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03b5",
-      "index": 126
+    "Ï": {
+      "filename": "pfa0126.ttf",
+      "index": 126,
+      "unicode": "U+00CF",
+      "category": "Latin Extended"
     },
-    "\u03b6": {
-      "filename": "hidden_a_visual_\u03b6.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b6.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03b6",
-      "index": 127
+    "Ð": {
+      "filename": "pfa0127.ttf",
+      "index": 127,
+      "unicode": "U+00D0",
+      "category": "Latin Extended"
     },
-    "\u03b7": {
-      "filename": "hidden_a_visual_\u03b7.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b7.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03b7",
-      "index": 128
+    "Ñ": {
+      "filename": "pfa0128.ttf",
+      "index": 128,
+      "unicode": "U+00D1",
+      "category": "Latin Extended"
     },
-    "\u03b8": {
-      "filename": "hidden_a_visual_\u03b8.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b8.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03b8",
-      "index": 129
+    "Ò": {
+      "filename": "pfa0129.ttf",
+      "index": 129,
+      "unicode": "U+00D2",
+      "category": "Latin Extended"
     },
-    "\u03b9": {
-      "filename": "hidden_a_visual_\u03b9.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b9.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03b9",
-      "index": 130
+    "Ó": {
+      "filename": "pfa0130.ttf",
+      "index": 130,
+      "unicode": "U+00D3",
+      "category": "Latin Extended"
     },
-    "\u03ba": {
-      "filename": "hidden_a_visual_\u03ba.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03ba.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03ba",
-      "index": 131
+    "Ô": {
+      "filename": "pfa0131.ttf",
+      "index": 131,
+      "unicode": "U+00D4",
+      "category": "Latin Extended"
     },
-    "\u03bb": {
-      "filename": "hidden_a_visual_\u03bb.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03bb.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03bb",
-      "index": 132
+    "Õ": {
+      "filename": "pfa0132.ttf",
+      "index": 132,
+      "unicode": "U+00D5",
+      "category": "Latin Extended"
     },
-    "\u03bc": {
-      "filename": "hidden_a_visual_\u03bc.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03bc.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03bc",
-      "index": 133
+    "Ö": {
+      "filename": "pfa0133.ttf",
+      "index": 133,
+      "unicode": "U+00D6",
+      "category": "Latin Extended"
     },
-    "\u03bd": {
-      "filename": "hidden_a_visual_\u03bd.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03bd.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03bd",
-      "index": 134
+    "×": {
+      "filename": "pfa0134.ttf",
+      "index": 134,
+      "unicode": "U+00D7",
+      "category": "Latin Extended"
     },
-    "\u03be": {
-      "filename": "hidden_a_visual_\u03be.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03be.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03be",
-      "index": 135
+    "Ø": {
+      "filename": "pfa0135.ttf",
+      "index": 135,
+      "unicode": "U+00D8",
+      "category": "Latin Extended"
     },
-    "\u03bf": {
-      "filename": "hidden_a_visual_\u03bf.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03bf.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03bf",
-      "index": 136
+    "Ù": {
+      "filename": "pfa0136.ttf",
+      "index": 136,
+      "unicode": "U+00D9",
+      "category": "Latin Extended"
     },
-    "\u03c0": {
-      "filename": "hidden_a_visual_\u03c0.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c0.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03c0",
-      "index": 137
+    "Ú": {
+      "filename": "pfa0137.ttf",
+      "index": 137,
+      "unicode": "U+00DA",
+      "category": "Latin Extended"
     },
-    "\u03c1": {
-      "filename": "hidden_a_visual_\u03c1.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c1.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03c1",
-      "index": 138
+    "Û": {
+      "filename": "pfa0138.ttf",
+      "index": 138,
+      "unicode": "U+00DB",
+      "category": "Latin Extended"
     },
-    "\u03c3": {
-      "filename": "hidden_a_visual_\u03c3.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c3.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03c3",
-      "index": 139
+    "Ü": {
+      "filename": "pfa0139.ttf",
+      "index": 139,
+      "unicode": "U+00DC",
+      "category": "Latin Extended"
     },
-    "\u03c4": {
-      "filename": "hidden_a_visual_\u03c4.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c4.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03c4",
-      "index": 140
+    "Ý": {
+      "filename": "pfa0140.ttf",
+      "index": 140,
+      "unicode": "U+00DD",
+      "category": "Latin Extended"
     },
-    "\u03c5": {
-      "filename": "hidden_a_visual_\u03c5.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c5.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03c5",
-      "index": 141
+    "Þ": {
+      "filename": "pfa0141.ttf",
+      "index": 141,
+      "unicode": "U+00DE",
+      "category": "Latin Extended"
     },
-    "\u03c6": {
-      "filename": "hidden_a_visual_\u03c6.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c6.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03c6",
-      "index": 142
+    "ß": {
+      "filename": "pfa0142.ttf",
+      "index": 142,
+      "unicode": "U+00DF",
+      "category": "Latin Extended"
     },
-    "\u03c7": {
-      "filename": "hidden_a_visual_\u03c7.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c7.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03c7",
-      "index": 143
+    "æ": {
+      "filename": "pfa0149.ttf",
+      "index": 149,
+      "unicode": "U+00E6",
+      "category": "Latin Extended"
     },
-    "\u03c8": {
-      "filename": "hidden_a_visual_\u03c8.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c8.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03c8",
-      "index": 144
+    "ç": {
+      "filename": "pfa0150.ttf",
+      "index": 150,
+      "unicode": "U+00E7",
+      "category": "Latin Extended"
     },
-    "\u03c9": {
-      "filename": "hidden_a_visual_\u03c9.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c9.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u03c9",
-      "index": 145
+    "è": {
+      "filename": "pfa0151.ttf",
+      "index": 151,
+      "unicode": "U+00E8",
+      "category": "Latin Extended"
     },
-    "\u2202": {
-      "filename": "hidden_a_visual_\u2202.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2202.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u2202",
-      "index": 146
+    "é": {
+      "filename": "pfa0152.ttf",
+      "index": 152,
+      "unicode": "U+00E9",
+      "category": "Latin Extended"
     },
-    "\u2207": {
-      "filename": "hidden_a_visual_\u2207.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2207.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u2207",
-      "index": 147
+    "ê": {
+      "filename": "pfa0153.ttf",
+      "index": 153,
+      "unicode": "U+00EA",
+      "category": "Latin Extended"
     },
-    "\u220f": {
-      "filename": "hidden_a_visual_\u220f.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u220f.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u220f",
-      "index": 148
+    "ë": {
+      "filename": "pfa0154.ttf",
+      "index": 154,
+      "unicode": "U+00EB",
+      "category": "Latin Extended"
     },
-    "\u2211": {
-      "filename": "hidden_a_visual_\u2211.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2211.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u2211",
-      "index": 149
+    "ì": {
+      "filename": "pfa0155.ttf",
+      "index": 155,
+      "unicode": "U+00EC",
+      "category": "Latin Extended"
     },
-    "\u221a": {
-      "filename": "hidden_a_visual_\u221a.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u221a.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u221a",
-      "index": 150
+    "í": {
+      "filename": "pfa0156.ttf",
+      "index": 156,
+      "unicode": "U+00ED",
+      "category": "Latin Extended"
     },
-    "\u221e": {
-      "filename": "hidden_a_visual_\u221e.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u221e.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u221e",
-      "index": 151
+    "î": {
+      "filename": "pfa0157.ttf",
+      "index": 157,
+      "unicode": "U+00EE",
+      "category": "Latin Extended"
     },
-    "\u222b": {
-      "filename": "hidden_a_visual_\u222b.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u222b.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u222b",
-      "index": 152
+    "ï": {
+      "filename": "pfa0158.ttf",
+      "index": 158,
+      "unicode": "U+00EF",
+      "category": "Latin Extended"
     },
-    "\u2248": {
-      "filename": "hidden_a_visual_\u2248.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2248.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u2248",
-      "index": 153
+    "ð": {
+      "filename": "pfa0159.ttf",
+      "index": 159,
+      "unicode": "U+00F0",
+      "category": "Latin Extended"
     },
-    "\u2260": {
-      "filename": "hidden_a_visual_\u2260.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2260.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u2260",
-      "index": 154
+    "ñ": {
+      "filename": "pfa0160.ttf",
+      "index": 160,
+      "unicode": "U+00F1",
+      "category": "Latin Extended"
     },
-    "\u2264": {
-      "filename": "hidden_a_visual_\u2264.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2264.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u2264",
-      "index": 155
+    "ò": {
+      "filename": "pfa0161.ttf",
+      "index": 161,
+      "unicode": "U+00F2",
+      "category": "Latin Extended"
     },
-    "\u2265": {
-      "filename": "hidden_a_visual_\u2265.ttf",
-      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2265.ttf",
-      "hidden_char": "a",
-      "visual_char": "\u2265",
-      "index": 156
+    "ó": {
+      "filename": "pfa0162.ttf",
+      "index": 162,
+      "unicode": "U+00F3",
+      "category": "Latin Extended"
+    },
+    "ô": {
+      "filename": "pfa0163.ttf",
+      "index": 163,
+      "unicode": "U+00F4",
+      "category": "Latin Extended"
+    },
+    "õ": {
+      "filename": "pfa0164.ttf",
+      "index": 164,
+      "unicode": "U+00F5",
+      "category": "Latin Extended"
+    },
+    "ö": {
+      "filename": "pfa0165.ttf",
+      "index": 165,
+      "unicode": "U+00F6",
+      "category": "Latin Extended"
+    },
+    "÷": {
+      "filename": "pfa0166.ttf",
+      "index": 166,
+      "unicode": "U+00F7",
+      "category": "Latin Extended"
+    },
+    "ø": {
+      "filename": "pfa0167.ttf",
+      "index": 167,
+      "unicode": "U+00F8",
+      "category": "Latin Extended"
+    },
+    "ù": {
+      "filename": "pfa0168.ttf",
+      "index": 168,
+      "unicode": "U+00F9",
+      "category": "Latin Extended"
+    },
+    "ú": {
+      "filename": "pfa0169.ttf",
+      "index": 169,
+      "unicode": "U+00FA",
+      "category": "Latin Extended"
+    },
+    "û": {
+      "filename": "pfa0170.ttf",
+      "index": 170,
+      "unicode": "U+00FB",
+      "category": "Latin Extended"
+    },
+    "ü": {
+      "filename": "pfa0171.ttf",
+      "index": 171,
+      "unicode": "U+00FC",
+      "category": "Latin Extended"
+    },
+    "ý": {
+      "filename": "pfa0172.ttf",
+      "index": 172,
+      "unicode": "U+00FD",
+      "category": "Latin Extended"
+    },
+    "þ": {
+      "filename": "pfa0173.ttf",
+      "index": 173,
+      "unicode": "U+00FE",
+      "category": "Latin Extended"
+    },
+    "ÿ": {
+      "filename": "pfa0174.ttf",
+      "index": 174,
+      "unicode": "U+00FF",
+      "category": "Latin Extended"
+    },
+    "Ā": {
+      "filename": "pfa0175.ttf",
+      "index": 175,
+      "unicode": "U+0100",
+      "category": "Other"
+    },
+    "Ă": {
+      "filename": "pfa0177.ttf",
+      "index": 177,
+      "unicode": "U+0102",
+      "category": "Other"
+    },
+    "Ą": {
+      "filename": "pfa0179.ttf",
+      "index": 179,
+      "unicode": "U+0104",
+      "category": "Other"
+    },
+    "ą": {
+      "filename": "pfa0180.ttf",
+      "index": 180,
+      "unicode": "U+0105",
+      "category": "Other"
+    },
+    "Ć": {
+      "filename": "pfa0181.ttf",
+      "index": 181,
+      "unicode": "U+0106",
+      "category": "Other"
+    },
+    "ć": {
+      "filename": "pfa0182.ttf",
+      "index": 182,
+      "unicode": "U+0107",
+      "category": "Other"
+    },
+    "Č": {
+      "filename": "pfa0183.ttf",
+      "index": 183,
+      "unicode": "U+010C",
+      "category": "Other"
+    },
+    "č": {
+      "filename": "pfa0184.ttf",
+      "index": 184,
+      "unicode": "U+010D",
+      "category": "Other"
+    },
+    "Ď": {
+      "filename": "pfa0185.ttf",
+      "index": 185,
+      "unicode": "U+010E",
+      "category": "Other"
+    },
+    "ď": {
+      "filename": "pfa0186.ttf",
+      "index": 186,
+      "unicode": "U+010F",
+      "category": "Other"
+    },
+    "Đ": {
+      "filename": "pfa0187.ttf",
+      "index": 187,
+      "unicode": "U+0110",
+      "category": "Other"
+    },
+    "đ": {
+      "filename": "pfa0188.ttf",
+      "index": 188,
+      "unicode": "U+0111",
+      "category": "Other"
+    },
+    "Ē": {
+      "filename": "pfa0189.ttf",
+      "index": 189,
+      "unicode": "U+0112",
+      "category": "Other"
+    },
+    "ē": {
+      "filename": "pfa0190.ttf",
+      "index": 190,
+      "unicode": "U+0113",
+      "category": "Other"
+    },
+    "Ė": {
+      "filename": "pfa0191.ttf",
+      "index": 191,
+      "unicode": "U+0116",
+      "category": "Other"
+    },
+    "ė": {
+      "filename": "pfa0192.ttf",
+      "index": 192,
+      "unicode": "U+0117",
+      "category": "Other"
+    },
+    "Ę": {
+      "filename": "pfa0193.ttf",
+      "index": 193,
+      "unicode": "U+0118",
+      "category": "Other"
+    },
+    "ę": {
+      "filename": "pfa0194.ttf",
+      "index": 194,
+      "unicode": "U+0119",
+      "category": "Other"
+    },
+    "Ě": {
+      "filename": "pfa0195.ttf",
+      "index": 195,
+      "unicode": "U+011A",
+      "category": "Other"
+    },
+    "ě": {
+      "filename": "pfa0196.ttf",
+      "index": 196,
+      "unicode": "U+011B",
+      "category": "Other"
+    },
+    "Ğ": {
+      "filename": "pfa0197.ttf",
+      "index": 197,
+      "unicode": "U+011E",
+      "category": "Other"
+    },
+    "ğ": {
+      "filename": "pfa0198.ttf",
+      "index": 198,
+      "unicode": "U+011F",
+      "category": "Other"
+    },
+    "Ī": {
+      "filename": "pfa0199.ttf",
+      "index": 199,
+      "unicode": "U+012A",
+      "category": "Other"
+    },
+    "ī": {
+      "filename": "pfa0200.ttf",
+      "index": 200,
+      "unicode": "U+012B",
+      "category": "Other"
+    },
+    "İ": {
+      "filename": "pfa0201.ttf",
+      "index": 201,
+      "unicode": "U+0130",
+      "category": "Other"
+    },
+    "ı": {
+      "filename": "pfa0202.ttf",
+      "index": 202,
+      "unicode": "U+0131",
+      "category": "Other"
+    },
+    "Ł": {
+      "filename": "pfa0203.ttf",
+      "index": 203,
+      "unicode": "U+0141",
+      "category": "Other"
+    },
+    "ł": {
+      "filename": "pfa0204.ttf",
+      "index": 204,
+      "unicode": "U+0142",
+      "category": "Other"
+    },
+    "Ń": {
+      "filename": "pfa0205.ttf",
+      "index": 205,
+      "unicode": "U+0143",
+      "category": "Other"
+    },
+    "ń": {
+      "filename": "pfa0206.ttf",
+      "index": 206,
+      "unicode": "U+0144",
+      "category": "Other"
+    },
+    "Ň": {
+      "filename": "pfa0207.ttf",
+      "index": 207,
+      "unicode": "U+0147",
+      "category": "Other"
+    },
+    "ň": {
+      "filename": "pfa0208.ttf",
+      "index": 208,
+      "unicode": "U+0148",
+      "category": "Other"
+    },
+    "Ō": {
+      "filename": "pfa0209.ttf",
+      "index": 209,
+      "unicode": "U+014C",
+      "category": "Other"
+    },
+    "ō": {
+      "filename": "pfa0210.ttf",
+      "index": 210,
+      "unicode": "U+014D",
+      "category": "Other"
+    },
+    "Ő": {
+      "filename": "pfa0211.ttf",
+      "index": 211,
+      "unicode": "U+0150",
+      "category": "Other"
+    },
+    "ő": {
+      "filename": "pfa0212.ttf",
+      "index": 212,
+      "unicode": "U+0151",
+      "category": "Other"
+    },
+    "Œ": {
+      "filename": "pfa0213.ttf",
+      "index": 213,
+      "unicode": "U+0152",
+      "category": "Other"
+    },
+    "œ": {
+      "filename": "pfa0214.ttf",
+      "index": 214,
+      "unicode": "U+0153",
+      "category": "Other"
+    },
+    "Ř": {
+      "filename": "pfa0215.ttf",
+      "index": 215,
+      "unicode": "U+0158",
+      "category": "Other"
+    },
+    "ř": {
+      "filename": "pfa0216.ttf",
+      "index": 216,
+      "unicode": "U+0159",
+      "category": "Other"
+    },
+    "Ś": {
+      "filename": "pfa0217.ttf",
+      "index": 217,
+      "unicode": "U+015A",
+      "category": "Other"
+    },
+    "ś": {
+      "filename": "pfa0218.ttf",
+      "index": 218,
+      "unicode": "U+015B",
+      "category": "Other"
+    },
+    "Š": {
+      "filename": "pfa0219.ttf",
+      "index": 219,
+      "unicode": "U+0160",
+      "category": "Other"
+    },
+    "š": {
+      "filename": "pfa0220.ttf",
+      "index": 220,
+      "unicode": "U+0161",
+      "category": "Other"
+    },
+    "Ū": {
+      "filename": "pfa0221.ttf",
+      "index": 221,
+      "unicode": "U+016A",
+      "category": "Other"
+    },
+    "ū": {
+      "filename": "pfa0222.ttf",
+      "index": 222,
+      "unicode": "U+016B",
+      "category": "Other"
+    },
+    "Ů": {
+      "filename": "pfa0223.ttf",
+      "index": 223,
+      "unicode": "U+016E",
+      "category": "Other"
+    },
+    "ů": {
+      "filename": "pfa0224.ttf",
+      "index": 224,
+      "unicode": "U+016F",
+      "category": "Other"
+    },
+    "Ű": {
+      "filename": "pfa0225.ttf",
+      "index": 225,
+      "unicode": "U+0170",
+      "category": "Other"
+    },
+    "ű": {
+      "filename": "pfa0226.ttf",
+      "index": 226,
+      "unicode": "U+0171",
+      "category": "Other"
+    },
+    "Ź": {
+      "filename": "pfa0227.ttf",
+      "index": 227,
+      "unicode": "U+0179",
+      "category": "Other"
+    },
+    "ź": {
+      "filename": "pfa0228.ttf",
+      "index": 228,
+      "unicode": "U+017A",
+      "category": "Other"
+    },
+    "Ż": {
+      "filename": "pfa0229.ttf",
+      "index": 229,
+      "unicode": "U+017B",
+      "category": "Other"
+    },
+    "ż": {
+      "filename": "pfa0230.ttf",
+      "index": 230,
+      "unicode": "U+017C",
+      "category": "Other"
+    },
+    "Ž": {
+      "filename": "pfa0231.ttf",
+      "index": 231,
+      "unicode": "U+017D",
+      "category": "Other"
+    },
+    "ž": {
+      "filename": "pfa0232.ttf",
+      "index": 232,
+      "unicode": "U+017E",
+      "category": "Other"
+    },
+    "Ș": {
+      "filename": "pfa0233.ttf",
+      "index": 233,
+      "unicode": "U+0218",
+      "category": "Other"
+    },
+    "ș": {
+      "filename": "pfa0234.ttf",
+      "index": 234,
+      "unicode": "U+0219",
+      "category": "Other"
+    },
+    "Ț": {
+      "filename": "pfa0235.ttf",
+      "index": 235,
+      "unicode": "U+021A",
+      "category": "Other"
+    },
+    "ț": {
+      "filename": "pfa0236.ttf",
+      "index": 236,
+      "unicode": "U+021B",
+      "category": "Other"
+    },
+    "Α": {
+      "filename": "pfa0237.ttf",
+      "index": 237,
+      "unicode": "U+0391",
+      "category": "Greek"
+    },
+    "Β": {
+      "filename": "pfa0238.ttf",
+      "index": 238,
+      "unicode": "U+0392",
+      "category": "Greek"
+    },
+    "Γ": {
+      "filename": "pfa0239.ttf",
+      "index": 239,
+      "unicode": "U+0393",
+      "category": "Greek"
+    },
+    "Δ": {
+      "filename": "pfa0240.ttf",
+      "index": 240,
+      "unicode": "U+0394",
+      "category": "Greek"
+    },
+    "Ε": {
+      "filename": "pfa0241.ttf",
+      "index": 241,
+      "unicode": "U+0395",
+      "category": "Greek"
+    },
+    "Ζ": {
+      "filename": "pfa0242.ttf",
+      "index": 242,
+      "unicode": "U+0396",
+      "category": "Greek"
+    },
+    "Η": {
+      "filename": "pfa0243.ttf",
+      "index": 243,
+      "unicode": "U+0397",
+      "category": "Greek"
+    },
+    "Θ": {
+      "filename": "pfa0244.ttf",
+      "index": 244,
+      "unicode": "U+0398",
+      "category": "Greek"
+    },
+    "Ι": {
+      "filename": "pfa0245.ttf",
+      "index": 245,
+      "unicode": "U+0399",
+      "category": "Greek"
+    },
+    "Κ": {
+      "filename": "pfa0246.ttf",
+      "index": 246,
+      "unicode": "U+039A",
+      "category": "Greek"
+    },
+    "Λ": {
+      "filename": "pfa0247.ttf",
+      "index": 247,
+      "unicode": "U+039B",
+      "category": "Greek"
+    },
+    "Μ": {
+      "filename": "pfa0248.ttf",
+      "index": 248,
+      "unicode": "U+039C",
+      "category": "Greek"
+    },
+    "Ν": {
+      "filename": "pfa0249.ttf",
+      "index": 249,
+      "unicode": "U+039D",
+      "category": "Greek"
+    },
+    "Ξ": {
+      "filename": "pfa0250.ttf",
+      "index": 250,
+      "unicode": "U+039E",
+      "category": "Greek"
+    },
+    "Ο": {
+      "filename": "pfa0251.ttf",
+      "index": 251,
+      "unicode": "U+039F",
+      "category": "Greek"
+    },
+    "Π": {
+      "filename": "pfa0252.ttf",
+      "index": 252,
+      "unicode": "U+03A0",
+      "category": "Greek"
+    },
+    "Ρ": {
+      "filename": "pfa0253.ttf",
+      "index": 253,
+      "unicode": "U+03A1",
+      "category": "Greek"
+    },
+    "Σ": {
+      "filename": "pfa0254.ttf",
+      "index": 254,
+      "unicode": "U+03A3",
+      "category": "Greek"
+    },
+    "Τ": {
+      "filename": "pfa0255.ttf",
+      "index": 255,
+      "unicode": "U+03A4",
+      "category": "Greek"
+    },
+    "Υ": {
+      "filename": "pfa0256.ttf",
+      "index": 256,
+      "unicode": "U+03A5",
+      "category": "Greek"
+    },
+    "Φ": {
+      "filename": "pfa0257.ttf",
+      "index": 257,
+      "unicode": "U+03A6",
+      "category": "Greek"
+    },
+    "Χ": {
+      "filename": "pfa0258.ttf",
+      "index": 258,
+      "unicode": "U+03A7",
+      "category": "Greek"
+    },
+    "Ψ": {
+      "filename": "pfa0259.ttf",
+      "index": 259,
+      "unicode": "U+03A8",
+      "category": "Greek"
+    },
+    "Ω": {
+      "filename": "pfa0260.ttf",
+      "index": 260,
+      "unicode": "U+03A9",
+      "category": "Greek"
+    },
+    "α": {
+      "filename": "pfa0261.ttf",
+      "index": 261,
+      "unicode": "U+03B1",
+      "category": "Greek"
+    },
+    "β": {
+      "filename": "pfa0262.ttf",
+      "index": 262,
+      "unicode": "U+03B2",
+      "category": "Greek"
+    },
+    "γ": {
+      "filename": "pfa0263.ttf",
+      "index": 263,
+      "unicode": "U+03B3",
+      "category": "Greek"
+    },
+    "δ": {
+      "filename": "pfa0264.ttf",
+      "index": 264,
+      "unicode": "U+03B4",
+      "category": "Greek"
+    },
+    "ε": {
+      "filename": "pfa0265.ttf",
+      "index": 265,
+      "unicode": "U+03B5",
+      "category": "Greek"
+    },
+    "ζ": {
+      "filename": "pfa0266.ttf",
+      "index": 266,
+      "unicode": "U+03B6",
+      "category": "Greek"
+    },
+    "η": {
+      "filename": "pfa0267.ttf",
+      "index": 267,
+      "unicode": "U+03B7",
+      "category": "Greek"
+    },
+    "θ": {
+      "filename": "pfa0268.ttf",
+      "index": 268,
+      "unicode": "U+03B8",
+      "category": "Greek"
+    },
+    "ι": {
+      "filename": "pfa0269.ttf",
+      "index": 269,
+      "unicode": "U+03B9",
+      "category": "Greek"
+    },
+    "κ": {
+      "filename": "pfa0270.ttf",
+      "index": 270,
+      "unicode": "U+03BA",
+      "category": "Greek"
+    },
+    "λ": {
+      "filename": "pfa0271.ttf",
+      "index": 271,
+      "unicode": "U+03BB",
+      "category": "Greek"
+    },
+    "μ": {
+      "filename": "pfa0272.ttf",
+      "index": 272,
+      "unicode": "U+03BC",
+      "category": "Greek"
+    },
+    "ν": {
+      "filename": "pfa0273.ttf",
+      "index": 273,
+      "unicode": "U+03BD",
+      "category": "Greek"
+    },
+    "ξ": {
+      "filename": "pfa0274.ttf",
+      "index": 274,
+      "unicode": "U+03BE",
+      "category": "Greek"
+    },
+    "ο": {
+      "filename": "pfa0275.ttf",
+      "index": 275,
+      "unicode": "U+03BF",
+      "category": "Greek"
+    },
+    "π": {
+      "filename": "pfa0276.ttf",
+      "index": 276,
+      "unicode": "U+03C0",
+      "category": "Greek"
+    },
+    "ρ": {
+      "filename": "pfa0277.ttf",
+      "index": 277,
+      "unicode": "U+03C1",
+      "category": "Greek"
+    },
+    "σ": {
+      "filename": "pfa0278.ttf",
+      "index": 278,
+      "unicode": "U+03C3",
+      "category": "Greek"
+    },
+    "τ": {
+      "filename": "pfa0279.ttf",
+      "index": 279,
+      "unicode": "U+03C4",
+      "category": "Greek"
+    },
+    "υ": {
+      "filename": "pfa0280.ttf",
+      "index": 280,
+      "unicode": "U+03C5",
+      "category": "Greek"
+    },
+    "φ": {
+      "filename": "pfa0281.ttf",
+      "index": 281,
+      "unicode": "U+03C6",
+      "category": "Greek"
+    },
+    "χ": {
+      "filename": "pfa0282.ttf",
+      "index": 282,
+      "unicode": "U+03C7",
+      "category": "Greek"
+    },
+    "ψ": {
+      "filename": "pfa0283.ttf",
+      "index": 283,
+      "unicode": "U+03C8",
+      "category": "Greek"
+    },
+    "ω": {
+      "filename": "pfa0284.ttf",
+      "index": 284,
+      "unicode": "U+03C9",
+      "category": "Greek"
+    },
+    "–": {
+      "filename": "pfa0286.ttf",
+      "index": 286,
+      "unicode": "U+2013",
+      "category": "Other"
+    },
+    "—": {
+      "filename": "pfa0287.ttf",
+      "index": 287,
+      "unicode": "U+2014",
+      "category": "Other"
+    },
+    "‚": {
+      "filename": "pfa0288.ttf",
+      "index": 288,
+      "unicode": "U+201A",
+      "category": "Other"
+    },
+    "„": {
+      "filename": "pfa0289.ttf",
+      "index": 289,
+      "unicode": "U+201E",
+      "category": "Other"
+    },
+    "†": {
+      "filename": "pfa0290.ttf",
+      "index": 290,
+      "unicode": "U+2020",
+      "category": "Other"
+    },
+    "‡": {
+      "filename": "pfa0291.ttf",
+      "index": 291,
+      "unicode": "U+2021",
+      "category": "Other"
+    },
+    "•": {
+      "filename": "pfa0292.ttf",
+      "index": 292,
+      "unicode": "U+2022",
+      "category": "Other"
+    },
+    "‰": {
+      "filename": "pfa0294.ttf",
+      "index": 294,
+      "unicode": "U+2030",
+      "category": "Other"
+    },
+    "′": {
+      "filename": "pfa0296.ttf",
+      "index": 296,
+      "unicode": "U+2032",
+      "category": "Other"
+    },
+    "″": {
+      "filename": "pfa0297.ttf",
+      "index": 297,
+      "unicode": "U+2033",
+      "category": "Other"
+    },
+    "⁰": {
+      "filename": "pfa0301.ttf",
+      "index": 301,
+      "unicode": "U+2070",
+      "category": "Other"
+    },
+    "⁴": {
+      "filename": "pfa0303.ttf",
+      "index": 303,
+      "unicode": "U+2074",
+      "category": "Other"
+    },
+    "⁵": {
+      "filename": "pfa0304.ttf",
+      "index": 304,
+      "unicode": "U+2075",
+      "category": "Other"
+    },
+    "⁶": {
+      "filename": "pfa0305.ttf",
+      "index": 305,
+      "unicode": "U+2076",
+      "category": "Other"
+    },
+    "⁷": {
+      "filename": "pfa0306.ttf",
+      "index": 306,
+      "unicode": "U+2077",
+      "category": "Other"
+    },
+    "⁸": {
+      "filename": "pfa0307.ttf",
+      "index": 307,
+      "unicode": "U+2078",
+      "category": "Other"
+    },
+    "⁹": {
+      "filename": "pfa0308.ttf",
+      "index": 308,
+      "unicode": "U+2079",
+      "category": "Other"
+    },
+    "⁺": {
+      "filename": "pfa0309.ttf",
+      "index": 309,
+      "unicode": "U+207A",
+      "category": "Other"
+    },
+    "⁻": {
+      "filename": "pfa0310.ttf",
+      "index": 310,
+      "unicode": "U+207B",
+      "category": "Other"
+    },
+    "⁼": {
+      "filename": "pfa0311.ttf",
+      "index": 311,
+      "unicode": "U+207C",
+      "category": "Other"
+    },
+    "⁽": {
+      "filename": "pfa0312.ttf",
+      "index": 312,
+      "unicode": "U+207D",
+      "category": "Other"
+    },
+    "⁾": {
+      "filename": "pfa0313.ttf",
+      "index": 313,
+      "unicode": "U+207E",
+      "category": "Other"
+    },
+    "ⁿ": {
+      "filename": "pfa0314.ttf",
+      "index": 314,
+      "unicode": "U+207F",
+      "category": "Other"
+    },
+    "₀": {
+      "filename": "pfa0315.ttf",
+      "index": 315,
+      "unicode": "U+2080",
+      "category": "Other"
+    },
+    "₁": {
+      "filename": "pfa0316.ttf",
+      "index": 316,
+      "unicode": "U+2081",
+      "category": "Other"
+    },
+    "₂": {
+      "filename": "pfa0317.ttf",
+      "index": 317,
+      "unicode": "U+2082",
+      "category": "Other"
+    },
+    "₃": {
+      "filename": "pfa0318.ttf",
+      "index": 318,
+      "unicode": "U+2083",
+      "category": "Other"
+    },
+    "₄": {
+      "filename": "pfa0319.ttf",
+      "index": 319,
+      "unicode": "U+2084",
+      "category": "Other"
+    },
+    "₅": {
+      "filename": "pfa0320.ttf",
+      "index": 320,
+      "unicode": "U+2085",
+      "category": "Other"
+    },
+    "₆": {
+      "filename": "pfa0321.ttf",
+      "index": 321,
+      "unicode": "U+2086",
+      "category": "Other"
+    },
+    "₇": {
+      "filename": "pfa0322.ttf",
+      "index": 322,
+      "unicode": "U+2087",
+      "category": "Other"
+    },
+    "₈": {
+      "filename": "pfa0323.ttf",
+      "index": 323,
+      "unicode": "U+2088",
+      "category": "Other"
+    },
+    "₉": {
+      "filename": "pfa0324.ttf",
+      "index": 324,
+      "unicode": "U+2089",
+      "category": "Other"
+    },
+    "₊": {
+      "filename": "pfa0325.ttf",
+      "index": 325,
+      "unicode": "U+208A",
+      "category": "Other"
+    },
+    "₋": {
+      "filename": "pfa0326.ttf",
+      "index": 326,
+      "unicode": "U+208B",
+      "category": "Other"
+    },
+    "₌": {
+      "filename": "pfa0327.ttf",
+      "index": 327,
+      "unicode": "U+208C",
+      "category": "Other"
+    },
+    "₍": {
+      "filename": "pfa0328.ttf",
+      "index": 328,
+      "unicode": "U+208D",
+      "category": "Other"
+    },
+    "₎": {
+      "filename": "pfa0329.ttf",
+      "index": 329,
+      "unicode": "U+208E",
+      "category": "Other"
+    },
+    "₦": {
+      "filename": "pfa0344.ttf",
+      "index": 344,
+      "unicode": "U+20A6",
+      "category": "Other"
+    },
+    "₨": {
+      "filename": "pfa0345.ttf",
+      "index": 345,
+      "unicode": "U+20A8",
+      "category": "Other"
+    },
+    "₩": {
+      "filename": "pfa0346.ttf",
+      "index": 346,
+      "unicode": "U+20A9",
+      "category": "Other"
+    },
+    "₪": {
+      "filename": "pfa0347.ttf",
+      "index": 347,
+      "unicode": "U+20AA",
+      "category": "Other"
+    },
+    "₫": {
+      "filename": "pfa0348.ttf",
+      "index": 348,
+      "unicode": "U+20AB",
+      "category": "Other"
+    },
+    "€": {
+      "filename": "pfa0349.ttf",
+      "index": 349,
+      "unicode": "U+20AC",
+      "category": "Currency"
+    },
+    "₱": {
+      "filename": "pfa0350.ttf",
+      "index": 350,
+      "unicode": "U+20B1",
+      "category": "Other"
+    },
+    "₹": {
+      "filename": "pfa0354.ttf",
+      "index": 354,
+      "unicode": "U+20B9",
+      "category": "Currency"
+    },
+    "₺": {
+      "filename": "pfa0355.ttf",
+      "index": 355,
+      "unicode": "U+20BA",
+      "category": "Other"
+    },
+    "₼": {
+      "filename": "pfa0356.ttf",
+      "index": 356,
+      "unicode": "U+20BC",
+      "category": "Other"
+    },
+    "₽": {
+      "filename": "pfa0357.ttf",
+      "index": 357,
+      "unicode": "U+20BD",
+      "category": "Currency"
+    },
+    "№": {
+      "filename": "pfa0361.ttf",
+      "index": 361,
+      "unicode": "U+2116",
+      "category": "Other"
+    },
+    "™": {
+      "filename": "pfa0364.ttf",
+      "index": 364,
+      "unicode": "U+2122",
+      "category": "Other"
+    },
+    "⅛": {
+      "filename": "pfa0373.ttf",
+      "index": 373,
+      "unicode": "U+215B",
+      "category": "Other"
+    },
+    "⅜": {
+      "filename": "pfa0374.ttf",
+      "index": 374,
+      "unicode": "U+215C",
+      "category": "Other"
+    },
+    "⅝": {
+      "filename": "pfa0375.ttf",
+      "index": 375,
+      "unicode": "U+215D",
+      "category": "Other"
+    },
+    "⅞": {
+      "filename": "pfa0376.ttf",
+      "index": 376,
+      "unicode": "U+215E",
+      "category": "Other"
+    },
+    "∂": {
+      "filename": "pfa0416.ttf",
+      "index": 416,
+      "unicode": "U+2202",
+      "category": "Math"
+    },
+    "∆": {
+      "filename": "pfa0420.ttf",
+      "index": 420,
+      "unicode": "U+2206",
+      "category": "Other"
+    },
+    "∏": {
+      "filename": "pfa0426.ttf",
+      "index": 426,
+      "unicode": "U+220F",
+      "category": "Math"
+    },
+    "∑": {
+      "filename": "pfa0428.ttf",
+      "index": 428,
+      "unicode": "U+2211",
+      "category": "Math"
+    },
+    "√": {
+      "filename": "pfa0436.ttf",
+      "index": 436,
+      "unicode": "U+221A",
+      "category": "Math"
+    },
+    "∞": {
+      "filename": "pfa0440.ttf",
+      "index": 440,
+      "unicode": "U+221E",
+      "category": "Math"
+    },
+    "∫": {
+      "filename": "pfa0451.ttf",
+      "index": 451,
+      "unicode": "U+222B",
+      "category": "Math"
+    },
+    "≈": {
+      "filename": "pfa0462.ttf",
+      "index": 462,
+      "unicode": "U+2248",
+      "category": "Math"
+    },
+    "≠": {
+      "filename": "pfa0463.ttf",
+      "index": 463,
+      "unicode": "U+2260",
+      "category": "Math"
+    },
+    "≤": {
+      "filename": "pfa0466.ttf",
+      "index": 466,
+      "unicode": "U+2264",
+      "category": "Math"
+    },
+    "≥": {
+      "filename": "pfa0467.ttf",
+      "index": 467,
+      "unicode": "U+2265",
+      "category": "Math"
+    },
+    "◊": {
+      "filename": "pfa0529.ttf",
+      "index": 529,
+      "unicode": "U+25CA",
+      "category": "Other"
     }
   }
 }

@@ -29,7 +29,7 @@ const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
       <Route path="/try" element={<LoginPage />} />
       <Route path="/login" element={<Navigate to="/try" replace />} />
       <Route path="/video" element={<VideoPage />} />

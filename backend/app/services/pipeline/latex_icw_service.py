@@ -344,7 +344,7 @@ class LatexICWService:
             log_path.write_text("", encoding="utf-8")
             for iteration in range(2):
                 proc = subprocess.run(
-                    ["lualatex", "-interaction=nonstopmode", "document.tex"],
+                    ["xelatex", "-interaction=nonstopmode", "document.tex"],
                     cwd=temp_dir,
                     capture_output=True,
                     text=True,

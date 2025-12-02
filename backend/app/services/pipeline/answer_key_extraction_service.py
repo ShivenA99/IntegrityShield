@@ -159,7 +159,7 @@ class AnswerKeyExtractionService:
             model=model,
             messages=messages,
             temperature=0.0,
-            max_tokens=800,
+            max_tokens=3000,
             response_format=ANSWER_KEY_RESPONSE_SCHEMA,
         )
         message = response.choices[0].message if response.choices else None

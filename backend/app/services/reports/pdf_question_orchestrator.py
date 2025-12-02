@@ -106,10 +106,27 @@ class PDFQuestionEvaluator:
         uploads = await self._upload_to_providers(clients, pdf_path)
         question_responses: dict[str, list[dict[str, Any]]] = {q.question_number: [] for q in questions}
 
+        # Create tasks for all providers to run in parallel
+        tasks = []
+        provider_names = []
         for provider_name, client in clients.items():
             file_ref = uploads.get(provider_name)
-            batched_answers = await self._ask_all_questions(client, provider_name, file_ref, questions)
-            for answer in batched_answers:
+            task = self._ask_all_questions(client, provider_name, file_ref, questions)
+            tasks.append(task)
+            provider_names.append(provider_name)
+
+        # Execute all provider queries in parallel
+        logger.info("Querying %d providers in parallel for %d questions", len(tasks), len(questions))
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Process results from all providers
+        for provider_name, result in zip(provider_names, results):
+            if isinstance(result, Exception):
+                logger.error("Provider %s failed: %s", provider_name, result)
+                continue
+
+            # result is the batched_answers list
+            for answer in result:
                 q_number = answer.get("question_number")
                 if q_number not in question_responses:
                     logger.warning("Provider %s returned unknown question number %s", provider_name, q_number)
@@ -136,13 +153,33 @@ class PDFQuestionEvaluator:
         }
 
     async def _upload_to_providers(self, clients: dict[str, BaseLLMClient], pdf_path: str) -> dict[str, str | None]:
-        uploads: dict[str, str | None] = {}
-        for name, client in clients.items():
+        """Upload PDF to all providers concurrently with stagger delay to prevent thundering herd."""
+        async def upload_with_delay(name: str, client: BaseLLMClient, delay: float) -> tuple[str, str | None]:
+            await asyncio.sleep(delay)
             try:
-                uploads[name] = await client.upload_file(pdf_path)
+                file_ref = await client.upload_file(pdf_path)
+                logger.info("Successfully uploaded PDF to %s", name)
+                return name, file_ref
             except Exception as exc:  # noqa: BLE001
                 logger.error("Failed to upload PDF to %s: %s", name, exc)
-                uploads[name] = None
+                return name, None
+
+        # Stagger uploads by 300ms to avoid thundering herd (conservative for unknown API tier)
+        tasks = [
+            upload_with_delay(name, client, idx * 0.3)
+            for idx, (name, client) in enumerate(clients.items())
+        ]
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        uploads: dict[str, str | None] = {}
+        for result in results:
+            if isinstance(result, Exception):
+                logger.error("Upload exception: %s", result)
+                continue
+            name, file_ref = result
+            uploads[name] = file_ref
+
         return uploads
 
     async def _ask_all_questions(

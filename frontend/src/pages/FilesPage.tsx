@@ -10,7 +10,7 @@ import ArtifactPreviewModal, { ArtifactPreview } from "@components/shared/Artifa
 import { StatusPill } from "@components/shared/StatusPill";
 import { usePipeline } from "@hooks/usePipeline";
 import { usePipelineContext } from "@contexts/PipelineContext";
-import { ENHANCEMENT_METHOD_LABELS } from "@constants/enhancementMethods";
+import { getMethodDisplayLabel } from "@constants/enhancementMethods";
 
 interface ArtifactRow extends ArtifactPreview {
   category: "original" | "shielded" | "assessment" | "report";
@@ -52,6 +52,7 @@ const FilesPage: React.FC = () => {
     const manipulation = (structured.manipulation_results as Record<string, any>) ?? {};
     const reports = (structured.reports as Record<string, any>) ?? {};
     const documentInfo = structured.document as Record<string, any>;
+    const pipelineMode = status.pipeline_config?.mode;
 
     const rows: ArtifactRow[] = [];
     if (documentInfo?.original_path) {
@@ -70,13 +71,14 @@ const FilesPage: React.FC = () => {
     const enhanced = (manipulation.enhanced_pdfs as Record<string, any>) ?? {};
     Object.entries(enhanced).forEach(([method, meta]) => {
       if (!meta) return;
+      const displayLabel = getMethodDisplayLabel(method, pipelineMode);
       rows.push({
         key: `shielded-${method}`,
         label: "Shielded",
         kind: "assessment",
         category: "shielded",
-        variant: ENHANCEMENT_METHOD_LABELS[method as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? method.replace(/_/g, " "),
-        method: ENHANCEMENT_METHOD_LABELS[method as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? method.replace(/_/g, " "),
+        variant: displayLabel,
+        method: displayLabel,
         status: meta.relative_path ? "completed" : "pending",
         relativePath: meta.relative_path || meta.path || meta.file_path,
         sizeBytes: meta.size_bytes ?? meta.file_size_bytes,
@@ -113,20 +115,21 @@ const FilesPage: React.FC = () => {
     }
     const evaluations = (reports.evaluation as Record<string, any>) ?? {};
     Object.entries(evaluations).forEach(([method, meta]) => {
+      const displayLabel = getMethodDisplayLabel(method, pipelineMode);
       rows.push({
         key: `evaluation-${method}`,
         label: "Evaluation",
         kind: "report",
         category: "report",
-        variant: ENHANCEMENT_METHOD_LABELS[method as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? method.replace(/_/g, " "),
-        method: ENHANCEMENT_METHOD_LABELS[method as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? method.replace(/_/g, " "),
+        variant: displayLabel,
+        method: displayLabel,
         status: meta.artifact ? "completed" : "pending",
         relativePath: meta.artifact,
         sizeBytes: meta.output_files?.size_bytes,
       });
     });
     return rows;
-  }, [status?.structured_data]);
+  }, [status?.structured_data, status?.pipeline_config?.mode]);
 
   const filteredRows = useMemo(() => {
     switch (filter) {

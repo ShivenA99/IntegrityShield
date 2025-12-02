@@ -10,12 +10,20 @@ interface ProgressTrackerProps {
   onStageSelect?: (stage: string) => void;
   currentStage?: string;
   renderStageActions?: (stage: PipelineStageName) => React.ReactNode;
+  mode?: string;
 }
 
-const BASE_STAGE_ORDER: PipelineStageName[] = [
+const DETECTION_STAGE_ORDER: PipelineStageName[] = [
   "smart_reading",
   "content_discovery",
   "smart_substitution",
+  "pdf_creation",
+];
+
+const PREVENTION_STAGE_ORDER: PipelineStageName[] = [
+  "smart_reading",
+  "content_discovery",
+  "document_enhancement",
   "pdf_creation",
 ];
 
@@ -24,7 +32,7 @@ const stageLabels: Record<PipelineStageName, string> = {
   content_discovery: "Content Discovery",
   smart_substitution: "Strategy",
   effectiveness_testing: "Effectiveness Testing",
-  document_enhancement: "Document Enhancement",
+  document_enhancement: "Font Generation",
   pdf_creation: "Download PDFs",
   results_generation: "Results",
 };
@@ -36,9 +44,13 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   onStageSelect,
   currentStage,
   renderStageActions,
+  mode = "detection",
 }) => {
   const stageMap = new Map(stages.map((stage) => [stage.name, stage]));
-  const visibleStages: PipelineStageName[] = [...BASE_STAGE_ORDER];
+  const isPreventionMode = mode === "prevention";
+  const visibleStages: PipelineStageName[] = isPreventionMode
+    ? [...PREVENTION_STAGE_ORDER]
+    : [...DETECTION_STAGE_ORDER];
 
   return (
     <div className="progress-tracker">
