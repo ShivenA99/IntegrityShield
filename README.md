@@ -1,136 +1,309 @@
-# Integrity Shield – LLM Assessment Vulnerability Simulator
+# INTEGRITY SHIELD
 
-This repository hosts the end-to-end simulator we use to probe grading vulnerabilities in LLM-assisted educational workflows. It ingests instructor PDFs, weaponises subtle content manipulations, renders multiple attacked variants, and now models whole-class cheating behaviour through synthetic classroom datasets and evaluation analytics.
+**A System for Ethical AI Use & Authorship Transparency in Assessments**
 
-## 🎥 Demo Video
+[![Demo Video](https://img.shields.io/badge/Demo-Video-red?logo=youtube)](https://youtu.be/77W_fWW2Agg)
+[![Paper](https://img.shields.io/badge/Paper-EACL%202025-blue)](https://shivena99.github.io/IntegrityShield/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**[Watch the full demonstration](https://youtu.be/77W_fWW2Agg)** to see Integrity Shield in action.
+> **INTEGRITY SHIELD** is a document-layer watermarking system that embeds schema-aware, item-level watermarks into assessment PDFs while keeping their human-visible appearance unchanged. These watermarks consistently prevent MLLMs from answering shielded exam PDFs and encode stable, item-level signatures that can be reliably recovered from model or student responses.
 
-## Repository Layout
+---
+
+## 🎯 Overview
+
+Large language models (LLMs) can now solve entire exams directly from uploaded PDF assessments, raising urgent concerns about academic integrity and the reliability of grades and credentials. INTEGRITY SHIELD addresses this challenge through **document-layer watermarking** that:
+
+- ✅ **Prevents AI solving**: 91–94% exam-level blocking across GPT-5, Claude Sonnet-4.5, Grok-4.1, and Gemini-2.5 Flash
+- ✅ **Enables authorship detection**: 89–93% signature retrieval from model responses
+- ✅ **Maintains visual integrity**: PDFs remain visually unchanged for human readers
+- ✅ **Supports ethical assessment**: Provides interpretable authorship signals without invasive monitoring
+
+### How It Works
+
+INTEGRITY SHIELD exploits the **render-parse gap** in PDFs: what humans see often differs from what AI parsers ingest. By injecting invisible text, glyph remappings, and lightweight overlays, we influence model interpretation while leaving exams visually unchanged.
 
 ```
-backend/        Flask application, pipeline services, Alembic migrations
-frontend/       React + TypeScript SPA for orchestration and analysis
-documentation/  Living knowledge base (setup, architecture, APIs, data contracts)
-data/           Local storage for pipeline runs and shared artifacts (ignored in git)
-scripts/        One-off utilities and operational helpers
+┌─────────────────┐
+│  Upload Exam    │
+│  PDF + Answers  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────────────────┐
+│  Extraction & Structure Analysis    │
+│  • PyMuPDF + MLLM extraction        │
+│  • Question type detection          │
+│  • Answer schema identification     │
+└────────┬────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────┐
+│  Schema-Aware Watermark Planning    │
+│  • LLM-based tactic selection       │
+│  • Per-question strategy            │
+│  • Answer type logic                │
+└────────┬────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────┐
+│  Watermark Engine Application       │
+│  • code-glyph remapping             │
+│  • Invisible text injection         │
+│  • TrapDoc phantom tokens           │
+│  • In-context watermarks (ICW)      │
+└────────┬────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────┐
+│  Output Generation                  │
+│  • Shielded PDF variants (IS-v1/v2) │
+│  • Vulnerability reports            │
+│  • Attribution signatures           │
+└─────────────────────────────────────┘
 ```
 
-## Quick Start
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Python 3.9 (PyMuPDF compatibility), `pip`, and a virtual environment tool
-- Node.js 18+ and npm (Vite dev server)
-- PostgreSQL 14+ (recommended for JSONB columns) or SQLite for small local experiments
-- System packages: `mupdf-tools` (PyMuPDF), `poppler` (optional helpers)
-- API keys for any AI backends you plan to exercise (`OPENAI_API_KEY`, `MISTRAL_API_KEY`, etc.)
+- **Python 3.9+** (PyMuPDF compatibility)
+- **Node.js 18+** and npm
+- **PostgreSQL 14+** (or SQLite for local dev)
+- **API Keys**: OpenAI, Anthropic, Google AI, and/or Mistral (at least one required)
 
-### Backend
+### 1. Backend Setup
 
 ```bash
+# Navigate to backend directory
 cd backend
-python3 -m venv venv_host
-source venv_host/bin/activate
+
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
 **Configure Environment Variables:**
 
-Create a `.env` file in the `backend/` directory with the following required variables:
+Create a `.env` file in the `backend/` directory:
 
 ```bash
 # Environment Configuration
-FAIRTESTAI_ENV=development
-FAIRTESTAI_PORT=8000
-FAIRTESTAI_LOG_LEVEL=INFO
+INTEGRITYSHIELD_ENV=development
+INTEGRITYSHIELD_PORT=8000
+INTEGRITYSHIELD_LOG_LEVEL=INFO
 
 # Database Configuration
-FAIRTESTAI_DATABASE_URL=postgresql+psycopg://fairtestai:fairtestai@localhost:5433/fairtestai
+# SQLite (default for local dev):
+INTEGRITYSHIELD_DATABASE_URL=sqlite:///./data/integrityshield.db
+# PostgreSQL (production):
+# INTEGRITYSHIELD_DATABASE_URL=postgresql+psycopg2://user:pass@localhost:5432/integrityshield
 
-# Default Models and Methods
-FAIRTESTAI_DEFAULT_MODELS=gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro
-FAIRTESTAI_DEFAULT_METHODS=content_stream_overlay,pymupdf_overlay
-
-# Development Tools
-FAIRTESTAI_ENABLE_DEV_TOOLS=true
-
-# Model Configuration
-POST_FUSER_MODEL=gpt-5
-
-# API Keys (REQUIRED)
+# AI Provider API Keys (at least one required)
 OPENAI_API_KEY=your_openai_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
 GOOGLE_AI_KEY=your_google_ai_key_here
 MISTRAL_API_KEY=your_mistral_api_key_here
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
+
+# Model Configuration
 ANTHROPIC_MODEL=claude-sonnet-4-5-20250929
+POST_FUSER_MODEL=gpt-5
+
+# Development Tools
+INTEGRITYSHIELD_ENABLE_DEV_TOOLS=true
+INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true
 ```
 
 **Start the Backend:**
 
-Use the provided startup script which automatically loads environment variables and sets up the correct configuration:
-
 ```bash
-# From the project root directory
+# From the project root
 bash backend/scripts/run_dev_server.sh
 ```
 
-The startup script will:
-- Load environment variables from `backend/.env`
-- Verify required API keys are present
-- Set default database URL (SQLite for local dev) and other configuration
-- Activate the virtual environment
-- Start the Flask server on port 8000
+The server will start on `http://localhost:8000`. The startup script automatically:
+- Loads environment variables from `backend/.env`
+- Verifies required API keys
+- Runs database migrations
+- Starts the Flask server
 
-> **Note:** The script automatically sets `FAIRTESTAI_DATABASE_URL` to use SQLite (`sqlite:////.../data/fairtestai.db`) for local development. To use PostgreSQL, override this in your `.env` file. The application factory (`app.create_app`) runs Alembic migrations automatically when `FAIRTESTAI_AUTO_APPLY_MIGRATIONS` is set to `true` (default is `false` in the script).
-
-### Frontend
+### 2. Frontend Setup
 
 ```bash
+# Navigate to frontend directory
 cd frontend
+
+# Install dependencies
 npm install
-npm run dev  # http://localhost:5173
+
+# Start development server
+npm run dev
 ```
 
-The Vite dev server proxies `/api/*` to the Flask backend (default `http://localhost:8000`). Adjust the proxy in `vite.config.ts` if you change ports.
+The frontend will be available at `http://localhost:5173`. The Vite dev server automatically proxies API requests to the backend.
 
-## Pipeline Overview
+---
 
-Core stages (managed by `PipelineOrchestrator`) run in sequence on a background worker:
+## 📖 Usage Workflow
 
-1. **smart_reading** – OCR + vision extraction (`SmartReadingService`)
-2. **content_discovery** – Fuse multi-source questions, seed DB (`ContentDiscoveryService`)
-3. **smart_substitution** – Apply adversarial mappings and geometry validation (`SmartSubstitutionService`)
-4. **effectiveness_testing** – Optional re-query against target LLMs
-5. **document_enhancement** – Prep overlay/stream/LaTeX resources
-6. **pdf_creation** – Render attacked variants (`PdfCreationService`)
-7. **results_generation** – Summaries and pipeline metrics
+### Stage 1: Upload & Watermark Planning
 
-The SPA exposes two additional post-pipeline phases:
+1. **Upload Assessment**: Navigate to the dashboard and upload your exam PDF and answer key
+2. **Structure Extraction**: The system automatically extracts question structure, detecting:
+   - Multiple-choice questions (MCQ)
+   - True/False questions
+   - Long-form questions
+   - Diagrams and tables
+3. **Preview Strategy**: Review the planned watermark tactics for each question
 
-- **Classroom Datasets** – Triggered via the Classroom action once downloads exist; `POST /api/pipeline/<run_id>/classrooms` synthesises student answer sheets per attacked PDF. Artifacts and metadata live under `backend/data/pipeline_runs/<run>/answer_sheets/<classroom_key>/`.
-- **Classroom Evaluation** – The Evaluation action (`POST /api/pipeline/<run_id>/classrooms/<id>/evaluate`) aggregates student metrics (cheating breakdowns, score distributions) and persists `classroom_evaluations` records with JSON artifacts.
+### Stage 2: Watermark Embedding & AI Calibration
 
-LaTeX-based methods now capture selective overlay crops per manipulated rectangle (`assets/<method>_overlays/*.png`) so analysts can audit replacements alongside the final PDFs.
+1. **Generate Shielded PDFs**: The system creates two watermark variants:
+   - **IS-v1**: Lighter watermarking for minimal perturbation
+   - **IS-v2**: Stronger multi-layer watermarking for maximum robustness
+2. **AI Calibration**: Automatically evaluates watermark effectiveness across multiple MLLMs
+3. **Review Reports**: Inspect prevention rates and detection reliability
 
-## Documentation
+### Stage 3: Authorship Analysis
 
-The latest guides sit under [`documentation/`](documentation/README.md), including:
+1. **Deploy Assessment**: Distribute shielded PDF to students
+2. **Collect Responses**: Export student answers from your LMS
+3. **Analyze Authorship**: Upload responses to view:
+   - Per-question watermark retrieval scores
+   - Exam-level authorship degrees
+   - Cohort-level distributions
+4. **Human Review**: Use high authorship scores as signals for follow-up (oral checks, additional assessments)
 
-- Environmental setup & dependency matrix
-- Backend architecture, APIs, logging, and migrations
-- Frontend component map and stage UX
-- Pipeline stage reference plus classroom dataset lifecycle
-- Data contracts, database schema, and storage layout
-- Model, prompt, and attack configuration
-- Operational workflows and troubleshooting playbooks
+---
 
-Start with the [Documentation Index](documentation/README.md) for a curated table of contents.
+## 🔬 Performance
 
-## Contributing
+Evaluated across 30 multi-page exams spanning STEM, humanities, and medical reasoning:
 
-1. Branch from `AntiCheat-v0.0`, keep commits scoped, and run lint/tests where practical.
-2. Update documentation alongside code—docs are now part of the definition of done.
-3. Share reproducible runs or screenshots when raising PRs to capture behavioural changes.
+| Metric | GPT-5 | Claude Sonnet-4.5 | Grok-4.1 | Gemini-2.5 Flash |
+|--------|-------|-------------------|----------|------------------|
+| **Prevention (Exam-Level Blocking)** | 93.6% | 92.9% | 92.3% | 91.7% |
+| **Detection (Signature Retrieval)** | 92.8% | 92.1% | 91.6% | 91.0% |
 
-Have questions or found a gap? Extend the docs and ping the team in the PR—knowledge here is our shared foundation for future iterations.
+Compared to baselines:
+- **ICW** (In-Context Watermarking): 3-7% prevention/detection
+- **code-glyph**: 81-86% prevention/detection
+- **TRAPDOC**: 40-89% prevention/detection (unstable across models)
+
+---
+
+## 🏗️ Architecture
+
+### Backend (`backend/`)
+- **Framework**: Flask with SQLAlchemy ORM
+- **Database**: PostgreSQL (production) or SQLite (development)
+- **Services**:
+  - `DocumentIngestionService`: PDF parsing and structure extraction
+  - `WatermarkPlanningService`: LLM-based strategy selection
+  - `PdfRewritingService`: Document-layer watermark application
+  - `AuthorshipService`: Response scoring and attribution
+
+### Frontend (`frontend/`)
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **UI Library**: InstUI (Instructure's Canvas design system)
+- **State Management**: React Context API
+
+### Watermarking Techniques
+
+1. **Invisible Text Injection**: Hidden spans anchored near stems and options
+2. **Glyph Remapping**: CMap-based font substitutions (visually identical, parsed differently)
+3. **Off-Page Overlays**: Clipped content that influences parsing without visual changes
+4. **Phantom Tokens**: TrapDoc-inspired document-layer perturbations
+
+---
+
+## 📚 Documentation
+
+- **[Setup Guide](documentation/setup.md)**: Detailed installation and configuration
+- **[API Reference](documentation/api.md)**: Backend endpoints and contracts
+- **[Pipeline Stages](documentation/pipeline.md)**: Detailed stage descriptions
+- **[Architecture](documentation/architecture.md)**: System design and data flow
+- **[Troubleshooting](documentation/troubleshooting.md)**: Common issues and solutions
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the research community! To contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Make your changes with clear commit messages
+4. Add or update tests as appropriate
+5. Update documentation
+6. Submit a pull request
+
+Please ensure your code follows the existing style and passes all tests.
+
+---
+
+## 📄 Citation
+
+If you use INTEGRITY SHIELD in your research, please cite our paper:
+
+```bibtex
+@inproceedings{shekhar2025integrityshield,
+  title={INTEGRITY SHIELD: A System for Ethical AI Use \& Authorship Transparency in Assessments},
+  author={Shekhar, Ashish Raj and Agarwal, Shiven and Bordoloi, Priyanuj and Shah, Yash and Anvekar, Tejas and Gupta, Vivek},
+  booktitle={Proceedings of the 2025 Conference of the European Chapter of the Association for Computational Linguistics (EACL)},
+  year={2025}
+}
+```
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## ⚠️ Ethics & Responsible Use
+
+INTEGRITY SHIELD is designed for **ethical and transparent AI use in educational assessment settings**. The system:
+
+- **Does NOT monitor students**: No keystroke logging, webcam tracking, or device control
+- **Respects privacy**: All data stays within institutional infrastructure
+- **Requires transparency**: Institutions should communicate AI-use policies and watermarking presence to students
+- **Supports human judgment**: Authorship scores are signals for review, not automatic evidence for sanctions
+
+### Intended Use
+
+- ✅ Formal educational assessments with clear governance
+- ✅ Research on AI-assisted learning and academic integrity
+- ✅ Institutional policy development for ethical AI use
+
+### Not Intended For
+
+- ❌ Surveillance or covert monitoring
+- ❌ Automatic sanctions without human review
+- ❌ Non-assessment documents without clear authorization
+
+---
+
+## 🙏 Acknowledgments
+
+This work was conducted at Arizona State University. We thank the research community for valuable feedback and discussions on ethical AI use in education.
+
+**Authors**: Ashish Raj Shekhar*, Shiven Agarwal*, Priyanuj Bordoloi, Yash Shah, Tejas Anvekar, Vivek Gupta
+*Equal contribution
+
+---
+
+## 📞 Contact
+
+For questions, issues, or collaboration opportunities:
+- **Project Page**: [https://shivena99.github.io/IntegrityShield/](https://shivena99.github.io/IntegrityShield/)
+- **Demo**: [https://shivena99.github.io/IntegrityShield/](https://shivena99.github.io/IntegrityShield/)
+- **Issues**: [GitHub Issues](https://github.com/ShivenA99/IntegrityShield/issues)
