@@ -113,8 +113,12 @@ const FilesPage: React.FC = () => {
         variant: null,
       });
     }
+    // Check both evaluation and prevention_evaluation for backward compatibility
     const evaluations = (reports.evaluation as Record<string, any>) ?? {};
-    Object.entries(evaluations).forEach(([method, meta]) => {
+    const preventionEvaluations = (reports.prevention_evaluation as Record<string, any>) ?? {};
+    // Merge both, with evaluation taking precedence
+    const allEvaluations = { ...preventionEvaluations, ...evaluations };
+    Object.entries(allEvaluations).forEach(([method, meta]) => {
       const displayLabel = getMethodDisplayLabel(method, pipelineMode);
       rows.push({
         key: `evaluation-${method}`,

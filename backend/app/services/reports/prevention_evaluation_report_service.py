@@ -14,10 +14,13 @@ from ...utils.storage_paths import (
     resolve_run_relative_path,
     run_directory,
 )
+from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
 from ..data_management.structured_data_manager import StructuredDataManager
 from .answer_scoring import AnswerScoringService
 from .pdf_question_orchestrator import PDFQuestionEvaluator, QuestionPrompt
+
+logger = get_logger(__name__)
 
 
 class PreventionEvaluationReportService:
@@ -186,15 +189,41 @@ class PreventionEvaluationReportService:
                 )
 
             # Use answer scoring service to check correctness
-            scored_batch = self.scoring_service.score_batch(
-                question_text=entry.get("question_text", ""),
-                question_type=entry.get("question_type"),
-                gold_answer=entry.get("gold_answer"),
-                provider_answers=candidates,
-                options=entry.get("options"),
-                detection_context=None,  # No detection context in prevention mode
-            )
-            score_lookup = {item["provider"]: item for item in scored_batch}
+            try:
+                scored_batch = self.scoring_service.score_batch(
+                    question_text=entry.get("question_text", ""),
+                    question_type=entry.get("question_type"),
+                    gold_answer=entry.get("gold_answer"),
+                    provider_answers=candidates,
+                    options=entry.get("options"),
+                    detection_context=None,  # No detection context in prevention mode
+                )
+                score_lookup = {item["provider"]: item for item in scored_batch if item.get("provider")}
+            except Exception as exc:
+                logger.warning(
+                    "Failed to score batch for question %s: %s. Using fallback scoring.",
+                    entry.get("question_number"), exc
+                )
+                score_lookup = {}
+                # Fallback: score individually
+                for candidate in candidates:
+                    try:
+                        single_score = self.scoring_service.score(
+                            question_text=entry.get("question_text", ""),
+                            question_type=entry.get("question_type"),
+                            gold_answer=entry.get("gold_answer"),
+                            candidate_answer=candidate.get("answer_text"),
+                            options=entry.get("options"),
+                        )
+                        score_lookup[candidate.get("provider")] = {
+                            "provider": candidate.get("provider"),
+                            **single_score,
+                        }
+                    except Exception as single_exc:
+                        logger.warning(
+                            "Failed to score individual answer for provider %s, question %s: %s",
+                            candidate.get("provider"), entry.get("question_number"), single_exc
+                        )
 
             per_model = []
             for answer in entry.get("answers", []):
@@ -289,7 +318,7 @@ class PreventionEvaluationReportService:
         questions: List[Dict[str, Any]],
     ) -> Dict[str, Any]:
         """Build summary statistics for prevention mode evaluation."""
-        provider_totals: Dict[str, Dict[str, int]] = {}
+        provider_totals: Dict[str, Dict[str, Any]] = {}
 
         for entry in questions:
             for answer in entry.get("answers", []):
@@ -301,21 +330,39 @@ class PreventionEvaluationReportService:
                         "fooled_correct": 0,
                         "fooled_incorrect": 0,
                         "unknown": 0,
+                        "score_sum": 0.0,
+                        "score_count": 0,
                     }
 
                 provider_totals[provider]["total"] += 1
                 result = answer.get("prevention_result", "unknown")
                 provider_totals[provider][result] = provider_totals[provider].get(result, 0) + 1
+                
+                # Also track scorecard scores for average_score calculation
+                scorecard = answer.get("scorecard") or {}
+                score = scorecard.get("score")
+                if score is not None:
+                    provider_totals[provider]["score_sum"] += float(score)
+                    provider_totals[provider]["score_count"] += 1
 
         provider_summary = []
         for provider, totals in provider_totals.items():
             prevention_rate = (
                 (totals["prevented"] / totals["total"] * 100) if totals["total"] > 0 else 0.0
             )
+            # Calculate average_score from scorecard scores, or from prevention results
+            avg_score = (
+                (totals["score_sum"] / totals["score_count"]) 
+                if totals["score_count"] > 0 
+                else 0.0
+            )
+            
             provider_summary.append(
                 {
                     "provider": provider,
                     "total_questions": totals["total"],
+                    "questions_evaluated": totals["total"],  # Add for frontend compatibility
+                    "average_score": avg_score,  # Add for frontend compatibility
                     "prevented_count": totals["prevented"],
                     "fooled_correct_count": totals["fooled_correct"],
                     "fooled_incorrect_count": totals["fooled_incorrect"],
@@ -333,6 +380,7 @@ class PreventionEvaluationReportService:
     def _update_structured_data(self, run_id: str, payload: Dict[str, Any], relative_path: str) -> None:
         structured = self.structured_manager.load(run_id) or {}
         reports = structured.setdefault("reports", {})
+        # Store under "prevention_evaluation" to distinguish from detection mode evaluation reports
         prevention_eval_bucket = reports.setdefault("prevention_evaluation", {})
         prevention_eval_bucket[payload["method"]] = {
             "generated_at": payload["generated_at"],

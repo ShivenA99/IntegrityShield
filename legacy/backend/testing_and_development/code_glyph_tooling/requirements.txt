@@ -1,2 +1,0 @@
-fonttools==4.58.4
-PyMuPDF==1.25.0 

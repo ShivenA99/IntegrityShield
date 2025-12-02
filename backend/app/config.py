@@ -42,6 +42,7 @@ class BaseConfig:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
     GOOGLE_AI_KEY = os.getenv("GOOGLE_AI_KEY")
+    GROK_API_KEY = os.getenv("GROK_API_KEY")
     ENABLE_DEVELOPER_TOOLS = (
         os.getenv("FAIRTESTAI_ENABLE_DEV_TOOLS", "true").lower() == "true"
     )
@@ -148,12 +149,14 @@ class BaseConfig:
         "openai": os.getenv("FAIRTESTAI_REPORT_OPENAI_MODEL", "gpt-4.1"),
         "anthropic": os.getenv("FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
         "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "models/gemini-1.5-pro"),
+        "grok": os.getenv("FAIRTESTAI_REPORT_GROK_MODEL", "grok-2-latest"),
     }
     LLM_REPORT_MODEL_FALLBACKS = {
         "anthropic": os.getenv(
             "FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-3-5-haiku-20241022"
         ),
         "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "models/gemini-1.5-pro"),
+        "grok": os.getenv("FAIRTESTAI_REPORT_GROK_MODEL", "grok-2-latest"),
     }
     LLM_REPORT_SCORING_MODEL = os.getenv("FAIRTESTAI_REPORT_SCORING_MODEL", "gpt-5.1")
     LLM_REPORT_SCORING_REASONING = os.getenv(

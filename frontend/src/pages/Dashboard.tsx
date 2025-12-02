@@ -21,7 +21,7 @@ import { useNotifications } from "@contexts/NotificationContext";
 import { validatePdfFile } from "@services/utils/validators";
 import { updatePipelineConfig } from "@services/api/pipelineApi";
 import type { CorePipelineStageName } from "@services/types/pipeline";
-import { ENHANCEMENT_METHOD_LABELS } from "@constants/enhancementMethods";
+import { ENHANCEMENT_METHOD_LABELS, getMethodDisplayLabel } from "@constants/enhancementMethods";
 
 type ModeOption = "detection" | "prevention";
 
@@ -193,12 +193,18 @@ const Dashboard: React.FC = () => {
   const formatMethodLabel = (key?: string | null) => {
     if (!key) return null;
 
-    // If in detection mode and method is a detection variant, show "Detection Variant N"
+    // Use the centralized label function which handles mode-specific labels
+    const displayLabel = getMethodDisplayLabel(key, mode);
+    if (displayLabel && displayLabel !== key) {
+      return displayLabel;
+    }
+
+    // Fallback: In detection mode, show "Detection Variant N" for mapped methods
     if (mode === "detection" && key in DETECTION_VARIANT_MAP) {
       return `Detection Variant ${DETECTION_VARIANT_MAP[key]}`;
     }
 
-    // Otherwise, use the existing label mapping or fallback
+    // Final fallback to existing label mapping
     return ENHANCEMENT_METHOD_LABELS[key as keyof typeof ENHANCEMENT_METHOD_LABELS] ?? key.replace(/_/g, " ");
   };
 
@@ -248,18 +254,22 @@ const artifactGroups = useMemo<ArtifactGroup[]>(() => {
       });
     }
     // Show evaluation reports for all configured enhancement methods
+    // Check both evaluation and prevention_evaluation for backward compatibility
     const evaluationEntries = (reports.evaluation as Record<string, any>) ?? {};
+    const preventionEvaluationEntries = (reports.prevention_evaluation as Record<string, any>) ?? {};
+    // Merge both, with evaluation taking precedence
+    const allEvaluationEntries = { ...preventionEvaluationEntries, ...evaluationEntries };
     const configuredMethods = (status?.pipeline_config?.enhancement_methods as string[]) ?? [];
 
     // Create a set of methods we should show evaluation reports for
     const methodsToShow = new Set(configuredMethods);
 
     // Also include any methods that already have evaluation reports
-    Object.keys(evaluationEntries).forEach(method => methodsToShow.add(method));
+    Object.keys(allEvaluationEntries).forEach(method => methodsToShow.add(method));
 
     // Show evaluation report for each method
     methodsToShow.forEach((method) => {
-      const meta = evaluationEntries[method];
+      const meta = allEvaluationEntries[method];
       reportRows.push({
         key: `evaluation-${method}`,
         label: "Evaluation",

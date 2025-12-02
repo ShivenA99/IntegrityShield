@@ -39,11 +39,15 @@ const ReportsPage: React.FC = () => {
       generatedAt: detectionMeta?.generated_at,
     });
 
+    // Check both evaluation and prevention_evaluation for backward compatibility
     const evaluationEntries = (reports.evaluation as Record<string, any>) ?? {};
+    const preventionEvaluationEntries = (reports.prevention_evaluation as Record<string, any>) ?? {};
+    // Merge both, with evaluation taking precedence
+    const allEvaluationEntries = { ...preventionEvaluationEntries, ...evaluationEntries };
     let bestMethod: string | null = null;
     let bestMeta: any = null;
     let bestScore = -Infinity;
-    Object.entries(evaluationEntries).forEach(([method, meta]) => {
+    Object.entries(allEvaluationEntries).forEach(([method, meta]) => {
       const candidate =
         typeof meta?.metrics?.overall_score === "number"
           ? meta.metrics.overall_score

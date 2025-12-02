@@ -21,9 +21,9 @@ const INTERNAL_LABELS: Record<string, string> = {
 
 // Prevention mode variant labels (alphabetical order by method name)
 const PREVENTION_VARIANT_LABELS: Record<string, string> = {
-  latex_font_attack: "Variant Prevention 2",
-  latex_icw: "Variant Prevention 1",
-  latex_icw_font_attack: "Variant Prevention 3",
+  latex_font_attack: "Prevention 2",
+  latex_icw: "Prevention 1",
+  latex_icw_font_attack: "Prevention 3",
 };
 
 // Detection mode variant labels (alphabetical order by method name)
@@ -43,12 +43,16 @@ const DETECTION_VARIANT_LABELS: Record<string, string> = {
  * @returns The variant label to display
  */
 export function getMethodDisplayLabel(method: string, mode?: string): string {
+  // In prevention mode, prioritize prevention labels
   if (mode === "prevention" && method in PREVENTION_VARIANT_LABELS) {
     return PREVENTION_VARIANT_LABELS[method];
   }
+  
+  // In detection mode, show detection variant labels
   if (mode === "detection" && method in DETECTION_VARIANT_LABELS) {
     return DETECTION_VARIANT_LABELS[method];
   }
+  
   // Fallback to internal label if mode unknown or method not mapped
   return INTERNAL_LABELS[method] || method;
 }
