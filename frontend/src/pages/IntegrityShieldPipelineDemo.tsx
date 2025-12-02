@@ -31,6 +31,7 @@ import anthropicIcon from "../../../icons/claude_app_icon.png";
 import geminiIcon from "../../../icons/gemini.png";
 import grokIcon from "../../../icons/grok--v2.jpg";
 import { useDemoRun } from "@contexts/DemoRunContext";
+import { getAssetUrl } from "@utils/basePath";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -2350,7 +2351,7 @@ const IntegrityShieldPipelineDemo: React.FC = () => {
       <header className="ishield-demo__top-nav">
         <div className="ishield-demo__brand-stack">
           <div className="ishield-demo__brand">
-            <img src="/icons/logo.png" alt="IntegrityShield" className="ishield-demo__brand-logo" />
+            <img src={getAssetUrl("/icons/logo.png")} alt="IntegrityShield" className="ishield-demo__brand-logo" />
             <div className="ishield-demo__brand-title">INTEGRITYSHIELD</div>
           </div>
           <div className="ishield-demo__meta-bar">
