@@ -50,21 +50,6 @@ export const AuthProvider: React.FC<{ children?: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  // Periodic session validation (every 5 minutes)
-  useEffect(() => {
-    if (!user) return;
-
-    const validateInterval = setInterval(async () => {
-      const isValid = await validateSession();
-      if (!isValid) {
-        console.warn("Session expired: OpenAI key is no longer valid");
-        // User state already cleared by validateSession
-      }
-    }, 5 * 60 * 1000); // 5 minutes
-
-    return () => clearInterval(validateInterval);
-  }, [user, validateSession]);
-
   const loginWithKey = useCallback(async (payload: { openai_api_key: string; email?: string }) => {
     try {
       const response = await apiClient.loginWithKey(payload);
@@ -118,6 +103,21 @@ export const AuthProvider: React.FC<{ children?: React.ReactNode }> = ({ childre
       localStorage.removeItem("auth_token");
     }
   }, []);
+
+  // Periodic session validation (every 5 minutes) - placed after validateSession is defined
+  useEffect(() => {
+    if (!user) return;
+
+    const validateInterval = setInterval(async () => {
+      const isValid = await validateSession();
+      if (!isValid) {
+        console.warn("Session expired: OpenAI key is no longer valid");
+        // User state already cleared by validateSession
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(validateInterval);
+  }, [user, validateSession]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
