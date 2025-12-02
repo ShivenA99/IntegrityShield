@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Button } from "@instructure/ui-buttons";
 import { IconExternalLinkLine } from "@instructure/ui-icons";
+import { getAssetUrl } from "@utils/basePath";
 
 const NAV_ITEMS = [
   { label: "Home", to: "/" },
@@ -29,7 +30,7 @@ const PublicShell: React.FC<PublicShellProps> = ({ children, hideNav }) => {
           <div className="public-header__container">
             <div className="public-header__branding">
               <div className="public-header__logo">
-                <img src="/IS_logo.png?v=3" alt="IntegrityShield Logo" className="logo-image" />
+                <img src={getAssetUrl("/IS_logo.png") + "?v=3"} alt="IntegrityShield Logo" className="logo-image" />
               </div>
               <h1 className="public-header__title">INTEGRITYSHIELD</h1>
             </div>

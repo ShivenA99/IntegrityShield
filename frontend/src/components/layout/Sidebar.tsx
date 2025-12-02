@@ -153,7 +153,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
       <div className="app-sidebar__inner">
         <div className="app-sidebar__top">
           <span className="app-sidebar__brand" title="IntegrityShield">
-            <img src="/icons/logo.png" alt="IntegrityShield" className="app-sidebar__brand-logo" />
+            <img src={getAssetUrl("/icons/logo.png")} alt="IntegrityShield" className="app-sidebar__brand-logo" />
             {!collapsed && <span>INTEGRITYSHIELD</span>}
           </span>
           <button
