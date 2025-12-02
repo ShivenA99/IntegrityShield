@@ -1,0 +1,51 @@
+services:
+  # Backend API Service
+  - type: web
+    name: integrityshield-backend
+    runtime: python
+    plan: free
+    buildCommand: |
+      cd backend
+      pip install -r requirements.txt
+    startCommand: |
+      cd backend
+      python -m flask db upgrade
+      gunicorn run:app --workers 2 --threads 4 --timeout 300 --bind 0.0.0.0:$PORT --access-logfile - --error-logfile - --log-level info
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: INTEGRITYSHIELD_ENV
+        value: production
+      - key: INTEGRITYSHIELD_LOG_LEVEL
+        value: INFO
+      - key: INTEGRITYSHIELD_ENABLE_DEV_TOOLS
+        value: false
+      - key: INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS
+        value: true
+      - key: INTEGRITYSHIELD_PIPELINE_ROOT
+        value: /tmp/pipeline_runs
+      # Database URL - will be auto-set by Render when you link the database
+      - key: INTEGRITYSHIELD_DATABASE_URL
+        fromDatabase:
+          name: integrityshield-db
+          property: connectionString
+      # Secret key - generate this securely
+      - key: INTEGRITYSHIELD_SECRET_KEY
+        generateValue: true
+      # API Keys - you'll set these manually
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_AI_KEY
+        sync: false
+      - key: GROK_API_KEY
+        sync: false
+      - key: MISTRAL_API_KEY
+        sync: false
+
+databases:
+  - name: integrityshield-db
+    databaseName: integrityshield
+    plan: free
+    postgresMajorVersion: 15
