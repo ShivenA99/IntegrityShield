@@ -4,6 +4,11 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  base: process.env.GITHUB_PAGES === "true" ? "/fairtestai_-llm-assessment-vulnerability-simulator-main/" : "/",
+  build: {
+    outDir: process.env.GITHUB_PAGES === "true" ? "../docs" : "dist",
+    emptyOutDir: true,
+  },
   resolve: {
     alias: {
       "@components": path.resolve(__dirname, "src/components"),
