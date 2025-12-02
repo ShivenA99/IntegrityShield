@@ -5,6 +5,7 @@ import { FileBarChart2, LineChart } from "lucide-react";
 
 import { usePipeline } from "@hooks/usePipeline";
 import { ENHANCEMENT_METHOD_LABELS } from "@constants/enhancementMethods";
+import PageTitle from "@components/common/PageTitle";
 
 interface EnhancedPDF {
   path?: string;
@@ -82,6 +83,8 @@ const PdfCreationPanel: React.FC = () => {
   const reports = (structuredData?.reports as Record<string, any>) || {};
   const evaluationReports = (reports?.evaluation as Record<string, any>) || {};
   const runId = status?.run_id ?? activeRunId ?? null;
+  const mode = (status?.pipeline_config?.mode as string) ?? "detection"; // default to detection for backwards compatibility
+  const isPreventionMode = mode === "prevention";
   const detectionReportInfo = useMemo(() => {
     if (!structuredData) return null;
     const manipulationResults = (structuredData.manipulation_results as Record<string, any>) || {};
@@ -441,46 +444,50 @@ useEffect(() => {
   return (
     <div className="panel pdf-creation">
       <header className="panel-header panel-header--tight">
-        <h1>PDF Creation</h1>
+        <PageTitle>PDF Creation</PageTitle>
         <div className="panel-actions">
           <div className="panel-actions__inline">
-            <button
-              type="button"
-              className="ghost-button"
-              onClick={handleGenerateReport}
-              disabled={detectionReportButtonDisabled}
-              aria-busy={isGeneratingReport}
-              title={
-                substitutionStage?.status !== "completed"
-                  ? "Detection reports are available once Smart Substitution completes."
-                  : "Generate a question-level detection summary for this run."
-              }
-            >
-              {isGeneratingReport ? "Generating..." : "Generate Detection Report"}
-            </button>
-            {latestReportPath ? (
-              <button
-                type="button"
-                className="ghost-button"
-                onClick={handleDownloadReport}
-                title="Download the latest detection report."
-              >
-                Download Report
-              </button>
-            ) : null}
-            <button
-              type="button"
-              className="icon-button"
-              onClick={handleOpenDetectionReport}
-              disabled={!latestReportPath || !runId}
-              title={
-                latestReportPath
-                  ? "Open the detection report dashboard."
-                  : "Generate a detection report to view details."
-              }
-            >
-              <FileBarChart2 size={16} />
-            </button>
+            {!isPreventionMode && (
+              <>
+                <button
+                  type="button"
+                  className="ghost-button"
+                  onClick={handleGenerateReport}
+                  disabled={detectionReportButtonDisabled}
+                  aria-busy={isGeneratingReport}
+                  title={
+                    substitutionStage?.status !== "completed"
+                      ? "Detection reports are available once Smart Substitution completes."
+                      : "Generate a question-level detection summary for this run."
+                  }
+                >
+                  {isGeneratingReport ? "Generating..." : "Generate Detection Report"}
+                </button>
+                {latestReportPath ? (
+                  <button
+                    type="button"
+                    className="ghost-button"
+                    onClick={handleDownloadReport}
+                    title="Download the latest detection report."
+                  >
+                    Download Report
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="icon-button"
+                  onClick={handleOpenDetectionReport}
+                  disabled={!latestReportPath || !runId}
+                  title={
+                    latestReportPath
+                      ? "Open the detection report dashboard."
+                      : "Generate a detection report to view details."
+                  }
+                >
+                  <FileBarChart2 size={16} />
+                </button>
+              </>
+            )}
             <button
               type="button"
               className="icon-button"
@@ -531,10 +538,12 @@ useEffect(() => {
           <span>Variants</span>
           <strong>{entries.filter((entry) => entry.meta).length}</strong>
         </div>
-        <div className="stage-overview__item">
-          <span>Detection Report</span>
-          <strong>{detectionStatusLabel}</strong>
-        </div>
+        {!isPreventionMode && (
+          <div className="stage-overview__item">
+            <span>Detection Report</span>
+            <strong>{detectionStatusLabel}</strong>
+          </div>
+        )}
         <div className="stage-overview__item">
           <span>Elapsed</span>
           <strong>{stage?.duration_ms ? `${Math.round(stage.duration_ms / 1000)}s` : "—"}</strong>
@@ -543,7 +552,7 @@ useEffect(() => {
 
       {queueMessage ? <div className="panel-flash panel-flash--info">{queueMessage}</div> : null}
       {queueError ? <div className="panel-flash panel-flash--error">{queueError}</div> : null}
-      {reportMessage ? (
+      {!isPreventionMode && reportMessage ? (
         <div className="panel-flash panel-flash--info panel-flash--with-actions">
           <div className="panel-flash__content">
             <strong>{reportMessage}</strong>

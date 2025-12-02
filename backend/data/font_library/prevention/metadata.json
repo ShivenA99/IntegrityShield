@@ -1,0 +1,1106 @@
+{
+  "hidden_char": "a",
+  "base_font": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/resources/fonts/Roboto-Regular.ttf",
+  "visual_chars": " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u00b1\u00d7\u00f7\u0391\u0392\u0393\u0394\u0395\u0396\u0397\u0398\u0399\u039a\u039b\u039c\u039d\u039e\u039f\u03a0\u03a1\u03a3\u03a4\u03a5\u03a6\u03a7\u03a8\u03a9\u03b1\u03b2\u03b3\u03b4\u03b5\u03b6\u03b7\u03b8\u03b9\u03ba\u03bb\u03bc\u03bd\u03be\u03bf\u03c0\u03c1\u03c3\u03c4\u03c5\u03c6\u03c7\u03c8\u03c9\u2202\u2207\u220f\u2211\u221a\u221e\u222b\u2248\u2260\u2264\u2265",
+  "fonts": {
+    " ": {
+      "filename": "hidden_a_visual_space.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_space.ttf",
+      "hidden_char": "a",
+      "visual_char": " ",
+      "index": 0
+    },
+    "!": {
+      "filename": "hidden_a_visual_!.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_!.ttf",
+      "hidden_char": "a",
+      "visual_char": "!",
+      "index": 1
+    },
+    "\"": {
+      "filename": "hidden_a_visual_unicode_34.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_34.ttf",
+      "hidden_char": "a",
+      "visual_char": "\"",
+      "index": 2
+    },
+    "#": {
+      "filename": "hidden_a_visual_#.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_#.ttf",
+      "hidden_char": "a",
+      "visual_char": "#",
+      "index": 3
+    },
+    "$": {
+      "filename": "hidden_a_visual_$.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_$.ttf",
+      "hidden_char": "a",
+      "visual_char": "$",
+      "index": 4
+    },
+    "%": {
+      "filename": "hidden_a_visual_%.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_%.ttf",
+      "hidden_char": "a",
+      "visual_char": "%",
+      "index": 5
+    },
+    "&": {
+      "filename": "hidden_a_visual_&.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_&.ttf",
+      "hidden_char": "a",
+      "visual_char": "&",
+      "index": 6
+    },
+    "'": {
+      "filename": "hidden_a_visual_'.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_'.ttf",
+      "hidden_char": "a",
+      "visual_char": "'",
+      "index": 7
+    },
+    "(": {
+      "filename": "hidden_a_visual_(.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_(.ttf",
+      "hidden_char": "a",
+      "visual_char": "(",
+      "index": 8
+    },
+    ")": {
+      "filename": "hidden_a_visual_).ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_).ttf",
+      "hidden_char": "a",
+      "visual_char": ")",
+      "index": 9
+    },
+    "*": {
+      "filename": "hidden_a_visual_unicode_42.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_42.ttf",
+      "hidden_char": "a",
+      "visual_char": "*",
+      "index": 10
+    },
+    "+": {
+      "filename": "hidden_a_visual_+.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_+.ttf",
+      "hidden_char": "a",
+      "visual_char": "+",
+      "index": 11
+    },
+    ",": {
+      "filename": "hidden_a_visual_,.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_,.ttf",
+      "hidden_char": "a",
+      "visual_char": ",",
+      "index": 12
+    },
+    "-": {
+      "filename": "hidden_a_visual_-.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_-.ttf",
+      "hidden_char": "a",
+      "visual_char": "-",
+      "index": 13
+    },
+    ".": {
+      "filename": "hidden_a_visual_..ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_..ttf",
+      "hidden_char": "a",
+      "visual_char": ".",
+      "index": 14
+    },
+    "/": {
+      "filename": "hidden_a_visual_unicode_47.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_47.ttf",
+      "hidden_char": "a",
+      "visual_char": "/",
+      "index": 15
+    },
+    "0": {
+      "filename": "hidden_a_visual_0.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_0.ttf",
+      "hidden_char": "a",
+      "visual_char": "0",
+      "index": 16
+    },
+    "1": {
+      "filename": "hidden_a_visual_1.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_1.ttf",
+      "hidden_char": "a",
+      "visual_char": "1",
+      "index": 17
+    },
+    "2": {
+      "filename": "hidden_a_visual_2.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_2.ttf",
+      "hidden_char": "a",
+      "visual_char": "2",
+      "index": 18
+    },
+    "3": {
+      "filename": "hidden_a_visual_3.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_3.ttf",
+      "hidden_char": "a",
+      "visual_char": "3",
+      "index": 19
+    },
+    "4": {
+      "filename": "hidden_a_visual_4.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_4.ttf",
+      "hidden_char": "a",
+      "visual_char": "4",
+      "index": 20
+    },
+    "5": {
+      "filename": "hidden_a_visual_5.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_5.ttf",
+      "hidden_char": "a",
+      "visual_char": "5",
+      "index": 21
+    },
+    "6": {
+      "filename": "hidden_a_visual_6.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_6.ttf",
+      "hidden_char": "a",
+      "visual_char": "6",
+      "index": 22
+    },
+    "7": {
+      "filename": "hidden_a_visual_7.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_7.ttf",
+      "hidden_char": "a",
+      "visual_char": "7",
+      "index": 23
+    },
+    "8": {
+      "filename": "hidden_a_visual_8.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_8.ttf",
+      "hidden_char": "a",
+      "visual_char": "8",
+      "index": 24
+    },
+    "9": {
+      "filename": "hidden_a_visual_9.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_9.ttf",
+      "hidden_char": "a",
+      "visual_char": "9",
+      "index": 25
+    },
+    ":": {
+      "filename": "hidden_a_visual_unicode_58.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_58.ttf",
+      "hidden_char": "a",
+      "visual_char": ":",
+      "index": 26
+    },
+    ";": {
+      "filename": "hidden_a_visual_;.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_;.ttf",
+      "hidden_char": "a",
+      "visual_char": ";",
+      "index": 27
+    },
+    "<": {
+      "filename": "hidden_a_visual_unicode_60.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_60.ttf",
+      "hidden_char": "a",
+      "visual_char": "<",
+      "index": 28
+    },
+    "=": {
+      "filename": "hidden_a_visual_=.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_=.ttf",
+      "hidden_char": "a",
+      "visual_char": "=",
+      "index": 29
+    },
+    ">": {
+      "filename": "hidden_a_visual_unicode_62.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_62.ttf",
+      "hidden_char": "a",
+      "visual_char": ">",
+      "index": 30
+    },
+    "?": {
+      "filename": "hidden_a_visual_unicode_63.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_63.ttf",
+      "hidden_char": "a",
+      "visual_char": "?",
+      "index": 31
+    },
+    "@": {
+      "filename": "hidden_a_visual_@.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_@.ttf",
+      "hidden_char": "a",
+      "visual_char": "@",
+      "index": 32
+    },
+    "A": {
+      "filename": "hidden_a_visual_A.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_A.ttf",
+      "hidden_char": "a",
+      "visual_char": "A",
+      "index": 33
+    },
+    "B": {
+      "filename": "hidden_a_visual_B.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_B.ttf",
+      "hidden_char": "a",
+      "visual_char": "B",
+      "index": 34
+    },
+    "C": {
+      "filename": "hidden_a_visual_C.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_C.ttf",
+      "hidden_char": "a",
+      "visual_char": "C",
+      "index": 35
+    },
+    "D": {
+      "filename": "hidden_a_visual_D.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_D.ttf",
+      "hidden_char": "a",
+      "visual_char": "D",
+      "index": 36
+    },
+    "E": {
+      "filename": "hidden_a_visual_E.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_E.ttf",
+      "hidden_char": "a",
+      "visual_char": "E",
+      "index": 37
+    },
+    "F": {
+      "filename": "hidden_a_visual_F.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_F.ttf",
+      "hidden_char": "a",
+      "visual_char": "F",
+      "index": 38
+    },
+    "G": {
+      "filename": "hidden_a_visual_G.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_G.ttf",
+      "hidden_char": "a",
+      "visual_char": "G",
+      "index": 39
+    },
+    "H": {
+      "filename": "hidden_a_visual_H.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_H.ttf",
+      "hidden_char": "a",
+      "visual_char": "H",
+      "index": 40
+    },
+    "I": {
+      "filename": "hidden_a_visual_I.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_I.ttf",
+      "hidden_char": "a",
+      "visual_char": "I",
+      "index": 41
+    },
+    "J": {
+      "filename": "hidden_a_visual_J.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_J.ttf",
+      "hidden_char": "a",
+      "visual_char": "J",
+      "index": 42
+    },
+    "K": {
+      "filename": "hidden_a_visual_K.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_K.ttf",
+      "hidden_char": "a",
+      "visual_char": "K",
+      "index": 43
+    },
+    "L": {
+      "filename": "hidden_a_visual_L.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_L.ttf",
+      "hidden_char": "a",
+      "visual_char": "L",
+      "index": 44
+    },
+    "M": {
+      "filename": "hidden_a_visual_M.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_M.ttf",
+      "hidden_char": "a",
+      "visual_char": "M",
+      "index": 45
+    },
+    "N": {
+      "filename": "hidden_a_visual_N.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_N.ttf",
+      "hidden_char": "a",
+      "visual_char": "N",
+      "index": 46
+    },
+    "O": {
+      "filename": "hidden_a_visual_O.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_O.ttf",
+      "hidden_char": "a",
+      "visual_char": "O",
+      "index": 47
+    },
+    "P": {
+      "filename": "hidden_a_visual_P.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_P.ttf",
+      "hidden_char": "a",
+      "visual_char": "P",
+      "index": 48
+    },
+    "Q": {
+      "filename": "hidden_a_visual_Q.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_Q.ttf",
+      "hidden_char": "a",
+      "visual_char": "Q",
+      "index": 49
+    },
+    "R": {
+      "filename": "hidden_a_visual_R.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_R.ttf",
+      "hidden_char": "a",
+      "visual_char": "R",
+      "index": 50
+    },
+    "S": {
+      "filename": "hidden_a_visual_S.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_S.ttf",
+      "hidden_char": "a",
+      "visual_char": "S",
+      "index": 51
+    },
+    "T": {
+      "filename": "hidden_a_visual_T.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_T.ttf",
+      "hidden_char": "a",
+      "visual_char": "T",
+      "index": 52
+    },
+    "U": {
+      "filename": "hidden_a_visual_U.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_U.ttf",
+      "hidden_char": "a",
+      "visual_char": "U",
+      "index": 53
+    },
+    "V": {
+      "filename": "hidden_a_visual_V.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_V.ttf",
+      "hidden_char": "a",
+      "visual_char": "V",
+      "index": 54
+    },
+    "W": {
+      "filename": "hidden_a_visual_W.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_W.ttf",
+      "hidden_char": "a",
+      "visual_char": "W",
+      "index": 55
+    },
+    "X": {
+      "filename": "hidden_a_visual_X.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_X.ttf",
+      "hidden_char": "a",
+      "visual_char": "X",
+      "index": 56
+    },
+    "Y": {
+      "filename": "hidden_a_visual_Y.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_Y.ttf",
+      "hidden_char": "a",
+      "visual_char": "Y",
+      "index": 57
+    },
+    "Z": {
+      "filename": "hidden_a_visual_Z.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_Z.ttf",
+      "hidden_char": "a",
+      "visual_char": "Z",
+      "index": 58
+    },
+    "[": {
+      "filename": "hidden_a_visual_[.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_[.ttf",
+      "hidden_char": "a",
+      "visual_char": "[",
+      "index": 59
+    },
+    "\\": {
+      "filename": "hidden_a_visual_unicode_92.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_92.ttf",
+      "hidden_char": "a",
+      "visual_char": "\\",
+      "index": 60
+    },
+    "]": {
+      "filename": "hidden_a_visual_].ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_].ttf",
+      "hidden_char": "a",
+      "visual_char": "]",
+      "index": 61
+    },
+    "^": {
+      "filename": "hidden_a_visual_^.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_^.ttf",
+      "hidden_char": "a",
+      "visual_char": "^",
+      "index": 62
+    },
+    "_": {
+      "filename": "hidden_a_visual__.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual__.ttf",
+      "hidden_char": "a",
+      "visual_char": "_",
+      "index": 63
+    },
+    "`": {
+      "filename": "hidden_a_visual_`.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_`.ttf",
+      "hidden_char": "a",
+      "visual_char": "`",
+      "index": 64
+    },
+    "a": {
+      "filename": "hidden_a_visual_a.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_a.ttf",
+      "hidden_char": "a",
+      "visual_char": "a",
+      "index": 65
+    },
+    "b": {
+      "filename": "hidden_a_visual_b.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_b.ttf",
+      "hidden_char": "a",
+      "visual_char": "b",
+      "index": 66
+    },
+    "c": {
+      "filename": "hidden_a_visual_c.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_c.ttf",
+      "hidden_char": "a",
+      "visual_char": "c",
+      "index": 67
+    },
+    "d": {
+      "filename": "hidden_a_visual_d.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_d.ttf",
+      "hidden_char": "a",
+      "visual_char": "d",
+      "index": 68
+    },
+    "e": {
+      "filename": "hidden_a_visual_e.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_e.ttf",
+      "hidden_char": "a",
+      "visual_char": "e",
+      "index": 69
+    },
+    "f": {
+      "filename": "hidden_a_visual_f.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_f.ttf",
+      "hidden_char": "a",
+      "visual_char": "f",
+      "index": 70
+    },
+    "g": {
+      "filename": "hidden_a_visual_g.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_g.ttf",
+      "hidden_char": "a",
+      "visual_char": "g",
+      "index": 71
+    },
+    "h": {
+      "filename": "hidden_a_visual_h.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_h.ttf",
+      "hidden_char": "a",
+      "visual_char": "h",
+      "index": 72
+    },
+    "i": {
+      "filename": "hidden_a_visual_i.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_i.ttf",
+      "hidden_char": "a",
+      "visual_char": "i",
+      "index": 73
+    },
+    "j": {
+      "filename": "hidden_a_visual_j.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_j.ttf",
+      "hidden_char": "a",
+      "visual_char": "j",
+      "index": 74
+    },
+    "k": {
+      "filename": "hidden_a_visual_k.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_k.ttf",
+      "hidden_char": "a",
+      "visual_char": "k",
+      "index": 75
+    },
+    "l": {
+      "filename": "hidden_a_visual_l.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_l.ttf",
+      "hidden_char": "a",
+      "visual_char": "l",
+      "index": 76
+    },
+    "m": {
+      "filename": "hidden_a_visual_m.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_m.ttf",
+      "hidden_char": "a",
+      "visual_char": "m",
+      "index": 77
+    },
+    "n": {
+      "filename": "hidden_a_visual_n.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_n.ttf",
+      "hidden_char": "a",
+      "visual_char": "n",
+      "index": 78
+    },
+    "o": {
+      "filename": "hidden_a_visual_o.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_o.ttf",
+      "hidden_char": "a",
+      "visual_char": "o",
+      "index": 79
+    },
+    "p": {
+      "filename": "hidden_a_visual_p.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_p.ttf",
+      "hidden_char": "a",
+      "visual_char": "p",
+      "index": 80
+    },
+    "q": {
+      "filename": "hidden_a_visual_q.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_q.ttf",
+      "hidden_char": "a",
+      "visual_char": "q",
+      "index": 81
+    },
+    "r": {
+      "filename": "hidden_a_visual_r.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_r.ttf",
+      "hidden_char": "a",
+      "visual_char": "r",
+      "index": 82
+    },
+    "s": {
+      "filename": "hidden_a_visual_s.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_s.ttf",
+      "hidden_char": "a",
+      "visual_char": "s",
+      "index": 83
+    },
+    "t": {
+      "filename": "hidden_a_visual_t.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_t.ttf",
+      "hidden_char": "a",
+      "visual_char": "t",
+      "index": 84
+    },
+    "u": {
+      "filename": "hidden_a_visual_u.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_u.ttf",
+      "hidden_char": "a",
+      "visual_char": "u",
+      "index": 85
+    },
+    "v": {
+      "filename": "hidden_a_visual_v.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_v.ttf",
+      "hidden_char": "a",
+      "visual_char": "v",
+      "index": 86
+    },
+    "w": {
+      "filename": "hidden_a_visual_w.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_w.ttf",
+      "hidden_char": "a",
+      "visual_char": "w",
+      "index": 87
+    },
+    "x": {
+      "filename": "hidden_a_visual_x.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_x.ttf",
+      "hidden_char": "a",
+      "visual_char": "x",
+      "index": 88
+    },
+    "y": {
+      "filename": "hidden_a_visual_y.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_y.ttf",
+      "hidden_char": "a",
+      "visual_char": "y",
+      "index": 89
+    },
+    "z": {
+      "filename": "hidden_a_visual_z.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_z.ttf",
+      "hidden_char": "a",
+      "visual_char": "z",
+      "index": 90
+    },
+    "{": {
+      "filename": "hidden_a_visual_{.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_{.ttf",
+      "hidden_char": "a",
+      "visual_char": "{",
+      "index": 91
+    },
+    "|": {
+      "filename": "hidden_a_visual_unicode_124.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_unicode_124.ttf",
+      "hidden_char": "a",
+      "visual_char": "|",
+      "index": 92
+    },
+    "}": {
+      "filename": "hidden_a_visual_}.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_}.ttf",
+      "hidden_char": "a",
+      "visual_char": "}",
+      "index": 93
+    },
+    "~": {
+      "filename": "hidden_a_visual_~.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_~.ttf",
+      "hidden_char": "a",
+      "visual_char": "~",
+      "index": 94
+    },
+    "\u00b1": {
+      "filename": "hidden_a_visual_\u00b1.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u00b1.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u00b1",
+      "index": 95
+    },
+    "\u00d7": {
+      "filename": "hidden_a_visual_\u00d7.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u00d7.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u00d7",
+      "index": 96
+    },
+    "\u00f7": {
+      "filename": "hidden_a_visual_\u00f7.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u00f7.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u00f7",
+      "index": 97
+    },
+    "\u0391": {
+      "filename": "hidden_a_visual_\u0391.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0391.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u0391",
+      "index": 98
+    },
+    "\u0392": {
+      "filename": "hidden_a_visual_\u0392.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0392.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u0392",
+      "index": 99
+    },
+    "\u0393": {
+      "filename": "hidden_a_visual_\u0393.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0393.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u0393",
+      "index": 100
+    },
+    "\u0394": {
+      "filename": "hidden_a_visual_\u0394.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0394.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u0394",
+      "index": 101
+    },
+    "\u0395": {
+      "filename": "hidden_a_visual_\u0395.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0395.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u0395",
+      "index": 102
+    },
+    "\u0396": {
+      "filename": "hidden_a_visual_\u0396.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0396.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u0396",
+      "index": 103
+    },
+    "\u0397": {
+      "filename": "hidden_a_visual_\u0397.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0397.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u0397",
+      "index": 104
+    },
+    "\u0398": {
+      "filename": "hidden_a_visual_\u0398.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0398.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u0398",
+      "index": 105
+    },
+    "\u0399": {
+      "filename": "hidden_a_visual_\u0399.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u0399.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u0399",
+      "index": 106
+    },
+    "\u039a": {
+      "filename": "hidden_a_visual_\u039a.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039a.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u039a",
+      "index": 107
+    },
+    "\u039b": {
+      "filename": "hidden_a_visual_\u039b.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039b.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u039b",
+      "index": 108
+    },
+    "\u039c": {
+      "filename": "hidden_a_visual_\u039c.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039c.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u039c",
+      "index": 109
+    },
+    "\u039d": {
+      "filename": "hidden_a_visual_\u039d.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039d.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u039d",
+      "index": 110
+    },
+    "\u039e": {
+      "filename": "hidden_a_visual_\u039e.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039e.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u039e",
+      "index": 111
+    },
+    "\u039f": {
+      "filename": "hidden_a_visual_\u039f.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u039f.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u039f",
+      "index": 112
+    },
+    "\u03a0": {
+      "filename": "hidden_a_visual_\u03a0.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a0.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03a0",
+      "index": 113
+    },
+    "\u03a1": {
+      "filename": "hidden_a_visual_\u03a1.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a1.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03a1",
+      "index": 114
+    },
+    "\u03a3": {
+      "filename": "hidden_a_visual_\u03a3.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a3.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03a3",
+      "index": 115
+    },
+    "\u03a4": {
+      "filename": "hidden_a_visual_\u03a4.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a4.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03a4",
+      "index": 116
+    },
+    "\u03a5": {
+      "filename": "hidden_a_visual_\u03a5.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a5.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03a5",
+      "index": 117
+    },
+    "\u03a6": {
+      "filename": "hidden_a_visual_\u03a6.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a6.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03a6",
+      "index": 118
+    },
+    "\u03a7": {
+      "filename": "hidden_a_visual_\u03a7.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a7.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03a7",
+      "index": 119
+    },
+    "\u03a8": {
+      "filename": "hidden_a_visual_\u03a8.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a8.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03a8",
+      "index": 120
+    },
+    "\u03a9": {
+      "filename": "hidden_a_visual_\u03a9.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03a9.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03a9",
+      "index": 121
+    },
+    "\u03b1": {
+      "filename": "hidden_a_visual_\u03b1.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b1.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03b1",
+      "index": 122
+    },
+    "\u03b2": {
+      "filename": "hidden_a_visual_\u03b2.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b2.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03b2",
+      "index": 123
+    },
+    "\u03b3": {
+      "filename": "hidden_a_visual_\u03b3.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b3.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03b3",
+      "index": 124
+    },
+    "\u03b4": {
+      "filename": "hidden_a_visual_\u03b4.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b4.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03b4",
+      "index": 125
+    },
+    "\u03b5": {
+      "filename": "hidden_a_visual_\u03b5.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b5.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03b5",
+      "index": 126
+    },
+    "\u03b6": {
+      "filename": "hidden_a_visual_\u03b6.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b6.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03b6",
+      "index": 127
+    },
+    "\u03b7": {
+      "filename": "hidden_a_visual_\u03b7.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b7.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03b7",
+      "index": 128
+    },
+    "\u03b8": {
+      "filename": "hidden_a_visual_\u03b8.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b8.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03b8",
+      "index": 129
+    },
+    "\u03b9": {
+      "filename": "hidden_a_visual_\u03b9.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03b9.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03b9",
+      "index": 130
+    },
+    "\u03ba": {
+      "filename": "hidden_a_visual_\u03ba.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03ba.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03ba",
+      "index": 131
+    },
+    "\u03bb": {
+      "filename": "hidden_a_visual_\u03bb.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03bb.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03bb",
+      "index": 132
+    },
+    "\u03bc": {
+      "filename": "hidden_a_visual_\u03bc.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03bc.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03bc",
+      "index": 133
+    },
+    "\u03bd": {
+      "filename": "hidden_a_visual_\u03bd.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03bd.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03bd",
+      "index": 134
+    },
+    "\u03be": {
+      "filename": "hidden_a_visual_\u03be.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03be.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03be",
+      "index": 135
+    },
+    "\u03bf": {
+      "filename": "hidden_a_visual_\u03bf.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03bf.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03bf",
+      "index": 136
+    },
+    "\u03c0": {
+      "filename": "hidden_a_visual_\u03c0.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c0.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03c0",
+      "index": 137
+    },
+    "\u03c1": {
+      "filename": "hidden_a_visual_\u03c1.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c1.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03c1",
+      "index": 138
+    },
+    "\u03c3": {
+      "filename": "hidden_a_visual_\u03c3.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c3.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03c3",
+      "index": 139
+    },
+    "\u03c4": {
+      "filename": "hidden_a_visual_\u03c4.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c4.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03c4",
+      "index": 140
+    },
+    "\u03c5": {
+      "filename": "hidden_a_visual_\u03c5.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c5.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03c5",
+      "index": 141
+    },
+    "\u03c6": {
+      "filename": "hidden_a_visual_\u03c6.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c6.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03c6",
+      "index": 142
+    },
+    "\u03c7": {
+      "filename": "hidden_a_visual_\u03c7.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c7.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03c7",
+      "index": 143
+    },
+    "\u03c8": {
+      "filename": "hidden_a_visual_\u03c8.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c8.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03c8",
+      "index": 144
+    },
+    "\u03c9": {
+      "filename": "hidden_a_visual_\u03c9.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u03c9.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u03c9",
+      "index": 145
+    },
+    "\u2202": {
+      "filename": "hidden_a_visual_\u2202.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2202.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u2202",
+      "index": 146
+    },
+    "\u2207": {
+      "filename": "hidden_a_visual_\u2207.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2207.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u2207",
+      "index": 147
+    },
+    "\u220f": {
+      "filename": "hidden_a_visual_\u220f.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u220f.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u220f",
+      "index": 148
+    },
+    "\u2211": {
+      "filename": "hidden_a_visual_\u2211.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2211.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u2211",
+      "index": 149
+    },
+    "\u221a": {
+      "filename": "hidden_a_visual_\u221a.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u221a.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u221a",
+      "index": 150
+    },
+    "\u221e": {
+      "filename": "hidden_a_visual_\u221e.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u221e.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u221e",
+      "index": 151
+    },
+    "\u222b": {
+      "filename": "hidden_a_visual_\u222b.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u222b.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u222b",
+      "index": 152
+    },
+    "\u2248": {
+      "filename": "hidden_a_visual_\u2248.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2248.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u2248",
+      "index": 153
+    },
+    "\u2260": {
+      "filename": "hidden_a_visual_\u2260.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2260.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u2260",
+      "index": 154
+    },
+    "\u2264": {
+      "filename": "hidden_a_visual_\u2264.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2264.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u2264",
+      "index": 155
+    },
+    "\u2265": {
+      "filename": "hidden_a_visual_\u2265.ttf",
+      "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/font_library/prevention/hidden_a_visual_\u2265.ttf",
+      "hidden_char": "a",
+      "visual_char": "\u2265",
+      "index": 156
+    }
+  }
+}

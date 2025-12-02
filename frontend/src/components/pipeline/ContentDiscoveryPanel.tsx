@@ -6,6 +6,7 @@ import { ShieldAlert } from "lucide-react";
 import { usePipeline } from "@hooks/usePipeline";
 import { useQuestions } from "@hooks/useQuestions";
 import { formatDuration } from "@services/utils/formatters";
+import PageTitle from "@components/common/PageTitle";
 
 const ContentDiscoveryPanel: React.FC = () => {
   const { status, activeRunId, resumeFromStage, setPreferredStage, generateVulnerabilityReport } = usePipeline();
@@ -142,7 +143,7 @@ const ContentDiscoveryPanel: React.FC = () => {
   return (
     <div className="panel content-discovery">
       <header className="panel-header panel-header--tight">
-        <h1>Content Discovery</h1>
+        <PageTitle>Content Discovery</PageTitle>
         <div className="panel-actions">
           <div className="panel-actions__inline">
             <button

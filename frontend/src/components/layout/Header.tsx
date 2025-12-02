@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, RefreshCcw, RotateCcw } from "lucide-react";
+import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 import { usePipeline } from "@hooks/usePipeline";
 import DeveloperToggle from "@components/layout/DeveloperToggle";
@@ -42,7 +43,10 @@ const Header: React.FC = () => {
   return (
     <header className="app-header">
       <div className="app-header__brand">
-        <span className="app-header__logo">AntiCheatAI</span>
+        <span className="app-header__logo">
+          <ShieldCheckIcon className="app-header__shield-icon" aria-hidden="true" />
+          INTEGRITYSHIELD
+        </span>
         <div className="app-header__run">
           <RotateCcw size={16} aria-hidden="true" />
           <span>{runLabel}</span>

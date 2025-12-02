@@ -8,6 +8,7 @@ import { updateQuestionManipulation, generateMappingsForAll, generateMappingsFor
 import type { QuestionManipulation } from "@services/types/questions";
 import { formatDuration } from "@services/utils/formatters";
 import EnhancedQuestionViewer from "@components/question-level/EnhancedQuestionViewer";
+import PageTitle from "@components/common/PageTitle";
 import { ArrowRight, FileSpreadsheet, ListChecks, ScrollText } from "lucide-react";
 
 const LATEX_ATTACK_METHODS = [
@@ -504,7 +505,7 @@ const SmartSubstitutionPanel: React.FC = () => {
     <div className="panel smart-substitution">
       <header className="panel-header panel-header--tight">
         <div className="panel-title">
-          <h1>Strategy</h1>
+          <PageTitle>Strategy</PageTitle>
           <p>Generate, review, and validate manipulations before PDF creation.</p>
         </div>
         <div className="panel-actions">

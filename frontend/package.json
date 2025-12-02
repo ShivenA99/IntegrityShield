@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@instructure/canvas-theme": "^10.26.4",
     "@instructure/emotion": "^10.26.4",
     "@instructure/ui": "^10.26.4",

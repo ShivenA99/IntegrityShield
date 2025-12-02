@@ -125,6 +125,16 @@ body * {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-header__shield-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .app-header__run {
@@ -1833,6 +1843,16 @@ table tbody tr:hover {
   margin: 0.35rem 0 0;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  padding: 0.6rem 0 0.6rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: rgba(255, 127, 50, 0.06);
+  border-radius: 0 4px 4px 0;
 }
 
 .panel-actions {
