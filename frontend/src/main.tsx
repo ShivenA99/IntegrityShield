@@ -89,10 +89,19 @@ const integrityShieldTheme = {
   "ic-link-decoration": "none",
 };
 
+// Get base path for GitHub Pages
+const getBasePath = () => {
+  // Check if we're on GitHub Pages by looking at the pathname
+  if (window.location.pathname.startsWith('/fairtestai_-llm-assessment-vulnerability-simulator-main')) {
+    return '/fairtestai_-llm-assessment-vulnerability-simulator-main';
+  }
+  return '';
+};
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <InstUISettingsProvider theme={integrityShieldTheme}>
-      <BrowserRouter>
+      <BrowserRouter basename={getBasePath()}>
         <App />
       </BrowserRouter>
     </InstUISettingsProvider>
