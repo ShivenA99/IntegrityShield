@@ -1,5 +1,5 @@
-import React from "react";
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 
 import NotificationSystem from "@components/shared/NotificationSystem";
 import ErrorBoundary from "@components/shared/ErrorBoundary";
@@ -27,6 +27,19 @@ const RequireAuth: React.FC = () => {
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Handle GitHub Pages SPA redirect from 404.html
+  useEffect(() => {
+    const redirect = sessionStorage.getItem('redirect');
+    if (redirect) {
+      sessionStorage.removeItem('redirect');
+      // Remove the base path before navigating
+      const path = redirect.replace('/IntegrityShield', '');
+      navigate(path || '/');
+    }
+  }, [navigate]);
+
   return (
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
