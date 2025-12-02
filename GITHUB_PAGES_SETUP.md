@@ -12,7 +12,7 @@ Your React landing pages are now configured to work with GitHub Pages!
 
 ## How to Enable GitHub Pages
 
-1. Go to your GitHub repository: https://github.com/ShivenA99/fairtestai_-llm-assessment-vulnerability-simulator-main
+1. Go to your GitHub repository: https://github.com/ShivenA99/integrityshield_-llm-assessment-vulnerability-simulator-main
 2. Click on **Settings** (top menu)
 3. Scroll down to **Pages** in the left sidebar
 4. Under **Source**, select:
@@ -24,7 +24,7 @@ Your React landing pages are now configured to work with GitHub Pages!
 
 Once enabled, your site will be available at:
 ```
-https://ShivenA99.github.io/fairtestai_-llm-assessment-vulnerability-simulator-main/
+https://ShivenA99.github.io/integrityshield_-llm-assessment-vulnerability-simulator-main/
 ```
 
 ## Rebuilding After Changes

@@ -37,7 +37,7 @@ yarn-error.log*
 .env.production.local
 
 # Generated assets and data dumps
-backend/data/fairtestai.db
+backend/data/integrityshield.db
 backend/data/pipeline_runs/
 backend/data/config/
 extracted/

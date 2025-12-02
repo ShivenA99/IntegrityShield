@@ -4,13 +4,13 @@
 
 ---
 
-I'm working on **FairTestAI**, an LLM Assessment Vulnerability Simulator on branch `eacl-demo`. Here's what you need to know:
+I'm working on **IntegrityShield**, an LLM Assessment Vulnerability Simulator on branch `eacl-demo`. Here's what you need to know:
 
 ## Current State
-- **Working Directory**: `/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main`
+- **Working Directory**: `/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main`
 - **Branch**: `eacl-demo`
 - **Server**: Runs on port 8000 via `backend/scripts/run_dev_server.sh`
-- **Database**: SQLite at `backend/data/fairtestai.db`
+- **Database**: SQLite at `backend/data/integrityshield.db`
 
 ## Recent Work Context
 
@@ -30,7 +30,7 @@ I'm working on **FairTestAI**, an LLM Assessment Vulnerability Simulator on bran
 ### Start Server
 ```bash
 cd backend
-FAIRTESTAI_AUTO_APPLY_MIGRATIONS=false bash scripts/run_dev_server.sh
+INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=false bash scripts/run_dev_server.sh
 ```
 
 ### Run Detection Test

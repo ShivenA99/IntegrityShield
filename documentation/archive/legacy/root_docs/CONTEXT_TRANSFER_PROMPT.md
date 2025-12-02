@@ -1,7 +1,7 @@
-# Context Transfer: FairTestAI LLM Vulnerability Simulator
+# Context Transfer: IntegrityShield LLM Vulnerability Simulator
 
 ## Repository Snapshot
-- Workspace: `/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main`
+- Workspace: `/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main`
 - Backend: Flask (Python 3.9) with PyMuPDF + PyPDF2 pipelines for PDF manipulation
 - Frontend: React + TypeScript
 - Logging: `backend_server.log` (runs under Flask auto-reload during dev)

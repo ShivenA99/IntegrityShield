@@ -32,22 +32,22 @@ Create a `.env` file in the `backend/` directory with the following configuratio
 
 ```bash
 # Environment Configuration
-FAIRTESTAI_ENV=development
-FAIRTESTAI_PORT=8000
-FAIRTESTAI_LOG_LEVEL=INFO
+INTEGRITYSHIELD_ENV=development
+INTEGRITYSHIELD_PORT=8000
+INTEGRITYSHIELD_LOG_LEVEL=INFO
 
 # Database Configuration
 # For PostgreSQL (recommended for production):
-FAIRTESTAI_DATABASE_URL=postgresql+psycopg://fairtestai:fairtestai@localhost:5433/fairtestai
+INTEGRITYSHIELD_DATABASE_URL=postgresql+psycopg://integrityshield:integrityshield@localhost:5433/integrityshield
 # For SQLite (default in startup script, good for local dev):
 # The startup script will override this to use SQLite unless explicitly set
 
 # Default Models and Methods
-FAIRTESTAI_DEFAULT_MODELS=gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro
-FAIRTESTAI_DEFAULT_METHODS=content_stream_overlay,pymupdf_overlay
+INTEGRITYSHIELD_DEFAULT_MODELS=gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro
+INTEGRITYSHIELD_DEFAULT_METHODS=content_stream_overlay,pymupdf_overlay
 
 # Development Tools
-FAIRTESTAI_ENABLE_DEV_TOOLS=true
+INTEGRITYSHIELD_ENABLE_DEV_TOOLS=true
 
 # Model Configuration
 POST_FUSER_MODEL=gpt-5
@@ -62,9 +62,9 @@ ANTHROPIC_MODEL=claude-sonnet-4-5-20250929
 
 > **Windows paths:** When running outside WSL, use double backslashes for file paths. If you develop inside WSL (recommended), keep Unix-style paths but grant filesystem permissions to your Windows user so the frontend can download artifacts.
 
-> **Database Note:** The startup script defaults to SQLite for local development (`sqlite:////.../data/fairtestai.db`). To use PostgreSQL, set `FAIRTESTAI_DATABASE_URL` in your `.env` file. The script will respect your override.
+> **Database Note:** The startup script defaults to SQLite for local development (`sqlite:////.../data/integrityshield.db`). To use PostgreSQL, set `INTEGRITYSHIELD_DATABASE_URL` in your `.env` file. The script will respect your override.
 
-> **Migrations:** The startup script sets `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=false` by default. To enable automatic migrations, set this to `true` in your `.env` file.
+> **Migrations:** The startup script sets `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=false` by default. To enable automatic migrations, set this to `true` in your `.env` file.
 
 ### 3. Start the Backend Server
 
@@ -81,7 +81,7 @@ The startup script (`backend/scripts/run_dev_server.sh`) will:
 - Verify that required API keys (`OPENAI_API_KEY`, `GOOGLE_AI_KEY`) are present
 - Set default configuration values (database URL, model settings, etc.)
 - Activate the `venv_host` virtual environment
-- Start the Flask server on port 8000 (or the port specified in `FAIRTESTAI_PORT`)
+- Start the Flask server on port 8000 (or the port specified in `INTEGRITYSHIELD_PORT`)
 
 **Alternative: Manual Startup**
 
@@ -91,7 +91,7 @@ If you prefer to start manually:
 cd backend
 source venv_host/bin/activate
 export $(cat .env | xargs)  # Load .env variables
-export FAIRTESTAI_DATABASE_URL="sqlite:////$(pwd)/data/fairtestai.db"  # Override for local dev
+export INTEGRITYSHIELD_DATABASE_URL="sqlite:////$(pwd)/data/integrityshield.db"  # Override for local dev
 python run.py  # listens on 0.0.0.0:8000
 ```
 
@@ -103,25 +103,25 @@ If you do not have a local Postgres instance, spin up a disposable container:
 
 ```bash
 docker run \
-  --name fairtestai-db \
-  -e POSTGRES_USER=fairtestai \
-  -e POSTGRES_PASSWORD=fairtestai \
-  -e POSTGRES_DB=fairtestai \
+  --name integrityshield-db \
+  -e POSTGRES_USER=integrityshield \
+  -e POSTGRES_PASSWORD=integrityshield \
+  -e POSTGRES_DB=integrityshield \
   -p 5432:5432 \
   -d postgres:14
 ```
 
-Point `FAIRTESTAI_DATABASE_URL` at the container:
+Point `INTEGRITYSHIELD_DATABASE_URL` at the container:
 
 ```
-FAIRTESTAI_DATABASE_URL=postgresql+psycopg://fairtestai:fairtestai@localhost:5432/fairtestai
+INTEGRITYSHIELD_DATABASE_URL=postgresql+psycopg://integrityshield:integrityshield@localhost:5432/integrityshield
 ```
 
 To reset the database during development:
 
 ```bash
-docker stop fairtestai-db
-docker rm fairtestai-db
+docker stop integrityshield-db
+docker rm integrityshield-db
 # rerun the docker command above to start fresh
 ```
 
@@ -134,11 +134,11 @@ You can substitute any custom `docker compose` stack—just ensure the service e
 services:
   db:
     image: postgres:14
-    container_name: fairtestai-db
+    container_name: integrityshield-db
     environment:
-      POSTGRES_USER: fairtestai
-      POSTGRES_PASSWORD: fairtestai
-      POSTGRES_DB: fairtestai
+      POSTGRES_USER: integrityshield
+      POSTGRES_PASSWORD: integrityshield
+      POSTGRES_DB: integrityshield
     ports:
       - "5432:5432"
     volumes:
@@ -151,13 +151,13 @@ Run `docker compose up -d db` (or `docker-compose up -d db`) to launch the datab
 
 #### Connecting to the Container
 
-- `psql postgresql://fairtestai:fairtestai@localhost:5432/fairtestai`
-- `docker exec -it fairtestai-db psql -U fairtestai -d fairtestai`
+- `psql postgresql://integrityshield:integrityshield@localhost:5432/integrityshield`
+- `docker exec -it integrityshield-db psql -U integrityshield -d integrityshield`
 
 ### Database Utilities
 
 - **Initialize schema manually** (optional): `flask db upgrade` if you prefer explicit migrations.
-- **Inspect tables**: `psql fairtestai` then `\dt` (Postgres) or `sqlite3 backend/data/fairtestai.db` for SQLite.
+- **Inspect tables**: `psql integrityshield` then `\dt` (Postgres) or `sqlite3 backend/data/integrityshield.db` for SQLite.
 - **Reset local data**: Remove `backend/data/pipeline_runs/<run-id>/` for targeted cleanup; avoid `rm -rf data` without confirming you no longer need artifacts.
 - **Verify overlays**: Run `ls backend/data/pipeline_runs/<run-id>/assets/<method>_overlays/` to confirm selective LaTeX crops were generated (PNG clips plus overlay logs).
 
@@ -193,6 +193,6 @@ The Vite dev server proxies `/api` requests to `http://localhost:8000` by defaul
 4. Click the `Classroom` action button (beneath the stage tracker) and generate a dataset; confirm `answer_sheet_runs` rows exist and JSON artifacts land under `answer_sheets/<classroom_key>/`.
 5. Use the `Evaluation` action to run classroom analytics and check `classroom_evaluations` for a completed record.
 6. Inspect `assets/<method>_overlays/` to verify selective overlay crops were saved for debugging.
-7. If using Docker, tail database logs with `docker logs -f fairtestai-db` to confirm connections succeed.
+7. If using Docker, tail database logs with `docker logs -f integrityshield-db` to confirm connections succeed.
 
 If any step fails, consult [operations.md](operations.md) for troubleshooting tips and logging commands.

@@ -1,8 +1,8 @@
-# FairTestAI - Comprehensive Project Handoff
+# IntegrityShield - Comprehensive Project Handoff
 
 ## 📋 Project Overview
 
-**FairTestAI** is an LLM Assessment Vulnerability Simulator that identifies and demonstrates vulnerabilities in LLM-based assessment systems. The platform processes educational PDFs and applies various LaTeX-based attacks to test whether LLMs can be manipulated during assessment grading.
+**IntegrityShield** is an LLM Assessment Vulnerability Simulator that identifies and demonstrates vulnerabilities in LLM-based assessment systems. The platform processes educational PDFs and applies various LaTeX-based attacks to test whether LLMs can be manipulated during assessment grading.
 
 ### Key Concepts
 - **Detection Mode**: Runs 7 pipeline stages to identify vulnerabilities using 5 different LaTeX attack methods
@@ -12,11 +12,11 @@
 ## 🌲 Current Branch & State
 
 **Branch**: `eacl-demo`
-**Working Directory**: `/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main`
+**Working Directory**: `/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main`
 
 ### Modified Files (Not Committed)
 - `backend/TEST_RESULTS.md` - Test execution logs
-- `backend/data/fairtestai.db-*` - Database files (SQLite WAL mode)
+- `backend/data/integrityshield.db-*` - Database files (SQLite WAL mode)
 - `backend/test_llm_api_mocks_simple.py`
 - `backend/test_streamlined_mapping_format.py`
 - `backend/test_streamlined_mapping_service.py`
@@ -97,12 +97,12 @@ backend/test_prevention_flow.py
 ### 1. Start the Backend Server
 ```bash
 cd backend
-FAIRTESTAI_AUTO_APPLY_MIGRATIONS=false bash scripts/run_dev_server.sh
+INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=false bash scripts/run_dev_server.sh
 ```
 
 **Important Notes:**
 - Server runs on port 8000 by default
-- Set `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=false` to prevent automatic migrations
+- Set `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=false` to prevent automatic migrations
 - The script activates the virtual environment automatically
 - Server logs written to console
 
@@ -197,7 +197,7 @@ find app -name "*.pyc" -delete
 find app -name "__pycache__" -type d -exec rm -rf {} +
 
 # Restart server fresh
-FAIRTESTAI_AUTO_APPLY_MIGRATIONS=false bash scripts/run_dev_server.sh
+INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=false bash scripts/run_dev_server.sh
 ```
 
 ### Issue 3: Test Script API Endpoint 404s
@@ -381,7 +381,7 @@ results_generation
 - **Other tests**: `backend/test_*.py` (many available)
 
 ### Data & Migrations
-- **Database**: `backend/data/fairtestai.db`
+- **Database**: `backend/data/integrityshield.db`
 - **Pipeline runs**: `backend/data/pipeline_runs/<RUN_ID>/`
 - **Migrations**: `backend/migrations/versions/`
 - **Display name migration**: `9c4d5e6f7g8i_add_display_name_to_enhanced_pdfs.py`
@@ -413,7 +413,7 @@ ls -la .venv/bin/python
 tail -f server.log  # or whatever log file you're using
 
 # Check database for pipeline status
-sqlite3 data/fairtestai.db "SELECT run_id, mode, current_stage, status FROM pipeline_runs ORDER BY created_at DESC LIMIT 5;"
+sqlite3 data/integrityshield.db "SELECT run_id, mode, current_stage, status FROM pipeline_runs ORDER BY created_at DESC LIMIT 5;"
 
 # Monitor font generation
 watch -n 2 "find data/pipeline_runs/<RUN_ID>/ -name '*.ttf' | wc -l"
@@ -425,12 +425,12 @@ watch -n 2 "find data/pipeline_runs/<RUN_ID>/ -name '*.ttf' | wc -l"
 lsof -ti:8000 | xargs kill -9
 find app -name "*.pyc" -delete
 find app -name "__pycache__" -type d -exec rm -rf {} +
-FAIRTESTAI_AUTO_APPLY_MIGRATIONS=false bash scripts/run_dev_server.sh
+INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=false bash scripts/run_dev_server.sh
 ```
 
 ## 📞 Getting Help
 
-- **GitHub Issues**: https://github.com/anthropics/fairtestai (if public repo)
+- **GitHub Issues**: https://github.com/anthropics/integrityshield (if public repo)
 - **Test Results**: Check `backend/TEST_RESULTS.md` for historical test logs
 - **Git History**: Review recent commits on `eacl-demo` branch for context
 

@@ -315,7 +315,7 @@ class ContentDiscoveryService:
             if not gold_generator.is_configured():
                 raise ValueError(
                     "Gold answer generation requires GPT-5 configuration. "
-                    "Set OPENAI_API_KEY and FAIRTESTAI_GOLD_ANSWER_MODEL to continue."
+                    "Set OPENAI_API_KEY and INTEGRITYSHIELD_GOLD_ANSWER_MODEL to continue."
                 )
 
         processed_updates: set[tuple[int | None, str | None]] = set()

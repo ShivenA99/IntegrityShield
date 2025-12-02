@@ -19,10 +19,10 @@
       "data_extraction_pipeline"
     ],
     "data_extraction_outputs": {
-      "tex": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
-      "assets": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_assets",
-      "pdf": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_reconstructed.pdf",
-      "json": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_extracted.json"
+      "tex": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
+      "assets": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_assets",
+      "pdf": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_reconstructed.pdf",
+      "json": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_extracted.json"
     },
     "gold_generation": {
       "status": "completed",
@@ -33,14 +33,14 @@
     }
   },
   "document": {
-    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.pdf",
+    "source_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.pdf",
     "filename": "mathematics_k-12_doc_03.pdf",
     "pages": 2,
-    "latex_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
-    "assets_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_assets",
-    "original_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.pdf",
-    "reconstructed_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_reconstructed.pdf",
-    "pdf": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_reconstructed.pdf"
+    "latex_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
+    "assets_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_assets",
+    "original_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.pdf",
+    "reconstructed_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_reconstructed.pdf",
+    "pdf": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03_reconstructed.pdf"
   },
   "questions": [
     {
@@ -2058,7 +2058,7 @@
           }
         }
       ],
-      "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/detection_report/detection_report.json",
+      "file_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/detection_report/detection_report.json",
       "relative_path": "detection_report/detection_report.json",
       "status": "completed"
     },
@@ -2076,9 +2076,9 @@
       "latex_font_attack": {},
       "latex_icw": {},
       "pymupdf_overlay": {
-        "after_redaction": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/after_redaction.pdf",
-        "after_rewrite": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/after_rewrite.pdf",
-        "final": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/final.pdf"
+        "after_redaction": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/after_redaction.pdf",
+        "after_rewrite": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/after_rewrite.pdf",
+        "final": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/final.pdf"
       }
     },
     "debug": {
@@ -2302,7 +2302,7 @@
               "stderr": 0
             }
           ],
-          "log_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/latex_font_attack_compile.log"
+          "log_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/latex_font_attack_compile.log"
         },
         "attacks": [
           {
@@ -2590,139 +2590,139 @@
             "fonts": [
               {
                 "index": 0,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos0.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos0.ttf",
                 "visual_text": "s",
                 "used_cache": false
               },
               {
                 "index": 1,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos1.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos1.ttf",
                 "visual_text": "e",
                 "used_cache": false
               },
               {
                 "index": 2,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos2.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos2.ttf",
                 "visual_text": "t ",
                 "used_cache": false
               },
               {
                 "index": 3,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos3.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos3.ttf",
                 "visual_text": "o",
                 "used_cache": false
               },
               {
                 "index": 4,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos4.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos4.ttf",
                 "visual_text": "f ",
                 "used_cache": false
               },
               {
                 "index": 5,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos5.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos5.ttf",
                 "visual_text": "d",
                 "used_cache": false
               },
               {
                 "index": 6,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos6.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos6.ttf",
                 "visual_text": "a",
                 "used_cache": false
               },
               {
                 "index": 7,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos7.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos7.ttf",
                 "visual_text": "ta",
                 "used_cache": false
               },
               {
                 "index": 8,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos8.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos8.ttf",
                 "visual_text": " 2",
                 "used_cache": false
               },
               {
                 "index": 9,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos9.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos9.ttf",
                 "visual_text": "3",
                 "used_cache": false
               },
               {
                 "index": 10,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos10.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos10.ttf",
                 "visual_text": ",",
                 "used_cache": false
               },
               {
                 "index": 12,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos12.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos12.ttf",
                 "visual_text": "1",
                 "used_cache": false
               },
               {
                 "index": 13,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos13.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos13.ttf",
                 "visual_text": "3",
                 "used_cache": false
               },
               {
                 "index": 14,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos14.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos14.ttf",
                 "visual_text": ",",
                 "used_cache": false
               },
               {
                 "index": 15,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos15.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos15.ttf",
                 "visual_text": " ",
                 "used_cache": false
               },
               {
                 "index": 16,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos16.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos16.ttf",
                 "visual_text": "1",
                 "used_cache": false
               },
               {
                 "index": 17,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos17.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos17.ttf",
                 "visual_text": "8",
                 "used_cache": false
               },
               {
                 "index": 18,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos18.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos18.ttf",
                 "visual_text": ",",
                 "used_cache": false
               },
               {
                 "index": 21,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos21.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos21.ttf",
                 "visual_text": "9",
                 "used_cache": false
               },
               {
                 "index": 24,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos24.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos24.ttf",
                 "visual_text": "3",
                 "used_cache": false
               },
               {
                 "index": 25,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos25.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos25.ttf",
                 "visual_text": "2",
                 "used_cache": false
               },
               {
                 "index": 28,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos28.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos28.ttf",
                 "visual_text": "2",
                 "used_cache": false
               },
               {
                 "index": 29,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos29.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0000/fa0000_pos29.ttf",
                 "visual_text": "5",
                 "used_cache": false
               }
@@ -2750,7 +2750,7 @@
             "fonts": [
               {
                 "index": 0,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0001/fa0001_pos0.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0001/fa0001_pos0.ttf",
                 "visual_text": "100",
                 "used_cache": false
               }
@@ -2821,7 +2821,7 @@
             "fonts": [
               {
                 "index": 4,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0002/fa0002_pos4.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0002/fa0002_pos4.ttf",
                 "visual_text": "4",
                 "used_cache": false
               }
@@ -3053,133 +3053,133 @@
             "fonts": [
               {
                 "index": 0,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos0.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos0.ttf",
                 "visual_text": "54",
                 "used_cache": false
               },
               {
                 "index": 1,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos1.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos1.ttf",
                 "visual_text": ",3",
                 "used_cache": false
               },
               {
                 "index": 2,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos2.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos2.ttf",
                 "visual_text": "21",
                 "used_cache": false
               },
               {
                 "index": 3,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos3.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos3.ttf",
                 "visual_text": " th",
                 "used_cache": false
               },
               {
                 "index": 4,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos4.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos4.ttf",
                 "visual_text": "at",
                 "used_cache": false
               },
               {
                 "index": 5,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos5.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos5.ttf",
                 "visual_text": " is",
                 "used_cache": false
               },
               {
                 "index": 6,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos6.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos6.ttf",
                 "visual_text": " ",
                 "used_cache": false
               },
               {
                 "index": 7,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos7.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos7.ttf",
                 "visual_text": "l",
                 "used_cache": false
               },
               {
                 "index": 8,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos8.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos8.ttf",
                 "visual_text": "e",
                 "used_cache": true
               },
               {
                 "index": 10,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos10.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos10.ttf",
                 "visual_text": "s",
                 "used_cache": false
               },
               {
                 "index": 11,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos11.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos11.ttf",
                 "visual_text": " ",
                 "used_cache": false
               },
               {
                 "index": 12,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos12.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos12.ttf",
                 "visual_text": "t",
                 "used_cache": false
               },
               {
                 "index": 13,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos13.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos13.ttf",
                 "visual_text": "h",
                 "used_cache": false
               },
               {
                 "index": 14,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos14.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos14.ttf",
                 "visual_text": "a",
                 "used_cache": false
               },
               {
                 "index": 15,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos15.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos15.ttf",
                 "visual_text": "n",
                 "used_cache": false
               },
               {
                 "index": 16,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos16.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos16.ttf",
                 "visual_text": " ",
                 "used_cache": true
               },
               {
                 "index": 17,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos17.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos17.ttf",
                 "visual_text": "5",
                 "used_cache": false
               },
               {
                 "index": 18,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos18.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos18.ttf",
                 "visual_text": "4",
                 "used_cache": false
               },
               {
                 "index": 19,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos19.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos19.ttf",
                 "visual_text": ",",
                 "used_cache": false
               },
               {
                 "index": 20,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos20.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos20.ttf",
                 "visual_text": "3",
                 "used_cache": false
               },
               {
                 "index": 21,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos21.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos21.ttf",
                 "visual_text": "2",
                 "used_cache": true
               },
               {
                 "index": 22,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos22.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0003/fa0003_pos22.ttf",
                 "visual_text": "1",
                 "used_cache": false
               }
@@ -3746,307 +3746,307 @@
             "fonts": [
               {
                 "index": 0,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos0.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos0.ttf",
                 "visual_text": "3 c",
                 "used_cache": false
               },
               {
                 "index": 1,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos1.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos1.ttf",
                 "visual_text": "ard",
                 "used_cache": false
               },
               {
                 "index": 2,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos2.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos2.ttf",
                 "visual_text": "s fr",
                 "used_cache": false
               },
               {
                 "index": 3,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos3.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos3.ttf",
                 "visual_text": "om",
                 "used_cache": false
               },
               {
                 "index": 4,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos4.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos4.ttf",
                 "visual_text": " a s",
                 "used_cache": false
               },
               {
                 "index": 5,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos5.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos5.ttf",
                 "visual_text": "tan",
                 "used_cache": false
               },
               {
                 "index": 6,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos6.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos6.ttf",
                 "visual_text": "dar",
                 "used_cache": false
               },
               {
                 "index": 7,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos7.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos7.ttf",
                 "visual_text": "d d",
                 "used_cache": false
               },
               {
                 "index": 8,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos8.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos8.ttf",
                 "visual_text": "eck",
                 "used_cache": false
               },
               {
                 "index": 9,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos9.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos9.ttf",
                 "visual_text": " of ",
                 "used_cache": false
               },
               {
                 "index": 10,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos10.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos10.ttf",
                 "visual_text": "52 ",
                 "used_cache": false
               },
               {
                 "index": 11,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos11.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos11.ttf",
                 "visual_text": "car",
                 "used_cache": false
               },
               {
                 "index": 12,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos12.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos12.ttf",
                 "visual_text": "ds,",
                 "used_cache": false
               },
               {
                 "index": 13,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos13.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos13.ttf",
                 "visual_text": " if a",
                 "used_cache": false
               },
               {
                 "index": 14,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos14.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos14.ttf",
                 "visual_text": "ll th",
                 "used_cache": false
               },
               {
                 "index": 15,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos15.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos15.ttf",
                 "visual_text": "ree",
                 "used_cache": false
               },
               {
                 "index": 16,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos16.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos16.ttf",
                 "visual_text": " ca",
                 "used_cache": false
               },
               {
                 "index": 17,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos17.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos17.ttf",
                 "visual_text": "rds",
                 "used_cache": false
               },
               {
                 "index": 18,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos18.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos18.ttf",
                 "visual_text": " mu",
                 "used_cache": false
               },
               {
                 "index": 19,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos19.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos19.ttf",
                 "visual_text": "st b",
                 "used_cache": false
               },
               {
                 "index": 20,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos20.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos20.ttf",
                 "visual_text": "e o",
                 "used_cache": false
               },
               {
                 "index": 21,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos21.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos21.ttf",
                 "visual_text": "f di",
                 "used_cache": false
               },
               {
                 "index": 22,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos22.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos22.ttf",
                 "visual_text": "ffe",
                 "used_cache": false
               },
               {
                 "index": 23,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos23.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos23.ttf",
                 "visual_text": "ren",
                 "used_cache": false
               },
               {
                 "index": 24,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos24.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos24.ttf",
                 "visual_text": "t su",
                 "used_cache": false
               },
               {
                 "index": 25,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos25.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos25.ttf",
                 "visual_text": "its?",
                 "used_cache": false
               },
               {
                 "index": 26,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos26.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos26.ttf",
                 "visual_text": " (A",
                 "used_cache": false
               },
               {
                 "index": 27,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos27.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos27.ttf",
                 "visual_text": "ssu",
                 "used_cache": false
               },
               {
                 "index": 28,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos28.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos28.ttf",
                 "visual_text": "me",
                 "used_cache": false
               },
               {
                 "index": 29,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos29.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos29.ttf",
                 "visual_text": " tha",
                 "used_cache": false
               },
               {
                 "index": 30,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos30.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos30.ttf",
                 "visual_text": "t th",
                 "used_cache": false
               },
               {
                 "index": 31,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos31.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos31.ttf",
                 "visual_text": "e o",
                 "used_cache": false
               },
               {
                 "index": 32,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos32.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos32.ttf",
                 "visual_text": "rde",
                 "used_cache": false
               },
               {
                 "index": 33,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos33.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos33.ttf",
                 "visual_text": "r of",
                 "used_cache": false
               },
               {
                 "index": 34,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos34.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos34.ttf",
                 "visual_text": " the",
                 "used_cache": false
               },
               {
                 "index": 35,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos35.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos35.ttf",
                 "visual_text": " ca",
                 "used_cache": false
               },
               {
                 "index": 36,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos36.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos36.ttf",
                 "visual_text": "rds",
                 "used_cache": false
               },
               {
                 "index": 37,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos37.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos37.ttf",
                 "visual_text": " do",
                 "used_cache": false
               },
               {
                 "index": 38,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos38.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos38.ttf",
                 "visual_text": "es ",
                 "used_cache": false
               },
               {
                 "index": 39,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos39.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos39.ttf",
                 "visual_text": "n",
                 "used_cache": false
               },
               {
                 "index": 40,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos40.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos40.ttf",
                 "visual_text": "o",
                 "used_cache": false
               },
               {
                 "index": 41,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos41.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos41.ttf",
                 "visual_text": "t",
                 "used_cache": false
               },
               {
                 "index": 42,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos42.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos42.ttf",
                 "visual_text": " ",
                 "used_cache": false
               },
               {
                 "index": 43,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos43.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos43.ttf",
                 "visual_text": "m",
                 "used_cache": false
               },
               {
                 "index": 44,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos44.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos44.ttf",
                 "visual_text": "a",
                 "used_cache": false
               },
               {
                 "index": 45,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos45.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos45.ttf",
                 "visual_text": "t",
                 "used_cache": false
               },
               {
                 "index": 46,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos46.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos46.ttf",
                 "visual_text": "t",
                 "used_cache": false
               },
               {
                 "index": 47,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos47.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos47.ttf",
                 "visual_text": "e",
                 "used_cache": false
               },
               {
                 "index": 48,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos48.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos48.ttf",
                 "visual_text": "r",
                 "used_cache": false
               },
               {
                 "index": 49,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos49.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos49.ttf",
                 "visual_text": ".",
                 "used_cache": false
               },
               {
                 "index": 50,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos50.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0004/fa0004_pos50.ttf",
                 "visual_text": ")",
                 "used_cache": false
               }
@@ -4102,25 +4102,25 @@
             "fonts": [
               {
                 "index": 0,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0005/fa0005_pos0.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0005/fa0005_pos0.ttf",
                 "visual_text": "ou",
                 "used_cache": false
               },
               {
                 "index": 1,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0005/fa0005_pos1.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0005/fa0005_pos1.ttf",
                 "visual_text": "tli",
                 "used_cache": false
               },
               {
                 "index": 2,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0005/fa0005_pos2.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0005/fa0005_pos2.ttf",
                 "visual_text": "e",
                 "used_cache": false
               },
               {
                 "index": 3,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0005/fa0005_pos3.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0005/fa0005_pos3.ttf",
                 "visual_text": "r",
                 "used_cache": false
               }
@@ -4146,7 +4146,7 @@
             "fonts": [
               {
                 "index": 0,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0006/fa0006_pos0.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0006/fa0006_pos0.ttf",
                 "visual_text": "+",
                 "used_cache": false
               }
@@ -4190,13 +4190,13 @@
             "fonts": [
               {
                 "index": 1,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0007/fa0007_pos1.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0007/fa0007_pos1.ttf",
                 "visual_text": "2",
                 "used_cache": false
               },
               {
                 "index": 2,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0007/fa0007_pos2.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0007/fa0007_pos2.ttf",
                 "visual_text": "4",
                 "used_cache": false
               }
@@ -4250,25 +4250,25 @@
             "fonts": [
               {
                 "index": 0,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0008/fa0008_pos0.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0008/fa0008_pos0.ttf",
                 "visual_text": "tw",
                 "used_cache": false
               },
               {
                 "index": 1,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0008/fa0008_pos1.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0008/fa0008_pos1.ttf",
                 "visual_text": "i",
                 "used_cache": false
               },
               {
                 "index": 2,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0008/fa0008_pos2.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0008/fa0008_pos2.ttf",
                 "visual_text": "c",
                 "used_cache": false
               },
               {
                 "index": 3,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0008/fa0008_pos3.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0008/fa0008_pos3.ttf",
                 "visual_text": "e",
                 "used_cache": false
               }
@@ -4341,37 +4341,37 @@
             "fonts": [
               {
                 "index": 0,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos0.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos0.ttf",
                 "visual_text": "m",
                 "used_cache": false
               },
               {
                 "index": 1,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos1.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos1.ttf",
                 "visual_text": "ul",
                 "used_cache": false
               },
               {
                 "index": 2,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos2.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos2.ttf",
                 "visual_text": "ti",
                 "used_cache": false
               },
               {
                 "index": 3,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos3.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos3.ttf",
                 "visual_text": "p",
                 "used_cache": false
               },
               {
                 "index": 4,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos4.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos4.ttf",
                 "visual_text": "l",
                 "used_cache": false
               },
               {
                 "index": 5,
-                "font_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos5.ttf",
+                "font_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-font-attack/fonts/fa0009/fa0009_pos5.ttf",
                 "visual_text": "e",
                 "used_cache": true
               }
@@ -4379,7 +4379,7 @@
           }
         ],
         "tex_source": {
-          "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
+          "path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
           "hash": "c707004c9be6c11b130c456b3fee38a35b843a0f901ce25cad3dbcfe285ba313"
         }
       },
@@ -4463,13 +4463,13 @@
           }
         ],
         "tex_source": {
-          "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
+          "path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
           "hash": "c707004c9be6c11b130c456b3fee38a35b843a0f901ce25cad3dbcfe285ba313"
         },
         "artifacts": {
-          "attacked_tex": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-icw/latex_icw_attacked.tex",
-          "compile_log": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-icw/latex_icw_compile.log",
-          "final_pdf": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-icw/latex_icw_final.pdf"
+          "attacked_tex": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-icw/latex_icw_attacked.tex",
+          "compile_log": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-icw/latex_icw_compile.log",
+          "final_pdf": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-icw/latex_icw_final.pdf"
         },
         "compile_summary": {
           "success": true,
@@ -4487,7 +4487,7 @@
               "stderr": 0
             }
           ],
-          "log_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-icw/latex_icw_compile.log"
+          "log_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/latex-icw/latex_icw_compile.log"
         },
         "mapping_signature": [
           {
@@ -4567,7 +4567,7 @@
             "style": "white_micro_text"
           },
           {
-            "tex_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
+            "tex_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
             "tex_hash": "c707004c9be6c11b130c456b3fee38a35b843a0f901ce25cad3dbcfe285ba313"
           }
         ]
@@ -4597,9 +4597,9 @@
     },
     "enhanced_pdfs": {
       "latex_dual_layer": {
-        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_dual_layer.pdf",
+        "path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_dual_layer.pdf",
         "size_bytes": 6616284,
-        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_dual_layer.pdf",
+        "file_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_dual_layer.pdf",
         "relative_path": "enhanced_latex_dual_layer.pdf",
         "file_size_bytes": 6616284,
         "visual_quality_score": 0.92,
@@ -4685,9 +4685,9 @@
         "created_at": "2025-11-23T00:52:26.282797+00:00"
       },
       "latex_font_attack": {
-        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_font_attack.pdf",
+        "path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_font_attack.pdf",
         "size_bytes": 795346,
-        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_font_attack.pdf",
+        "file_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_font_attack.pdf",
         "relative_path": "enhanced_latex_font_attack.pdf",
         "file_size_bytes": 795346,
         "visual_quality_score": 0.92,
@@ -4703,9 +4703,9 @@
         "created_at": "2025-11-23T00:52:26.282968+00:00"
       },
       "latex_icw": {
-        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_icw.pdf",
+        "path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_icw.pdf",
         "size_bytes": 49346,
-        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_icw.pdf",
+        "file_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/enhanced_latex_icw.pdf",
         "relative_path": "enhanced_latex_icw.pdf",
         "file_size_bytes": 49346,
         "visual_quality_score": 0.92,
@@ -4718,16 +4718,16 @@
           "style": "white_micro_text",
           "compile_success": true,
           "tex_source": {
-            "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
+            "path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/mathematics_k-12_doc_03.tex",
             "hash": "c707004c9be6c11b130c456b3fee38a35b843a0f901ce25cad3dbcfe285ba313"
           }
         },
         "created_at": "2025-11-23T00:52:26.283129+00:00"
       },
       "pymupdf_overlay": {
-        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/final.pdf",
+        "path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/final.pdf",
         "size_bytes": 975143,
-        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/final.pdf",
+        "file_path": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/final.pdf",
         "relative_path": "artifacts/redaction-rewrite-overlay/final.pdf",
         "file_size_bytes": 975143,
         "visual_quality_score": 0.92,
@@ -4746,9 +4746,9 @@
           "overlay_area_pct": 0.0087,
           "raw_targets": 12,
           "artifacts": {
-            "after_redaction": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/after_redaction.pdf",
-            "after_rewrite": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/after_rewrite.pdf",
-            "final": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/final.pdf"
+            "after_redaction": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/after_redaction.pdf",
+            "after_rewrite": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/after_rewrite.pdf",
+            "final": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/artifacts/redaction-rewrite-overlay/final.pdf"
           }
         },
         "created_at": "2025-11-23T00:52:26.283295+00:00"
@@ -4815,7 +4815,7 @@
   },
   "performance_metrics": {},
   "answer_key": {
-    "source_pdf": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/answer_key_math_answer_key_final.pdf",
+    "source_pdf": "/Users/shivenagarwal/Downloads/integrityshield_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3e40c4f8-b0d4-4b17-930c-e3bb8a37105f/answer_key_math_answer_key_final.pdf",
     "status": "parsed",
     "responses": {
       "1": {

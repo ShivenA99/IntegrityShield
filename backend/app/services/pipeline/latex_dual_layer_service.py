@@ -2077,7 +2077,7 @@ class LatexAttackService:
 
             return float(current_app.config.get("LATEX_COMPILATION_TIMEOUT", 60))
         except Exception:
-            return float(os.getenv("FAIRTESTAI_LATEX_COMPILATION_TIMEOUT", "60"))
+            return float(os.getenv("INTEGRITYSHIELD_LATEX_COMPILATION_TIMEOUT", "60"))
 
     def _safe_int(self, value: Any) -> int:
         try:

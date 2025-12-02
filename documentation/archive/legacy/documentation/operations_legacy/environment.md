@@ -44,6 +44,6 @@ Configure the proxy in `vite.config.ts` if the backend is running on a non-defau
 
 - **Auto Reload:** Flask debug mode plus Vite HMR give instant feedback on code changes.
 - **Logging:** Tail logs via `tail -f backend_server.log` or open the Developer Console in the UI.
-- **Database Browser:** SQLite DB located at `backend/data/fairtestai.db` (inspect with `sqlite3` or DB Browser).
+- **Database Browser:** SQLite DB located at `backend/data/integrityshield.db` (inspect with `sqlite3` or DB Browser).
 
 Keep this document updated when dependencies or setup steps change.

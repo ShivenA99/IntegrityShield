@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# FairTestAI - Automated GCP Deployment Script
-# This script automates the deployment of FairTestAI to Google Cloud Run
+# IntegrityShield - Automated GCP Deployment Script
+# This script automates the deployment of IntegrityShield to Google Cloud Run
 
-echo "🚀 FairTestAI GCP Deployment Script"
+echo "🚀 IntegrityShield GCP Deployment Script"
 echo "===================================="
 echo ""
 
@@ -13,11 +13,11 @@ command -v gcloud >/dev/null 2>&1 || { echo "❌ gcloud CLI not found. Install f
 command -v docker >/dev/null 2>&1 || { echo "⚠️  Docker not found. Continuing without local build test..."; }
 
 # Configuration
-PROJECT_ID="${GCP_PROJECT_ID:-fairtestai-demo}"
+PROJECT_ID="${GCP_PROJECT_ID:-integrityshield-demo}"
 REGION="${GCP_REGION:-us-central1}"
-SERVICE_NAME="fairtestai-backend"
-DB_INSTANCE="fairtestai-db"
-STORAGE_BUCKET="fairtestai-files-$(date +%s)"
+SERVICE_NAME="integrityshield-backend"
+DB_INSTANCE="integrityshield-db"
+STORAGE_BUCKET="integrityshield-files-$(date +%s)"
 
 echo "📋 Configuration:"
 echo "   Project ID: $PROJECT_ID"
@@ -41,7 +41,7 @@ echo ""
 echo "Step 1/7: Setting up GCP project..."
 gcloud config set project $PROJECT_ID 2>/dev/null || {
     echo "   Creating project $PROJECT_ID..."
-    gcloud projects create $PROJECT_ID --name="FairTestAI Demo"
+    gcloud projects create $PROJECT_ID --name="IntegrityShield Demo"
     gcloud config set project $PROJECT_ID
 }
 
@@ -63,7 +63,7 @@ else
         --root-password="$DB_PASSWORD" \
         --quiet
 
-    gcloud sql databases create fairtestai --instance=$DB_INSTANCE --quiet
+    gcloud sql databases create integrityshield --instance=$DB_INSTANCE --quiet
 fi
 
 # Get connection name
@@ -71,7 +71,7 @@ CONNECTION_NAME=$(gcloud sql instances describe $DB_INSTANCE --format="value(con
 echo "   Connection name: $CONNECTION_NAME"
 
 # Build database URL
-DATABASE_URL="postgresql://postgres:$DB_PASSWORD@/fairtestai?host=/cloudsql/$CONNECTION_NAME"
+DATABASE_URL="postgresql://postgres:$DB_PASSWORD@/integrityshield?host=/cloudsql/$CONNECTION_NAME"
 
 echo "Step 4/7: Creating storage bucket..."
 gsutil mb -l $REGION gs://$STORAGE_BUCKET 2>/dev/null || echo "   Bucket already exists or created"
@@ -105,8 +105,8 @@ gcloud run deploy $SERVICE_NAME \
     --max-instances 5 \
     --min-instances 0 \
     --add-cloudsql-instances $CONNECTION_NAME \
-    --set-secrets="OPENAI_API_KEY=openai-api-key:latest,ANTHROPIC_API_KEY=anthropic-api-key:latest,GOOGLE_AI_KEY=google-ai-key:latest,GROK_API_KEY=grok-api-key:latest,MISTRAL_API_KEY=mistral-api-key:latest,FAIRTESTAI_SECRET_KEY=app-secret-key:latest,FAIRTESTAI_DATABASE_URL=database-url:latest" \
-    --set-env-vars="FAIRTESTAI_ENV=production,FAIRTESTAI_FILE_STORAGE_BUCKET=$STORAGE_BUCKET,FAIRTESTAI_PIPELINE_ROOT=/tmp/pipeline_runs,FAIRTESTAI_ENABLE_DEV_TOOLS=false,FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true,FAIRTESTAI_LOG_LEVEL=INFO" \
+    --set-secrets="OPENAI_API_KEY=openai-api-key:latest,ANTHROPIC_API_KEY=anthropic-api-key:latest,GOOGLE_AI_KEY=google-ai-key:latest,GROK_API_KEY=grok-api-key:latest,MISTRAL_API_KEY=mistral-api-key:latest,INTEGRITYSHIELD_SECRET_KEY=app-secret-key:latest,INTEGRITYSHIELD_DATABASE_URL=database-url:latest" \
+    --set-env-vars="INTEGRITYSHIELD_ENV=production,INTEGRITYSHIELD_FILE_STORAGE_BUCKET=$STORAGE_BUCKET,INTEGRITYSHIELD_PIPELINE_ROOT=/tmp/pipeline_runs,INTEGRITYSHIELD_ENABLE_DEV_TOOLS=false,INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true,INTEGRITYSHIELD_LOG_LEVEL=INFO" \
     --quiet
 
 # Get service URL

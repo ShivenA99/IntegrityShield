@@ -1,6 +1,6 @@
 # Pipeline & Stage Behaviors
 
-The FairTestAI pipeline transforms an input PDF into manipulated variants that expose LLM grading vulnerabilities. The orchestrator executes stages in the order shown below; each stage persists results to SQL and to `backend/data/pipeline_runs/<run-id>/`.
+The IntegrityShield pipeline transforms an input PDF into manipulated variants that expose LLM grading vulnerabilities. The orchestrator executes stages in the order shown below; each stage persists results to SQL and to `backend/data/pipeline_runs/<run-id>/`.
 
 ```
 smart_reading → content_discovery → smart_substitution

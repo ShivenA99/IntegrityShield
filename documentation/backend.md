@@ -23,7 +23,7 @@ The backend is a Flask application that orchestrates PDF manipulation stages, ma
   - `3b8be3ac12de` – introduces `answer_sheet_runs`, `answer_sheet_students`, `answer_sheet_records`.  
   - `7f2b8c19fb8c` – adds classroom metadata columns and `classroom_evaluations`.
 
-Disable automatic upgrades by setting `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=false` in your environment; this is useful for CI gates where you want to control migration application explicitly.
+Disable automatic upgrades by setting `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=false` in your environment; this is useful for CI gates where you want to control migration application explicitly.
 
 ### Database Operations & Migrations
 
@@ -46,7 +46,7 @@ alembic current
 
 For a clean start against a fresh Postgres container, drop and recreate the database (or remove the Docker container) and run `flask db upgrade` once before launching the app. When auto-migrations remain enabled, `python run.py` will perform the upgrade automatically; manual commands remain useful in CI or staged environments.
 
-> Helpful snippet for CI: `FLASK_APP=app FAIRTESTAI_ENV=production flask db upgrade` ensures migrations run against the configured production database.
+> Helpful snippet for CI: `FLASK_APP=app INTEGRITYSHIELD_ENV=production flask db upgrade` ensures migrations run against the configured production database.
 
 ## Pipeline Services
 

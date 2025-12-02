@@ -46,7 +46,7 @@ from PyPDF2.generic import (
 
 
 DEFAULT_REPLACEMENTS: Dict[str, str] = {
-    "FairTestAI": "FairTestDemo",
+    "IntegrityShield": "FairTestDemo",
     "assessment": "evaluation",
     "simulator": "prototype",
 }

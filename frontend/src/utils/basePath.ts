@@ -4,8 +4,8 @@
  */
 export const getBasePath = (): string => {
   // Check if we're on GitHub Pages by looking at the pathname
-  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/fairtestai_-llm-assessment-vulnerability-simulator-main')) {
-    return '/fairtestai_-llm-assessment-vulnerability-simulator-main';
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/integrityshield_-llm-assessment-vulnerability-simulator-main')) {
+    return '/integrityshield_-llm-assessment-vulnerability-simulator-main';
   }
   // Use Vite's base URL if available (for builds)
   if (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/') {

@@ -24,8 +24,8 @@
 1. In Render dashboard, click **"New +"** button (top right)
 2. Select **"PostgreSQL"**
 3. Configure:
-   - **Name**: `fairtestai-db` (or your choice)
-   - **Database**: `fairtestai` (or leave default)
+   - **Name**: `integrityshield-db` (or your choice)
+   - **Database**: `integrityshield` (or leave default)
    - **User**: Leave default
    - **Region**: Choose closest to you
    - **PostgreSQL Version**: Latest (14+)
@@ -43,11 +43,11 @@
 3. **Connect Repository**:
    - Click **"Connect account"** if not connected
    - Select your GitHub account
-   - Find and select: `fairtestai_-llm-assessment-vulnerability-simulator-main`
+   - Find and select: `integrityshield_-llm-assessment-vulnerability-simulator-main`
    - Click **"Connect"**
 
 4. **Configure Service**:
-   - **Name**: `fairtestai-backend` (or your choice)
+   - **Name**: `integrityshield-backend` (or your choice)
    - **Region**: Same as database
    - **Branch**: `main` (or your default branch)
    - **Root Directory**: `backend` ⚠️ **IMPORTANT: Set this!**
@@ -73,11 +73,11 @@
    
    | Key | Value | Notes |
    |-----|-------|-------|
-   | `FAIRTESTAI_SECRET_KEY` | Generate new one (see below) | **Generate a new secret key** |
-   | `FAIRTESTAI_DATABASE_URL` | Paste Internal Database URL from Step 1.2 | From PostgreSQL service |
-   | `FAIRTESTAI_ENV` | `production` | |
-   | `FAIRTESTAI_AUTO_APPLY_MIGRATIONS` | `true` | Auto-run database migrations |
-   | `FAIRTESTAI_CORS_ORIGINS` | `https://shivenagarwal.github.io` | Your GitHub Pages URL |
+   | `INTEGRITYSHIELD_SECRET_KEY` | Generate new one (see below) | **Generate a new secret key** |
+   | `INTEGRITYSHIELD_DATABASE_URL` | Paste Internal Database URL from Step 1.2 | From PostgreSQL service |
+   | `INTEGRITYSHIELD_ENV` | `production` | |
+   | `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS` | `true` | Auto-run database migrations |
+   | `INTEGRITYSHIELD_CORS_ORIGINS` | `https://shivenagarwal.github.io` | Your GitHub Pages URL |
 
    **Optional (Backend Default Keys - users can override):**
    
@@ -92,7 +92,7 @@
    ```bash
    python3 -c "import secrets; print(secrets.token_urlsafe(32))"
    ```
-   Copy the output and use it for `FAIRTESTAI_SECRET_KEY`
+   Copy the output and use it for `INTEGRITYSHIELD_SECRET_KEY`
 
 ### Step 1.5: Deploy Backend
 
@@ -102,7 +102,7 @@
    - Run database migrations
    - Start the service
 3. **Note your service URL**: 
-   - It will be something like: `https://fairtestai-backend.onrender.com`
+   - It will be something like: `https://integrityshield-backend.onrender.com`
    - **Copy this URL** - you'll need it for frontend!
 
 ### Step 1.6: Verify Backend is Running
@@ -130,9 +130,9 @@
 2. Find the `build:gh-pages:prod` script
 3. Replace `YOUR-BACKEND-URL` with your actual Render backend URL:
    ```json
-   "build:gh-pages:prod": "VITE_API_BASE_URL=https://fairtestai-backend.onrender.com/api GITHUB_PAGES=true vite build"
+   "build:gh-pages:prod": "VITE_API_BASE_URL=https://integrityshield-backend.onrender.com/api GITHUB_PAGES=true vite build"
    ```
-   ⚠️ **Replace `fairtestai-backend.onrender.com` with YOUR actual backend URL!**
+   ⚠️ **Replace `integrityshield-backend.onrender.com` with YOUR actual backend URL!**
 
 ### Step 2.2: Build Frontend
 
@@ -182,7 +182,7 @@ git push
 1. Wait 1-2 minutes for GitHub Pages to build
 2. Visit your GitHub Pages URL:
    ```
-   https://shivenagarwal.github.io/fairtestai_-llm-assessment-vulnerability-simulator-main/
+   https://shivenagarwal.github.io/integrityshield_-llm-assessment-vulnerability-simulator-main/
    ```
 3. You should see your landing page!
 
@@ -230,12 +230,12 @@ git push
   - Verify database URL format is correct
 
 **Problem**: Database connection failed
-- **Check**: `FAIRTESTAI_DATABASE_URL` is correct
+- **Check**: `INTEGRITYSHIELD_DATABASE_URL` is correct
 - **Check**: Database is running (in Render dashboard)
 - **Fix**: Ensure you used "Internal Database URL" not "External"
 
 **Problem**: Migrations failed
-- **Check**: `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true` is set
+- **Check**: `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true` is set
 - **Fix**: Manually run in Render shell: `alembic upgrade head`
 
 ### Frontend Issues
@@ -243,7 +243,7 @@ git push
 **Problem**: Frontend can't connect to backend
 - **Check**: Browser console (F12) for errors
 - **Check**: `VITE_API_BASE_URL` in build command matches backend URL
-- **Check**: CORS settings - `FAIRTESTAI_CORS_ORIGINS` should match GitHub Pages URL
+- **Check**: CORS settings - `INTEGRITYSHIELD_CORS_ORIGINS` should match GitHub Pages URL
 
 **Problem**: 404 errors on routes
 - **Check**: `docs/404.html` exists (should be a copy of index.html)
@@ -280,7 +280,7 @@ git push
 ## 🎉 You're Deployed!
 
 Your application is now live at:
-- **Frontend**: `https://shivenagarwal.github.io/fairtestai_-llm-assessment-vulnerability-simulator-main/`
+- **Frontend**: `https://shivenagarwal.github.io/integrityshield_-llm-assessment-vulnerability-simulator-main/`
 - **Backend**: `https://your-backend.onrender.com`
 
 Users can now:

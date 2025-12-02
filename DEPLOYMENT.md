@@ -1,6 +1,6 @@
-# FairTestAI Deployment Guide - Google Cloud Run
+# IntegrityShield Deployment Guide - Google Cloud Run
 
-This guide walks through deploying FairTestAI backend to Google Cloud Platform.
+This guide walks through deploying IntegrityShield backend to Google Cloud Platform.
 
 ## Prerequisites
 
@@ -26,10 +26,10 @@ Cloud Storage (pipeline files)
 gcloud auth login
 
 # Create new project
-gcloud projects create fairtestai-demo --name="FairTestAI Demo"
+gcloud projects create integrityshield-demo --name="IntegrityShield Demo"
 
 # Set as active project
-gcloud config set project fairtestai-demo
+gcloud config set project integrityshield-demo
 
 # Enable required APIs
 gcloud services enable \
@@ -47,25 +47,25 @@ gcloud config set run/region us-central1
 
 ```bash
 # Create PostgreSQL instance (smallest tier for demo)
-gcloud sql instances create fairtestai-db \
+gcloud sql instances create integrityshield-db \
   --database-version=POSTGRES_15 \
   --tier=db-f1-micro \
   --region=us-central1 \
   --root-password=GENERATE_SECURE_PASSWORD_HERE
 
 # Create database
-gcloud sql databases create fairtestai --instance=fairtestai-db
+gcloud sql databases create integrityshield --instance=integrityshield-db
 
 # Get connection name (save this!)
-gcloud sql instances describe fairtestai-db --format="value(connectionName)"
-# Output: PROJECT_ID:us-central1:fairtestai-db
+gcloud sql instances describe integrityshield-db --format="value(connectionName)"
+# Output: PROJECT_ID:us-central1:integrityshield-db
 ```
 
 ## Step 3: Create Storage Bucket (2 min)
 
 ```bash
 # Create bucket for pipeline files
-gsutil mb -l us-central1 gs://fairtestai-files
+gsutil mb -l us-central1 gs://integrityshield-files
 
 # Set lifecycle to delete old files after 90 days (optional)
 cat > lifecycle.json << 'EOF'
@@ -78,7 +78,7 @@ cat > lifecycle.json << 'EOF'
   }
 }
 EOF
-gsutil lifecycle set lifecycle.json gs://fairtestai-files
+gsutil lifecycle set lifecycle.json gs://integrityshield-files
 ```
 
 ## Step 4: Store Secrets (5 min)
@@ -95,8 +95,8 @@ echo -n "YOUR_MISTRAL_API_KEY" | gcloud secrets create mistral-api-key --data-fi
 python3 -c "import secrets; print(secrets.token_urlsafe(32))" | gcloud secrets create app-secret-key --data-file=-
 
 # Create database URL secret
-# Format: postgresql://postgres:PASSWORD@/fairtestai?host=/cloudsql/PROJECT_ID:us-central1:fairtestai-db
-echo -n "postgresql://postgres:YOUR_DB_PASSWORD@/fairtestai?host=/cloudsql/PROJECT_ID:us-central1:fairtestai-db" \
+# Format: postgresql://postgres:PASSWORD@/integrityshield?host=/cloudsql/PROJECT_ID:us-central1:integrityshield-db
+echo -n "postgresql://postgres:YOUR_DB_PASSWORD@/integrityshield?host=/cloudsql/PROJECT_ID:us-central1:integrityshield-db" \
   | gcloud secrets create database-url --data-file=-
 ```
 
@@ -107,11 +107,11 @@ echo -n "postgresql://postgres:YOUR_DB_PASSWORD@/fairtestai?host=/cloudsql/PROJE
 cd backend
 
 # Build container image
-gcloud builds submit --tag gcr.io/PROJECT_ID/fairtestai-backend
+gcloud builds submit --tag gcr.io/PROJECT_ID/integrityshield-backend
 
 # Deploy to Cloud Run
-gcloud run deploy fairtestai-backend \
-  --image gcr.io/PROJECT_ID/fairtestai-backend \
+gcloud run deploy integrityshield-backend \
+  --image gcr.io/PROJECT_ID/integrityshield-backend \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
@@ -120,13 +120,13 @@ gcloud run deploy fairtestai-backend \
   --timeout 300 \
   --max-instances 5 \
   --min-instances 0 \
-  --add-cloudsql-instances PROJECT_ID:us-central1:fairtestai-db \
-  --set-secrets="OPENAI_API_KEY=openai-api-key:latest,ANTHROPIC_API_KEY=anthropic-api-key:latest,GOOGLE_AI_KEY=google-ai-key:latest,GROK_API_KEY=grok-api-key:latest,MISTRAL_API_KEY=mistral-api-key:latest,FAIRTESTAI_SECRET_KEY=app-secret-key:latest,FAIRTESTAI_DATABASE_URL=database-url:latest" \
-  --set-env-vars="FAIRTESTAI_ENV=production,FAIRTESTAI_FILE_STORAGE_BUCKET=fairtestai-files,FAIRTESTAI_PIPELINE_ROOT=/tmp/pipeline_runs,FAIRTESTAI_ENABLE_DEV_TOOLS=false,FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true"
+  --add-cloudsql-instances PROJECT_ID:us-central1:integrityshield-db \
+  --set-secrets="OPENAI_API_KEY=openai-api-key:latest,ANTHROPIC_API_KEY=anthropic-api-key:latest,GOOGLE_AI_KEY=google-ai-key:latest,GROK_API_KEY=grok-api-key:latest,MISTRAL_API_KEY=mistral-api-key:latest,INTEGRITYSHIELD_SECRET_KEY=app-secret-key:latest,INTEGRITYSHIELD_DATABASE_URL=database-url:latest" \
+  --set-env-vars="INTEGRITYSHIELD_ENV=production,INTEGRITYSHIELD_FILE_STORAGE_BUCKET=integrityshield-files,INTEGRITYSHIELD_PIPELINE_ROOT=/tmp/pipeline_runs,INTEGRITYSHIELD_ENABLE_DEV_TOOLS=false,INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true"
 
 # Get the service URL
-gcloud run services describe fairtestai-backend --region us-central1 --format="value(status.url)"
-# Output: https://fairtestai-backend-RANDOM.run.app
+gcloud run services describe integrityshield-backend --region us-central1 --format="value(status.url)"
+# Output: https://integrityshield-backend-RANDOM.run.app
 ```
 
 ## Step 6: Update Frontend (2 min)
@@ -135,7 +135,7 @@ Update your frontend's API endpoint to point to the Cloud Run URL:
 
 ```javascript
 // In your frontend config
-const API_BASE_URL = 'https://fairtestai-backend-RANDOM.run.app'
+const API_BASE_URL = 'https://integrityshield-backend-RANDOM.run.app'
 ```
 
 Commit and push to GitHub to update GitHub Pages.
@@ -144,10 +144,10 @@ Commit and push to GitHub to update GitHub Pages.
 
 ```bash
 # Health check
-curl https://fairtestai-backend-RANDOM.run.app/api/health
+curl https://integrityshield-backend-RANDOM.run.app/api/health
 
 # Test with authentication
-curl -X POST https://fairtestai-backend-RANDOM.run.app/api/auth/register \
+curl -X POST https://integrityshield-backend-RANDOM.run.app/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"test123"}'
 ```
@@ -156,10 +156,10 @@ curl -X POST https://fairtestai-backend-RANDOM.run.app/api/auth/register \
 
 ```bash
 # View logs
-gcloud run services logs read fairtestai-backend --region us-central1
+gcloud run services logs read integrityshield-backend --region us-central1
 
 # View metrics
-gcloud run services describe fairtestai-backend --region us-central1
+gcloud run services describe integrityshield-backend --region us-central1
 ```
 
 ## Cost Optimization
@@ -172,23 +172,23 @@ For demo period, costs should be minimal (~$5-10 total):
 To minimize costs:
 ```bash
 # Stop Cloud SQL when not in use
-gcloud sql instances patch fairtestai-db --activation-policy=NEVER
+gcloud sql instances patch integrityshield-db --activation-policy=NEVER
 
 # Restart when needed
-gcloud sql instances patch fairtestai-db --activation-policy=ALWAYS
+gcloud sql instances patch integrityshield-db --activation-policy=ALWAYS
 ```
 
 ## Cleanup (After Demo)
 
 ```bash
 # Delete Cloud Run service
-gcloud run services delete fairtestai-backend --region us-central1
+gcloud run services delete integrityshield-backend --region us-central1
 
 # Delete Cloud SQL instance
-gcloud sql instances delete fairtestai-db
+gcloud sql instances delete integrityshield-db
 
 # Delete storage bucket
-gsutil rm -r gs://fairtestai-files
+gsutil rm -r gs://integrityshield-files
 
 # Delete secrets
 gcloud secrets delete openai-api-key
@@ -200,7 +200,7 @@ gcloud secrets delete app-secret-key
 gcloud secrets delete database-url
 
 # Delete project (removes everything)
-gcloud projects delete fairtestai-demo
+gcloud projects delete integrityshield-demo
 ```
 
 ## Troubleshooting
@@ -208,16 +208,16 @@ gcloud projects delete fairtestai-demo
 ### Database Connection Issues
 ```bash
 # Check Cloud SQL connection
-gcloud sql instances describe fairtestai-db
+gcloud sql instances describe integrityshield-db
 
 # View Cloud Run logs for errors
-gcloud run services logs read fairtestai-backend --region us-central1 --limit=50
+gcloud run services logs read integrityshield-backend --region us-central1 --limit=50
 ```
 
 ### Memory/Timeout Issues
 ```bash
 # Increase memory and timeout
-gcloud run services update fairtestai-backend \
+gcloud run services update integrityshield-backend \
   --memory 4Gi \
   --timeout 600 \
   --region us-central1
@@ -226,7 +226,7 @@ gcloud run services update fairtestai-backend \
 ### Cold Start Issues
 ```bash
 # Set minimum instances to 1 (costs ~$5/month extra)
-gcloud run services update fairtestai-backend \
+gcloud run services update integrityshield-backend \
   --min-instances 1 \
   --region us-central1
 ```
@@ -235,5 +235,5 @@ gcloud run services update fairtestai-backend \
 
 For issues, check:
 1. Cloud Run logs: `gcloud run services logs read`
-2. Cloud SQL status: `gcloud sql instances describe fairtestai-db`
+2. Cloud SQL status: `gcloud sql instances describe integrityshield-db`
 3. Secret Manager: `gcloud secrets versions access latest --secret=SECRET_NAME`

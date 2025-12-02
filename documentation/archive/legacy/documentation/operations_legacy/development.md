@@ -46,7 +46,7 @@ cd backend && tail -f backend_server.log
 jq '.' backend/data/pipeline_runs/<run-id>/structured.json
 
 # Explore DB
-sqlite3 backend/data/fairtestai.db "SELECT stage, status, duration_ms FROM pipeline_stages ORDER BY id;"
+sqlite3 backend/data/integrityshield.db "SELECT stage, status, duration_ms FROM pipeline_stages ORDER BY id;"
 ```
 
 Keep this document updated as processes evolve.

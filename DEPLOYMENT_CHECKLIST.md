@@ -55,17 +55,17 @@ web: gunicorn run:app --workers 4 --bind 0.0.0.0:$PORT --timeout 120
 ### 4. Database Migrations
 
 **Status**: Should auto-apply in production
-- Set `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true` in cloud platform
+- Set `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true` in cloud platform
 - Or run manually: `alembic upgrade head`
 
 ### 5. Environment Variables
 
 **Required in Cloud Platform**:
-- `FAIRTESTAI_SECRET_KEY` (generate new one for production)
-- `FAIRTESTAI_DATABASE_URL` (PostgreSQL connection string)
-- `FAIRTESTAI_CORS_ORIGINS` (set to GitHub Pages URL)
-- `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true`
-- `FAIRTESTAI_ENV=production`
+- `INTEGRITYSHIELD_SECRET_KEY` (generate new one for production)
+- `INTEGRITYSHIELD_DATABASE_URL` (PostgreSQL connection string)
+- `INTEGRITYSHIELD_CORS_ORIGINS` (set to GitHub Pages URL)
+- `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true`
+- `INTEGRITYSHIELD_ENV=production`
 
 **Optional** (for backend fallback keys):
 - `OPENAI_API_KEY`

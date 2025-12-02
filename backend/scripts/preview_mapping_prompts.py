@@ -5,10 +5,10 @@ import os
 import sys
 from pathlib import Path
 
-if "FAIRTESTAI_PIPELINE_ROOT" not in os.environ:
+if "INTEGRITYSHIELD_PIPELINE_ROOT" not in os.environ:
     repo_root = Path(__file__).resolve().parents[2]
     default_root = repo_root / "backend" / "data" / "pipeline_runs"
-    os.environ["FAIRTESTAI_PIPELINE_ROOT"] = str(default_root)
+    os.environ["INTEGRITYSHIELD_PIPELINE_ROOT"] = str(default_root)
 
 from app import create_app
 from app.services.data_management.structured_data_manager import StructuredDataManager

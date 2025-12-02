@@ -1,4 +1,4 @@
-const KEY = "fairtestai.pipeline.recentRuns";
+const KEY = "integrityshield.pipeline.recentRuns";
 
 export function saveRecentRun(runId: string) {
   const entries = loadRecentRuns();

@@ -10,7 +10,7 @@ import structlog
 
 def configure_logging(app: Any | None = None) -> None:
     """Configure application-wide logging using structlog."""
-    log_level = (app.config.get("LOG_LEVEL") if app else os.getenv("FAIRTESTAI_LOG_LEVEL")) or "INFO"
+    log_level = (app.config.get("LOG_LEVEL") if app else os.getenv("INTEGRITYSHIELD_LOG_LEVEL")) or "INFO"
 
     root_logger = logging.getLogger()
     root_logger.setLevel(log_level)

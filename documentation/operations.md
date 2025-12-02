@@ -64,10 +64,10 @@ This playbook captures daily development routines, testing expectations, and tro
 
 ```bash
 # Inspect pipeline stages for a run
-psql fairtestai -c "SELECT stage_name, status, duration_ms FROM pipeline_stages WHERE pipeline_run_id = '<run>' ORDER BY started_at;"
+psql integrityshield -c "SELECT stage_name, status, duration_ms FROM pipeline_stages WHERE pipeline_run_id = '<run>' ORDER BY started_at;"
 
 # Drop and recreate local Postgres database (danger!)
-dropdb fairtestai && createdb fairtestai
+dropdb integrityshield && createdb integrityshield
 
 # Remove artifacts for a specific run (after backing up if needed)
 rm -rf backend/data/pipeline_runs/<run-id>

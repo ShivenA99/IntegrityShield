@@ -36,7 +36,7 @@ This backend is a Flask 2.x application organized around pipeline services that 
 
 - **AI Providers:** Mistral OCR (`mistral_ocr_client.py`), OpenAI Vision, GPT-5 fusion. Requests use `httpx`, handle 4xx/5xx with retries/logging.
 - **PDF Libraries:** PyMuPDF (`fitz`) for geometry, snapshots, and validation; PyPDF2 for parsing and writing content streams.
-- **Storage:** Local filesystem structure under `backend/data/`: run artifacts, DB file (`fairtestai.db` for dev), structured JSON caches.
+- **Storage:** Local filesystem structure under `backend/data/`: run artifacts, DB file (`integrityshield.db` for dev), structured JSON caches.
 
 ## Configuration
 

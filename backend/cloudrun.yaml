@@ -2,7 +2,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: fairtestai-backend
+  name: integrityshield-backend
   annotations:
     run.googleapis.com/ingress: all
     run.googleapis.com/launch-stage: BETA
@@ -14,28 +14,28 @@ spec:
         autoscaling.knative.dev/minScale: '0'
         autoscaling.knative.dev/maxScale: '5'
         # Cloud SQL connection (will be updated during deployment)
-        run.googleapis.com/cloudsql-instances: 'PROJECT_ID:REGION:fairtestai-db'
+        run.googleapis.com/cloudsql-instances: 'PROJECT_ID:REGION:integrityshield-db'
         # Request timeout (5 minutes for long-running pipeline tasks)
         run.googleapis.com/client-name: 'terraform'
     spec:
       containerConcurrency: 10
       timeoutSeconds: 300
-      serviceAccountName: fairtestai-sa
+      serviceAccountName: integrityshield-sa
       containers:
-      - image: gcr.io/PROJECT_ID/fairtestai-backend:latest
+      - image: gcr.io/PROJECT_ID/integrityshield-backend:latest
         ports:
         - name: http1
           containerPort: 8080
         env:
         # App configuration
-        - name: FAIRTESTAI_ENV
+        - name: INTEGRITYSHIELD_ENV
           value: 'production'
-        - name: FAIRTESTAI_PORT
+        - name: INTEGRITYSHIELD_PORT
           value: '8080'
-        - name: FAIRTESTAI_LOG_LEVEL
+        - name: INTEGRITYSHIELD_LOG_LEVEL
           value: 'INFO'
         # Database (Cloud SQL)
-        - name: FAIRTESTAI_DATABASE_URL
+        - name: INTEGRITYSHIELD_DATABASE_URL
           valueFrom:
             secretKeyRef:
               name: database-url
@@ -67,19 +67,19 @@ spec:
               name: mistral-api-key
               key: key
         # Storage (Cloud Storage bucket)
-        - name: FAIRTESTAI_FILE_STORAGE_BUCKET
-          value: 'fairtestai-files'
-        - name: FAIRTESTAI_PIPELINE_ROOT
+        - name: INTEGRITYSHIELD_FILE_STORAGE_BUCKET
+          value: 'integrityshield-files'
+        - name: INTEGRITYSHIELD_PIPELINE_ROOT
           value: '/tmp/pipeline_runs'
         # Security
-        - name: FAIRTESTAI_SECRET_KEY
+        - name: INTEGRITYSHIELD_SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: app-secret-key
               key: key
-        - name: FAIRTESTAI_ENABLE_DEV_TOOLS
+        - name: INTEGRITYSHIELD_ENABLE_DEV_TOOLS
           value: 'false'
-        - name: FAIRTESTAI_AUTO_APPLY_MIGRATIONS
+        - name: INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS
           value: 'true'
         resources:
           limits:

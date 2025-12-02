@@ -136,8 +136,8 @@ class AnswerKeyExtractionService:
             raise RuntimeError("OPENAI_API_KEY not configured for answer key extraction")
 
         model = (
-            current_app.config.get("FAIRTESTAI_ANSWER_KEY_MODEL")
-            or os.getenv("FAIRTESTAI_ANSWER_KEY_MODEL")
+            current_app.config.get("INTEGRITYSHIELD_ANSWER_KEY_MODEL")
+            or os.getenv("INTEGRITYSHIELD_ANSWER_KEY_MODEL")
             or current_app.config.get("OPENAI_DEFAULT_MODEL")
             or os.getenv("OPENAI_DEFAULT_MODEL")
             or "gpt-4o-mini"

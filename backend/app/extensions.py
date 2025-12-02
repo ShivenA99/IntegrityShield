@@ -29,7 +29,7 @@ def configure_sqlite_connection(dbapi_connection, connection_record) -> None:
     if not isinstance(dbapi_connection, sqlite3.Connection):
         return
 
-    busy_timeout_seconds = float(os.getenv("FAIRTESTAI_SQLITE_TIMEOUT_SECONDS", "30"))
+    busy_timeout_seconds = float(os.getenv("INTEGRITYSHIELD_SQLITE_TIMEOUT_SECONDS", "30"))
     busy_timeout_ms = int(max(busy_timeout_seconds, 0) * 1000)
 
     cursor = dbapi_connection.cursor()

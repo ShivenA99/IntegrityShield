@@ -1,6 +1,6 @@
 # AntiCheatAI Demo Environment
 
-This guide explains how to run the read-only AntiCheatAI demo alongside the core FairTestAI stack.
+This guide explains how to run the read-only AntiCheatAI demo alongside the core IntegrityShield stack.
 
 ## 1. Prepare Demo Assets
 
@@ -25,7 +25,7 @@ See `demo_assets/schema.md` for the table payload contract. The backend serves t
 
 The existing Flask app now exposes demo endpoints under `/api/demo`. Optional environment variables:
 
-- `FAIRTESTAI_DEMO_ASSETS_PATH` – override the default `demo_assets` directory location.
+- `INTEGRITYSHIELD_DEMO_ASSETS_PATH` – override the default `demo_assets` directory location.
 
 Run the backend as usual:
 

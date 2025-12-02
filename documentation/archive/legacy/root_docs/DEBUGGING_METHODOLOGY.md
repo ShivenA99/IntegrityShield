@@ -562,7 +562,7 @@ grep -n "spacing_adjustment = -" base_renderer.py
 ```bash
 # Kill old server
 # Start new server with fix
-FAIRTESTAI_PORT=8001 .venv/bin/python run.py
+INTEGRITYSHIELD_PORT=8001 .venv/bin/python run.py
 ```
 
 ✅ **Backend restarted with fix active**

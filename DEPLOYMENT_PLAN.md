@@ -34,8 +34,8 @@ GitHub Pages (Frontend) → Cloud Backend (API) → Database
    - Build Command: `cd backend && pip install -r requirements.txt`
    - Start Command: `cd backend && gunicorn run:app`
    - Environment Variables: See [`DEPLOYMENT_ENV_VARS.md`](./DEPLOYMENT_ENV_VARS.md) for complete list
-     - `FAIRTESTAI_DATABASE_URL` (PostgreSQL from Render)
-     - `FAIRTESTAI_SECRET_KEY` (generate secure key)
+     - `INTEGRITYSHIELD_DATABASE_URL` (PostgreSQL from Render)
+     - `INTEGRITYSHIELD_SECRET_KEY` (generate secure key)
      - `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc. (optional, users provide their own)
 5. Create PostgreSQL database on Render
 6. Update frontend API base URL to point to Render backend
@@ -109,9 +109,9 @@ VITE_API_BASE_URL=https://your-backend-url.com/api npm run build:gh-pages
 
 Required environment variables:
 ```bash
-FAIRTESTAI_SECRET_KEY=<generate-secure-random-key>
-FAIRTESTAI_DATABASE_URL=postgresql://user:pass@host:port/dbname
-FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true
+INTEGRITYSHIELD_SECRET_KEY=<generate-secure-random-key>
+INTEGRITYSHIELD_DATABASE_URL=postgresql://user:pass@host:port/dbname
+INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true
 CORS_ORIGINS=https://your-github-pages-url.github.io
 ```
 
@@ -125,7 +125,7 @@ GROK_API_KEY=<optional>
 
 ### Database Migrations
 
-Migrations will run automatically if `FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true`.
+Migrations will run automatically if `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true`.
 
 To run manually:
 ```bash
@@ -147,7 +147,7 @@ const TRY_IT_URL = import.meta.env.VITE_API_BASE_URL
 
 2. Or use environment variable:
 ```bash
-VITE_APP_URL=https://your-github-pages-url.github.io/fairtestai_-llm-assessment-vulnerability-simulator-main
+VITE_APP_URL=https://your-github-pages-url.github.io/integrityshield_-llm-assessment-vulnerability-simulator-main
 ```
 
 ### CORS Configuration

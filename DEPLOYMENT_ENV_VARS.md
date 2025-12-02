@@ -16,8 +16,8 @@ In local development, environment variables are loaded from `.env` files:
 
 | Variable | Description | Example | Required For |
 |----------|-------------|---------|--------------|
-| `FAIRTESTAI_SECRET_KEY` | Flask secret key for sessions/JWT | `your-random-secret-key-here` | Authentication, encryption |
-| `FAIRTESTAI_DATABASE_URL` | Database connection string | `postgresql://user:pass@host:5432/dbname` | Database |
+| `INTEGRITYSHIELD_SECRET_KEY` | Flask secret key for sessions/JWT | `your-random-secret-key-here` | Authentication, encryption |
+| `INTEGRITYSHIELD_DATABASE_URL` | Database connection string | `postgresql://user:pass@host:5432/dbname` | Database |
 | `OPENAI_API_KEY` | OpenAI API key | `sk-...` | OpenAI LLM calls |
 | `GOOGLE_AI_KEY` | Google/Gemini API key | `AIza...` | Google LLM calls |
 
@@ -32,14 +32,14 @@ In local development, environment variables are loaded from `.env` files:
 
 | Variable | Description | Default | Used For |
 |----------|-------------|---------|----------|
-| `FAIRTESTAI_ENV` | Environment name | `development` | Config selection |
-| `FAIRTESTAI_AUTO_APPLY_MIGRATIONS` | Auto-run DB migrations | `true` | Database setup |
-| `FAIRTESTAI_CORS_ORIGINS` | Allowed CORS origins | `*` | Frontend access |
-| `FAIRTESTAI_LOG_LEVEL` | Logging level | `DEBUG` | Logging |
-| `FAIRTESTAI_PIPELINE_ROOT` | Pipeline storage path | `./data/pipeline_runs` | File storage |
-| `FAIRTESTAI_REPORT_ANTHROPIC_MODEL` | Anthropic model | `claude-3-5-haiku-20241022` | Report generation |
-| `FAIRTESTAI_REPORT_GOOGLE_MODEL` | Google model | `models/gemini-2.5-flash` | Report generation |
-| `FAIRTESTAI_REPORT_GROK_MODEL` | Grok model | `grok-2-latest` | Report generation |
+| `INTEGRITYSHIELD_ENV` | Environment name | `development` | Config selection |
+| `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS` | Auto-run DB migrations | `true` | Database setup |
+| `INTEGRITYSHIELD_CORS_ORIGINS` | Allowed CORS origins | `*` | Frontend access |
+| `INTEGRITYSHIELD_LOG_LEVEL` | Logging level | `DEBUG` | Logging |
+| `INTEGRITYSHIELD_PIPELINE_ROOT` | Pipeline storage path | `./data/pipeline_runs` | File storage |
+| `INTEGRITYSHIELD_REPORT_ANTHROPIC_MODEL` | Anthropic model | `claude-3-5-haiku-20241022` | Report generation |
+| `INTEGRITYSHIELD_REPORT_GOOGLE_MODEL` | Google model | `models/gemini-2.5-flash` | Report generation |
+| `INTEGRITYSHIELD_REPORT_GROK_MODEL` | Grok model | `grok-2-latest` | Report generation |
 
 ## Cloud Deployment Options
 
@@ -54,21 +54,21 @@ In local development, environment variables are loaded from `.env` files:
 
 **Example Setup:**
 ```
-FAIRTESTAI_SECRET_KEY=your-secret-key-here
-FAIRTESTAI_DATABASE_URL=postgresql://user:pass@host:5432/dbname
+INTEGRITYSHIELD_SECRET_KEY=your-secret-key-here
+INTEGRITYSHIELD_DATABASE_URL=postgresql://user:pass@host:5432/dbname
 OPENAI_API_KEY=sk-...
 GOOGLE_AI_KEY=AIza...
 ANTHROPIC_API_KEY=sk-ant-...
 GROK_API_KEY=xai-...
-FAIRTESTAI_ENV=production
-FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true
-FAIRTESTAI_CORS_ORIGINS=https://shivenagarwal.github.io
+INTEGRITYSHIELD_ENV=production
+INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true
+INTEGRITYSHIELD_CORS_ORIGINS=https://shivenagarwal.github.io
 ```
 
 **Database Setup:**
 - Render provides managed PostgreSQL databases
 - When you create a PostgreSQL database, Render automatically provides a `DATABASE_URL`
-- Set `FAIRTESTAI_DATABASE_URL` to this value (or Render can auto-inject it as `DATABASE_URL`)
+- Set `INTEGRITYSHIELD_DATABASE_URL` to this value (or Render can auto-inject it as `DATABASE_URL`)
 
 **Security:**
 - Render encrypts environment variables at rest
@@ -90,7 +90,7 @@ Same as Render above.
 **Database Setup:**
 - Railway provides managed PostgreSQL
 - Railway automatically injects `DATABASE_URL` environment variable
-- You can use `DATABASE_URL` directly or set `FAIRTESTAI_DATABASE_URL=$DATABASE_URL`
+- You can use `DATABASE_URL` directly or set `INTEGRITYSHIELD_DATABASE_URL=$DATABASE_URL`
 
 ### Option 3: AWS (Elastic Beanstalk)
 
@@ -103,13 +103,13 @@ Same as Render above.
 
 **Alternative (Using EB CLI):**
 ```bash
-eb setenv FAIRTESTAI_SECRET_KEY=your-key FAIRTESTAI_DATABASE_URL=...
+eb setenv INTEGRITYSHIELD_SECRET_KEY=your-key INTEGRITYSHIELD_DATABASE_URL=...
 ```
 
 **Database Setup:**
 - Use RDS (Relational Database Service) for PostgreSQL
 - Create RDS instance and get connection string
-- Set `FAIRTESTAI_DATABASE_URL` to RDS connection string
+- Set `INTEGRITYSHIELD_DATABASE_URL` to RDS connection string
 
 ### Option 4: Google Cloud Platform (App Engine)
 
@@ -118,8 +118,8 @@ eb setenv FAIRTESTAI_SECRET_KEY=your-key FAIRTESTAI_DATABASE_URL=...
 Create `app.yaml`:
 ```yaml
 env_variables:
-  FAIRTESTAI_SECRET_KEY: 'your-secret-key'
-  FAIRTESTAI_DATABASE_URL: 'postgresql://...'
+  INTEGRITYSHIELD_SECRET_KEY: 'your-secret-key'
+  INTEGRITYSHIELD_DATABASE_URL: 'postgresql://...'
   OPENAI_API_KEY: 'sk-...'
   # ... etc
 ```
@@ -128,17 +128,17 @@ env_variables:
 Use Google Secret Manager:
 ```yaml
 env_variables:
-  FAIRTESTAI_SECRET_KEY: 'projects/PROJECT_ID/secrets/SECRET_NAME/versions/latest'
+  INTEGRITYSHIELD_SECRET_KEY: 'projects/PROJECT_ID/secrets/SECRET_NAME/versions/latest'
 ```
 
 **Database Setup:**
 - Use Cloud SQL for PostgreSQL
 - Get connection string from Cloud SQL console
-- Set `FAIRTESTAI_DATABASE_URL`
+- Set `INTEGRITYSHIELD_DATABASE_URL`
 
 ## Generating a Secure Secret Key
 
-For `FAIRTESTAI_SECRET_KEY`, generate a secure random key:
+For `INTEGRITYSHIELD_SECRET_KEY`, generate a secure random key:
 
 **Python:**
 ```python
@@ -176,7 +176,7 @@ cat .env  # Review only, don't share output
 
 ### Step 2: Generate Production Secret Key
 
-Generate a new `FAIRTESTAI_SECRET_KEY` for production (don't reuse dev key):
+Generate a new `INTEGRITYSHIELD_SECRET_KEY` for production (don't reuse dev key):
 ```python
 import secrets
 print(secrets.token_urlsafe(32))
@@ -188,14 +188,14 @@ Add all variables to your cloud platform's environment variable settings (see pl
 
 ### Step 4: Update Database URL
 
-- **Local**: `sqlite:////path/to/fairtestai.db`
+- **Local**: `sqlite:////path/to/integrityshield.db`
 - **Production**: `postgresql://user:password@host:5432/dbname`
 
 ### Step 5: Update CORS Origins
 
-Set `FAIRTESTAI_CORS_ORIGINS` to your frontend URL:
+Set `INTEGRITYSHIELD_CORS_ORIGINS` to your frontend URL:
 ```
-FAIRTESTAI_CORS_ORIGINS=https://shivenagarwal.github.io
+INTEGRITYSHIELD_CORS_ORIGINS=https://shivenagarwal.github.io
 ```
 
 ## Security Best Practices
@@ -205,7 +205,7 @@ FAIRTESTAI_CORS_ORIGINS=https://shivenagarwal.github.io
 3. **Rotate keys regularly** - Especially if they were ever exposed
 4. **Use secret management services** - For production, consider AWS Secrets Manager, Google Secret Manager, etc.
 5. **Limit CORS origins** - Don't use `*` in production, specify exact frontend URL
-6. **Use strong secret keys** - Generate `FAIRTESTAI_SECRET_KEY` with sufficient entropy (32+ bytes)
+6. **Use strong secret keys** - Generate `INTEGRITYSHIELD_SECRET_KEY` with sufficient entropy (32+ bytes)
 
 ## Testing Environment Variables in Production
 
@@ -216,7 +216,7 @@ After deployment, verify environment variables are loaded:
 curl https://your-backend-url.com/api/status
 
 # Or check logs for configuration
-# Look for: "Starting backend with: FAIRTESTAI_DATABASE_URL=..."
+# Look for: "Starting backend with: INTEGRITYSHIELD_DATABASE_URL=..."
 ```
 
 ## Troubleshooting
@@ -236,7 +236,7 @@ curl https://your-backend-url.com/api/status
 **Problem**: Can't connect to database.
 
 **Solution**:
-1. Verify `FAIRTESTAI_DATABASE_URL` is set correctly
+1. Verify `INTEGRITYSHIELD_DATABASE_URL` is set correctly
 2. Check database credentials
 3. Ensure database is accessible from your cloud service (firewall/security groups)
 4. For managed databases, check connection string format
@@ -246,7 +246,7 @@ curl https://your-backend-url.com/api/status
 **Problem**: Frontend can't call backend API.
 
 **Solution**:
-1. Set `FAIRTESTAI_CORS_ORIGINS` to your frontend URL (not `*`)
+1. Set `INTEGRITYSHIELD_CORS_ORIGINS` to your frontend URL (not `*`)
 2. Include protocol: `https://shivenagarwal.github.io` (not just domain)
 3. Restart backend after changing CORS settings
 
@@ -265,15 +265,15 @@ curl https://your-backend-url.com/api/status
 
 3. **Set Environment Variables**:
    ```
-   FAIRTESTAI_SECRET_KEY=<generated-secret>
-   FAIRTESTAI_DATABASE_URL=<from-postgres-service>
+   INTEGRITYSHIELD_SECRET_KEY=<generated-secret>
+   INTEGRITYSHIELD_DATABASE_URL=<from-postgres-service>
    OPENAI_API_KEY=<your-key>
    GOOGLE_AI_KEY=<your-key>
    ANTHROPIC_API_KEY=<your-key>
    GROK_API_KEY=<your-key>
-   FAIRTESTAI_ENV=production
-   FAIRTESTAI_AUTO_APPLY_MIGRATIONS=true
-   FAIRTESTAI_CORS_ORIGINS=https://shivenagarwal.github.io
+   INTEGRITYSHIELD_ENV=production
+   INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS=true
+   INTEGRITYSHIELD_CORS_ORIGINS=https://shivenagarwal.github.io
    ```
 
 4. **Deploy**: Render will automatically deploy on git push

@@ -1,4 +1,4 @@
-# AntiCheatAI – LLM Assessment Vulnerability Simulator
+# IntegrityShield – LLM Assessment Vulnerability Simulator
 
 This repository hosts the end-to-end simulator we use to probe grading vulnerabilities in LLM-assisted educational workflows. It ingests instructor PDFs, weaponises subtle content manipulations, renders multiple attacked variants, and now models whole-class cheating behaviour through synthetic classroom datasets and evaluation analytics.
 
@@ -37,19 +37,19 @@ Create a `.env` file in the `backend/` directory with the following required var
 
 ```bash
 # Environment Configuration
-FAIRTESTAI_ENV=development
-FAIRTESTAI_PORT=8000
-FAIRTESTAI_LOG_LEVEL=INFO
+INTEGRITYSHIELD_ENV=development
+INTEGRITYSHIELD_PORT=8000
+INTEGRITYSHIELD_LOG_LEVEL=INFO
 
 # Database Configuration
-FAIRTESTAI_DATABASE_URL=postgresql+psycopg://fairtestai:fairtestai@localhost:5433/fairtestai
+INTEGRITYSHIELD_DATABASE_URL=postgresql+psycopg://integrityshield:integrityshield@localhost:5433/integrityshield
 
 # Default Models and Methods
-FAIRTESTAI_DEFAULT_MODELS=gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro
-FAIRTESTAI_DEFAULT_METHODS=content_stream_overlay,pymupdf_overlay
+INTEGRITYSHIELD_DEFAULT_MODELS=gpt-4o-mini,claude-3-5-sonnet,gemini-1.5-pro
+INTEGRITYSHIELD_DEFAULT_METHODS=content_stream_overlay,pymupdf_overlay
 
 # Development Tools
-FAIRTESTAI_ENABLE_DEV_TOOLS=true
+INTEGRITYSHIELD_ENABLE_DEV_TOOLS=true
 
 # Model Configuration
 POST_FUSER_MODEL=gpt-5
@@ -78,7 +78,7 @@ The startup script will:
 - Activate the virtual environment
 - Start the Flask server on port 8000
 
-> **Note:** The script automatically sets `FAIRTESTAI_DATABASE_URL` to use SQLite (`sqlite:////.../data/fairtestai.db`) for local development. To use PostgreSQL, override this in your `.env` file. The application factory (`app.create_app`) runs Alembic migrations automatically when `FAIRTESTAI_AUTO_APPLY_MIGRATIONS` is set to `true` (default is `false` in the script).
+> **Note:** The script automatically sets `INTEGRITYSHIELD_DATABASE_URL` to use SQLite (`sqlite:////.../data/integrityshield.db`) for local development. To use PostgreSQL, override this in your `.env` file. The application factory (`app.create_app`) runs Alembic migrations automatically when `INTEGRITYSHIELD_AUTO_APPLY_MIGRATIONS` is set to `true` (default is `false` in the script).
 
 ### Frontend
 

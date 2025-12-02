@@ -46,17 +46,17 @@ class GoldAnswerGenerationService:
     def __init__(self) -> None:
         self.logger = get_logger(__name__)
         self._client: Optional[AsyncOpenAI] = None
-        self._model_name = current_app.config.get("FAIRTESTAI_GOLD_ANSWER_MODEL", "gpt-5.1")
+        self._model_name = current_app.config.get("INTEGRITYSHIELD_GOLD_ANSWER_MODEL", "gpt-5.1")
         self._reasoning_effort = (
             current_app.config.get("GOLD_ANSWER_REASONING", "medium") or "medium"
         )
-        self._enabled = current_app.config.get("FAIRTESTAI_ENABLE_GOLD_ANSWER_GENERATION", True)
+        self._enabled = current_app.config.get("INTEGRITYSHIELD_ENABLE_GOLD_ANSWER_GENERATION", True)
         self._force_refresh_all: bool = current_app.config.get("GOLD_ANSWER_FORCE_REFRESH", True)
         self._force_mcq_refresh: bool = current_app.config.get("GOLD_ANSWER_FORCE_REFRESH_MCQ", True)
 
         api_key = current_app.config.get("OPENAI_API_KEY")
         if not self._enabled:
-            self.logger.info("Gold answer generation disabled via FAIRTESTAI_ENABLE_GOLD_ANSWERS.")
+            self.logger.info("Gold answer generation disabled via INTEGRITYSHIELD_ENABLE_GOLD_ANSWERS.")
             return
         if not api_key:
             self.logger.warning("Gold answer generation requires OPENAI_API_KEY.")
