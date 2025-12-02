@@ -13,8 +13,10 @@ import type {
   VulnerabilityReportResult
 } from "@services/types/pipeline";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+
 const client = axios.create({
-  baseURL: "/api/pipeline"
+  baseURL: `${API_BASE_URL}/pipeline`
 });
 
 const isDev = typeof globalThis !== "undefined" && (globalThis as any).importMeta?.env?.DEV;

@@ -1,0 +1,55 @@
+{
+  "hash": "15f542dc",
+  "configHash": "0b2c7c29",
+  "lockfileHash": "a55f38b4",
+  "browserHash": "b3e7a149",
+  "optimized": {
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "1070a881",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "5a840634",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "51957836",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "d2e6a820",
+      "needsInterop": false
+    },
+    "@instructure/emotion": {
+      "src": "../../node_modules/@instructure/emotion/es/index.js",
+      "file": "@instructure_emotion.js",
+      "fileHash": "9828de23",
+      "needsInterop": false
+    },
+    "@instructure/canvas-theme": {
+      "src": "../../node_modules/@instructure/canvas-theme/es/index.js",
+      "file": "@instructure_canvas-theme.js",
+      "fileHash": "48accd93",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-E5PH4BBX": {
+      "file": "chunk-E5PH4BBX.js"
+    },
+    "chunk-PC3TOTTI": {
+      "file": "chunk-PC3TOTTI.js"
+    },
+    "chunk-N4ACULNO": {
+      "file": "chunk-N4ACULNO.js"
+    }
+  }
+}

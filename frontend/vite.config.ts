@@ -5,6 +5,11 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   base: process.env.GITHUB_PAGES === "true" ? "/IntegrityShield/" : "/",
+  define: {
+    "import.meta.env.VITE_API_BASE_URL": process.env.GITHUB_PAGES === "true"
+      ? JSON.stringify("https://fairtestai-llm-assessment-vulnerability.onrender.com/api")
+      : JSON.stringify("/api"),
+  },
   build: {
     outDir: process.env.GITHUB_PAGES === "true" ? "../docs" : "dist",
     emptyOutDir: true,

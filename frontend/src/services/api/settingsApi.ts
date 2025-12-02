@@ -1,8 +1,10 @@
 import axios from "axios";
 import type { SettingsPayload } from "@services/types/settings";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+
 const client = axios.create({
-  baseURL: "/api/settings"
+  baseURL: `${API_BASE_URL}/settings`
 });
 
 const isDev = typeof globalThis !== "undefined" && (globalThis as any).importMeta?.env?.DEV;

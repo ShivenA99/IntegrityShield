@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+
 const client = axios.create({
-  baseURL: "/api/enhancement"
+  baseURL: `${API_BASE_URL}/enhancement`
 });
 
 export async function fetchEnhancedPdfs(runId: string) {

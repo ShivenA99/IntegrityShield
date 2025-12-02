@@ -1,8 +1,10 @@
 import axios from "axios";
 import type { LogEntry, PerformanceMetricRecord } from "@services/types/developer";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+
 const client = axios.create({
-  baseURL: "/api/developer"
+  baseURL: `${API_BASE_URL}/developer`
 });
 
 const isDev = typeof globalThis !== "undefined" && (globalThis as any).importMeta?.env?.DEV;
