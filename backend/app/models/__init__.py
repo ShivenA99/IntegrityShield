@@ -15,6 +15,7 @@ from .answer_sheets import (
     AnswerSheetRecord,
     ClassroomEvaluation,
 )
+from .user import User, UserAPIKey
 
 __all__ = [
     "PipelineRun",
@@ -30,4 +31,6 @@ __all__ = [
     "AnswerSheetStudent",
     "AnswerSheetRecord",
     "ClassroomEvaluation",
+    "User",
+    "UserAPIKey",
 ]

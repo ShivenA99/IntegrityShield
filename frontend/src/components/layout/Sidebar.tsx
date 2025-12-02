@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { usePipeline } from "@hooks/usePipeline";
 import { useDemoRun } from "@contexts/DemoRunContext";
+import { getAssetUrl } from "@utils/basePath";
 
 const links = [
   { to: "/dashboard", label: "Active Assessment", shortLabel: "Assess", icon: LayoutDashboard },

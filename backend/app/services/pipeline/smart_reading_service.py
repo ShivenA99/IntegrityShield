@@ -16,24 +16,25 @@ from ...utils.logging import get_logger
 from ...utils.time import isoformat, utc_now
 from ...utils.storage_paths import run_directory
 
-# Add data_extraction to path
+# Try to import QuestionExtractionPipeline from data_extraction (optional dependency)
+QuestionExtractionPipeline = None
 data_extraction_path = Path(__file__).parent.parent.parent.parent / "data_extraction"
-if str(data_extraction_path) not in sys.path:
-    sys.path.insert(0, str(data_extraction_path))
 
-try:
-    from src.pipeline import QuestionExtractionPipeline
-except ImportError:
-    # Fallback: try relative import
-    import importlib.util
-    pipeline_path = data_extraction_path / "src" / "pipeline.py"
-    if pipeline_path.exists():
-        spec = importlib.util.spec_from_file_location("pipeline", pipeline_path)
-        pipeline_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(pipeline_module)
-        QuestionExtractionPipeline = pipeline_module.QuestionExtractionPipeline
-    else:
-        raise ImportError(f"Cannot import QuestionExtractionPipeline from {data_extraction_path}")
+if data_extraction_path.exists():
+    if str(data_extraction_path) not in sys.path:
+        sys.path.insert(0, str(data_extraction_path))
+    
+    try:
+        from src.pipeline import QuestionExtractionPipeline
+    except ImportError:
+        # Fallback: try relative import
+        import importlib.util
+        pipeline_path = data_extraction_path / "src" / "pipeline.py"
+        if pipeline_path.exists():
+            spec = importlib.util.spec_from_file_location("pipeline", pipeline_path)
+            pipeline_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(pipeline_module)
+            QuestionExtractionPipeline = pipeline_module.QuestionExtractionPipeline
 
 
 class SmartReadingService:
@@ -41,14 +42,25 @@ class SmartReadingService:
         self.logger = get_logger(__name__)
         self.file_manager = FileManager()
         self.structured_manager = StructuredDataManager()
-        # Initialize data extraction pipeline
-        self.data_extraction_pipeline = QuestionExtractionPipeline(
-            use_openai=True,
-            use_mistral=True,
-            enable_latex=True,  # Always enabled
-            latex_include_images=True,
-            latex_compile_pdf=True
-        )
+        # Initialize data extraction pipeline if available
+        if QuestionExtractionPipeline is None:
+            self.data_extraction_pipeline = None
+            self.logger.warning(
+                "QuestionExtractionPipeline not available. SmartReadingService will be disabled. "
+                f"To enable, ensure data_extraction directory exists at: {data_extraction_path}"
+            )
+        else:
+            try:
+                self.data_extraction_pipeline = QuestionExtractionPipeline(
+                    use_openai=True,
+                    use_mistral=True,
+                    enable_latex=True,  # Always enabled
+                    latex_include_images=True,
+                    latex_compile_pdf=True
+                )
+            except Exception as exc:  # noqa: BLE001
+                self.logger.error(f"Failed to initialize QuestionExtractionPipeline: {exc}")
+                self.data_extraction_pipeline = None
 
     async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
         return await asyncio.to_thread(self._process_pdf, run_id)
@@ -59,6 +71,44 @@ class SmartReadingService:
             raise ValueError("Pipeline run not found")
 
         pdf_path = Path(run.original_pdf_path)
+
+        # Check if data extraction pipeline is available
+        if self.data_extraction_pipeline is None:
+            error_msg = (
+                f"SmartReadingService requires data_extraction directory at {data_extraction_path}, "
+                "but it was not found. This directory was removed during repository cleanup. "
+                "The pipeline can continue without smart_reading, but AI-powered question extraction will be disabled."
+            )
+            self.logger.error(error_msg)
+            live_logging_service.emit(
+                run_id,
+                "smart_reading",
+                "ERROR",
+                error_msg,
+                context={"pdf_path": str(pdf_path)}
+            )
+            # Initialize minimal structured data without AI extraction
+            structured = self.structured_manager.load(run_id) or {}
+            structured.setdefault("pipeline_metadata", {})
+            structured["pipeline_metadata"].update({
+                "current_stage": "smart_reading",
+                "stages_completed": ["smart_reading"],
+                "last_updated": isoformat(utc_now()),
+                "ai_extraction_enabled": False,
+                "error": "data_extraction directory not found",
+            })
+            structured.setdefault("document", {})
+            structured["document"].update({
+                "source_path": str(pdf_path),
+                "filename": pdf_path.name,
+            })
+            self.structured_manager.save(run_id, structured)
+            return {
+                "pages": 0,
+                "questions_found": 0,
+                "files_copied": 0,
+                "error": "data_extraction not available",
+            }
 
         live_logging_service.emit(
             run_id,

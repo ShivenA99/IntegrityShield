@@ -24,6 +24,10 @@ redis>=5.0
 python-json-logger>=2.0
 structlog>=24.1
 uvicorn>=0.30
+gunicorn>=21.2.0
+# Authentication dependencies
+cryptography>=41.0
+PyJWT>=2.8
 # Data extraction pipeline dependencies
 mistralai>=1.0.0
 docling>=1.0.0
