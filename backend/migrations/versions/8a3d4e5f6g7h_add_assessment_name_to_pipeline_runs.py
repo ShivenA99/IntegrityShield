@@ -18,21 +18,26 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Add assessment_name column
-    op.add_column(
-        "pipeline_runs",
-        sa.Column("assessment_name", sa.String(length=255), nullable=True),
-    )
-
-    # Optionally backfill from original_filename
+    # Check if column already exists before adding
     bind = op.get_bind()
-    bind.execute(
-        sa.text(
-            "UPDATE pipeline_runs "
-            "SET assessment_name = original_filename "
-            "WHERE assessment_name IS NULL AND original_filename IS NOT NULL"
+    inspector = sa.inspect(bind)
+    columns = [col["name"] for col in inspector.get_columns("pipeline_runs")]
+
+    if "assessment_name" not in columns:
+        # Add assessment_name column only if it doesn't exist
+        op.add_column(
+            "pipeline_runs",
+            sa.Column("assessment_name", sa.String(length=255), nullable=True),
         )
-    )
+
+        # Optionally backfill from original_filename
+        bind.execute(
+            sa.text(
+                "UPDATE pipeline_runs "
+                "SET assessment_name = original_filename "
+                "WHERE assessment_name IS NULL AND original_filename IS NOT NULL"
+            )
+        )
 
 
 def downgrade() -> None:
