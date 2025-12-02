@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import uuid
 from typing import Any, Optional
 
@@ -16,10 +17,14 @@ class User(db.Model, TimestampMixin):
     id: Mapped[str] = mapped_column(
         db.String(36), primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    email: Mapped[str] = mapped_column(db.String(255), unique=True, nullable=False, index=True)
+    email: Mapped[Optional[str]] = mapped_column(db.String(255), nullable=True, index=True)
     name: Mapped[Optional[str]] = mapped_column(db.String(255), nullable=True)
-    password_hash: Mapped[str] = mapped_column(db.String(255), nullable=False)
+    password_hash: Mapped[Optional[str]] = mapped_column(db.String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(db.Boolean, default=True, nullable=False)
+
+    # OpenAI key authentication fields
+    openai_key_hash: Mapped[Optional[str]] = mapped_column(db.String(64), unique=True, nullable=True, index=True)
+    encrypted_openai_key: Mapped[Optional[str]] = mapped_column(db.Text, nullable=True)
 
     api_keys: Mapped[list["UserAPIKey"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", lazy="selectin"
@@ -32,7 +37,27 @@ class User(db.Model, TimestampMixin):
 
     def check_password(self, password: str) -> bool:
         """Check if the provided password matches the user's password."""
+        if not self.password_hash:
+            return False
         return check_password_hash(self.password_hash, password)
+
+    @staticmethod
+    def hash_openai_key(api_key: str) -> str:
+        """Generate SHA256 hash of OpenAI key for unique identification."""
+        return hashlib.sha256(api_key.encode('utf-8')).hexdigest()
+
+    def set_openai_key(self, api_key: str) -> None:
+        """Encrypt and store OpenAI key, set hash as identifier."""
+        from ..utils.encryption import encrypt_api_key
+        self.openai_key_hash = self.hash_openai_key(api_key)
+        self.encrypted_openai_key = encrypt_api_key(api_key)
+
+    def get_openai_key(self) -> Optional[str]:
+        """Decrypt and return OpenAI key."""
+        if not self.encrypted_openai_key:
+            return None
+        from ..utils.encryption import decrypt_api_key
+        return decrypt_api_key(self.encrypted_openai_key)
 
     def to_dict(self) -> dict[str, Any]:
         """Convert user to dictionary (excluding sensitive data)."""
@@ -41,6 +66,7 @@ class User(db.Model, TimestampMixin):
             "email": self.email,
             "name": self.name,
             "is_active": self.is_active,
+            "has_openai_key": bool(self.encrypted_openai_key),
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 

@@ -15,30 +15,48 @@ except Exception:
     SSL_CONTEXT = ssl.create_default_context()
 
 
-async def validate_openai_key(api_key: str) -> tuple[bool, Optional[str]]:
-    """Validate OpenAI API key by making a simple test call."""
-    try:
-        url = "https://api.openai.com/v1/models"
-        headers = {"Authorization": f"Bearer {api_key}"}
-        connector = aiohttp.TCPConnector(ssl=SSL_CONTEXT)
-        
-        async with aiohttp.ClientSession(connector=connector) as session:
-            async with session.get(
-                url,
-                headers=headers,
-                timeout=aiohttp.ClientTimeout(total=10)
-            ) as resp:
-                if resp.status == 200:
-                    return True, None
-                elif resp.status == 401:
-                    return False, "Invalid API key"
-                else:
-                    error_text = await resp.text()
-                    return False, f"API error: {error_text[:200]}"
-    except asyncio.TimeoutError:
-        return False, "Request timeout"
-    except Exception as e:
-        return False, f"Validation error: {str(e)[:200]}"
+async def validate_openai_key(api_key: str, max_retries: int = 2) -> tuple[bool, Optional[str]]:
+    """Validate OpenAI API key by making a simple test call with retry logic."""
+    url = "https://api.openai.com/v1/models"
+    headers = {"Authorization": f"Bearer {api_key}"}
+
+    for attempt in range(max_retries + 1):
+        try:
+            connector = aiohttp.TCPConnector(ssl=SSL_CONTEXT)
+
+            async with aiohttp.ClientSession(connector=connector) as session:
+                async with session.get(
+                    url,
+                    headers=headers,
+                    timeout=aiohttp.ClientTimeout(total=10)
+                ) as resp:
+                    if resp.status == 200:
+                        return True, None
+                    elif resp.status == 401:
+                        return False, "Invalid or expired OpenAI API key"
+                    elif resp.status == 429:
+                        return False, "OpenAI API rate limit exceeded"
+                    elif resp.status >= 500:
+                        # Server error - retry if we have attempts left
+                        if attempt < max_retries:
+                            await asyncio.sleep(1)
+                            continue
+                        return False, "OpenAI API temporarily unavailable"
+                    else:
+                        error_text = await resp.text()
+                        return False, f"API error: {error_text[:200]}"
+        except asyncio.TimeoutError:
+            if attempt < max_retries:
+                await asyncio.sleep(1)
+                continue
+            return False, "OpenAI API request timeout"
+        except Exception as e:
+            if attempt < max_retries:
+                await asyncio.sleep(1)
+                continue
+            return False, f"Validation error: {str(e)[:200]}"
+
+    return False, "Validation failed after retries"
 
 
 async def validate_anthropic_key(api_key: str) -> tuple[bool, Optional[str]]:
