@@ -78,7 +78,7 @@ const LTIShell: React.FC<LTIShellProps> = ({ title, subtitle, actionSlot, childr
             {/* Logo and Brand - Centered */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <img
-                src="/IS_logo.png?v=3"
+                src={getAssetUrl("/IS_logo.png") + "?v=3"}
                 alt="IntegrityShield Logo"
                 style={{
                   width: '3rem',

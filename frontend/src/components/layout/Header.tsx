@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAssetUrl } from "@utils/basePath";
 import { FileText, RefreshCcw, RotateCcw } from "lucide-react";
 import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
@@ -44,7 +45,7 @@ const Header: React.FC = () => {
     <header className="app-header">
       <div className="app-header__brand">
         <span className="app-header__logo">
-          <img src="/IS_logo.png?v=3" alt="IntegrityShield" className="app-header__logo-image" />
+          <img src={getAssetUrl("/IS_logo.png") + "?v=3"} alt="IntegrityShield" className="app-header__logo-image" />
           INTEGRITYSHIELD
         </span>
         <div className="app-header__run">

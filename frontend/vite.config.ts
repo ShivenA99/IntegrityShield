@@ -20,6 +20,7 @@ export default defineConfig({
       "@constants": path.resolve(__dirname, "src/constants"),
       "@data": path.resolve(__dirname, "src/data"),
       "@layout": path.resolve(__dirname, "src/layout"),
+      "@utils": path.resolve(__dirname, "src/utils"),
     }
   },
   server: {
