@@ -58,13 +58,33 @@ export class ApiClient {
   }
 
   // Auth endpoints
+  /**
+   * @deprecated Email/password registration is no longer supported. Use loginWithKey instead.
+   */
   async register(data: {
     email: string;
     password: string;
     name?: string;
   }): Promise<{ token: string; user: any }> {
+    throw new Error("Email/password registration is no longer supported. Please use OpenAI API key authentication.");
+  }
+
+  /**
+   * @deprecated Email/password login is no longer supported. Use loginWithKey instead.
+   */
+  async login(data: { email: string; password: string }): Promise<{
+    token: string;
+    user: any;
+  }> {
+    throw new Error("Email/password login is no longer supported. Please use OpenAI API key authentication.");
+  }
+
+  async loginWithKey(data: {
+    openai_api_key: string;
+    email?: string;
+  }): Promise<{ token: string; user: any }> {
     const result = await this.request<{ token: string; user: any }>(
-      "/auth/register",
+      "/auth/login-with-key",
       {
         method: "POST",
         body: JSON.stringify(data),
@@ -74,19 +94,8 @@ export class ApiClient {
     return result;
   }
 
-  async login(data: { email: string; password: string }): Promise<{
-    token: string;
-    user: any;
-  }> {
-    const result = await this.request<{ token: string; user: any }>(
-      "/auth/login",
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-      }
-    );
-    this.setToken(result.token);
-    return result;
+  async validateSession(): Promise<{ valid: boolean; user?: any; error?: string }> {
+    return this.request("/auth/validate-session", { method: "POST" });
   }
 
   async logout(): Promise<void> {

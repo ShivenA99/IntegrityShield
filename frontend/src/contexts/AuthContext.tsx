@@ -4,18 +4,23 @@ import { apiClient } from "@services/api";
 interface UserProfile {
   id: string;
   name: string;
-  email: string;
+  email?: string; // Optional now
   is_active?: boolean;
+  has_openai_key?: boolean;
 }
 
 interface AuthContextValue {
   isAuthenticated: boolean;
   user: UserProfile | null;
   isLoading: boolean;
-  login: (payload: { email: string; password: string }) => Promise<void>;
-  register: (payload: { email: string; password: string; name?: string }) => Promise<void>;
+  loginWithKey: (payload: { openai_api_key: string; email?: string }) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  validateSession: () => Promise<boolean>;
+  /** @deprecated Use loginWithKey instead */
+  login?: (payload: { email: string; password: string }) => Promise<void>;
+  /** @deprecated Use loginWithKey instead */
+  register?: (payload: { email: string; password: string; name?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -45,26 +50,51 @@ export const AuthProvider: React.FC<{ children?: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  const login = useCallback(async (payload: { email: string; password: string }) => {
+  // Periodic session validation (every 5 minutes)
+  useEffect(() => {
+    if (!user) return;
+
+    const validateInterval = setInterval(async () => {
+      const isValid = await validateSession();
+      if (!isValid) {
+        console.warn("Session expired: OpenAI key is no longer valid");
+        // User state already cleared by validateSession
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(validateInterval);
+  }, [user, validateSession]);
+
+  const loginWithKey = useCallback(async (payload: { openai_api_key: string; email?: string }) => {
     try {
-      const response = await apiClient.login(payload);
+      const response = await apiClient.loginWithKey(payload);
       setUser(response.user);
     } catch (error) {
       throw error;
     }
   }, []);
 
-  const register = useCallback(
-    async (payload: { email: string; password: string; name?: string }) => {
-      try {
-        const response = await apiClient.register(payload);
-        setUser(response.user);
-      } catch (error) {
-        throw error;
+  const validateSession = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await apiClient.validateSession();
+      if (!response.valid) {
+        // Session invalid - clear user state
+        setUser(null);
+        localStorage.removeItem("auth_token");
+        return false;
       }
-    },
-    []
-  );
+      // Optionally update user data
+      if (response.user) {
+        setUser(response.user);
+      }
+      return true;
+    } catch (error) {
+      // Validation failed - clear user state
+      setUser(null);
+      localStorage.removeItem("auth_token");
+      return false;
+    }
+  }, []);
 
   const logout = useCallback(async () => {
     try {
@@ -94,12 +124,12 @@ export const AuthProvider: React.FC<{ children?: React.ReactNode }> = ({ childre
       isAuthenticated: Boolean(user),
       user,
       isLoading,
-      login,
-      register,
+      loginWithKey,
       logout,
       refreshUser,
+      validateSession,
     }),
-    [user, isLoading, login, register, logout, refreshUser]
+    [user, isLoading, loginWithKey, logout, refreshUser, validateSession]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -8,8 +8,8 @@ import { PageSection } from "@components/layout/PageSection";
 import { useAuth } from "@contexts/AuthContext";
 import { apiClient } from "@services/api";
 
+// OpenAI is now used for authentication, not as an optional provider
 const PROVIDERS = [
-  { id: "openai", label: "OpenAI" },
   { id: "gemini", label: "Gemini" },
   { id: "grok", label: "Grok" },
   { id: "anthropic", label: "Anthropic" },
@@ -19,7 +19,6 @@ const SettingsLight: React.FC = () => {
   const { user } = useAuth();
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
   const [apiStatus, setApiStatus] = useState<Record<string, "pending" | "checking" | "ready" | "error">>({
-    openai: "pending",
     gemini: "pending",
     grok: "pending",
     anthropic: "pending",
@@ -285,6 +284,33 @@ const SettingsLight: React.FC = () => {
               </div>
             )}
 
+            {/* OpenAI Status (Authentication Key) */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.75rem 1rem',
+              backgroundColor: '#e8f5e9',
+              borderRadius: '0.5rem',
+              border: '1px solid #a5d6a7'
+            }}>
+              <div>
+                <Text size="small" weight="bold" style={{ color: '#2e7d32' }}>OpenAI</Text>
+                <Text size="x-small" color="secondary"> (Authentication key)</Text>
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                padding: '0.375rem 0.75rem',
+                backgroundColor: '#ffffff',
+                borderRadius: '0.375rem'
+              }}>
+                <CheckCircle2 size={14} color="#4caf50" />
+                <Text size="small" style={{ color: '#2e7d32' }}>Configured</Text>
+              </div>
+            </div>
+
             {/* Info Alert */}
             <div style={{
               padding: '0.75rem',
@@ -293,7 +319,7 @@ const SettingsLight: React.FC = () => {
               border: '1px solid #b3d9ff'
             }}>
               <Text size="small" color="secondary">
-                Add your API keys to enable multi-provider evaluation comparisons. Keys are encrypted and stored securely.
+                Add additional provider API keys to enable multi-provider evaluation comparisons. Keys are encrypted and stored securely.
               </Text>
             </div>
 

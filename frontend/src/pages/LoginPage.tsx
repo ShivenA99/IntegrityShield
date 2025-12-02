@@ -8,30 +8,28 @@ import PublicShell from "@layout/PublicShell";
 import { useAuth } from "@contexts/AuthContext";
 import { apiClient } from "@services/api";
 
+// OpenAI is now the primary authentication key, not an optional provider
 const API_PROVIDERS = [
-  { id: "openai", label: "OpenAI" },
   { id: "gemini", label: "Gemini" },
   { id: "grok", label: "Grok" },
   { id: "anthropic", label: "Anthropic" },
 ];
 
 const steps = [
-  { id: 1, title: "Sign in" },
+  { id: 1, title: "Authenticate with OpenAI" },
   { id: 2, title: "Configure providers" },
 ];
 
 const LoginPage: React.FC = () => {
-  const { login, register, isAuthenticated } = useAuth();
+  const { loginWithKey, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [formState, setFormState] = useState({ name: "", email: "", password: "" });
-  const [formErrors, setFormErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+  const [formState, setFormState] = useState({ openaiKey: "", email: "" });
+  const [formErrors, setFormErrors] = useState<{ openaiKey?: string; email?: string; general?: string }>({});
   const [submitting, setSubmitting] = useState(false);
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
   const [apiStatus, setApiStatus] = useState<Record<string, "pending" | "checking" | "ready" | "error">>({
-    openai: "pending",
     gemini: "pending",
     grok: "pending",
     anthropic: "pending",
@@ -71,17 +69,26 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const handleSignIn = async (event: React.FormEvent) => {
+  const handleOpenAILogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setFormErrors({});
     setSubmitting(true);
 
     const errors: typeof formErrors = {};
-    if (!formState.email.trim()) {
-      errors.email = "Email is required.";
+
+    // Validate OpenAI key format
+    if (!formState.openaiKey.trim()) {
+      errors.openaiKey = "OpenAI API key is required.";
+    } else if (!formState.openaiKey.startsWith("sk-")) {
+      errors.openaiKey = "Invalid OpenAI API key format (must start with 'sk-').";
     }
-    if (!formState.password.trim()) {
-      errors.password = "Password is required.";
+
+    // Validate email if provided
+    if (formState.email.trim()) {
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailPattern.test(formState.email)) {
+        errors.email = "Invalid email format.";
+      }
     }
 
     if (Object.keys(errors).length > 0) {
@@ -91,23 +98,16 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      if (isRegisterMode) {
-        await register({
-          email: formState.email,
-          password: formState.password,
-          name: formState.name || undefined,
-        });
-      } else {
-        await login({
-          email: formState.email,
-          password: formState.password,
-        });
-      }
+      // loginWithKey validates the key against OpenAI API and creates/updates user
+      await loginWithKey({
+        openai_api_key: formState.openaiKey,
+        email: formState.email || undefined,
+      });
       // Success - move to step 2
       setCurrentStep(2);
     } catch (error: any) {
       setFormErrors({
-        general: error.message || "Authentication failed. Please try again.",
+        general: error.message || "Authentication failed. Please check your OpenAI API key.",
       });
     } finally {
       setSubmitting(false);
@@ -217,11 +217,9 @@ const LoginPage: React.FC = () => {
             <header className="wizard-card__header">
               <div>
                 <p className="wizard-eyebrow">Step 1 of 2</p>
-                <h2>{isRegisterMode ? "Create Account" : "Sign in"}</h2>
+                <h2>Authenticate with OpenAI</h2>
                 <p>
-                  {isRegisterMode
-                    ? "Create your IntegrityShield account to get started."
-                    : "Use your IntegrityShield credentials to sign in."}
+                  Enter your OpenAI API key to get started. Your key is validated, encrypted, and securely stored.
                 </p>
               </div>
               <Button as={Link} to="/" color="secondary" withBackground={false}>
@@ -234,20 +232,27 @@ const LoginPage: React.FC = () => {
                 <span>{formErrors.general}</span>
               </div>
             )}
-            <form className="form-grid" onSubmit={handleSignIn}>
-              {isRegisterMode && (
-                <label>
-                  <span>Name</span>
-                  <input
-                    type="text"
-                    value={formState.name}
-                    onChange={(event) => setFormState((prev) => ({ ...prev, name: event.target.value }))}
-                    placeholder="Optional"
-                  />
-                </label>
-              )}
+            <form className="form-grid" onSubmit={handleOpenAILogin}>
               <label>
-                <span>Email</span>
+                <span>OpenAI API Key <span style={{ color: "#c33" }}>*</span></span>
+                <input
+                  type="password"
+                  value={formState.openaiKey}
+                  onChange={(event) => setFormState((prev) => ({ ...prev, openaiKey: event.target.value }))}
+                  placeholder="sk-..."
+                  aria-invalid={Boolean(formErrors.openaiKey)}
+                  required
+                />
+                {formErrors.openaiKey ? (
+                  <small className="form-error">{formErrors.openaiKey}</small>
+                ) : (
+                  <small style={{ color: "#666", fontSize: "0.875rem" }}>
+                    Your OpenAI key (starts with "sk-"). We'll validate it against the OpenAI API.
+                  </small>
+                )}
+              </label>
+              <label>
+                <span>Email (optional)</span>
                 <input
                   type="email"
                   value={formState.email}
@@ -255,21 +260,11 @@ const LoginPage: React.FC = () => {
                   placeholder="you@example.com"
                   aria-invalid={Boolean(formErrors.email)}
                 />
-                {formErrors.email ? <small className="form-error">{formErrors.email}</small> : null}
-              </label>
-              <label>
-                <span>Password</span>
-                <input
-                  type="password"
-                  value={formState.password}
-                  onChange={(event) => setFormState((prev) => ({ ...prev, password: event.target.value }))}
-                  placeholder="••••••••"
-                  aria-invalid={Boolean(formErrors.password)}
-                />
-                {formErrors.password ? <small className="form-error">{formErrors.password}</small> : null}
-                {isRegisterMode && (
+                {formErrors.email ? (
+                  <small className="form-error">{formErrors.email}</small>
+                ) : (
                   <small style={{ color: "#666", fontSize: "0.875rem" }}>
-                    Must be at least 8 characters with uppercase, lowercase, and a number
+                    Optional. Used for account identification and notifications.
                   </small>
                 )}
               </label>
@@ -277,22 +272,11 @@ const LoginPage: React.FC = () => {
                 <Button type="submit" color="primary" interaction={submitting ? "disabled" : "enabled"}>
                   {submitting ? (
                     <>
-                      <Loader2 size={16} className="spin" /> {isRegisterMode ? "Creating Account..." : "Signing in..."}
+                      <Loader2 size={16} className="spin" /> Validating key...
                     </>
                   ) : (
-                    isRegisterMode ? "Create Account" : "Sign in"
+                    "Continue"
                   )}
-                </Button>
-                <Button
-                  type="button"
-                  color="secondary"
-                  withBackground={false}
-                  onClick={() => {
-                    setIsRegisterMode(!isRegisterMode);
-                    setFormErrors({});
-                  }}
-                >
-                  {isRegisterMode ? "Already have an account? Sign in" : "Don't have an account? Register"}
                 </Button>
               </div>
             </form>
@@ -304,8 +288,8 @@ const LoginPage: React.FC = () => {
             <header className="wizard-card__header">
               <div>
                 <p className="wizard-eyebrow">Step 2 of 2</p>
-                <h2>Configure providers</h2>
-                <p>Providers are optional. Add keys if you'd like IntegrityShield to run multi-provider evaluation comparisons.</p>
+                <h2>Configure additional providers</h2>
+                <p>OpenAI is already configured. Add optional providers if you'd like to run multi-provider evaluation comparisons.</p>
               </div>
             </header>
 
