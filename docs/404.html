@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IntegrityShield Pipeline</title>
+    <script>
+      // GitHub Pages SPA redirect workaround
+      // When a user directly visits a route like /IntegrityShield/try,
+      // GitHub Pages serves this 404.html, which redirects to index.html
+      // with the path preserved in sessionStorage for React Router to handle
+
+      sessionStorage.redirect = location.pathname;
+    </script>
+    <meta http-equiv="refresh" content="0;URL='/IntegrityShield/'" />
+  </head>
+  <body>
+    <div>Redirecting...</div>
+  </body>
+</html>
