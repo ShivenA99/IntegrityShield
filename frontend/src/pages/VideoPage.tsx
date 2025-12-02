@@ -11,19 +11,28 @@ const VideoPage: React.FC = () => (
       </section>
 
       <div className="video-container">
-        <div className="video-placeholder">
-          <svg className="video-placeholder__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polygon points="10 8 16 12 10 16 10 8"></polygon>
-          </svg>
-          <p className="video-placeholder__text">
-            A comprehensive walkthrough video will be available here soon.
-          </p>
+        <div className="video-embed">
+          <iframe
+            width="100%"
+            height="600"
+            src="https://www.youtube.com/embed/77W_fWW2Agg"
+            title="IntegrityShield Demo Video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={{
+              maxWidth: '1200px',
+              margin: '0 auto',
+              display: 'block',
+              borderRadius: '8px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+            }}
+          />
         </div>
 
         <div className="video-actions">
           <p className="video-actions__text">
-            In the meantime, explore the interactive demo or sign in to access the full dashboard.
+            Watch the demo above, then explore the interactive version or sign in to access the full dashboard.
           </p>
           <div className="video-actions__buttons">
             <Button color="primary" as={Link} to="/try" size="large">
