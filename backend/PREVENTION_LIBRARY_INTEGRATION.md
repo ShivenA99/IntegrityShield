@@ -254,7 +254,7 @@ def _apply_prevention_font_attack(
 
             # Build replacement LaTeX with font command
             font_cmd = font_cmds[0]
-            replacement = f"{{\\{font_cmd} {UNIVERSAL_HIDDEN_CHAR}}}"
+            replacement = f"{{\\{font_cmd}} a} {UNIVERSAL_HIDDEN_CHAR}}}"
 
             replacements.append((char_start, char_end, replacement, None))
             occupied_ranges.append((char_start, char_end, f"prevention_char_{counter}"))
