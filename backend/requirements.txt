@@ -32,3 +32,4 @@ PyJWT>=2.8
 mistralai>=1.0.0
 docling>=1.0.0
 python-docx>=1.0.0
+# Force rebuild for Render - Tue Dec  2 04:45:52 MST 2025
