@@ -18,11 +18,17 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Add display_name column to enhanced_pdfs
-    op.add_column(
-        "enhanced_pdfs",
-        sa.Column("display_name", sa.String(length=128), nullable=True),
-    )
+    # Check if column already exists before adding
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    columns = [col["name"] for col in inspector.get_columns("enhanced_pdfs")]
+
+    if "display_name" not in columns:
+        # Add display_name column only if it doesn't exist
+        op.add_column(
+            "enhanced_pdfs",
+            sa.Column("display_name", sa.String(length=128), nullable=True),
+        )
 
 
 def downgrade() -> None:
