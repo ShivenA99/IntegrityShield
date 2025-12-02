@@ -27,7 +27,8 @@ class User(db.Model, TimestampMixin):
 
     def set_password(self, password: str) -> None:
         """Hash and set the user's password."""
-        self.password_hash = generate_password_hash(password)
+        # Use pbkdf2:sha256 for Python 3.9 compatibility (scrypt requires 3.10+)
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
     def check_password(self, password: str) -> bool:
         """Check if the provided password matches the user's password."""

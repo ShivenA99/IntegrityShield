@@ -12,6 +12,7 @@ from ...utils.time import isoformat, utc_now
 from .latex_dual_layer_service import LatexAttackService
 from .latex_font_attack_service import LatexFontAttackService
 from .latex_icw_service import LatexICWService
+from .pdf_creation_service import get_method_display_name
 
 
 class DocumentEnhancementService:
@@ -24,20 +25,24 @@ class DocumentEnhancementService:
 
     async def run(self, run_id: str, config: Dict[str, Any]) -> Dict[str, Any]:
         methods = config.get("enhancement_methods") or []
-        return await asyncio.to_thread(self._prepare_methods, run_id, methods)
+        mode = config.get("mode", "detection")
+        return await asyncio.to_thread(self._prepare_methods, run_id, methods, mode)
 
-    def _prepare_methods(self, run_id: str, methods: Iterable[str]) -> Dict[str, Any]:
+    def _prepare_methods(self, run_id: str, methods: Iterable[str], mode: str = "detection") -> Dict[str, Any]:
         structured = self.structured_manager.load(run_id) or {}
         enhanced_map: Dict[str, Dict] = {}
 
         EnhancedPDF.query.filter_by(pipeline_run_id=run_id).delete()
         db.session.commit()
 
-        for method in methods:
+        methods_list = list(methods)
+        for method in methods_list:
             pdf_path = enhanced_pdf_path(run_id, method)
+            display_name = get_method_display_name(mode, method, methods_list)
             enhanced = EnhancedPDF(
                 pipeline_run_id=run_id,
                 method_name=method,
+                display_name=display_name,
                 file_path=str(pdf_path),
                 generation_config={"method": method},
             )

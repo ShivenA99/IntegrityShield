@@ -194,6 +194,13 @@ class SmartReadingService:
                     )
         else:
             self.logger.warning(f".tex file not found at {tex_file}", run_id=run_id)
+            live_logging_service.emit(
+                run_id,
+                "smart_reading",
+                "WARNING",
+                f"LaTeX reconstruction did not generate .tex file. LaTeX-based attacks (latex_icw, latex_font_attack) will not work. Expected file: {tex_file}",
+                component="latex_generation"
+            )
         
         # Find and copy .pdf file (compiled LaTeX PDF)
         pdf_file = latex_output_dir / f"{pdf_stem}.pdf"

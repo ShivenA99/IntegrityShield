@@ -234,16 +234,11 @@ class EvaluationReportService:
                 detection_hit = scorecard.get("hit_detection_target")
                 if detection_hit is None:
                     detection_hit = self._matches_detection(answer.get("answer_text"), detection_info)
-                baseline_score = self._lookup_baseline_score(baseline_entry, provider)
                 per_model.append(
                     {
                         **answer,
                         "scorecard": scorecard,
                         "matches_detection_target": detection_hit,
-                        "baseline_score": baseline_score,
-                        "delta_from_baseline": (
-                            scorecard.get("score", 0.0) - baseline_score if baseline_score is not None else None
-                        ),
                         "scoring_source": scorecard.get("source"),
                     }
                 )
@@ -312,15 +307,6 @@ class EvaluationReportService:
             text = text[:-1]
         return text
 
-    def _lookup_baseline_score(self, baseline_entry: Dict[str, Any], provider: str | None) -> float | None:
-        if not baseline_entry or not provider:
-            return None
-        for answer in baseline_entry.get("answers", []):
-            if answer.get("provider") == provider:
-                scorecard = answer.get("scorecard") or {}
-                return float(scorecard.get("score", 0.0))
-        return None
-
     def _build_summary(
         self,
         questions: List[Dict[str, Any]],
@@ -331,29 +317,19 @@ class EvaluationReportService:
         for entry in questions:
             for answer in entry.get("answers", []):
                 provider = answer.get("provider") or "unknown"
-                provider_totals.setdefault(provider, {"score_sum": 0.0, "count": 0, "delta_sum": 0.0, "delta_count": 0})
+                provider_totals.setdefault(provider, {"score_sum": 0.0, "count": 0})
                 provider_totals[provider]["score_sum"] += float(answer.get("scorecard", {}).get("score", 0.0))
                 provider_totals[provider]["count"] += 1
-                delta = answer.get("delta_from_baseline")
-                if delta is not None:
-                    provider_totals[provider]["delta_sum"] += delta
-                    provider_totals[provider]["delta_count"] += 1
                 if answer.get("matches_detection_target"):
                     fooled_totals[provider] = fooled_totals.get(provider, 0) + 1
 
         provider_summary = []
         for provider, totals in provider_totals.items():
             avg_score = (totals["score_sum"] / totals["count"]) if totals["count"] else 0.0
-            avg_delta = (
-                totals["delta_sum"] / totals["delta_count"]
-                if totals["delta_count"] > 0
-                else (None if not baseline_reference else 0.0)
-            )
             provider_summary.append(
                 {
                     "provider": provider,
                     "average_score": avg_score,
-                    "average_delta_from_baseline": avg_delta,
                     "questions_evaluated": totals["count"],
                     "fooled_count": fooled_totals.get(provider, 0),
                 }
@@ -362,7 +338,6 @@ class EvaluationReportService:
         return {
             "total_questions": len(questions),
             "providers": provider_summary,
-            "baseline_available": bool(baseline_reference),
         }
 
     def _load_detection_reference(self, run_id: str, structured: Dict[str, Any]) -> Dict[str, Any]:
