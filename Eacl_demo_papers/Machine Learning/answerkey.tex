@@ -1,0 +1,103 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Machine Learning}}\\[0.25em]
+  {\large \textbf{Supervised Learning Fundamentals Quiz -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item \textbf{(C) High bias and high training error.} High bias and training error indicate underfitting, not overfitting. Overfitting shows low training error but high test error (high variance).
+
+  \item \textbf{(B) The size of steps taken toward the minimum.} Learning rate $\alpha$ scales the gradient: $\theta = \theta - \alpha \nabla L$. Too large causes divergence; too small causes slow convergence.
+
+  \item \textbf{(B) L2 regularization (Ridge).} L2 adds $\lambda \sum w_i^2$ to loss. L1 (Lasso) adds $\lambda \sum |w_i|$, promoting sparsity through zero weights.
+
+  \item \textbf{(B) True positives divided by all predicted positives.} Precision = TP/(TP+FP). Recall (option A) = TP/(TP+FN). Accuracy (option D) = (TP+TN)/Total.
+
+  \item \textbf{(C) Provide more reliable performance estimates.} K-fold trains on K-1 folds and validates on 1, rotating through all folds. Averages reduce variance in performance estimates.
+
+  \item \textbf{True.} An unlimited-depth tree can create a leaf for every training example, achieving 100\% training accuracy but memorizing noise and failing to generalize.
+
+  \item \textbf{False.} Softmax is used for multi-class classification (outputs probability distribution over K classes). Binary classification typically uses sigmoid (outputs single probability).
+
+  \item \textbf{False.} Feature scaling is essential for distance-based algorithms (KNN, SVM, neural networks) and gradient descent. Tree-based algorithms (Random Forest, XGBoost) are scale-invariant.
+
+  \item \textbf{Bias-Variance Tradeoff:}
+  
+  \textbf{Definitions:}
+  \begin{itemize}
+    \item \textit{Bias}: Error from oversimplified assumptions; underfitting; model cannot capture true patterns
+    \item \textit{Variance}: Error from sensitivity to training data fluctuations; overfitting; model captures noise
+    \item Total Error = Bias² + Variance + Irreducible Error
+  \end{itemize}
+  
+  \textbf{Model complexity effects:}
+  \begin{itemize}
+    \item Simple models (linear regression): High bias, low variance
+    \item Complex models (deep neural networks): Low bias, high variance
+    \item Optimal complexity minimizes total error
+  \end{itemize}
+  
+  \textbf{Training data size effects:}
+  \begin{itemize}
+    \item More data reduces variance (model sees more patterns)
+    \item Bias remains unchanged by data quantity
+    \item Large datasets allow more complex models
+  \end{itemize}
+  
+  \textbf{Regularization effects:}
+  \begin{itemize}
+    \item Adds penalty for model complexity
+    \item Increases bias but decreases variance
+    \item L1/L2 regularization, dropout, early stopping
+    \item Example: Ridge regression prevents coefficient explosion
+  \end{itemize}
+
+  \item \textbf{Logistic Regression Overview:}
+  
+  \textbf{Model formulation:}
+  \begin{align*}
+  z &= w^T x + b \\
+  \hat{y} &= \sigma(z) = \frac{1}{1 + e^{-z}}
+  \end{align*}
+  
+  \textbf{Sigmoid function:}
+  \begin{itemize}
+    \item Maps any real number to (0, 1)
+    \item Output interpreted as P(y=1|x)
+    \item Decision boundary at $\hat{y} = 0.5$ (when $z = 0$)
+  \end{itemize}
+  
+  \textbf{Loss function (Binary Cross-Entropy):}
+  \begin{align*}
+  L &= -\frac{1}{m}\sum_{i=1}^{m}[y_i \log(\hat{y}_i) + (1-y_i)\log(1-\hat{y}_i)]
+  \end{align*}
+  \begin{itemize}
+    \item Penalizes confident wrong predictions heavily
+    \item Convex function—guarantees global minimum
+  \end{itemize}
+  
+  \textbf{Gradient descent optimization:}
+  \begin{align*}
+  \frac{\partial L}{\partial w} &= \frac{1}{m} X^T (\hat{y} - y) \\
+  w &:= w - \alpha \frac{\partial L}{\partial w} \\
+  b &:= b - \alpha \frac{\partial L}{\partial b}
+  \end{align*}
+  \begin{itemize}
+    \item Iteratively updates parameters to minimize loss
+    \item Learning rate $\alpha$ controls step size
+    \item Converges to optimal parameters
+  \end{itemize}
+
+\end{enumerate}
+
+\end{document}

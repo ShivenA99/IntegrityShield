@@ -1,0 +1,2115 @@
+{
+  "docid": "e8fed4e4-8a7f-4290-9784-364e2b3073ff",
+  "document_name": "maths_K-12_DEMO",
+  "institution_name": "Unknown",
+  "domain": "Mathematics",
+  "topic": "Basic Mathematics",
+  "number_of_pages": "2",
+  "total_questions": "15",
+  "questions": [
+    {
+      "question_number": 1,
+      "question_type": "mcq_single",
+      "stem_text": "The value of 9 × 6 is:",
+      "options": {
+        "A": "42",
+        "B": "45",
+        "C": "54",
+        "D": "63"
+      },
+      "sub_questions": null,
+      "gold_answer": "C",
+      "gold_confidence": 1.0,
+      "answer_explanation": "9 multiplied by 6 equals 54.",
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            106.20702362060547,
+            514.986572265625,
+            138.74908447265625,
+            526.9417724609375
+          ],
+          "B": [
+            105.55702209472656,
+            534.0626220703125,
+            138.74465942382812,
+            546.017822265625
+          ],
+          "C": [
+            106.85802459716797,
+            553.1375732421875,
+            138.7305908203125,
+            565.0927734375
+          ],
+          "D": [
+            105.55702209472656,
+            572.2125854492188,
+            138.74465942382812,
+            584.1677856445312
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "9 × 6",
+          "latex": "9 \\times 6",
+          "position": "stem",
+          "description": "Multiplication of 9 and 6"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "9 × 6",
+          "context": "stem",
+          "alternatives": [
+            "9 + 6",
+            "9 - 6",
+            "9 ÷ 6"
+          ],
+          "importance": "critical",
+          "bbox": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "span_ids": [],
+          "char_start": 16,
+          "char_end": 21
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "9",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "6",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "apply",
+        "topic": "Arithmetic",
+        "subtopic": "Multiplication",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": null
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "1. The value of 9 × 6 is:\n(a) 42\n(b) 45\n(c) 54\n(d) 63",
+      "page_number": 1,
+      "source_page": "page_1"
+    },
+    {
+      "question_number": 2,
+      "question_type": "mcq_single",
+      "stem_text": "2/5 of 50 equals:",
+      "options": {
+        "A": "10",
+        "B": "15",
+        "C": "20",
+        "D": "25"
+      },
+      "sub_questions": null,
+      "gold_answer": "B",
+      "gold_confidence": 1.0,
+      "answer_explanation": "2/5 of 50 is calculated as (2/5) × 50 = 20.",
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            363.708251953125,
+            360.0259704589844,
+            529.6077270507812,
+            374.3721618652344
+          ],
+          "B": [
+            105.55699157714844,
+            648.4495849609375,
+            138.73268127441406,
+            660.40478515625
+          ],
+          "C": [
+            82.40800476074219,
+            360.0259704589844,
+            153.04867553710938,
+            374.3721618652344
+          ],
+          "D": [
+            105.55699157714844,
+            686.6005859375,
+            138.73268127441406,
+            698.5557861328125
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "2/5 × 50",
+          "latex": "\\frac{2}{5} \\times 50",
+          "position": "stem",
+          "description": "Fraction of a number calculation"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "2/5",
+          "context": "stem",
+          "alternatives": [
+            "1/5",
+            "3/5",
+            "4/5"
+          ],
+          "importance": "critical",
+          "bbox": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "span_ids": [],
+          "char_start": 3,
+          "char_end": 6
+        },
+        {
+          "term": "50",
+          "context": "stem",
+          "alternatives": [
+            "40",
+            "60",
+            "70"
+          ],
+          "importance": "high",
+          "bbox": [
+            102.45999908447266,
+            601.6005859375,
+            177.22784423828125,
+            621.7568359375
+          ],
+          "span_ids": [
+            "page0:block11:line0:span0",
+            "page0:block11:line0:span1"
+          ],
+          "char_start": 10,
+          "char_end": 12
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "2",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "5",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "50",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "apply",
+        "topic": "Fractions",
+        "subtopic": "Fraction of a Number",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": null
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "2. 2/5 of 50 equals:\n(a) 10\n(b) 15\n(c) 20\n(d) 25",
+      "page_number": 1,
+      "source_page": "page_1"
+    },
+    {
+      "question_number": 3,
+      "question_type": "mcq_single",
+      "stem_text": "The average (mean) of 12, 15, 18 is:",
+      "options": {
+        "A": "14",
+        "B": "15",
+        "C": "16",
+        "D": "17"
+      },
+      "sub_questions": null,
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "answer_explanation": "The average is calculated as (12 + 15 + 18) / 3 = 15.",
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "B": [
+            105.55699157714844,
+            648.4495849609375,
+            138.73268127441406,
+            660.40478515625
+          ],
+          "C": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "D": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "(12 + 15 + 18) / 3",
+          "latex": "\\frac{12 + 15 + 18}{3}",
+          "position": "stem",
+          "description": "Formula to calculate the average of three numbers."
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "average",
+          "context": "stem",
+          "alternatives": [
+            "mean",
+            "median"
+          ],
+          "importance": "critical",
+          "bbox": [
+            86.30699157714844,
+            710.6566162109375,
+            232.66256713867188,
+            722.61181640625
+          ],
+          "span_ids": [
+            "page0:block16:line0:span0"
+          ],
+          "char_start": 7,
+          "char_end": 14
+        },
+        {
+          "term": "mean",
+          "context": "stem",
+          "alternatives": [
+            "average",
+            "median"
+          ],
+          "importance": "high",
+          "bbox": [
+            86.30699157714844,
+            710.6566162109375,
+            232.66256713867188,
+            722.61181640625
+          ],
+          "span_ids": [
+            "page0:block16:line0:span0"
+          ],
+          "char_start": 16,
+          "char_end": 20
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "12",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "15",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "18",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "apply",
+        "topic": "Statistics",
+        "subtopic": "Averages",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "3. The average (mean) of 12, 15, 18 is:\n(a) 14\n(b) 15\n(c) 16\n(d) 17",
+      "page_number": 1,
+      "source_page": "page_1"
+    },
+    {
+      "question_number": 4,
+      "question_type": "mcq_single",
+      "stem_text": "If 2x + 7 = 19, then x =:",
+      "options": {
+        "A": "5",
+        "B": "6",
+        "C": "7",
+        "D": "8"
+      },
+      "sub_questions": null,
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "answer_explanation": "Solving the equation 2x + 7 = 19 gives x = 6.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            105.55699920654297,
+            92.66365051269531,
+            138.74464416503906,
+            104.61885070800781
+          ],
+          "B": [
+            106.85800170898438,
+            110.71662902832031,
+            138.73057556152344,
+            122.67182922363281
+          ],
+          "C": [
+            105.55699920654297,
+            128.7686309814453,
+            138.74464416503906,
+            140.7238311767578
+          ],
+          "D": [
+            105.55699920654297,
+            228.9926300048828,
+            132.8865966796875,
+            240.9478302001953
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "2x + 7 = 19",
+          "latex": "2x + 7 = 19",
+          "position": "stem",
+          "description": "Linear equation to solve for x."
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "2x + 7 = 19",
+          "context": "stem",
+          "alternatives": [
+            "3x + 7 = 19",
+            "2x + 8 = 19"
+          ],
+          "importance": "critical",
+          "bbox": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "span_ids": [],
+          "char_start": 6,
+          "char_end": 17
+        },
+        {
+          "term": "x",
+          "context": "stem",
+          "alternatives": [
+            "y",
+            "z"
+          ],
+          "importance": "high",
+          "bbox": [
+            86.30699920654297,
+            151.80262756347656,
+            125.47223663330078,
+            163.75782775878906
+          ],
+          "span_ids": [
+            "page1:block4:line0:span0",
+            "page1:block4:line0:span1"
+          ],
+          "char_start": 7,
+          "char_end": 8
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "2",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "7",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "19",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "apply",
+        "topic": "Algebra",
+        "subtopic": "Linear Equations",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "4. If 2x + 7 = 19, then x =:\n(a) 5\n(b) 6\n(c) 7\n(d) 8",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 5,
+      "question_type": "mcq_single",
+      "stem_text": "A right triangle has legs of lengths 5 and 12. The hypotenuse is:",
+      "options": {
+        "A": "11",
+        "B": "12",
+        "C": "13",
+        "D": "14"
+      },
+      "sub_questions": null,
+      "gold_answer": "C",
+      "gold_confidence": 1.0,
+      "answer_explanation": "Using the Pythagorean theorem, the hypotenuse is calculated as √(5² + 12²) = 13.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          86.30699920654297,
+          252.02662658691406,
+          431.680908203125,
+          263.9818420410156
+        ],
+        "stem_bbox": [
+          86.30699920654297,
+          252.02662658691406,
+          431.680908203125,
+          263.9818420410156
+        ],
+        "stem_spans": [
+          "page1:block9:line0:span0"
+        ],
+        "option_bboxes": {
+          "A": [
+            106.20700073242188,
+            275.05963134765625,
+            138.74905395507812,
+            287.01483154296875
+          ],
+          "B": [
+            86.30699920654297,
+            252.02662658691406,
+            431.680908203125,
+            263.9818420410156
+          ],
+          "C": [
+            106.85800170898438,
+            311.1646423339844,
+            138.73057556152344,
+            323.1198425292969
+          ],
+          "D": [
+            106.20700073242188,
+            74.61164855957031,
+            138.74905395507812,
+            86.56684875488281
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "c = √(a² + b²)",
+          "latex": "c = \\sqrt{a^2 + b^2}",
+          "position": "stem",
+          "description": "Pythagorean theorem formula"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "right triangle",
+          "context": "stem",
+          "alternatives": [
+            "isosceles triangle",
+            "equilateral triangle"
+          ],
+          "importance": "critical",
+          "bbox": [
+            86.30699920654297,
+            252.02662658691406,
+            431.680908203125,
+            263.9818420410156
+          ],
+          "span_ids": [
+            "page1:block9:line0:span0"
+          ],
+          "char_start": 5,
+          "char_end": 19
+        },
+        {
+          "term": "hypotenuse",
+          "context": "stem",
+          "alternatives": [
+            "leg",
+            "base"
+          ],
+          "importance": "high",
+          "bbox": [
+            86.30699920654297,
+            252.02662658691406,
+            431.680908203125,
+            263.9818420410156
+          ],
+          "span_ids": [
+            "page1:block9:line0:span0"
+          ],
+          "char_start": 54,
+          "char_end": 64
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "5",
+          "unit": "units",
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "12",
+          "unit": "units",
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "medium",
+        "cognitive_level": "apply",
+        "topic": "Geometry",
+        "subtopic": "Pythagorean theorem",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "5. A right triangle has legs of lengths 5 and 12. The hypotenuse is:\n(a) 11\n(b) 12\n(c) 13\n(d) 14",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 6,
+      "question_type": "true_false",
+      "stem_text": "30% of 250 is 75.",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "True",
+      "gold_confidence": 1.0,
+      "answer_explanation": "30% of 250 is calculated as (30/100) * 250 = 75.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          86.30699920654297,
+          416.6226501464844,
+          188.189208984375,
+          428.5778503417969
+        ],
+        "stem_bbox": [
+          86.30699920654297,
+          416.6226501464844,
+          188.189208984375,
+          428.5778503417969
+        ],
+        "stem_spans": [
+          "page1:block16:line0:span0"
+        ],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "percentage = (percentage_value/100) * total_value",
+          "latex": "\\text{percentage} = \\left(\\frac{\\text{percentage\\_value}}{100}\\right) \\times \\text{total\\_value}",
+          "position": "stem",
+          "description": "Formula to calculate percentage of a number"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "30%",
+          "context": "stem",
+          "alternatives": [
+            "25%",
+            "50%"
+          ],
+          "importance": "high",
+          "bbox": [
+            86.30699920654297,
+            416.6226501464844,
+            188.189208984375,
+            428.5778503417969
+          ],
+          "span_ids": [
+            "page1:block16:line0:span0"
+          ],
+          "char_start": 3,
+          "char_end": 6
+        },
+        {
+          "term": "250",
+          "context": "stem",
+          "alternatives": [
+            "200",
+            "300"
+          ],
+          "importance": "medium",
+          "bbox": [
+            86.30699920654297,
+            416.6226501464844,
+            188.189208984375,
+            428.5778503417969
+          ],
+          "span_ids": [
+            "page1:block16:line0:span0"
+          ],
+          "char_start": 10,
+          "char_end": 13
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "30",
+          "unit": "%",
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "250",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "75",
+          "unit": null,
+          "context": "stem",
+          "role": "expected_answer"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Arithmetic",
+        "subtopic": "Percentage",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": null
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "6. 30% of 250 is 75.",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 7,
+      "question_type": "true_false",
+      "stem_text": "The number 0 is neither positive nor negative.",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "True",
+      "gold_confidence": 0.9,
+      "answer_explanation": "Zero is considered neutral, as it is neither positive nor negative.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          86.30699920654297,
+          439.6566467285156,
+          338.7889099121094,
+          451.6118469238281
+        ],
+        "stem_bbox": [
+          86.30699920654297,
+          439.6566467285156,
+          338.7889099121094,
+          451.6118469238281
+        ],
+        "stem_spans": [
+          "page1:block17:line0:span0"
+        ],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "positive",
+          "context": "stem",
+          "alternatives": [
+            "negative",
+            "neutral"
+          ],
+          "importance": "critical",
+          "bbox": [
+            86.30699920654297,
+            439.6566467285156,
+            338.7889099121094,
+            451.6118469238281
+          ],
+          "span_ids": [
+            "page1:block17:line0:span0"
+          ],
+          "char_start": 27,
+          "char_end": 35
+        },
+        {
+          "term": "negative",
+          "context": "stem",
+          "alternatives": [
+            "positive",
+            "neutral"
+          ],
+          "importance": "critical",
+          "bbox": [
+            86.30699920654297,
+            439.6566467285156,
+            338.7889099121094,
+            451.6118469238281
+          ],
+          "span_ids": [
+            "page1:block17:line0:span0"
+          ],
+          "char_start": 40,
+          "char_end": 48
+        },
+        {
+          "term": "neither",
+          "context": "stem",
+          "alternatives": [
+            "either",
+            "both"
+          ],
+          "importance": "high",
+          "bbox": [
+            86.30699920654297,
+            439.6566467285156,
+            338.7889099121094,
+            451.6118469238281
+          ],
+          "span_ids": [
+            "page1:block17:line0:span0"
+          ],
+          "char_start": 19,
+          "char_end": 26
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Number Properties",
+        "subtopic": "Zero",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": null
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "7. The number 0 is neither positive nor negative.",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 8,
+      "question_type": "true_false",
+      "stem_text": "The product of two even numbers is even.",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "True",
+      "gold_confidence": 0.9,
+      "answer_explanation": "Multiplying two even numbers always results in an even number.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          86.30699920654297,
+          462.68963623046875,
+          316.3370056152344,
+          474.64483642578125
+        ],
+        "stem_bbox": [
+          86.30699920654297,
+          462.68963623046875,
+          316.3370056152344,
+          474.64483642578125
+        ],
+        "stem_spans": [
+          "page1:block18:line0:span0"
+        ],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "product",
+          "context": "stem",
+          "alternatives": [
+            "sum",
+            "difference"
+          ],
+          "importance": "high",
+          "bbox": [
+            86.30699920654297,
+            462.68963623046875,
+            316.3370056152344,
+            474.64483642578125
+          ],
+          "span_ids": [
+            "page1:block18:line0:span0"
+          ],
+          "char_start": 7,
+          "char_end": 14
+        },
+        {
+          "term": "even numbers",
+          "context": "stem",
+          "alternatives": [
+            "odd numbers",
+            "prime numbers"
+          ],
+          "importance": "critical",
+          "bbox": [
+            86.30699920654297,
+            462.68963623046875,
+            316.3370056152344,
+            474.64483642578125
+          ],
+          "span_ids": [
+            "page1:block18:line0:span0"
+          ],
+          "char_start": 22,
+          "char_end": 34
+        },
+        {
+          "term": "even",
+          "context": "stem",
+          "alternatives": [
+            "odd",
+            "prime"
+          ],
+          "importance": "critical",
+          "bbox": [
+            86.30699920654297,
+            462.68963623046875,
+            316.3370056152344,
+            474.64483642578125
+          ],
+          "span_ids": [
+            "page1:block18:line0:span0"
+          ],
+          "char_start": 22,
+          "char_end": 26
+        }
+      ],
+      "numerical_values": null,
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Number Properties",
+        "subtopic": "Even and Odd Numbers",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": null
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.9,
+        "structure_confidence": 1.0
+      },
+      "original_text": "8. The product of two even numbers is even.",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 9,
+      "question_type": "true_false",
+      "stem_text": "The perimeter of a square with side 7 units is 28 units.",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "True",
+      "gold_confidence": 0.9,
+      "answer_explanation": "The perimeter of a square is calculated as 4 times the side length. Therefore, 4 × 7 = 28.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          86.30699920654297,
+          485.7236328125,
+          383.5252990722656,
+          497.6788330078125
+        ],
+        "stem_bbox": [
+          86.30699920654297,
+          485.7236328125,
+          383.5252990722656,
+          497.6788330078125
+        ],
+        "stem_spans": [
+          "page1:block19:line0:span0"
+        ],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "Perimeter = 4 × side",
+          "latex": "P = 4s",
+          "position": "stem",
+          "description": "Formula for the perimeter of a square"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "perimeter",
+          "context": "stem",
+          "alternatives": [
+            "area",
+            "volume"
+          ],
+          "importance": "critical",
+          "bbox": [
+            86.30699920654297,
+            485.7236328125,
+            383.5252990722656,
+            497.6788330078125
+          ],
+          "span_ids": [
+            "page1:block19:line0:span0"
+          ],
+          "char_start": 7,
+          "char_end": 16
+        },
+        {
+          "term": "square",
+          "context": "stem",
+          "alternatives": [
+            "rectangle",
+            "circle"
+          ],
+          "importance": "high",
+          "bbox": [
+            86.30699920654297,
+            485.7236328125,
+            383.5252990722656,
+            497.6788330078125
+          ],
+          "span_ids": [
+            "page1:block19:line0:span0"
+          ],
+          "char_start": 22,
+          "char_end": 28
+        },
+        {
+          "term": "units",
+          "context": "stem",
+          "alternatives": [
+            "meters",
+            "centimeters"
+          ],
+          "importance": "medium",
+          "bbox": [
+            86.30699920654297,
+            485.7236328125,
+            383.5252990722656,
+            497.6788330078125
+          ],
+          "span_ids": [
+            "page1:block19:line0:span0"
+          ],
+          "char_start": 41,
+          "char_end": 46
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "7",
+          "unit": "units",
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "28",
+          "unit": "units",
+          "context": "stem",
+          "role": "expected_answer"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "apply",
+        "topic": "Geometry",
+        "subtopic": "Perimeter",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 0.9,
+        "positioning_quality": 0.9,
+        "structure_confidence": 0.95
+      },
+      "original_text": "9. The perimeter of a square with side 7 units is 28 units.",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 10,
+      "question_type": "calculation",
+      "stem_text": "Compute: 36 ÷ 3 + 5 × 4.",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "32",
+      "gold_confidence": 0.9,
+      "answer_explanation": "First, divide 36 by 3 to get 12. Then, multiply 5 by 4 to get 20. Finally, add 12 and 20 to get 32.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "compute",
+          "context": "stem",
+          "alternatives": [
+            "calculate",
+            "evaluate"
+          ],
+          "importance": "critical",
+          "bbox": [
+            80.4540023803711,
+            587.5755615234375,
+            168.2769012451172,
+            599.53076171875
+          ],
+          "span_ids": [
+            "page1:block22:line0:span0"
+          ],
+          "char_start": 4,
+          "char_end": 11
+        },
+        {
+          "term": "÷",
+          "context": "stem",
+          "alternatives": [
+            "×",
+            "+"
+          ],
+          "importance": "high",
+          "bbox": [
+            80.4540023803711,
+            587.420654296875,
+            180.2321014404297,
+            599.53076171875
+          ],
+          "span_ids": [
+            "page1:block22:line0:span0",
+            "page1:block22:line0:span1"
+          ],
+          "char_start": 16,
+          "char_end": 17
+        },
+        {
+          "term": "×",
+          "context": "stem",
+          "alternatives": [
+            "÷",
+            "-"
+          ],
+          "importance": "high",
+          "bbox": [
+            80.4540023803711,
+            587.420654296875,
+            220.9754180908203,
+            599.53076171875
+          ],
+          "span_ids": [
+            "page1:block22:line0:span0",
+            "page1:block22:line0:span1",
+            "page1:block22:line0:span2",
+            "page1:block22:line0:span3"
+          ],
+          "char_start": 24,
+          "char_end": 25
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "36",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "3",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "5",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "4",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "32",
+          "unit": null,
+          "context": "stem",
+          "role": "expected_answer"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "medium",
+        "cognitive_level": "apply",
+        "topic": "Arithmetic",
+        "subtopic": "Order of Operations",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 120,
+        "points": 4
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 0.9,
+        "positioning_quality": 0.3,
+        "structure_confidence": 0.95
+      },
+      "original_text": "11. Compute: 36 ÷ 3 + 5 × 4. (4 marks)",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 11,
+      "question_type": "calculation",
+      "stem_text": "Compute: 36 ÷ 3 + 5 × 4.",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "32",
+      "gold_confidence": 0.9,
+      "answer_explanation": "First, divide 36 by 3 to get 12, then multiply 5 by 4 to get 20, and finally add the results: 12 + 20 = 32.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "36 ÷ 3 + 5 × 4",
+          "latex": "36 \\div 3 + 5 \\times 4",
+          "position": "stem",
+          "description": "Arithmetic expression to compute"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "compute",
+          "context": "stem",
+          "alternatives": [
+            "calculate",
+            "evaluate"
+          ],
+          "importance": "high",
+          "bbox": [
+            80.4540023803711,
+            587.5755615234375,
+            168.2769012451172,
+            599.53076171875
+          ],
+          "span_ids": [
+            "page1:block22:line0:span0"
+          ],
+          "char_start": 4,
+          "char_end": 11
+        },
+        {
+          "term": "÷",
+          "context": "stem",
+          "alternatives": [
+            "divide",
+            "/"
+          ],
+          "importance": "critical",
+          "bbox": [
+            80.4540023803711,
+            587.420654296875,
+            180.2321014404297,
+            599.53076171875
+          ],
+          "span_ids": [
+            "page1:block22:line0:span0",
+            "page1:block22:line0:span1"
+          ],
+          "char_start": 16,
+          "char_end": 17
+        },
+        {
+          "term": "×",
+          "context": "stem",
+          "alternatives": [
+            "multiply",
+            "*"
+          ],
+          "importance": "critical",
+          "bbox": [
+            80.4540023803711,
+            587.420654296875,
+            220.9754180908203,
+            599.53076171875
+          ],
+          "span_ids": [
+            "page1:block22:line0:span0",
+            "page1:block22:line0:span1",
+            "page1:block22:line0:span2",
+            "page1:block22:line0:span3"
+          ],
+          "char_start": 24,
+          "char_end": 25
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "36",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "3",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "5",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "4",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "apply",
+        "topic": "Arithmetic Operations",
+        "subtopic": "Order of Operations",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": 4
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "11. Compute: 36 ÷ 3 + 5 × 4. (4 marks)",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 12,
+      "question_type": "calculation",
+      "stem_text": "Simplify the fraction: 45/60 (write in lowest terms).",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "3/4",
+      "gold_confidence": 0.9,
+      "answer_explanation": "Divide both the numerator and the denominator by their greatest common divisor, which is 15.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "45/60",
+          "latex": "\\frac{45}{60}",
+          "position": "stem",
+          "description": "Fraction to simplify"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "simplify",
+          "context": "stem",
+          "alternatives": [
+            "reduce",
+            "minimize"
+          ],
+          "importance": "high",
+          "bbox": [
+            80.4540023803711,
+            615.9406127929688,
+            216.593994140625,
+            627.8958129882812
+          ],
+          "span_ids": [
+            "page1:block23:line0:span0"
+          ],
+          "char_start": 4,
+          "char_end": 12
+        },
+        {
+          "term": "fraction",
+          "context": "stem",
+          "alternatives": [
+            "ratio",
+            "proportion"
+          ],
+          "importance": "medium",
+          "bbox": [
+            80.4540023803711,
+            615.9406127929688,
+            216.593994140625,
+            627.8958129882812
+          ],
+          "span_ids": [
+            "page1:block23:line0:span0"
+          ],
+          "char_start": 17,
+          "char_end": 25
+        },
+        {
+          "term": "lowest terms",
+          "context": "stem",
+          "alternatives": [
+            "simplest form",
+            "reduced form"
+          ],
+          "importance": "high",
+          "bbox": [
+            216.593994140625,
+            615.9406127929688,
+            353.1880798339844,
+            636.0958251953125
+          ],
+          "span_ids": [
+            "page1:block24:line0:span0",
+            "page1:block24:line0:span1"
+          ],
+          "char_start": 43,
+          "char_end": 55
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "45",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "60",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "apply",
+        "topic": "Fractions",
+        "subtopic": "Simplification",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": 4
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "12. Simplify the fraction: 45/60 (write in lowest terms). (4 marks)",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 13,
+      "question_type": "calculation",
+      "stem_text": "Solve for x: 5x − 9 = 16.",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "x = 5",
+      "gold_confidence": 0.9,
+      "answer_explanation": "Add 9 to both sides to get 5x = 25, then divide by 5.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "5x - 9 = 16",
+          "latex": "5x - 9 = 16",
+          "position": "stem",
+          "description": "Equation to solve for x"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "solve",
+          "context": "stem",
+          "alternatives": [
+            "find",
+            "calculate"
+          ],
+          "importance": "critical",
+          "bbox": [
+            72.0,
+            520.8355712890625,
+            329.4047546386719,
+            538.051025390625
+          ],
+          "span_ids": [
+            "page1:block20:line0:span0"
+          ],
+          "char_start": 4,
+          "char_end": 9
+        },
+        {
+          "term": "x",
+          "context": "stem",
+          "alternatives": [
+            "variable",
+            "unknown"
+          ],
+          "importance": "high",
+          "bbox": [
+            86.30699920654297,
+            151.80262756347656,
+            125.47223663330078,
+            163.75782775878906
+          ],
+          "span_ids": [
+            "page1:block4:line0:span0",
+            "page1:block4:line0:span1"
+          ],
+          "char_start": 14,
+          "char_end": 15
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "5",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "9",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "16",
+          "unit": null,
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "medium",
+        "cognitive_level": "apply",
+        "topic": "Algebra",
+        "subtopic": "Linear Equations",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 120,
+        "points": 4
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "13. Solve for x: 5x − 9 = 16. (4 marks)",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 14,
+      "question_type": "calculation",
+      "stem_text": "Find the simple interest on $800 at 5% per year for 3 years.",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "$120",
+      "gold_confidence": 0.9,
+      "answer_explanation": "Use the formula I = PRT, where P = 800, R = 0.05, T = 3.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "I = PRT",
+          "latex": "I = PRT",
+          "position": "stem",
+          "description": "Simple interest formula"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "simple interest",
+          "context": "stem",
+          "alternatives": [
+            "compound interest",
+            "interest"
+          ],
+          "importance": "critical",
+          "bbox": [
+            80.45399475097656,
+            665.7255859375,
+            240.09182739257812,
+            677.6807861328125
+          ],
+          "span_ids": [
+            "page1:block26:line0:span0"
+          ],
+          "char_start": 13,
+          "char_end": 28
+        },
+        {
+          "term": "5%",
+          "context": "stem",
+          "alternatives": [
+            "rate",
+            "percentage"
+          ],
+          "importance": "high",
+          "bbox": [
+            80.45399475097656,
+            665.5048217773438,
+            409.93951416015625,
+            677.6807861328125
+          ],
+          "span_ids": [
+            "page1:block26:line0:span0",
+            "page1:block26:line0:span1",
+            "page1:block26:line0:span2"
+          ],
+          "char_start": 40,
+          "char_end": 42
+        },
+        {
+          "term": "3 years",
+          "context": "stem",
+          "alternatives": [
+            "duration",
+            "time"
+          ],
+          "importance": "medium",
+          "bbox": [
+            80.45399475097656,
+            665.5048217773438,
+            409.93951416015625,
+            677.6807861328125
+          ],
+          "span_ids": [
+            "page1:block26:line0:span0",
+            "page1:block26:line0:span1",
+            "page1:block26:line0:span2"
+          ],
+          "char_start": 56,
+          "char_end": 63
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "800",
+          "unit": "dollars",
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "5",
+          "unit": "percent",
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "3",
+          "unit": "years",
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "medium",
+        "cognitive_level": "apply",
+        "topic": "Finance",
+        "subtopic": "Simple Interest",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 180,
+        "points": 4
+      },
+      "confidence": 0.95,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "14. Find the simple interest on $800 at 5% per year for 3 years. (4 marks)",
+      "page_number": 2,
+      "source_page": "page_2"
+    },
+    {
+      "question_number": 15,
+      "question_type": "calculation",
+      "stem_text": "A pen marked at $50 is sold at a 20% discount. Find the selling price.",
+      "options": null,
+      "sub_questions": null,
+      "gold_answer": "$40",
+      "gold_confidence": 1.0,
+      "answer_explanation": "The selling price is calculated by applying a 20% discount to the marked price of $50. 20% of $50 is $10, so the selling price is $50 - $10 = $40.",
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {},
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "formulas": [
+        {
+          "text": "Selling Price = Marked Price - (Discount Percentage × Marked Price)",
+          "latex": "SP = MP - (DP \\times MP)",
+          "position": "stem",
+          "description": "Formula to calculate selling price after discount"
+        }
+      ],
+      "visual_elements": [],
+      "tables": null,
+      "code_snippets": null,
+      "key_terms": [
+        {
+          "term": "marked price",
+          "context": "stem",
+          "alternatives": [
+            "list price",
+            "original price"
+          ],
+          "importance": "high",
+          "bbox": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "span_ids": [],
+          "char_start": -1,
+          "char_end": -1
+        },
+        {
+          "term": "discount",
+          "context": "stem",
+          "alternatives": [
+            "rebate",
+            "reduction"
+          ],
+          "importance": "high",
+          "bbox": [
+            80.45399475097656,
+            688.537841796875,
+            463.976806640625,
+            700.7138061523438
+          ],
+          "span_ids": [
+            "page1:block27:line0:span0",
+            "page1:block27:line0:span1",
+            "page1:block27:line0:span2"
+          ],
+          "char_start": 42,
+          "char_end": 50
+        },
+        {
+          "term": "selling price",
+          "context": "stem",
+          "alternatives": [
+            "final price",
+            "sale price"
+          ],
+          "importance": "critical",
+          "bbox": [
+            80.45399475097656,
+            688.537841796875,
+            463.976806640625,
+            700.7138061523438
+          ],
+          "span_ids": [
+            "page1:block27:line0:span0",
+            "page1:block27:line0:span1",
+            "page1:block27:line0:span2"
+          ],
+          "char_start": 61,
+          "char_end": 74
+        }
+      ],
+      "numerical_values": [
+        {
+          "value": "50",
+          "unit": "dollars",
+          "context": "stem",
+          "role": "given_data"
+        },
+        {
+          "value": "20",
+          "unit": "percent",
+          "context": "stem",
+          "role": "given_data"
+        }
+      ],
+      "metadata": {
+        "subject_area": "mathematics",
+        "complexity": "easy",
+        "cognitive_level": "apply",
+        "topic": "Arithmetic",
+        "subtopic": "Percentage",
+        "has_images": false,
+        "has_formulas": true,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 120,
+        "points": 8
+      },
+      "confidence": 1.0,
+      "extraction_quality": {
+        "text_quality": 1.0,
+        "positioning_quality": 0.3,
+        "structure_confidence": 1.0
+      },
+      "original_text": "15. A pen marked at $ 50 is sold at a 20% discount. Find the selling price. (8 marks)",
+      "page_number": 2,
+      "source_page": "page_2"
+    }
+  ]
+}

@@ -1,0 +1,1866 @@
+{
+  "pipeline_metadata": {
+    "run_id": "c56bb75b-2c4e-472a-ae8c-42b932bc2f48",
+    "current_stage": "results_generation",
+    "stages_completed": [
+      "results_generation",
+      "smart_substitution",
+      "smart_reading",
+      "content_discovery"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-27T22:29:02.306384+00:00",
+    "version": "2.0.0",
+    "config": {},
+    "ai_extraction_enabled": true,
+    "ai_sources_used": [
+      "openai_vision",
+      "mistral_ocr"
+    ]
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/Quiz_7.pdf",
+    "filename": "Quiz_7.pdf",
+    "pages": 1
+  },
+  "questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following best explains how multi-head attention improves contextual understanding in Transformers?",
+      "options": {
+        "A": "By reducing the total number of parameters through parallelization",
+        "B": "By enforcing uniform attention over the sequence to prevent bias",
+        "C": "By increasing computation speed through batch-wise attention",
+        "D": "By enabling different heads to attend to diverse relational patterns across positions"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          74.61164855957031,
+          540.0427856445312,
+          101.01283264160156
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1",
+      "gold_answer": "D",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 229,
+            "original": "Which of the following best explains how multi-head attention improves contextual understanding in Transformers?",
+            "replacement": "Which of the following best explains how multi-head attention improves contextual understanding in Transformers? [altered]",
+            "start_pos": 0,
+            "end_pos": 112,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "Which component of the Transformer architecture is exclusively utilized in GPT, making it more suited for generative tasks?",
+      "options": {
+        "A": "Decoder layers with masked self-attention",
+        "B": "Encoder layers for input sequence modeling",
+        "C": "A hybrid encoder-decoder combination",
+        "D": "A purely feed-forward architecture"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          174.86061096191406,
+          540.0067138671875,
+          201.2617950439453
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2",
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 230,
+            "original": "Which component of the Transformer architecture is exclusively utilized in GPT, making it more suited for generative tasks?",
+            "replacement": "Which component of the Transformer architecture is exclusively utilized in GPT, making it more suited for generative tasks? [altered]",
+            "start_pos": 0,
+            "end_pos": 123,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "What design choice in GPT restricts it from leveraging full bidirectional context, and what consequence does this have?",
+      "options": {
+        "A": "Encoder-based design; restricts output generation",
+        "B": "Unidirectional left-to-right flow; limits full context understanding",
+        "C": "Bidirectional masking; leads to context overfitting",
+        "D": "Cross-attention dependencies; increase inference latency"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          275.10955810546875,
+          540.042724609375,
+          301.5107727050781
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 231,
+            "original": "What design choice in GPT restricts it from leveraging full bidirectional context, and what consequence does this have?",
+            "replacement": "What design choice in GPT restricts it from leveraging full bidirectional context, and what consequence does this have? [altered]",
+            "start_pos": 0,
+            "end_pos": 119,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following best characterizes the training objectives that enable BERT to capture both deep token-level context and inter-sentence semantics?",
+      "options": {
+        "A": "Predicting the next token in a left-to-right fashion using unidirectional context",
+        "B": "Learning to generate a target sequence from an input sequence in an encoder-decoder setup",
+        "C": "Jointly optimizing masked token reconstruction and inter-sentence coherence discrimination",
+        "D": "Aligning image features with textual descriptions through cross-modal supervision"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          375.359619140625,
+          540.0426635742188,
+          401.75982666015625
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 232,
+            "original": "Which of the following best characterizes the training objectives that enable BERT to capture both deep token-level context and inter-sentence semantics?",
+            "replacement": "Which of the following best characterizes the training objectives that enable BERT to capture both deep token-level context and inter-sentence semantics? [altered]",
+            "start_pos": 0,
+            "end_pos": 153,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "5",
+      "question_type": "short_answer",
+      "stem_text": "What are the potential drawbacks of the two-stage process of pretraining on large corpora followed by fine-tuning on specific tasks in Transformer models?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          536.0487060546875,
+          540.0787353515625,
+          562.4498901367188
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 233,
+            "original": "What are the potential drawbacks of the two-stage process of pretraining on large corpora followed by fine-tuning on specific tasks in Transformer models?",
+            "replacement": "What are the potential drawbacks of the two-stage process of pretraining on large corpora followed by fine-tuning on specific tasks in Transformer models? [altered]",
+            "start_pos": 0,
+            "end_pos": 154,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "6",
+      "question_type": "short_answer",
+      "stem_text": "What are the potential drawbacks of GPT’s autoregressive training objective when applied to tasks requiring holistic understanding of text?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          574.9027099609375,
+          540.0546264648438,
+          601.3038940429688
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 234,
+            "original": "What are the potential drawbacks of GPT’s autoregressive training objective when applied to tasks requiring holistic understanding of text?",
+            "replacement": "What are the potential drawbacks of GPT’s autoregressive training objective when applied to tasks requiring holistic understanding of text? [altered]",
+            "start_pos": 0,
+            "end_pos": 139,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "7",
+      "question_type": "short_answer",
+      "stem_text": "BERT utilizes a masked language model (MLM) during pretraining. What is the primary challenge associated with the MLM approach, and how does it affect the model’s downstream performance?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          613.7567138671875,
+          540.0546264648438,
+          654.6038818359375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "7",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 235,
+            "original": "BERT utilizes a masked language model (MLM) during pretraining. What is the primary challenge associated with the MLM approach, and how does it affect the model’s downstream performance?",
+            "replacement": "BERT utilizes a masked language model (MLM) during pretraining. What is the primary challenge associated with the MLM approach, and how does it affect the model’s downstream performance? [altered]",
+            "start_pos": 0,
+            "end_pos": 186,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "8",
+      "question_type": "short_answer",
+      "stem_text": "GPT models are known for their unidirectional (left-to-right) processing. How does this design choice impact their performance on tasks like text generation compared to tasks like text classification?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          667.0576782226562,
+          540.056640625,
+          707.9038696289062
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "8",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 236,
+            "original": "GPT models are known for their unidirectional (left-to-right) processing. How does this design choice impact their performance on tasks like text generation compared to tasks like text classification?",
+            "replacement": "GPT models are known for their unidirectional (left-to-right) processing. How does this design choice impact their performance on tasks like text generation compared to tasks like text classification? [altered]",
+            "start_pos": 0,
+            "end_pos": 200,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "assets": {
+    "images": [],
+    "fonts": [
+      "CMBX12",
+      "CMR12"
+    ],
+    "extracted_elements": 41
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_content_stream_overlay.pdf",
+        "size_bytes": 6041682,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_content_stream_overlay.pdf",
+        "file_size_bytes": 6041682,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 8,
+        "overlay_targets": 8,
+        "overlay_area_pct": 0.0292,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 6041682,
+          "effectiveness_score": 1.0,
+          "replacements": 8,
+          "matches_found": 8,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 8,
+          "overlay_applied": 8,
+          "overlay_targets": 8,
+          "overlay_area_pct": 0.0292,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:29:02.296527+00:00"
+      },
+      "dual_layer": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_dual_layer.pdf",
+        "size_bytes": 39237,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_dual_layer.pdf",
+        "file_size_bytes": 39237,
+        "visual_quality_score": 0.97,
+        "effectiveness_score": 0.85,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 39237,
+          "effectiveness_score": 0.85
+        },
+        "created_at": "2025-09-27T22:29:02.296665+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_image_overlay.pdf",
+        "size_bytes": 5985525,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_image_overlay.pdf",
+        "file_size_bytes": 5985525,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": 0.029221244318229186,
+        "render_stats": {
+          "mapping_entries": 8,
+          "overlays_applied": 8,
+          "file_size_bytes": 5985525,
+          "effectiveness_score": 1.0,
+          "overlay_area_pct": 0.029221244318229186,
+          "text_pages": 1,
+          "text_tj_hits": 39,
+          "text_replacements": 0,
+          "text_matches_found": 0,
+          "text_tokens_scanned": 2012
+        },
+        "created_at": "2025-09-27T22:29:02.296792+00:00"
+      },
+      "font_manipulation": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_font_manipulation.pdf",
+        "size_bytes": 34173,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_font_manipulation.pdf",
+        "file_size_bytes": 34173,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.75,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 34173,
+          "effectiveness_score": 0.75
+        },
+        "created_at": "2025-09-27T22:29:02.296915+00:00"
+      },
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_content_stream.pdf",
+        "size_bytes": 6041682,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_content_stream.pdf",
+        "file_size_bytes": 6041682,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 8,
+        "overlay_targets": 8,
+        "overlay_area_pct": 0.0292,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 6041682,
+          "effectiveness_score": 1.0,
+          "replacements": 8,
+          "matches_found": 8,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 8,
+          "overlay_applied": 8,
+          "overlay_targets": 8,
+          "overlay_area_pct": 0.0292,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:29:02.297037+00:00"
+      },
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_pymupdf_overlay.pdf",
+        "size_bytes": 6041682,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/c56bb75b-2c4e-472a-ae8c-42b932bc2f48/enhanced_pymupdf_overlay.pdf",
+        "file_size_bytes": 6041682,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 8,
+        "overlay_targets": 8,
+        "overlay_area_pct": 0.0292,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 6041682,
+          "effectiveness_score": 1.0,
+          "replacements": 8,
+          "textbox_adjustments": 8,
+          "min_fontsize_used": 5.5,
+          "overlay_applied": 8,
+          "overlay_targets": 8,
+          "overlay_area_pct": 0.0292,
+          "raw_targets": 8
+        },
+        "created_at": "2025-09-27T22:29:02.297152+00:00"
+      }
+    },
+    "debug": {
+      "content_stream_overlay": {
+        "decoded_sample": null,
+        "per_font_top_tokens": null,
+        "enhanced_mapping_stats": {
+          "total_entries": 8,
+          "discovered_tokens": 0
+        }
+      },
+      "overlay_layers": {
+        "pymupdf_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 8,
+          "enhanced_mapping_boost": 0
+        },
+        "image_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 8,
+          "enhanced_mapping_boost": 0
+        }
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 478.95,
+      "mapping_build_time_ms": 9.26,
+      "enhancement_stats": {
+        "base_mapping_size": 8,
+        "enhanced_mapping_size": 8,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream_overlay": {
+          "duration_ms": 122.91,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 6041682
+        },
+        "content_stream": {
+          "duration_ms": 119.93,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 6041682
+        },
+        "pymupdf_overlay": {
+          "duration_ms": 118.81,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 6041682
+        },
+        "image_overlay": {
+          "duration_ms": 89.24,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 5985525
+        },
+        "dual_layer": {
+          "duration_ms": 5.63,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 39237
+        },
+        "font_manipulation": {
+          "duration_ms": 1.15,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 34173
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 6,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 34173,
+        "total_output_size_bytes": 24183981,
+        "size_efficiency": 707.6926520937583
+      }
+    },
+    "summary": {
+      "questions": 8,
+      "average_effectiveness": 0.0,
+      "generated_at": "2025-09-27T22:29:02.306384+00:00"
+    }
+  },
+  "performance_metrics": {},
+  "content_elements": [
+    {
+      "type": "text",
+      "content": "CSE 576 Quiz 7",
+      "page": 1,
+      "bbox": [
+        72.0,
+        35.90663146972656,
+        154.1202850341797,
+        47.86183547973633
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "Transformer Pretraining Quiz",
+      "page": 1,
+      "bbox": [
+        383.70794677734375,
+        35.90663146972656,
+        540.0341186523438,
+        47.86183547973633
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "1. Which of the following best explains how multi-head attention improves contextual",
+      "page": 1,
+      "bbox": [
+        86.30699920654297,
+        74.61164855957031,
+        540.0427856445312,
+        86.56684875488281
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "understanding in Transformers?",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        89.05763244628906,
+        264.3818054199219,
+        101.01283264160156
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "A) By reducing the total number of parameters through parallelization",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        103.50361633300781,
+        465.40850830078125,
+        115.45881652832031
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "B) By enforcing uniform attention over the sequence to prevent bias",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        117.94960021972656,
+        451.3013916015625,
+        129.90480041503906
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "C) By increasing computation speed through batch-wise attention",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        132.3946075439453,
+        440.1471862792969,
+        144.3498077392578
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "D) By enabling different heads to attend to diverse relational patterns across positions",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        146.84059143066406,
+        540.0567626953125,
+        158.79579162597656
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "2. Which component of the Transformer architecture is exclusively utilized in GPT, mak-",
+      "page": 1,
+      "bbox": [
+        86.30699920654297,
+        174.86061096191406,
+        540.0067138671875,
+        186.81581115722656
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "ing it more suited for generative tasks?",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        189.3065948486328,
+        301.4668884277344,
+        201.2617950439453
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "A) Decoder layers with masked self-attention",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        203.75257873535156,
+        332.50250244140625,
+        215.70777893066406
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "B) Encoder layers for input sequence modeling",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        218.1985626220703,
+        341.0504150390625,
+        230.1537628173828
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "C) A hybrid encoder-decoder combination",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        232.64454650878906,
+        317.18792724609375,
+        244.59974670410156
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "D) A purely feed-forward architecture",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        247.0895538330078,
+        295.5609130859375,
+        259.0447692871094
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "3. What design choice in GPT restricts it from leveraging full bidirectional context, and",
+      "page": 1,
+      "bbox": [
+        86.30699920654297,
+        275.10955810546875,
+        540.042724609375,
+        287.06475830078125
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "what consequence does this have?",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        289.5555725097656,
+        274.4480895996094,
+        301.5107727050781
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "A) Encoder-based design; restricts output generation",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        304.0015869140625,
+        372.88720703125,
+        315.956787109375
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "B) Unidirectional left-to-right flow; limits full context understanding",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        318.4476013183594,
+        452.7598876953125,
+        330.4028015136719
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "C) Bidirectional masking; leads to context overfitting",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        332.89361572265625,
+        374.4175109863281,
+        344.84881591796875
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "D) Cross-attention dependencies; increase inference latency",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        347.3396301269531,
+        405.05853271484375,
+        359.2948303222656
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "4. Which of the following best characterizes the training objectives that enable BERT to",
+      "page": 1,
+      "bbox": [
+        86.30699920654297,
+        375.359619140625,
+        540.0426635742188,
+        387.3148193359375
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "capture both deep token-level context and inter-sentence semantics?",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        389.80462646484375,
+        450.3688659667969,
+        401.75982666015625
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "A) Predicting the next token in a left-to-right fashion using unidirectional context",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        404.2506408691406,
+        522.6859130859375,
+        416.2058410644531
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "B) Learning to generate a target sequence from an input sequence in an encoder-",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        418.6966552734375,
+        540.0327758789062,
+        430.65185546875
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "decoder setup",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        433.1426696777344,
+        171.88438415527344,
+        445.0978698730469
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "C) Jointly optimizing masked token reconstruction and inter-sentence coherence dis-",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        447.58868408203125,
+        540.020751953125,
+        459.54388427734375
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "crimination",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        462.03369140625,
+        159.80963134765625,
+        473.9888916015625
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "D) Aligning image features with textual descriptions through cross-modal supervision",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        476.4797058105469,
+        540.0567626953125,
+        488.4349060058594
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "Short Answer Questions",
+      "page": 1,
+      "bbox": [
+        72.0,
+        511.6396789550781,
+        214.80484008789062,
+        523.5948486328125
+      ],
+      "font": "CMBX12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "5. What are the potential drawbacks of the two-stage process of pretraining on large",
+      "page": 1,
+      "bbox": [
+        86.30699920654297,
+        536.0487060546875,
+        540.0787353515625,
+        548.00390625
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "corpora followed by fine-tuning on specific tasks in Transformer models?",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        550.4946899414062,
+        472.3067626953125,
+        562.4498901367188
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "6. What are the potential drawbacks of GPT’s autoregressive training objective when",
+      "page": 1,
+      "bbox": [
+        86.30699920654297,
+        574.9027099609375,
+        540.0546264648438,
+        586.85791015625
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "applied to tasks requiring holistic understanding of text?",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        589.3486938476562,
+        392.5893859863281,
+        601.3038940429688
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "7. BERT utilizes a masked language model (MLM) during pretraining.",
+      "page": 1,
+      "bbox": [
+        86.30699920654297,
+        613.7567138671875,
+        465.1314697265625,
+        625.7119140625
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "What is the",
+      "page": 1,
+      "bbox": [
+        475.64007568359375,
+        613.7567138671875,
+        540.0546264648438,
+        625.7119140625
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "primary challenge associated with the MLM approach, and how does it affect the",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        628.2026977539062,
+        540.0447998046875,
+        640.1578979492188
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "model’s downstream performance?",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        642.648681640625,
+        277.962890625,
+        654.6038818359375
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "8. GPT models are known for their unidirectional (left-to-right) processing. How does",
+      "page": 1,
+      "bbox": [
+        86.30699920654297,
+        667.0576782226562,
+        540.04248046875,
+        679.0128784179688
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "this design choice impact their performance on tasks like text generation compared to",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        681.502685546875,
+        540.056640625,
+        693.4578857421875
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "tasks like text classification?",
+      "page": 1,
+      "bbox": [
+        101.26499938964844,
+        695.9486694335938,
+        246.89129638671875,
+        707.9038696289062
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        534.14697265625,
+        740.544677734375,
+        540.0050048828125,
+        752.4998779296875
+      ],
+      "font": "CMR12",
+      "size": 11.9552001953125
+    }
+  ],
+  "ai_extraction": {
+    "source": "gpt5_fusion",
+    "confidence": 0.95,
+    "questions_found": 8,
+    "processing_time_ms": 36739,
+    "cost_cents": 30.3825,
+    "error": null,
+    "raw_response": {
+      "content": "```json\n{\n  \"fusion_analysis\": {\n    \"total_questions_found\": 8,\n    \"source_agreements\": {\n      \"vision_mistral\": 8,\n      \"vision_only\": 0,\n      \"mistral_only\": 0,\n      \"conflicts_resolved\": 0\n    },\n    \"quality_score\": 0.95\n  },\n  \"questions\": [\n    {\n      \"question_number\": \"1\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following best explains how multi-head attention improves contextual understanding in Transformers?\",\n      \"options\": {\n        \"A\": \"By reducing the total number of parameters through parallelization\",\n        \"B\": \"By enforcing uniform attention over the sequence to prevent bias\",\n        \"C\": \"By increasing computation speed through batch-wise attention\",\n        \"D\": \"By enabling different heads to attend to diverse relational patterns across positions\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [86.30699920654297, 74.61164855957031, 540.0427856445312, 101.01283264160156],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"2\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which component of the Transformer architecture is exclusively utilized in GPT, making it more suited for generative tasks?\",\n      \"options\": {\n        \"A\": \"Decoder layers with masked self-attention\",\n        \"B\": \"Encoder layers for input sequence modeling\",\n        \"C\": \"A hybrid encoder-decoder combination\",\n        \"D\": \"A purely feed-forward architecture\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [86.30699920654297, 174.86061096191406, 540.0067138671875, 201.2617950439453],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"3\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What design choice in GPT restricts it from leveraging full bidirectional context, and what consequence does this have?\",\n      \"options\": {\n        \"A\": \"Encoder-based design; restricts output generation\",\n        \"B\": \"Unidirectional left-to-right flow; limits full context understanding\",\n        \"C\": \"Bidirectional masking; leads to context overfitting\",\n        \"D\": \"Cross-attention dependencies; increase inference latency\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [86.30699920654297, 275.10955810546875, 540.042724609375, 301.5107727050781],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"4\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following best characterizes the training objectives that enable BERT to capture both deep token-level context and inter-sentence semantics?\",\n      \"options\": {\n        \"A\": \"Predicting the next token in a left-to-right fashion using unidirectional context\",\n        \"B\": \"Learning to generate a target sequence from an input sequence in an encoder-decoder setup\",\n        \"C\": \"Jointly optimizing masked token reconstruction and inter-sentence coherence discrimination\",\n        \"D\": \"Aligning image features with textual descriptions through cross-modal supervision\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [86.30699920654297, 375.359619140625, 540.0426635742188, 401.75982666015625],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"5\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"What are the potential drawbacks of the two-stage process of pretraining on large corpora followed by fine-tuning on specific tasks in Transformer models?\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [86.30699920654297, 536.0487060546875, 540.0787353515625, 562.4498901367188],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"6\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"What are the potential drawbacks of GPT’s autoregressive training objective when applied to tasks requiring holistic understanding of text?\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [86.30699920654297, 574.9027099609375, 540.0546264648438, 601.3038940429688],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"7\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"BERT utilizes a masked language model (MLM) during pretraining. What is the primary challenge associated with the MLM approach, and how does it affect the model’s downstream performance?\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [86.30699920654297, 613.7567138671875, 540.0546264648438, 654.6038818359375],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"8\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"GPT models are known for their unidirectional (left-to-right) processing. How does this design choice impact their performance on tasks like text generation compared to tasks like text classification?\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [86.30699920654297, 667.0576782226562, 540.056640625, 707.9038696289062],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    }\n  ]\n}\n```",
+      "model": "gpt-4o",
+      "sources_used": [
+        "pymupdf",
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "orchestration": {
+        "extraction_results": {
+          "mistral_ocr": {
+            "questions_count": 8,
+            "confidence": 0.85,
+            "processing_time_ms": 5413
+          },
+          "openai_vision": {
+            "questions_count": 8,
+            "confidence": 0.9,
+            "processing_time_ms": 24663
+          }
+        },
+        "total_processing_time_ms": 61414,
+        "clients_used": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  },
+  "ai_questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following best explains how multi-head attention improves contextual understanding in Transformers?",
+      "options": {
+        "A": "By reducing the total number of parameters through parallelization",
+        "B": "By enforcing uniform attention over the sequence to prevent bias",
+        "C": "By increasing computation speed through batch-wise attention",
+        "D": "By enabling different heads to attend to diverse relational patterns across positions"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          74.61164855957031,
+          540.0427856445312,
+          101.01283264160156
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1"
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "Which component of the Transformer architecture is exclusively utilized in GPT, making it more suited for generative tasks?",
+      "options": {
+        "A": "Decoder layers with masked self-attention",
+        "B": "Encoder layers for input sequence modeling",
+        "C": "A hybrid encoder-decoder combination",
+        "D": "A purely feed-forward architecture"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          174.86061096191406,
+          540.0067138671875,
+          201.2617950439453
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2"
+    },
+    {
+      "question_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "What design choice in GPT restricts it from leveraging full bidirectional context, and what consequence does this have?",
+      "options": {
+        "A": "Encoder-based design; restricts output generation",
+        "B": "Unidirectional left-to-right flow; limits full context understanding",
+        "C": "Bidirectional masking; leads to context overfitting",
+        "D": "Cross-attention dependencies; increase inference latency"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          275.10955810546875,
+          540.042724609375,
+          301.5107727050781
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3"
+    },
+    {
+      "question_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following best characterizes the training objectives that enable BERT to capture both deep token-level context and inter-sentence semantics?",
+      "options": {
+        "A": "Predicting the next token in a left-to-right fashion using unidirectional context",
+        "B": "Learning to generate a target sequence from an input sequence in an encoder-decoder setup",
+        "C": "Jointly optimizing masked token reconstruction and inter-sentence coherence discrimination",
+        "D": "Aligning image features with textual descriptions through cross-modal supervision"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          375.359619140625,
+          540.0426635742188,
+          401.75982666015625
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4"
+    },
+    {
+      "question_number": "5",
+      "question_type": "short_answer",
+      "stem_text": "What are the potential drawbacks of the two-stage process of pretraining on large corpora followed by fine-tuning on specific tasks in Transformer models?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          536.0487060546875,
+          540.0787353515625,
+          562.4498901367188
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5"
+    },
+    {
+      "question_number": "6",
+      "question_type": "short_answer",
+      "stem_text": "What are the potential drawbacks of GPT’s autoregressive training objective when applied to tasks requiring holistic understanding of text?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          574.9027099609375,
+          540.0546264648438,
+          601.3038940429688
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6"
+    },
+    {
+      "question_number": "7",
+      "question_type": "short_answer",
+      "stem_text": "BERT utilizes a masked language model (MLM) during pretraining. What is the primary challenge associated with the MLM approach, and how does it affect the model’s downstream performance?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          613.7567138671875,
+          540.0546264648438,
+          654.6038818359375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "7"
+    },
+    {
+      "question_number": "8",
+      "question_type": "short_answer",
+      "stem_text": "GPT models are known for their unidirectional (left-to-right) processing. How does this design choice impact their performance on tasks like text generation compared to tasks like text classification?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          86.30699920654297,
+          667.0576782226562,
+          540.056640625,
+          707.9038696289062
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 8,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "8"
+    }
+  ],
+  "question_index": [
+    {
+      "q_number": "1",
+      "page": 1,
+      "stem": {
+        "text": "Which of the following best explains how multi-head attention improves contextual understanding in Transformers?",
+        "bbox": [
+          86.30699920654297,
+          74.61164855957031,
+          540.0427856445312,
+          101.01283264160156
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "By reducing the total number of parameters through parallelization"
+        },
+        "B": {
+          "text": "By enforcing uniform attention over the sequence to prevent bias"
+        },
+        "C": {
+          "text": "By increasing computation speed through batch-wise attention"
+        },
+        "D": {
+          "text": "By enabling different heads to attend to diverse relational patterns across positions"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "2",
+      "page": 1,
+      "stem": {
+        "text": "Which component of the Transformer architecture is exclusively utilized in GPT, making it more suited for generative tasks?",
+        "bbox": [
+          86.30699920654297,
+          174.86061096191406,
+          540.0067138671875,
+          201.2617950439453
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Decoder layers with masked self-attention"
+        },
+        "B": {
+          "text": "Encoder layers for input sequence modeling"
+        },
+        "C": {
+          "text": "A hybrid encoder-decoder combination"
+        },
+        "D": {
+          "text": "A purely feed-forward architecture"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "3",
+      "page": 1,
+      "stem": {
+        "text": "What design choice in GPT restricts it from leveraging full bidirectional context, and what consequence does this have?",
+        "bbox": [
+          86.30699920654297,
+          275.10955810546875,
+          540.042724609375,
+          301.5107727050781
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Encoder-based design; restricts output generation"
+        },
+        "B": {
+          "text": "Unidirectional left-to-right flow; limits full context understanding"
+        },
+        "C": {
+          "text": "Bidirectional masking; leads to context overfitting"
+        },
+        "D": {
+          "text": "Cross-attention dependencies; increase inference latency"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "4",
+      "page": 1,
+      "stem": {
+        "text": "Which of the following best characterizes the training objectives that enable BERT to capture both deep token-level context and inter-sentence semantics?",
+        "bbox": [
+          86.30699920654297,
+          375.359619140625,
+          540.0426635742188,
+          401.75982666015625
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Predicting the next token in a left-to-right fashion using unidirectional context"
+        },
+        "B": {
+          "text": "Learning to generate a target sequence from an input sequence in an encoder-decoder setup"
+        },
+        "C": {
+          "text": "Jointly optimizing masked token reconstruction and inter-sentence coherence discrimination"
+        },
+        "D": {
+          "text": "Aligning image features with textual descriptions through cross-modal supervision"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "5",
+      "page": 1,
+      "stem": {
+        "text": "What are the potential drawbacks of the two-stage process of pretraining on large corpora followed by fine-tuning on specific tasks in Transformer models?",
+        "bbox": [
+          86.30699920654297,
+          536.0487060546875,
+          540.0787353515625,
+          562.4498901367188
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "6",
+      "page": 1,
+      "stem": {
+        "text": "What are the potential drawbacks of GPT’s autoregressive training objective when applied to tasks requiring holistic understanding of text?",
+        "bbox": [
+          86.30699920654297,
+          574.9027099609375,
+          540.0546264648438,
+          601.3038940429688
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "7",
+      "page": 1,
+      "stem": {
+        "text": "BERT utilizes a masked language model (MLM) during pretraining. What is the primary challenge associated with the MLM approach, and how does it affect the model’s downstream performance?",
+        "bbox": [
+          86.30699920654297,
+          613.7567138671875,
+          540.0546264648438,
+          654.6038818359375
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "8",
+      "page": 1,
+      "stem": {
+        "text": "GPT models are known for their unidirectional (left-to-right) processing. How does this design choice impact their performance on tasks like text generation compared to tasks like text classification?",
+        "bbox": [
+          86.30699920654297,
+          667.0576782226562,
+          540.056640625,
+          707.9038696289062
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 8,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

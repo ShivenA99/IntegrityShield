@@ -1,0 +1,42 @@
+{
+  "stage": "after_reconstruction",
+  "operations": [
+    {
+      "index": 0,
+      "operator": "TJ",
+      "operands": [
+        "['and', -343, 'sequen', 1, 'ce', -343, 'length', -343]"
+      ]
+    },
+    {
+      "index": 1,
+      "operator": "Tf",
+      "operands": [
+        "/Courier",
+        "5"
+      ]
+    },
+    {
+      "index": 2,
+      "operator": "TJ",
+      "operands": [
+        "['800']"
+      ]
+    },
+    {
+      "index": 3,
+      "operator": "Tf",
+      "operands": [
+        "/F50",
+        "8"
+      ]
+    },
+    {
+      "index": 4,
+      "operator": "TJ",
+      "operands": [
+        "['.', -456, 'Analyze', -343, 'gradien', 29, 't', -343, 'b', -28, 'eha', 28, 'vior:']"
+      ]
+    }
+  ]
+}

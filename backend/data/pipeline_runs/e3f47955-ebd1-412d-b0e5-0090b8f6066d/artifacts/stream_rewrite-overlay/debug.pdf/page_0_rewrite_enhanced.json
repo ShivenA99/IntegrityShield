@@ -1,0 +1,6818 @@
+{
+  "stage": "page_0_rewrite",
+  "run_id": "e3f47955-ebd1-412d-b0e5-0090b8f6066d",
+  "page_index": 0,
+  "font_context": {
+    "3": {
+      "font": "/F37",
+      "fontsize": 17.2154,
+      "text_preview": "RNNs and LSTM Quiz"
+    },
+    "6": {
+      "font": "/F52",
+      "fontsize": 14.3462,
+      "text_preview": "Multiple Choice Questions"
+    },
+    "9": {
+      "font": "/F53",
+      "fontsize": 8.9664,
+      "text_preview": "Q1."
+    },
+    "12": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "What is not the primary bene\ft of stacking multipl"
+    },
+    "14": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "A. Faster training"
+    },
+    "16": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "B. Lower memory usage"
+    },
+    "18": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "C. Better learning of hierarchical features"
+    },
+    "20": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "D. Simpler architecture"
+    },
+    "23": {
+      "font": "/F53",
+      "fontsize": 8.9664,
+      "text_preview": "Q2."
+    },
+    "26": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "Which of the following is the main reason RNNs str"
+    },
+    "28": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "A. Over\ftting"
+    },
+    "30": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "B. Vanishing gradients"
+    },
+    "32": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "C. Lack of non-linearity"
+    },
+    "34": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "D. Insu\u000ecient data"
+    },
+    "37": {
+      "font": "/F53",
+      "fontsize": 8.9664,
+      "text_preview": "Q3."
+    },
+    "40": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "What di\u000berentiates an LSTM cell from a standard cn"
+    },
+    "42": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "A. It uses ReLU instead of tanh"
+    },
+    "44": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "B. It introduces gates to control the \row of infor"
+    },
+    "46": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "C. It has fewer parameters"
+    },
+    "48": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "D. It is a convolutional architecture"
+    },
+    "51": {
+      "font": "/F53",
+      "fontsize": 8.9664,
+      "text_preview": "Q4."
+    },
+    "54": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "In a standard rnn, which gate is responsible for d"
+    },
+    "56": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "A. Output gate"
+    },
+    "58": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "B. Forget gate"
+    },
+    "60": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "C. Input gate"
+    },
+    "62": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "D. Update gate"
+    },
+    "65": {
+      "font": "/F52",
+      "fontsize": 14.3462,
+      "text_preview": "Descriptive Questions"
+    },
+    "68": {
+      "font": "/F53",
+      "fontsize": 8.9664,
+      "text_preview": "Q5."
+    },
+    "71": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "Why is the forget gate bias in CNNs often initiali"
+    },
+    "73": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "dependency learning."
+    },
+    "76": {
+      "font": "/F53",
+      "fontsize": 8.9664,
+      "text_preview": "Q6."
+    },
+    "79": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "Unidirectional RNNs are often used for POS tagging"
+    },
+    "81": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "alignment and context \row."
+    },
+    "84": {
+      "font": "/F53",
+      "fontsize": 8.9664,
+      "text_preview": "Q7."
+    },
+    "87": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "Designing an RNN model for variable-length legal d"
+    },
+    "89": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "(a) Choose between vanilla RNN or LSTM."
+    },
+    "91": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "(b) Stack layers or keep it shallow?"
+    },
+    "93": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "(c) Make it unidirectional?"
+    },
+    "95": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "Justify each choice based on model behavior and ta"
+    },
+    "98": {
+      "font": "/F53",
+      "fontsize": 8.9664,
+      "text_preview": "Q8."
+    },
+    "101": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "Consider a vanilla RNN with recurrent weight matri"
+    },
+    "104": {
+      "font": "/F54",
+      "fontsize": 8.9664,
+      "text_preview": "W"
+    },
+    "107": {
+      "font": "/F43",
+      "fontsize": 5.9776,
+      "text_preview": "h"
+    },
+    "110": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "and sequence length 500. Analyze gradient behavior"
+    },
+    "112": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "(1) If"
+    },
+    "115": {
+      "font": "/F55",
+      "fontsize": 8.9664,
+      "text_preview": "k"
+    },
+    "118": {
+      "font": "/F54",
+      "fontsize": 8.9664,
+      "text_preview": "W"
+    },
+    "121": {
+      "font": "/F43",
+      "fontsize": 5.9776,
+      "text_preview": "h"
+    },
+    "124": {
+      "font": "/F55",
+      "fontsize": 8.9664,
+      "text_preview": "k"
+    },
+    "127": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "= 0"
+    },
+    "130": {
+      "font": "/F54",
+      "fontsize": 8.9664,
+      "text_preview": ":"
+    },
+    "133": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "9: Will gradients vanish or explode? Justify."
+    },
+    "135": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "(2) If"
+    },
+    "138": {
+      "font": "/F55",
+      "fontsize": 8.9664,
+      "text_preview": "k"
+    },
+    "141": {
+      "font": "/F54",
+      "fontsize": 8.9664,
+      "text_preview": "W"
+    },
+    "144": {
+      "font": "/F43",
+      "fontsize": 5.9776,
+      "text_preview": "h"
+    },
+    "147": {
+      "font": "/F55",
+      "fontsize": 8.9664,
+      "text_preview": "k"
+    },
+    "150": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "= 1"
+    },
+    "153": {
+      "font": "/F54",
+      "fontsize": 8.9664,
+      "text_preview": ":"
+    },
+    "156": {
+      "font": "/F50",
+      "fontsize": 8.9664,
+      "text_preview": "2: Will gradients vanish or explode? Justify. Sugg"
+    },
+    "159": {
+      "font": "/F58",
+      "fontsize": 8.9664,
+      "text_preview": "Hint: Consider eigenvalue e\u000bects on gradient propa"
+    },
+    "162": {
+      "font": "/F28",
+      "fontsize": 9.9626,
+      "text_preview": "1"
+    }
+  },
+  "text_matrix_analysis": {
+    "total_positions": 124,
+    "positions": [
+      {
+        "operator": "Td",
+        "offset": [
+          225.917,
+          717.776
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          225.917,
+          717.776
+        ],
+        "position": [
+          225.917,
+          717.776
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['RNNs', -302, 'and', -302, 'LSTM', -302, 'Quiz']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          225.917,
+          717.776
+        ],
+        "position": [
+          225.917,
+          717.776
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -171.917,
+          -67.896
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          649.88
+        ],
+        "position": [
+          54.0,
+          649.88
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Multiple', -375, 'Choice', -375, 'Questions']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          649.88
+        ],
+        "position": [
+          54.0,
+          649.88
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          0.0,
+          -16.937
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          632.943
+        ],
+        "position": [
+          54.0,
+          632.943
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Q1.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          632.943
+        ],
+        "position": [
+          54.0,
+          632.943
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          21.204,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          75.20400000000001,
+          632.943
+        ],
+        "position": [
+          75.20400000000001,
+          632.943
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['What', -342, 'is', -343, 'the', -343, 'primary', -342, 'b', -29, 'ene\\x0ct', -342, 'of', -343, 'stac', 29, 'king', -343, 'm', 29, 'ultiple', -343, 'RNN', -342, 'la', 28, 'y', 29, 'ers', -343, '(i.e.,', -342, 'stac', 28, 'k', 29, 'ed', -343, 'RNNs)?']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          75.20400000000001,
+          632.943
+        ],
+        "position": [
+          75.20400000000001,
+          632.943
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.629,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.575,
+          619.992
+        ],
+        "position": [
+          74.575,
+          619.992
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'F', 86, 'aster', -342, 'training']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.575,
+          619.992
+        ],
+        "position": [
+          74.575,
+          619.992
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          0.384,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.959,
+          607.0409999999999
+        ],
+        "position": [
+          74.959,
+          607.0409999999999
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'Lo', 29, 'w', 29, 'er', -343, 'memory', -342, 'usage']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.959,
+          607.0409999999999
+        ],
+        "position": [
+          74.959,
+          607.0409999999999
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.129,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.83,
+          594.0889999999999
+        ],
+        "position": [
+          74.83,
+          594.0889999999999
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'Bett', 1, 'er', -343, 'learning', -343, 'of', -342, 'hierarc', 28, 'hic', 1, 'al', -343, 'features']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.83,
+          594.0889999999999
+        ],
+        "position": [
+          74.83,
+          594.0889999999999
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.383,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.447,
+          581.1379999999999
+        ],
+        "position": [
+          74.447,
+          581.1379999999999
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'Sim', 1, 'pler', -343, 'arc', 29, 'hitecture']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.447,
+          581.1379999999999
+        ],
+        "position": [
+          74.447,
+          581.1379999999999
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -20.447,
+          -17.559
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          563.579
+        ],
+        "position": [
+          54.0,
+          563.579
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Q2.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          563.579
+        ],
+        "position": [
+          54.0,
+          563.579
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          21.204,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          75.20400000000001,
+          563.579
+        ],
+        "position": [
+          75.20400000000001,
+          563.579
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Whic', 29, 'h', -343, 'of', -343, 'th', 1, 'e', -343, 'follo', 29, 'wing', -343, 'is', -343, 'the', -342, 'main', -343, 'reason', -342, 'RNNs', -343, 'struggle', -342, 'with', -343, 'long-term', -342, 'dep', -29, 'endencie', 1, 's?']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          75.20400000000001,
+          563.579
+        ],
+        "position": [
+          75.20400000000001,
+          563.579
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.629,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.575,
+          550.627
+        ],
+        "position": [
+          74.575,
+          550.627
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'Ov', 29, 'er\\x0ctting']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.575,
+          550.627
+        ],
+        "position": [
+          74.575,
+          550.627
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          0.384,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.959,
+          537.6759999999999
+        ],
+        "position": [
+          74.959,
+          537.6759999999999
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'V', 86, 'anishing', -342, 'gradien', 28, 'ts']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.959,
+          537.6759999999999
+        ],
+        "position": [
+          74.959,
+          537.6759999999999
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.129,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.83,
+          524.7239999999999
+        ],
+        "position": [
+          74.83,
+          524.7239999999999
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'L', 1, 'ac', 28, 'k', -343, 'of', -342, 'non-linearit', 29, 'y']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.83,
+          524.7239999999999
+        ],
+        "position": [
+          74.83,
+          524.7239999999999
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.383,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.447,
+          511.7729999999999
+        ],
+        "position": [
+          74.447,
+          511.7729999999999
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'Insu', 1, '\\x0ecien', 28, 't', -342, 'data']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.447,
+          511.7729999999999
+        ],
+        "position": [
+          74.447,
+          511.7729999999999
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -20.447,
+          -17.559
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          494.2139999999999
+        ],
+        "position": [
+          54.0,
+          494.2139999999999
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Q3.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          494.2139999999999
+        ],
+        "position": [
+          54.0,
+          494.2139999999999
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          21.204,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          75.20400000000001,
+          494.2139999999999
+        ],
+        "position": [
+          75.20400000000001,
+          494.2139999999999
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['What', -342, 'di\\x0beren', 28, 'tiates', -342, 'an', -343, 'LSTM', -342, 'cell', -343, 'from', -343, 'a', -342, 'standard', -343, 'RNN', -342, 'cell?']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          75.20400000000001,
+          494.2139999999999
+        ],
+        "position": [
+          75.20400000000001,
+          494.2139999999999
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.629,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.575,
+          481.2619999999999
+        ],
+        "position": [
+          74.575,
+          481.2619999999999
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'It', -342, 'uses', -343, 'ReLU', -342, 'instead', -343, 'of', -342, 'tanh']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.575,
+          481.2619999999999
+        ],
+        "position": [
+          74.575,
+          481.2619999999999
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          0.384,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.959,
+          468.31099999999986
+        ],
+        "position": [
+          74.959,
+          468.31099999999986
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'It', -342, 'in', 28, 'tro', -28, 'duces', -343, 'gate', 1, 's', -343, 'to', -343, 'con', 29, 'trol', -343, 'the', -342, '\\ro', 28, 'w', -342, 'of', -343, 'information']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.959,
+          468.31099999999986
+        ],
+        "position": [
+          74.959,
+          468.31099999999986
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.129,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.83,
+          455.35899999999987
+        ],
+        "position": [
+          74.83,
+          455.35899999999987
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'It', -342, 'has', -343, 'few', 29, 'er', -343, 'parameters']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.83,
+          455.35899999999987
+        ],
+        "position": [
+          74.83,
+          455.35899999999987
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.383,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.447,
+          442.40799999999984
+        ],
+        "position": [
+          74.447,
+          442.40799999999984
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'It', -342, 'is', -343, 'a', -342, 'con', 28, 'v', 29, 'olutional', -343, 'arc', 29, 'hitecture']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.447,
+          442.40799999999984
+        ],
+        "position": [
+          74.447,
+          442.40799999999984
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -20.447,
+          -17.559
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          424.8489999999998
+        ],
+        "position": [
+          54.0,
+          424.8489999999998
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Q4.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          424.8489999999998
+        ],
+        "position": [
+          54.0,
+          424.8489999999998
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          21.204,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          75.20400000000001,
+          424.8489999999998
+        ],
+        "position": [
+          75.20400000000001,
+          424.8489999999998
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['In', -343, 'a', -342, 'standard', -343, 'LSTM', 1, ',', -343, 'whic', 29, 'h', -343, 'gate', -343, 'is', -342, 'resp', -29, 'onsible', -342, 'for', -343, 'deciding', -342, 'ho', 28, 'w', -342, 'm', 28, 'uc', 29, 'h', -343, 'of', -342, 'the', -343, 'past', -342, 'memory', -343, 'to', -342, 'k', 28, 'eep?']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          75.20400000000001,
+          424.8489999999998
+        ],
+        "position": [
+          75.20400000000001,
+          424.8489999999998
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.629,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.575,
+          411.8969999999998
+        ],
+        "position": [
+          74.575,
+          411.8969999999998
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'Outp', 1, 'ut', -343, 'gate']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.575,
+          411.8969999999998
+        ],
+        "position": [
+          74.575,
+          411.8969999999998
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          0.384,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.959,
+          398.9459999999998
+        ],
+        "position": [
+          74.959,
+          398.9459999999998
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'F', 86, 'orget', -342, 'gate']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.959,
+          398.9459999999998
+        ],
+        "position": [
+          74.959,
+          398.9459999999998
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.129,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.83,
+          385.9949999999998
+        ],
+        "position": [
+          74.83,
+          385.9949999999998
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'In', 1, 'put', -343, 'gate']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.83,
+          385.9949999999998
+        ],
+        "position": [
+          74.83,
+          385.9949999999998
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.383,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.447,
+          373.0429999999998
+        ],
+        "position": [
+          74.447,
+          373.0429999999998
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'Up', -28, 'date', -343, 'gate']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          74.447,
+          373.0429999999998
+        ],
+        "position": [
+          74.447,
+          373.0429999999998
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -20.447,
+          -31.444
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          341.59899999999976
+        ],
+        "position": [
+          54.0,
+          341.59899999999976
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Descriptiv', 31, 'e', -375, 'Questions']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          54.0,
+          341.59899999999976
+        ],
+        "position": [
+          54.0,
+          341.59899999999976
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          3.703,
+          -16.937
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          57.703,
+          324.66199999999975
+        ],
+        "position": [
+          57.703,
+          324.66199999999975
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Q5.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          57.703,
+          324.66199999999975
+        ],
+        "position": [
+          57.703,
+          324.66199999999975
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          21.204,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          324.66199999999975
+        ],
+        "position": [
+          78.90700000000001,
+          324.66199999999975
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Wh', 29, 'y', -399, 'is', -398, 'the', -399, 'forget', -398, 'gate', -398, 'bias', -399, 'in', -398, 'LSTMs', -398, 'often', -399, 'initialized', -398, 'to', -398, 'a', -399, 'high', -398, 'v', 57, 'alue', -399, '(e', 1, '.g.,', -413, '2', -398, 'or', -399, '3)?', -624, 'Explain', -398, 'its', -399, 'e\\x0bect', -398, 'on', -398, 'long-term']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          324.66199999999975
+        ],
+        "position": [
+          78.90700000000001,
+          324.66199999999975
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          0.0,
+          -10.959
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          313.70299999999975
+        ],
+        "position": [
+          78.90700000000001,
+          313.70299999999975
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['dep', -28, 'endency', -343, 'learning.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          313.70299999999975
+        ],
+        "position": [
+          78.90700000000001,
+          313.70299999999975
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -21.204,
+          -19.863
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          57.70300000000001,
+          293.83999999999975
+        ],
+        "position": [
+          57.70300000000001,
+          293.83999999999975
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Q6.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          57.70300000000001,
+          293.83999999999975
+        ],
+        "position": [
+          57.70300000000001,
+          293.83999999999975
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          21.204,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          293.83999999999975
+        ],
+        "position": [
+          78.90700000000001,
+          293.83999999999975
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Bidirectional', -295, 'RNNs', -294, 'are', -295, 'often', -295, 'used', -294, 'for', -295, 'POS', -295, 'tagging', -295, 'b', 1, 'ut', -295, 'not', -295, 'mac', 29, 'hine', -295, 'translation.', -441, 'Explain', -294, 'wh', 28, 'y', 86, ',', -305, 'cons', 1, 'idering', -295, 'input-output']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          293.83999999999975
+        ],
+        "position": [
+          78.90700000000001,
+          293.83999999999975
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          0.0,
+          -10.959
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          282.88099999999974
+        ],
+        "position": [
+          78.90700000000001,
+          282.88099999999974
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['alignmen', 29, 't', -343, 'and', -342, 'con', 28, 'text', -342, '\\ro', 28, 'w.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          282.88099999999974
+        ],
+        "position": [
+          78.90700000000001,
+          282.88099999999974
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -21.204,
+          -19.863
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          57.70300000000001,
+          263.01799999999974
+        ],
+        "position": [
+          57.70300000000001,
+          263.01799999999974
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Q7.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          57.70300000000001,
+          263.01799999999974
+        ],
+        "position": [
+          57.70300000000001,
+          263.01799999999974
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          21.204,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          263.01799999999974
+        ],
+        "position": [
+          78.90700000000001,
+          263.01799999999974
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Designing', -342, 'an', -343, 'RNN', -343, 'm', 1, 'o', -29, 'del', -343, 'for', -342, 'v', 57, 'ariable-length', -343, 'le', 1, 'gal', -343, 'do', -29, 'cum', 1, 'en', 28, 'ts', -342, 'with', -343, 'long', -343, 'de', 1, 'p', -29, 'endencies:']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          263.01799999999974
+        ],
+        "position": [
+          78.90700000000001,
+          263.01799999999974
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          5.161,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          84.06800000000001,
+          250.06699999999975
+        ],
+        "position": [
+          84.06800000000001,
+          250.06699999999975
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['(a)', -556, 'C', 1, 'ho', -29, 'ose', -343, 'b', -28, 'et', 29, 'w', 28, 'een', -342, 'v', 57, 'anilla', -343, 'RNN', -342, 'or', -343, 'LSTM.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          84.06800000000001,
+          250.06699999999975
+        ],
+        "position": [
+          84.06800000000001,
+          250.06699999999975
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -0.512,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          83.55600000000001,
+          237.11599999999976
+        ],
+        "position": [
+          83.55600000000001,
+          237.11599999999976
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['(b)', -556, 'S', 1, 'tac', 28, 'k', -343, 'la', 29, 'y', 29, 'ers', -343, 'or', -343, 'k', 29, 'eep', -343, 'it', -342, 'shallo', 28, 'w?']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          83.55600000000001,
+          237.11599999999976
+        ],
+        "position": [
+          83.55600000000001,
+          237.11599999999976
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          1.024,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          84.58000000000001,
+          224.16399999999976
+        ],
+        "position": [
+          84.58000000000001,
+          224.16399999999976
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['(c)', -556, 'M', 1, 'ak', 28, 'e', -343, 'i', 1, 't', -343, 'bidirectional?']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          84.58000000000001,
+          224.16399999999976
+        ],
+        "position": [
+          84.58000000000001,
+          224.16399999999976
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -5.673,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          211.21299999999977
+        ],
+        "position": [
+          78.90700000000001,
+          211.21299999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Justify', -343, 'eac', 29, 'h', -343, 'c', 29, 'hoice', -342, 'based', -343, 'on', -343, 'mo', -28, 'del', -343, 'b', -28, 'eha', 28, 'vior', -342, 'and', -343, 'task', -342, 'needs.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          211.21299999999977
+        ],
+        "position": [
+          78.90700000000001,
+          211.21299999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -21.204,
+          -19.863
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          57.70300000000001,
+          191.34999999999977
+        ],
+        "position": [
+          57.70300000000001,
+          191.34999999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Q8.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          57.70300000000001,
+          191.34999999999977
+        ],
+        "position": [
+          57.70300000000001,
+          191.34999999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          21.204,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          191.34999999999977
+        ],
+        "position": [
+          78.90700000000001,
+          191.34999999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Consider', -342, 'a', -343, 'v', 57, 'anilla', -342, 'RNN', -343, 'with', -343, 're', 1, 'curren', 28, 't', -342, 'w', 28, 'eigh', 29, 't', -343, 'matrix']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000001,
+          191.34999999999977
+        ],
+        "position": [
+          78.90700000000001,
+          191.34999999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          219.158,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          298.065,
+          191.34999999999977
+        ],
+        "position": [
+          298.065,
+          191.34999999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['W']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          298.065,
+          191.34999999999977
+        ],
+        "position": [
+          298.065,
+          191.34999999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          8.702,
+          -1.063
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          306.767,
+          190.28699999999978
+        ],
+        "position": [
+          306.767,
+          190.28699999999978
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['h']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          306.767,
+          190.28699999999978
+        ],
+        "position": [
+          306.767,
+          190.28699999999978
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          7.908,
+          1.063
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          314.675,
+          191.34999999999977
+        ],
+        "position": [
+          314.675,
+          191.34999999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['and', -343, 'sequen', 1, 'ce', -343, 'length', -343, '50.', -456, 'Analyze', -343, 'gradien', 29, 't', -343, 'b', -28, 'eha', 28, 'vior:']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          314.675,
+          191.34999999999977
+        ],
+        "position": [
+          314.675,
+          191.34999999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -230.607,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          84.06800000000001,
+          178.39799999999977
+        ],
+        "position": [
+          84.06800000000001,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['(1)', -556, 'I', 1, 'f']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          84.06800000000001,
+          178.39799999999977
+        ],
+        "position": [
+          84.06800000000001,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          25.97,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          110.03800000000001,
+          178.39799999999977
+        ],
+        "position": [
+          110.03800000000001,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          110.03800000000001,
+          178.39799999999977
+        ],
+        "position": [
+          110.03800000000001,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          4.608,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          114.64600000000002,
+          178.39799999999977
+        ],
+        "position": [
+          114.64600000000002,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['W']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          114.64600000000002,
+          178.39799999999977
+        ],
+        "position": [
+          114.64600000000002,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          8.702,
+          -1.062
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          123.34800000000001,
+          177.33599999999976
+        ],
+        "position": [
+          123.34800000000001,
+          177.33599999999976
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['h']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          123.34800000000001,
+          177.33599999999976
+        ],
+        "position": [
+          123.34800000000001,
+          177.33599999999976
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          4.836,
+          1.062
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          128.18400000000003,
+          178.39799999999977
+        ],
+        "position": [
+          128.18400000000003,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          128.18400000000003,
+          178.39799999999977
+        ],
+        "position": [
+          128.18400000000003,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          7.168,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          135.35200000000003,
+          178.39799999999977
+        ],
+        "position": [
+          135.35200000000003,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['=', -285, '0']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          135.35200000000003,
+          178.39799999999977
+        ],
+        "position": [
+          135.35200000000003,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          14.335,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          149.68700000000004,
+          178.39799999999977
+        ],
+        "position": [
+          149.68700000000004,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "[':']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          149.68700000000004,
+          178.39799999999977
+        ],
+        "position": [
+          149.68700000000004,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          2.56,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          152.24700000000004,
+          178.39799999999977
+        ],
+        "position": [
+          152.24700000000004,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['9:', -457, 'Will', -342, 'gradien', 28, 'ts', -342, 'v', 57, 'anish', -343, 'or', -342, 'explo', -29, 'de?', -457, 'J', 1, 'ustify', 85, '.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          152.24700000000004,
+          178.39799999999977
+        ],
+        "position": [
+          152.24700000000004,
+          178.39799999999977
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -68.179,
+          -12.951
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          84.06800000000004,
+          165.44699999999978
+        ],
+        "position": [
+          84.06800000000004,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['(2)', -556, 'I', 1, 'f']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          84.06800000000004,
+          165.44699999999978
+        ],
+        "position": [
+          84.06800000000004,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          25.97,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          110.03800000000004,
+          165.44699999999978
+        ],
+        "position": [
+          110.03800000000004,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          110.03800000000004,
+          165.44699999999978
+        ],
+        "position": [
+          110.03800000000004,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          4.608,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          114.64600000000004,
+          165.44699999999978
+        ],
+        "position": [
+          114.64600000000004,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['W']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          114.64600000000004,
+          165.44699999999978
+        ],
+        "position": [
+          114.64600000000004,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          8.702,
+          -1.063
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          123.34800000000004,
+          164.3839999999998
+        ],
+        "position": [
+          123.34800000000004,
+          164.3839999999998
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['h']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          123.34800000000004,
+          164.3839999999998
+        ],
+        "position": [
+          123.34800000000004,
+          164.3839999999998
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          4.836,
+          1.063
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          128.18400000000005,
+          165.44699999999978
+        ],
+        "position": [
+          128.18400000000005,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          128.18400000000005,
+          165.44699999999978
+        ],
+        "position": [
+          128.18400000000005,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          7.168,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          135.35200000000006,
+          165.44699999999978
+        ],
+        "position": [
+          135.35200000000006,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['=', -285, '1']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          135.35200000000006,
+          165.44699999999978
+        ],
+        "position": [
+          135.35200000000006,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          14.335,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          149.68700000000007,
+          165.44699999999978
+        ],
+        "position": [
+          149.68700000000007,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "[':']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          149.68700000000007,
+          165.44699999999978
+        ],
+        "position": [
+          149.68700000000007,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          2.56,
+          0.0
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          152.24700000000007,
+          165.44699999999978
+        ],
+        "position": [
+          152.24700000000007,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['2:', -457, 'Will', -342, 'gradien', 28, 'ts', -342, 'v', 57, 'anish', -343, 'or', -342, 'explo', -29, 'de?', -457, 'J', 1, 'ustify', 85, '.', -457, 'Suggest', -342, 'an', -343, 'easy', -342, '\\x0cx', -343, 'and', -342, 'explain', -343, 'ho', 29, 'w', -343, 'it', -342, 'helps.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          152.24700000000007,
+          165.44699999999978
+        ],
+        "position": [
+          152.24700000000007,
+          165.44699999999978
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          -73.34,
+          -12.952
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000007,
+          152.49499999999978
+        ],
+        "position": [
+          78.90700000000007,
+          152.49499999999978
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['Hint:', -472, 'Consider', -367, 'eigenvalue', -368, 'e\\x0be', 53, 'cts', -368, 'on', -367, 'gr', 53, 'adient', -368, 'pr', 53, 'op', 52, 'agation', -367, 'over', -367, 'time.']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          78.90700000000007,
+          152.49499999999978
+        ],
+        "position": [
+          78.90700000000007,
+          152.49499999999978
+        ]
+      },
+      {
+        "operator": "Td",
+        "offset": [
+          224.602,
+          -128.383
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          303.50900000000007,
+          24.111999999999767
+        ],
+        "position": [
+          303.50900000000007,
+          24.111999999999767
+        ]
+      },
+      {
+        "operator": "TJ",
+        "operands": [
+          "['1']"
+        ],
+        "matrix": [
+          1,
+          0,
+          0,
+          1,
+          303.50900000000007,
+          24.111999999999767
+        ],
+        "position": [
+          303.50900000000007,
+          24.111999999999767
+        ]
+      }
+    ]
+  },
+  "full_page_hierarchy": {
+    "page_width": 612.0,
+    "page_height": 792.0,
+    "blocks": [
+      {
+        "block_number": 0,
+        "bbox": [
+          225.91700744628906,
+          60.784751892089844,
+          386.1062316894531,
+          78.00015258789062
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              225.91700744628906,
+              60.784751892089844,
+              386.1062316894531,
+              78.00015258789062
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "RNNs and LSTM Quiz",
+                "font": "CMR17",
+                "size": 17.21540069580078,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  225.91700744628906,
+                  60.784751892089844,
+                  386.1062316894531,
+                  78.00015258789062
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 1,
+        "bbox": [
+          54.0,
+          130.90798950195312,
+          241.84915161132812,
+          145.25418090820312
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              54.0,
+              130.90798950195312,
+              241.84915161132812,
+              145.25418090820312
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Multiple Choice Questions",
+                "font": "CMBX12",
+                "size": 14.346199989318848,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  54.0,
+                  130.90798950195312,
+                  241.84915161132812,
+                  145.25418090820312
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 2,
+        "bbox": [
+          54.0,
+          152.0494842529297,
+          409.6595764160156,
+          212.8208770751953
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              54.0,
+              152.0494842529297,
+              409.6595764160156,
+              161.01588439941406
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Q1.",
+                "font": "CMBX9",
+                "size": 8.966400146484375,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  54.0,
+                  152.0494842529297,
+                  70.22917938232422,
+                  161.01588439941406
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " What is the primary benefit of stacking multiple RNN layers (i.e., stacked RNNs)?",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  70.22917938232422,
+                  152.0494842529297,
+                  409.6595764160156,
+                  161.01588439941406
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 1,
+            "bbox": [
+              74.57500457763672,
+              165.00047302246094,
+              148.65541076660156,
+              173.9668731689453
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "A. Faster training",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.57500457763672,
+                  165.00047302246094,
+                  148.65541076660156,
+                  173.9668731689453
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 2,
+            "bbox": [
+              74.9590072631836,
+              177.9514617919922,
+              173.98394775390625,
+              186.91786193847656
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "B. Lower memory usage",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.9590072631836,
+                  177.9514617919922,
+                  173.98394775390625,
+                  186.91786193847656
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 3,
+            "bbox": [
+              74.83000946044922,
+              190.9034881591797,
+              244.4832763671875,
+              199.86988830566406
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "C. Better learning of hierarchical features",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.83000946044922,
+                  190.9034881591797,
+                  244.4832763671875,
+                  199.86988830566406
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 4,
+            "bbox": [
+              74.44700622558594,
+              203.85447692871094,
+              170.78199768066406,
+              212.8208770751953
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "D. Simpler architecture",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.44700622558594,
+                  203.85447692871094,
+                  170.78199768066406,
+                  212.8208770751953
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 3,
+        "bbox": [
+          54.00000762939453,
+          221.4134979248047,
+          428.7222595214844,
+          282.1859130859375
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              54.00000762939453,
+              221.4134979248047,
+              428.7222595214844,
+              230.37989807128906
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Q2.",
+                "font": "CMBX9",
+                "size": 8.966400146484375,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  54.00000762939453,
+                  221.4134979248047,
+                  70.22918701171875,
+                  230.37989807128906
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " Which of the following is the main reason RNNs struggle with long-term dependencies?",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  70.22918701171875,
+                  221.4134979248047,
+                  428.7222595214844,
+                  230.37989807128906
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 1,
+            "bbox": [
+              74.57501220703125,
+              234.3655242919922,
+              133.08975219726562,
+              243.33192443847656
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "A. Overfitting",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.57501220703125,
+                  234.3655242919922,
+                  133.08975219726562,
+                  243.33192443847656
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 2,
+            "bbox": [
+              74.95901489257812,
+              247.31651306152344,
+              168.27235412597656,
+              256.28289794921875
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "B. Vanishing gradients",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.95901489257812,
+                  247.31651306152344,
+                  168.27235412597656,
+                  256.28289794921875
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 3,
+            "bbox": [
+              74.83001708984375,
+              260.2685241699219,
+              172.89552307128906,
+              269.23492431640625
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "C. Lack of non-linearity",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.83001708984375,
+                  260.2685241699219,
+                  172.89552307128906,
+                  269.23492431640625
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 4,
+            "bbox": [
+              74.44701385498047,
+              273.2195129394531,
+              154.11351013183594,
+              282.1859130859375
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "D. Insufficient data",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.44701385498047,
+                  273.2195129394531,
+                  154.11351013183594,
+                  282.1859130859375
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 4,
+        "bbox": [
+          54.00001525878906,
+          290.77850341796875,
+          323.4656982421875,
+          351.5508728027344
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              54.00001525878906,
+              290.77850341796875,
+              323.4656982421875,
+              299.7449035644531
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Q3.",
+                "font": "CMBX9",
+                "size": 8.966400146484375,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  54.00001525878906,
+                  290.77850341796875,
+                  70.22919464111328,
+                  299.7449035644531
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " What differentiates an LSTM cell from a standard RNN cell?",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  70.22919464111328,
+                  290.77850341796875,
+                  323.4656982421875,
+                  299.7449035644531
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 1,
+            "bbox": [
+              74.57501983642578,
+              303.7304992675781,
+              205.92384338378906,
+              312.6968994140625
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "A. It uses ReLU instead of tanh",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.57501983642578,
+                  303.7304992675781,
+                  205.92384338378906,
+                  312.6968994140625
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 2,
+            "bbox": [
+              74.95902252197266,
+              316.6814880371094,
+              301.9703674316406,
+              325.64788818359375
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "B. It introduces gates to control the flow of information",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.95902252197266,
+                  316.6814880371094,
+                  301.9703674316406,
+                  325.64788818359375
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 3,
+            "bbox": [
+              74.83002471923828,
+              329.63348388671875,
+              184.17527770996094,
+              338.5998840332031
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "C. It has fewer parameters",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.83002471923828,
+                  329.63348388671875,
+                  184.17527770996094,
+                  338.5998840332031
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 4,
+            "bbox": [
+              74.447021484375,
+              342.58447265625,
+              220.48280334472656,
+              351.5508728027344
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "D. It is a convolutional architecture",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.447021484375,
+                  342.58447265625,
+                  220.48280334472656,
+                  351.5508728027344
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 5,
+        "bbox": [
+          54.000022888183594,
+          360.1434631347656,
+          477.3559875488281,
+          420.91583251953125
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              54.000022888183594,
+              360.1434631347656,
+              477.3559875488281,
+              369.10986328125
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Q4.",
+                "font": "CMBX9",
+                "size": 8.966400146484375,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  54.000022888183594,
+                  360.1434631347656,
+                  70.22920227050781,
+                  369.10986328125
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " In a standard LSTM, which gate is responsible for deciding how much of the past memory to keep?",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  70.22920227050781,
+                  360.1434631347656,
+                  477.3559875488281,
+                  369.10986328125
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 1,
+            "bbox": [
+              74.57502746582031,
+              373.095458984375,
+              138.70272827148438,
+              382.0618591308594
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "A. Output gate",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.57502746582031,
+                  373.095458984375,
+                  138.70272827148438,
+                  382.0618591308594
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 2,
+            "bbox": [
+              74.95903015136719,
+              386.04644775390625,
+              134.7559356689453,
+              395.0128479003906
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "B. Forget gate",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.95903015136719,
+                  386.04644775390625,
+                  134.7559356689453,
+                  395.0128479003906
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 3,
+            "bbox": [
+              74.83003234863281,
+              398.9974365234375,
+              131.27352905273438,
+              407.9638366699219
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "C. Input gate",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.83003234863281,
+                  398.9974365234375,
+                  131.27352905273438,
+                  407.9638366699219
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 4,
+            "bbox": [
+              74.44702911376953,
+              411.9494323730469,
+              138.709228515625,
+              420.91583251953125
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "D. Update gate",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  74.44702911376953,
+                  411.9494323730469,
+                  138.709228515625,
+                  420.91583251953125
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 6,
+        "bbox": [
+          54.000030517578125,
+          439.18896484375,
+          207.92042541503906,
+          453.53515625
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              54.000030517578125,
+              439.18896484375,
+              207.92042541503906,
+              453.53515625
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Descriptive Questions",
+                "font": "CMBX12",
+                "size": 14.346199989318848,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  54.000030517578125,
+                  439.18896484375,
+                  207.92042541503906,
+                  453.53515625
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 7,
+        "bbox": [
+          57.70302963256836,
+          460.3304443359375,
+          558.0806274414062,
+          480.255859375
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              57.70302963256836,
+              460.3304443359375,
+              558.0806274414062,
+              469.2968444824219
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Q5.",
+                "font": "CMBX9",
+                "size": 8.966400146484375,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  57.70302963256836,
+                  460.3304443359375,
+                  73.93221282958984,
+                  469.2968444824219
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " Why is the forget gate bias in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-term",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  73.93221282958984,
+                  460.3304443359375,
+                  558.0806274414062,
+                  469.2968444824219
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 1,
+            "bbox": [
+              78.90702819824219,
+              471.2894592285156,
+              163.9353790283203,
+              480.255859375
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "dependency learning.",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  78.90702819824219,
+                  471.2894592285156,
+                  163.9353790283203,
+                  480.255859375
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 8,
+        "bbox": [
+          57.703025817871094,
+          491.1524658203125,
+          558.0892944335938,
+          511.077880859375
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              57.703025817871094,
+              491.1524658203125,
+              558.0892944335938,
+              500.1188659667969
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Q6.",
+                "font": "CMBX9",
+                "size": 8.966400146484375,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  57.703025817871094,
+                  491.1524658203125,
+                  73.93220520019531,
+                  500.1188659667969
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " Bidirectional RNNs are often used for POS tagging but not machine translation. Explain why, considering input-output",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  73.93220520019531,
+                  491.1524658203125,
+                  558.0892944335938,
+                  500.1188659667969
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 1,
+            "bbox": [
+              78.90702819824219,
+              502.1114807128906,
+              191.05877685546875,
+              511.077880859375
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "alignment and context flow.",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  78.90702819824219,
+                  502.1114807128906,
+                  191.05877685546875,
+                  511.077880859375
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 9,
+        "bbox": [
+          57.703025817871094,
+          521.9745483398438,
+          425.79913330078125,
+          582.7459106445312
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              57.703025817871094,
+              521.9745483398438,
+              425.79913330078125,
+              530.94091796875
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Q7.",
+                "font": "CMBX9",
+                "size": 8.966400146484375,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  57.703025817871094,
+                  521.9745483398438,
+                  73.93220520019531,
+                  530.94091796875
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " Designing an RNN model for variable-length legal documents with long dependencies:",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  73.93220520019531,
+                  521.9745483398438,
+                  425.79913330078125,
+                  530.94091796875
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 1,
+            "bbox": [
+              84.06803131103516,
+              534.925537109375,
+              261.4234313964844,
+              543.8919067382812
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "(a) Choose between vanilla RNN or LSTM.",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  84.06803131103516,
+                  534.925537109375,
+                  261.4234313964844,
+                  543.8919067382812
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 2,
+            "bbox": [
+              83.5560302734375,
+              547.8765258789062,
+              227.18881225585938,
+              556.8428955078125
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "(b) Stack layers or keep it shallow?",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  83.5560302734375,
+                  547.8765258789062,
+                  227.18881225585938,
+                  556.8428955078125
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 3,
+            "bbox": [
+              84.58003234863281,
+              560.8285522460938,
+              189.4510498046875,
+              569.794921875
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "(c) Make it bidirectional?",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  84.58003234863281,
+                  560.8285522460938,
+                  189.4510498046875,
+                  569.794921875
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 4,
+            "bbox": [
+              78.90703582763672,
+              573.779541015625,
+              323.24139404296875,
+              582.7459106445312
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Justify each choice based on model behavior and task needs.",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  78.90703582763672,
+                  573.779541015625,
+                  323.24139404296875,
+                  582.7459106445312
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 10,
+        "bbox": [
+          57.703033447265625,
+          593.6425170898438,
+          523.4397583007812,
+          641.4638671875
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              57.703033447265625,
+              593.6425170898438,
+              523.4397583007812,
+              603.671875
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Q8.",
+                "font": "CMBX9",
+                "size": 8.966400146484375,
+                "flags": 20,
+                "color": 0,
+                "bbox": [
+                  57.703033447265625,
+                  593.6425170898438,
+                  73.93221282958984,
+                  602.60888671875
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " Consider a vanilla RNN with recurrent weight matrix",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  73.93221282958984,
+                  593.6425170898438,
+                  295.03314208984375,
+                  602.60888671875
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 2,
+                "text": " W",
+                "font": "CMMI9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  295.03314208984375,
+                  593.6425170898438,
+                  306.77142333984375,
+                  602.60888671875
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 3,
+                "text": "h",
+                "font": "CMMI6",
+                "size": 5.97760009765625,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  306.76702880859375,
+                  597.0413208007812,
+                  311.1067810058594,
+                  603.0189208984375
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 4,
+                "text": " and sequence length 50. Analyze gradient behavior:",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  311.1067810058594,
+                  593.6425170898438,
+                  523.4397583007812,
+                  603.671875
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 1,
+            "bbox": [
+              84.06802368164062,
+              606.4783325195312,
+              331.5302429199219,
+              615.969970703125
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "(1) If",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  84.06802368164062,
+                  606.5945434570312,
+                  106.96822357177734,
+                  615.5609130859375
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " \u2225",
+                "font": "CMSY9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  106.96822357177734,
+                  606.4783325195312,
+                  114.6467514038086,
+                  615.4447021484375
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 2,
+                "text": "W",
+                "font": "CMMI9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  114.64602661132812,
+                  606.5945434570312,
+                  123.35240173339844,
+                  615.5609130859375
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 3,
+                "text": "h",
+                "font": "CMMI6",
+                "size": 5.97760009765625,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  123.3480224609375,
+                  609.9923706054688,
+                  127.68775939941406,
+                  615.969970703125
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 4,
+                "text": "\u2225",
+                "font": "CMSY9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  128.18402099609375,
+                  606.4783325195312,
+                  132.79275512695312,
+                  615.4447021484375
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 5,
+                "text": "= 0",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  135.35202026367188,
+                  606.5945434570312,
+                  149.68032836914062,
+                  615.5609130859375
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 6,
+                "text": ".",
+                "font": "CMMI9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  149.68702697753906,
+                  606.5945434570312,
+                  152.2514190673828,
+                  615.5609130859375
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 7,
+                "text": "9: Will gradients vanish or explode? Justify.",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  152.2470245361328,
+                  606.5945434570312,
+                  331.5302429199219,
+                  615.5609130859375
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 2,
+            "bbox": [
+              84.06802368164062,
+              619.4293212890625,
+              517.027099609375,
+              628.9219360351562
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "(2) If",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  84.06802368164062,
+                  619.5455322265625,
+                  106.96822357177734,
+                  628.5119018554688
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 1,
+                "text": " \u2225",
+                "font": "CMSY9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  106.96822357177734,
+                  619.4293212890625,
+                  114.6467514038086,
+                  628.3956909179688
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 2,
+                "text": "W",
+                "font": "CMMI9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  114.64602661132812,
+                  619.5455322265625,
+                  123.35240173339844,
+                  628.5119018554688
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 3,
+                "text": "h",
+                "font": "CMMI6",
+                "size": 5.97760009765625,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  123.3480224609375,
+                  622.9443359375,
+                  127.68775939941406,
+                  628.9219360351562
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 4,
+                "text": "\u2225",
+                "font": "CMSY9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  128.18402099609375,
+                  619.4293212890625,
+                  132.79275512695312,
+                  628.3956909179688
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 5,
+                "text": "= 1",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  135.35202026367188,
+                  619.5455322265625,
+                  149.68032836914062,
+                  628.5119018554688
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 6,
+                "text": ".",
+                "font": "CMMI9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  149.68702697753906,
+                  619.5455322265625,
+                  152.2514190673828,
+                  628.5119018554688
+                ],
+                "matrix": []
+              },
+              {
+                "span_number": 7,
+                "text": "2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps.",
+                "font": "CMR9",
+                "size": 8.966400146484375,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  152.2470245361328,
+                  619.5455322265625,
+                  517.027099609375,
+                  628.5119018554688
+                ],
+                "matrix": []
+              }
+            ]
+          },
+          {
+            "line_number": 3,
+            "bbox": [
+              78.90702819824219,
+              632.4974975585938,
+              354.87506103515625,
+              641.4638671875
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "Hint: Consider eigenvalue effects on gradient propagation over time.",
+                "font": "CMTI9",
+                "size": 8.966400146484375,
+                "flags": 6,
+                "color": 0,
+                "bbox": [
+                  78.90702819824219,
+                  632.4974975585938,
+                  354.87506103515625,
+                  641.4638671875
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "block_number": 11,
+        "bbox": [
+          303.509033203125,
+          760.1019897460938,
+          308.4903259277344,
+          770.0645751953125
+        ],
+        "lines": [
+          {
+            "line_number": 0,
+            "bbox": [
+              303.509033203125,
+              760.1019897460938,
+              308.4903259277344,
+              770.0645751953125
+            ],
+            "spans": [
+              {
+                "span_number": 0,
+                "text": "1",
+                "font": "CMR10",
+                "size": 9.962599754333496,
+                "flags": 4,
+                "color": 0,
+                "bbox": [
+                  303.509033203125,
+                  760.1019897460938,
+                  308.4903259277344,
+                  770.0645751953125
+                ],
+                "matrix": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "operations_comparison": {
+    "before": [
+      {
+        "index": 0,
+        "operator": "BT",
+        "operands": []
+      },
+      {
+        "index": 1,
+        "operator": "Tf",
+        "operands": [
+          "/F37",
+          "17.2154"
+        ]
+      },
+      {
+        "index": 2,
+        "operator": "Td",
+        "operands": [
+          "225.917",
+          "717.776"
+        ]
+      },
+      {
+        "index": 3,
+        "operator": "TJ",
+        "operands": [
+          "['RNNs', -302, 'and', -302, 'LSTM', -302, 'Quiz']"
+        ]
+      },
+      {
+        "index": 4,
+        "operator": "Tf",
+        "operands": [
+          "/F52",
+          "14.3462"
+        ]
+      },
+      {
+        "index": 5,
+        "operator": "Td",
+        "operands": [
+          "-171.917",
+          "-67.896"
+        ]
+      },
+      {
+        "index": 6,
+        "operator": "TJ",
+        "operands": [
+          "['Multiple', -375, 'Choice', -375, 'Questions']"
+        ]
+      },
+      {
+        "index": 7,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 8,
+        "operator": "Td",
+        "operands": [
+          "0",
+          "-16.937"
+        ]
+      },
+      {
+        "index": 9,
+        "operator": "TJ",
+        "operands": [
+          "['Q1.']"
+        ]
+      },
+      {
+        "index": 10,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 11,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 12,
+        "operator": "TJ",
+        "operands": [
+          "['What', -342, 'is', -343, 'the', -343, 'primary', -342, 'b', -29, 'ene\\x0ct', -342, 'of', -343, 'stac', 29, 'king', -343, 'm', 29, 'ultiple', -343, 'RNN', -342, 'la', 28, 'y', 29, 'ers', -343, '(i.e.,', -342, 'stac', 28, 'k', 29, 'ed', -343, 'RNNs)?']"
+        ]
+      },
+      {
+        "index": 13,
+        "operator": "Td",
+        "operands": [
+          "-0.629",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 14,
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'F', 86, 'aster', -342, 'training']"
+        ]
+      },
+      {
+        "index": 15,
+        "operator": "Td",
+        "operands": [
+          "0.384",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 16,
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'Lo', 29, 'w', 29, 'er', -343, 'memory', -342, 'usage']"
+        ]
+      },
+      {
+        "index": 17,
+        "operator": "Td",
+        "operands": [
+          "-0.129",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 18,
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'Bett', 1, 'er', -343, 'learning', -343, 'of', -342, 'hierarc', 28, 'hic', 1, 'al', -343, 'features']"
+        ]
+      },
+      {
+        "index": 19,
+        "operator": "Td",
+        "operands": [
+          "-0.383",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 20,
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'Sim', 1, 'pler', -343, 'arc', 29, 'hitecture']"
+        ]
+      },
+      {
+        "index": 21,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 22,
+        "operator": "Td",
+        "operands": [
+          "-20.447",
+          "-17.559"
+        ]
+      },
+      {
+        "index": 23,
+        "operator": "TJ",
+        "operands": [
+          "['Q2.']"
+        ]
+      },
+      {
+        "index": 24,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 25,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 26,
+        "operator": "TJ",
+        "operands": [
+          "['Whic', 29, 'h', -343, 'of', -343, 'th', 1, 'e', -343, 'follo', 29, 'wing', -343, 'is', -343, 'the', -342, 'main', -343, 'reason', -342, 'RNNs', -343, 'struggle', -342, 'with', -343, 'long-term', -342, 'dep', -29, 'endencie', 1, 's?']"
+        ]
+      },
+      {
+        "index": 27,
+        "operator": "Td",
+        "operands": [
+          "-0.629",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 28,
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'Ov', 29, 'er\\x0ctting']"
+        ]
+      },
+      {
+        "index": 29,
+        "operator": "Td",
+        "operands": [
+          "0.384",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 30,
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'V', 86, 'anishing', -342, 'gradien', 28, 'ts']"
+        ]
+      },
+      {
+        "index": 31,
+        "operator": "Td",
+        "operands": [
+          "-0.129",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 32,
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'L', 1, 'ac', 28, 'k', -343, 'of', -342, 'non-linearit', 29, 'y']"
+        ]
+      },
+      {
+        "index": 33,
+        "operator": "Td",
+        "operands": [
+          "-0.383",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 34,
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'Insu', 1, '\\x0ecien', 28, 't', -342, 'data']"
+        ]
+      },
+      {
+        "index": 35,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 36,
+        "operator": "Td",
+        "operands": [
+          "-20.447",
+          "-17.559"
+        ]
+      },
+      {
+        "index": 37,
+        "operator": "TJ",
+        "operands": [
+          "['Q3.']"
+        ]
+      },
+      {
+        "index": 38,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 39,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 40,
+        "operator": "TJ",
+        "operands": [
+          "['What', -342, 'di\\x0beren', 28, 'tiates', -342, 'an', -343, 'LSTM', -342, 'cell', -343, 'from', -343, 'a', -342, 'standard', -343, 'RNN', -342, 'cell?']"
+        ]
+      },
+      {
+        "index": 41,
+        "operator": "Td",
+        "operands": [
+          "-0.629",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 42,
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'It', -342, 'uses', -343, 'ReLU', -342, 'instead', -343, 'of', -342, 'tanh']"
+        ]
+      },
+      {
+        "index": 43,
+        "operator": "Td",
+        "operands": [
+          "0.384",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 44,
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'It', -342, 'in', 28, 'tro', -28, 'duces', -343, 'gate', 1, 's', -343, 'to', -343, 'con', 29, 'trol', -343, 'the', -342, '\\ro', 28, 'w', -342, 'of', -343, 'information']"
+        ]
+      },
+      {
+        "index": 45,
+        "operator": "Td",
+        "operands": [
+          "-0.129",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 46,
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'It', -342, 'has', -343, 'few', 29, 'er', -343, 'parameters']"
+        ]
+      },
+      {
+        "index": 47,
+        "operator": "Td",
+        "operands": [
+          "-0.383",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 48,
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'It', -342, 'is', -343, 'a', -342, 'con', 28, 'v', 29, 'olutional', -343, 'arc', 29, 'hitecture']"
+        ]
+      },
+      {
+        "index": 49,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 50,
+        "operator": "Td",
+        "operands": [
+          "-20.447",
+          "-17.559"
+        ]
+      },
+      {
+        "index": 51,
+        "operator": "TJ",
+        "operands": [
+          "['Q4.']"
+        ]
+      },
+      {
+        "index": 52,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 53,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 54,
+        "operator": "TJ",
+        "operands": [
+          "['In', -343, 'a', -342, 'standard', -343, 'LSTM', 1, ',', -343, 'whic', 29, 'h', -343, 'gate', -343, 'is', -342, 'resp', -29, 'onsible', -342, 'for', -343, 'deciding', -342, 'ho', 28, 'w', -342, 'm', 28, 'uc', 29, 'h', -343, 'of', -342, 'the', -343, 'past', -342, 'memory', -343, 'to', -342, 'k', 28, 'eep?']"
+        ]
+      },
+      {
+        "index": 55,
+        "operator": "Td",
+        "operands": [
+          "-0.629",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 56,
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'Outp', 1, 'ut', -343, 'gate']"
+        ]
+      },
+      {
+        "index": 57,
+        "operator": "Td",
+        "operands": [
+          "0.384",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 58,
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'F', 86, 'orget', -342, 'gate']"
+        ]
+      },
+      {
+        "index": 59,
+        "operator": "Td",
+        "operands": [
+          "-0.129",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 60,
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'In', 1, 'put', -343, 'gate']"
+        ]
+      },
+      {
+        "index": 61,
+        "operator": "Td",
+        "operands": [
+          "-0.383",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 62,
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'Up', -28, 'date', -343, 'gate']"
+        ]
+      },
+      {
+        "index": 63,
+        "operator": "Tf",
+        "operands": [
+          "/F52",
+          "14.3462"
+        ]
+      },
+      {
+        "index": 64,
+        "operator": "Td",
+        "operands": [
+          "-20.447",
+          "-31.444"
+        ]
+      },
+      {
+        "index": 65,
+        "operator": "TJ",
+        "operands": [
+          "['Descriptiv', 31, 'e', -375, 'Questions']"
+        ]
+      },
+      {
+        "index": 66,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 67,
+        "operator": "Td",
+        "operands": [
+          "3.703",
+          "-16.937"
+        ]
+      },
+      {
+        "index": 68,
+        "operator": "TJ",
+        "operands": [
+          "['Q5.']"
+        ]
+      },
+      {
+        "index": 69,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 70,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 71,
+        "operator": "TJ",
+        "operands": [
+          "['Wh', 29, 'y', -399, 'is', -398, 'the', -399, 'forget', -398, 'gate', -398, 'bias', -399, 'in', -398, 'LSTMs', -398, 'often', -399, 'initialized', -398, 'to', -398, 'a', -399, 'high', -398, 'v', 57, 'alue', -399, '(e', 1, '.g.,', -413, '2', -398, 'or', -399, '3)?', -624, 'Explain', -398, 'its', -399, 'e\\x0bect', -398, 'on', -398, 'long-term']"
+        ]
+      },
+      {
+        "index": 72,
+        "operator": "Td",
+        "operands": [
+          "0",
+          "-10.959"
+        ]
+      },
+      {
+        "index": 73,
+        "operator": "TJ",
+        "operands": [
+          "['dep', -28, 'endency', -343, 'learning.']"
+        ]
+      },
+      {
+        "index": 74,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 75,
+        "operator": "Td",
+        "operands": [
+          "-21.204",
+          "-19.863"
+        ]
+      },
+      {
+        "index": 76,
+        "operator": "TJ",
+        "operands": [
+          "['Q6.']"
+        ]
+      },
+      {
+        "index": 77,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 78,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 79,
+        "operator": "TJ",
+        "operands": [
+          "['Bidirectional', -295, 'RNNs', -294, 'are', -295, 'often', -295, 'used', -294, 'for', -295, 'POS', -295, 'tagging', -295, 'b', 1, 'ut', -295, 'not', -295, 'mac', 29, 'hine', -295, 'translation.', -441, 'Explain', -294, 'wh', 28, 'y', 86, ',', -305, 'cons', 1, 'idering', -295, 'input-output']"
+        ]
+      },
+      {
+        "index": 80,
+        "operator": "Td",
+        "operands": [
+          "0",
+          "-10.959"
+        ]
+      },
+      {
+        "index": 81,
+        "operator": "TJ",
+        "operands": [
+          "['alignmen', 29, 't', -343, 'and', -342, 'con', 28, 'text', -342, '\\ro', 28, 'w.']"
+        ]
+      },
+      {
+        "index": 82,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 83,
+        "operator": "Td",
+        "operands": [
+          "-21.204",
+          "-19.863"
+        ]
+      },
+      {
+        "index": 84,
+        "operator": "TJ",
+        "operands": [
+          "['Q7.']"
+        ]
+      },
+      {
+        "index": 85,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 86,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 87,
+        "operator": "TJ",
+        "operands": [
+          "['Designing', -342, 'an', -343, 'RNN', -343, 'm', 1, 'o', -29, 'del', -343, 'for', -342, 'v', 57, 'ariable-length', -343, 'le', 1, 'gal', -343, 'do', -29, 'cum', 1, 'en', 28, 'ts', -342, 'with', -343, 'long', -343, 'de', 1, 'p', -29, 'endencies:']"
+        ]
+      },
+      {
+        "index": 88,
+        "operator": "Td",
+        "operands": [
+          "5.161",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 89,
+        "operator": "TJ",
+        "operands": [
+          "['(a)', -556, 'C', 1, 'ho', -29, 'ose', -343, 'b', -28, 'et', 29, 'w', 28, 'een', -342, 'v', 57, 'anilla', -343, 'RNN', -342, 'or', -343, 'LSTM.']"
+        ]
+      },
+      {
+        "index": 90,
+        "operator": "Td",
+        "operands": [
+          "-0.512",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 91,
+        "operator": "TJ",
+        "operands": [
+          "['(b)', -556, 'S', 1, 'tac', 28, 'k', -343, 'la', 29, 'y', 29, 'ers', -343, 'or', -343, 'k', 29, 'eep', -343, 'it', -342, 'shallo', 28, 'w?']"
+        ]
+      },
+      {
+        "index": 92,
+        "operator": "Td",
+        "operands": [
+          "1.024",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 93,
+        "operator": "TJ",
+        "operands": [
+          "['(c)', -556, 'M', 1, 'ak', 28, 'e', -343, 'i', 1, 't', -343, 'bidirectional?']"
+        ]
+      },
+      {
+        "index": 94,
+        "operator": "Td",
+        "operands": [
+          "-5.673",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 95,
+        "operator": "TJ",
+        "operands": [
+          "['Justify', -343, 'eac', 29, 'h', -343, 'c', 29, 'hoice', -342, 'based', -343, 'on', -343, 'mo', -28, 'del', -343, 'b', -28, 'eha', 28, 'vior', -342, 'and', -343, 'task', -342, 'needs.']"
+        ]
+      },
+      {
+        "index": 96,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 97,
+        "operator": "Td",
+        "operands": [
+          "-21.204",
+          "-19.863"
+        ]
+      },
+      {
+        "index": 98,
+        "operator": "TJ",
+        "operands": [
+          "['Q8.']"
+        ]
+      },
+      {
+        "index": 99,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 100,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 101,
+        "operator": "TJ",
+        "operands": [
+          "['Consider', -342, 'a', -343, 'v', 57, 'anilla', -342, 'RNN', -343, 'with', -343, 're', 1, 'curren', 28, 't', -342, 'w', 28, 'eigh', 29, 't', -343, 'matrix']"
+        ]
+      },
+      {
+        "index": 102,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 103,
+        "operator": "Td",
+        "operands": [
+          "219.158",
+          "0"
+        ]
+      },
+      {
+        "index": 104,
+        "operator": "TJ",
+        "operands": [
+          "['W']"
+        ]
+      },
+      {
+        "index": 105,
+        "operator": "Tf",
+        "operands": [
+          "/F43",
+          "5.9776"
+        ]
+      },
+      {
+        "index": 106,
+        "operator": "Td",
+        "operands": [
+          "8.702",
+          "-1.063"
+        ]
+      },
+      {
+        "index": 107,
+        "operator": "TJ",
+        "operands": [
+          "['h']"
+        ]
+      },
+      {
+        "index": 108,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 109,
+        "operator": "Td",
+        "operands": [
+          "7.908",
+          "1.063"
+        ]
+      },
+      {
+        "index": 110,
+        "operator": "TJ",
+        "operands": [
+          "['and', -343, 'sequen', 1, 'ce', -343, 'length', -343, '50.', -456, 'Analyze', -343, 'gradien', 29, 't', -343, 'b', -28, 'eha', 28, 'vior:']"
+        ]
+      },
+      {
+        "index": 111,
+        "operator": "Td",
+        "operands": [
+          "-230.607",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 112,
+        "operator": "TJ",
+        "operands": [
+          "['(1)', -556, 'I', 1, 'f']"
+        ]
+      },
+      {
+        "index": 113,
+        "operator": "Tf",
+        "operands": [
+          "/F55",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 114,
+        "operator": "Td",
+        "operands": [
+          "25.97",
+          "0"
+        ]
+      },
+      {
+        "index": 115,
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ]
+      },
+      {
+        "index": 116,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 117,
+        "operator": "Td",
+        "operands": [
+          "4.608",
+          "0"
+        ]
+      },
+      {
+        "index": 118,
+        "operator": "TJ",
+        "operands": [
+          "['W']"
+        ]
+      },
+      {
+        "index": 119,
+        "operator": "Tf",
+        "operands": [
+          "/F43",
+          "5.9776"
+        ]
+      },
+      {
+        "index": 120,
+        "operator": "Td",
+        "operands": [
+          "8.702",
+          "-1.062"
+        ]
+      },
+      {
+        "index": 121,
+        "operator": "TJ",
+        "operands": [
+          "['h']"
+        ]
+      },
+      {
+        "index": 122,
+        "operator": "Tf",
+        "operands": [
+          "/F55",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 123,
+        "operator": "Td",
+        "operands": [
+          "4.836",
+          "1.062"
+        ]
+      },
+      {
+        "index": 124,
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ]
+      },
+      {
+        "index": 125,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 126,
+        "operator": "Td",
+        "operands": [
+          "7.168",
+          "0"
+        ]
+      },
+      {
+        "index": 127,
+        "operator": "TJ",
+        "operands": [
+          "['=', -285, '0']"
+        ]
+      },
+      {
+        "index": 128,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 129,
+        "operator": "Td",
+        "operands": [
+          "14.335",
+          "0"
+        ]
+      },
+      {
+        "index": 130,
+        "operator": "TJ",
+        "operands": [
+          "[':']"
+        ]
+      },
+      {
+        "index": 131,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 132,
+        "operator": "Td",
+        "operands": [
+          "2.56",
+          "0"
+        ]
+      },
+      {
+        "index": 133,
+        "operator": "TJ",
+        "operands": [
+          "['9:', -457, 'Will', -342, 'gradien', 28, 'ts', -342, 'v', 57, 'anish', -343, 'or', -342, 'explo', -29, 'de?', -457, 'J', 1, 'ustify', 85, '.']"
+        ]
+      },
+      {
+        "index": 134,
+        "operator": "Td",
+        "operands": [
+          "-68.179",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 135,
+        "operator": "TJ",
+        "operands": [
+          "['(2)', -556, 'I', 1, 'f']"
+        ]
+      },
+      {
+        "index": 136,
+        "operator": "Tf",
+        "operands": [
+          "/F55",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 137,
+        "operator": "Td",
+        "operands": [
+          "25.97",
+          "0"
+        ]
+      },
+      {
+        "index": 138,
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ]
+      },
+      {
+        "index": 139,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 140,
+        "operator": "Td",
+        "operands": [
+          "4.608",
+          "0"
+        ]
+      },
+      {
+        "index": 141,
+        "operator": "TJ",
+        "operands": [
+          "['W']"
+        ]
+      },
+      {
+        "index": 142,
+        "operator": "Tf",
+        "operands": [
+          "/F43",
+          "5.9776"
+        ]
+      },
+      {
+        "index": 143,
+        "operator": "Td",
+        "operands": [
+          "8.702",
+          "-1.063"
+        ]
+      },
+      {
+        "index": 144,
+        "operator": "TJ",
+        "operands": [
+          "['h']"
+        ]
+      },
+      {
+        "index": 145,
+        "operator": "Tf",
+        "operands": [
+          "/F55",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 146,
+        "operator": "Td",
+        "operands": [
+          "4.836",
+          "1.063"
+        ]
+      },
+      {
+        "index": 147,
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ]
+      },
+      {
+        "index": 148,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 149,
+        "operator": "Td",
+        "operands": [
+          "7.168",
+          "0"
+        ]
+      },
+      {
+        "index": 150,
+        "operator": "TJ",
+        "operands": [
+          "['=', -285, '1']"
+        ]
+      },
+      {
+        "index": 151,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 152,
+        "operator": "Td",
+        "operands": [
+          "14.335",
+          "0"
+        ]
+      },
+      {
+        "index": 153,
+        "operator": "TJ",
+        "operands": [
+          "[':']"
+        ]
+      },
+      {
+        "index": 154,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 155,
+        "operator": "Td",
+        "operands": [
+          "2.56",
+          "0"
+        ]
+      },
+      {
+        "index": 156,
+        "operator": "TJ",
+        "operands": [
+          "['2:', -457, 'Will', -342, 'gradien', 28, 'ts', -342, 'v', 57, 'anish', -343, 'or', -342, 'explo', -29, 'de?', -457, 'J', 1, 'ustify', 85, '.', -457, 'Suggest', -342, 'an', -343, 'easy', -342, '\\x0cx', -343, 'and', -342, 'explain', -343, 'ho', 29, 'w', -343, 'it', -342, 'helps.']"
+        ]
+      },
+      {
+        "index": 157,
+        "operator": "Tf",
+        "operands": [
+          "/F58",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 158,
+        "operator": "Td",
+        "operands": [
+          "-73.34",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 159,
+        "operator": "TJ",
+        "operands": [
+          "['Hint:', -472, 'Consider', -367, 'eigenvalue', -368, 'e\\x0be', 53, 'cts', -368, 'on', -367, 'gr', 53, 'adient', -368, 'pr', 53, 'op', 52, 'agation', -367, 'over', -367, 'time.']"
+        ]
+      },
+      {
+        "index": 160,
+        "operator": "Tf",
+        "operands": [
+          "/F28",
+          "9.9626"
+        ]
+      },
+      {
+        "index": 161,
+        "operator": "Td",
+        "operands": [
+          "224.602",
+          "-128.383"
+        ]
+      },
+      {
+        "index": 162,
+        "operator": "TJ",
+        "operands": [
+          "['1']"
+        ]
+      },
+      {
+        "index": 163,
+        "operator": "ET",
+        "operands": []
+      }
+    ],
+    "after": [
+      {
+        "index": 0,
+        "operator": "BT",
+        "operands": []
+      },
+      {
+        "index": 1,
+        "operator": "Tf",
+        "operands": [
+          "/F37",
+          "17.2154"
+        ]
+      },
+      {
+        "index": 2,
+        "operator": "Td",
+        "operands": [
+          "225.917",
+          "717.776"
+        ]
+      },
+      {
+        "index": 3,
+        "operator": "TJ",
+        "operands": [
+          "['RNNs', -302, 'and', -302, 'LSTM', -302, 'Quiz']"
+        ]
+      },
+      {
+        "index": 4,
+        "operator": "Tf",
+        "operands": [
+          "/F52",
+          "14.3462"
+        ]
+      },
+      {
+        "index": 5,
+        "operator": "Td",
+        "operands": [
+          "-171.917",
+          "-67.896"
+        ]
+      },
+      {
+        "index": 6,
+        "operator": "TJ",
+        "operands": [
+          "['Multiple', -375, 'Choice', -375, 'Questions']"
+        ]
+      },
+      {
+        "index": 7,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 8,
+        "operator": "Td",
+        "operands": [
+          "0",
+          "-16.937"
+        ]
+      },
+      {
+        "index": 9,
+        "operator": "TJ",
+        "operands": [
+          "['Q1.']"
+        ]
+      },
+      {
+        "index": 10,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 11,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 12,
+        "operator": "TJ",
+        "operands": [
+          "['What', -342, 'is', -343]"
+        ]
+      },
+      {
+        "index": 13,
+        "operator": "Tf",
+        "operands": [
+          "/Courier",
+          "4"
+        ]
+      },
+      {
+        "index": 14,
+        "operator": "TJ",
+        "operands": [
+          "['not the']"
+        ]
+      },
+      {
+        "index": 15,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8"
+        ]
+      },
+      {
+        "index": 16,
+        "operator": "TJ",
+        "operands": [
+          "[998, -343, 'primary', -342, 'b', -29, 'ene\\x0ct', -342, 'of', -343, 'stac', 29, 'king', -343, 'm', 29, 'ultiple', -343, 'RNN', -342, 'la', 28, 'y', 29, 'ers', -343, '(i.e.,', -342, 'stac', 28, 'k', 29, 'ed', -343, 'RNNs)?']"
+        ]
+      },
+      {
+        "index": 17,
+        "operator": "Td",
+        "operands": [
+          "-0.629",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 18,
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'F', 86, 'aster', -342, 'training']"
+        ]
+      },
+      {
+        "index": 19,
+        "operator": "Td",
+        "operands": [
+          "0.384",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 20,
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'Lo', 29, 'w', 29, 'er', -343, 'memory', -342, 'usage']"
+        ]
+      },
+      {
+        "index": 21,
+        "operator": "Td",
+        "operands": [
+          "-0.129",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 22,
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'Bett', 1, 'er', -343, 'learning', -343, 'of', -342, 'hierarc', 28, 'hic', 1, 'al', -343, 'features']"
+        ]
+      },
+      {
+        "index": 23,
+        "operator": "Td",
+        "operands": [
+          "-0.383",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 24,
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'Sim', 1, 'pler', -343, 'arc', 29, 'hitecture']"
+        ]
+      },
+      {
+        "index": 25,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 26,
+        "operator": "Td",
+        "operands": [
+          "-20.447",
+          "-17.559"
+        ]
+      },
+      {
+        "index": 27,
+        "operator": "TJ",
+        "operands": [
+          "['Q2.']"
+        ]
+      },
+      {
+        "index": 28,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 29,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 30,
+        "operator": "TJ",
+        "operands": [
+          "['Whic', 29, 'h', -343, 'of', -343, 'th', 1, 'e', -343, 'follo', 29, 'wing', -343, 'is', -343, 'the', -342, 'main', -343, 'reason', -342, 'RNNs', -343, 'struggle', -342, 'with', -343]"
+        ]
+      },
+      {
+        "index": 31,
+        "operator": "Tf",
+        "operands": [
+          "/Courier",
+          "5"
+        ]
+      },
+      {
+        "index": 32,
+        "operator": "TJ",
+        "operands": [
+          "['short']"
+        ]
+      },
+      {
+        "index": 33,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8"
+        ]
+      },
+      {
+        "index": 34,
+        "operator": "TJ",
+        "operands": [
+          "['-term', -342, 'dep', -29, 'endencie', 1, 's?']"
+        ]
+      },
+      {
+        "index": 35,
+        "operator": "Td",
+        "operands": [
+          "-0.629",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 36,
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'Ov', 29, 'er\\x0ctting']"
+        ]
+      },
+      {
+        "index": 37,
+        "operator": "Td",
+        "operands": [
+          "0.384",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 38,
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'V', 86, 'anishing', -342, 'gradien', 28, 'ts']"
+        ]
+      },
+      {
+        "index": 39,
+        "operator": "Td",
+        "operands": [
+          "-0.129",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 40,
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'L', 1, 'ac', 28, 'k', -343, 'of', -342, 'non-linearit', 29, 'y']"
+        ]
+      },
+      {
+        "index": 41,
+        "operator": "Td",
+        "operands": [
+          "-0.383",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 42,
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'Insu', 1, '\\x0ecien', 28, 't', -342, 'data']"
+        ]
+      },
+      {
+        "index": 43,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 44,
+        "operator": "Td",
+        "operands": [
+          "-20.447",
+          "-17.559"
+        ]
+      },
+      {
+        "index": 45,
+        "operator": "TJ",
+        "operands": [
+          "['Q3.']"
+        ]
+      },
+      {
+        "index": 46,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 47,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 48,
+        "operator": "TJ",
+        "operands": [
+          "['What', -342, 'di\\x0beren', 28, 'tiates', -342, 'an', -343, 'LSTM', -342, 'cell', -343, 'from', -343, 'a', -342, 'standard', -343]"
+        ]
+      },
+      {
+        "index": 49,
+        "operator": "Tf",
+        "operands": [
+          "/Courier",
+          "8"
+        ]
+      },
+      {
+        "index": 50,
+        "operator": "TJ",
+        "operands": [
+          "['cnn']"
+        ]
+      },
+      {
+        "index": 51,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8"
+        ]
+      },
+      {
+        "index": 52,
+        "operator": "TJ",
+        "operands": [
+          "[-498, -342, 'cell?']"
+        ]
+      },
+      {
+        "index": 53,
+        "operator": "Td",
+        "operands": [
+          "-0.629",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 54,
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'It', -342, 'uses', -343, 'ReLU', -342, 'instead', -343, 'of', -342, 'tanh']"
+        ]
+      },
+      {
+        "index": 55,
+        "operator": "Td",
+        "operands": [
+          "0.384",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 56,
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'It', -342, 'in', 28, 'tro', -28, 'duces', -343, 'gate', 1, 's', -343, 'to', -343, 'con', 29, 'trol', -343, 'the', -342, '\\ro', 28, 'w', -342, 'of', -343, 'information']"
+        ]
+      },
+      {
+        "index": 57,
+        "operator": "Td",
+        "operands": [
+          "-0.129",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 58,
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'It', -342, 'has', -343, 'few', 29, 'er', -343, 'parameters']"
+        ]
+      },
+      {
+        "index": 59,
+        "operator": "Td",
+        "operands": [
+          "-0.383",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 60,
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'It', -342, 'is', -343, 'a', -342, 'con', 28, 'v', 29, 'olutional', -343, 'arc', 29, 'hitecture']"
+        ]
+      },
+      {
+        "index": 61,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 62,
+        "operator": "Td",
+        "operands": [
+          "-20.447",
+          "-17.559"
+        ]
+      },
+      {
+        "index": 63,
+        "operator": "TJ",
+        "operands": [
+          "['Q4.']"
+        ]
+      },
+      {
+        "index": 64,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 65,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 66,
+        "operator": "TJ",
+        "operands": [
+          "['In', -343, 'a', -342, 'standard', -343]"
+        ]
+      },
+      {
+        "index": 67,
+        "operator": "Tf",
+        "operands": [
+          "/Courier",
+          "8"
+        ]
+      },
+      {
+        "index": 68,
+        "operator": "TJ",
+        "operands": [
+          "['rnn']"
+        ]
+      },
+      {
+        "index": 69,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8"
+        ]
+      },
+      {
+        "index": 70,
+        "operator": "TJ",
+        "operands": [
+          "[-1097, 1, ',', -343, 'whic', 29, 'h', -343, 'gate', -343, 'is', -342, 'resp', -29, 'onsible', -342, 'for', -343, 'deciding', -342, 'ho', 28, 'w', -342, 'm', 28, 'uc', 29, 'h', -343, 'of', -342, 'the', -343, 'past', -342, 'memory', -343, 'to', -342, 'k', 28, 'eep?']"
+        ]
+      },
+      {
+        "index": 71,
+        "operator": "Td",
+        "operands": [
+          "-0.629",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 72,
+        "operator": "TJ",
+        "operands": [
+          "['A.', -556, 'Outp', 1, 'ut', -343, 'gate']"
+        ]
+      },
+      {
+        "index": 73,
+        "operator": "Td",
+        "operands": [
+          "0.384",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 74,
+        "operator": "TJ",
+        "operands": [
+          "['B.', -556, 'F', 86, 'orget', -342, 'gate']"
+        ]
+      },
+      {
+        "index": 75,
+        "operator": "Td",
+        "operands": [
+          "-0.129",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 76,
+        "operator": "TJ",
+        "operands": [
+          "['C.', -556, 'In', 1, 'put', -343, 'gate']"
+        ]
+      },
+      {
+        "index": 77,
+        "operator": "Td",
+        "operands": [
+          "-0.383",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 78,
+        "operator": "TJ",
+        "operands": [
+          "['D.', -556, 'Up', -28, 'date', -343, 'gate']"
+        ]
+      },
+      {
+        "index": 79,
+        "operator": "Tf",
+        "operands": [
+          "/F52",
+          "14.3462"
+        ]
+      },
+      {
+        "index": 80,
+        "operator": "Td",
+        "operands": [
+          "-20.447",
+          "-31.444"
+        ]
+      },
+      {
+        "index": 81,
+        "operator": "TJ",
+        "operands": [
+          "['Descriptiv', 31, 'e', -375, 'Questions']"
+        ]
+      },
+      {
+        "index": 82,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 83,
+        "operator": "Td",
+        "operands": [
+          "3.703",
+          "-16.937"
+        ]
+      },
+      {
+        "index": 84,
+        "operator": "TJ",
+        "operands": [
+          "['Q5.']"
+        ]
+      },
+      {
+        "index": 85,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 86,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 87,
+        "operator": "TJ",
+        "operands": [
+          "['Wh', 29, 'y', -399, 'is', -398, 'the', -399, 'forget', -398, 'gate', -398, 'bias', -399, 'in', -398]"
+        ]
+      },
+      {
+        "index": 88,
+        "operator": "Tf",
+        "operands": [
+          "/Courier",
+          "8"
+        ]
+      },
+      {
+        "index": 89,
+        "operator": "TJ",
+        "operands": [
+          "['CNNs']"
+        ]
+      },
+      {
+        "index": 90,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8"
+        ]
+      },
+      {
+        "index": 91,
+        "operator": "TJ",
+        "operands": [
+          "[-902, -398, 'often', -399, 'initialized', -398, 'to', -398, 'a', -399, 'high', -398, 'v', 57, 'alue', -399, '(e', 1, '.g.,', -413, '2', -398, 'or', -399, '3)?', -624, 'Explain', -398, 'its', -399, 'e\\x0bect', -398, 'on', -398, 'long-term']"
+        ]
+      },
+      {
+        "index": 92,
+        "operator": "Td",
+        "operands": [
+          "0",
+          "-10.959"
+        ]
+      },
+      {
+        "index": 93,
+        "operator": "TJ",
+        "operands": [
+          "['dep', -28, 'endency', -343, 'learning.']"
+        ]
+      },
+      {
+        "index": 94,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 95,
+        "operator": "Td",
+        "operands": [
+          "-21.204",
+          "-19.863"
+        ]
+      },
+      {
+        "index": 96,
+        "operator": "TJ",
+        "operands": [
+          "['Q6.']"
+        ]
+      },
+      {
+        "index": 97,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 98,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 99,
+        "operator": "Tf",
+        "operands": [
+          "/Courier",
+          "6"
+        ]
+      },
+      {
+        "index": 100,
+        "operator": "TJ",
+        "operands": [
+          "['Unidirectional']"
+        ]
+      },
+      {
+        "index": 101,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8"
+        ]
+      },
+      {
+        "index": 102,
+        "operator": "TJ",
+        "operands": [
+          "[-295, 'RNNs', -294, 'are', -295, 'often', -295, 'used', -294, 'for', -295, 'POS', -295, 'tagging', -295, 'b', 1, 'ut', -295, 'not', -295, 'mac', 29, 'hine', -295, 'translation.', -441, 'Explain', -294, 'wh', 28, 'y', 86, ',', -305, 'cons', 1, 'idering', -295, 'input-output']"
+        ]
+      },
+      {
+        "index": 103,
+        "operator": "Td",
+        "operands": [
+          "0",
+          "-10.959"
+        ]
+      },
+      {
+        "index": 104,
+        "operator": "TJ",
+        "operands": [
+          "['alignmen', 29, 't', -343, 'and', -342, 'con', 28, 'text', -342, '\\ro', 28, 'w.']"
+        ]
+      },
+      {
+        "index": 105,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 106,
+        "operator": "Td",
+        "operands": [
+          "-21.204",
+          "-19.863"
+        ]
+      },
+      {
+        "index": 107,
+        "operator": "TJ",
+        "operands": [
+          "['Q7.']"
+        ]
+      },
+      {
+        "index": 108,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 109,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 110,
+        "operator": "TJ",
+        "operands": [
+          "['Designing', -342, 'an', -343, 'RNN', -343, 'm', 1, 'o', -29, 'del', -343, 'for', -342, 'v', 57, 'ariable-length', -343, 'le', 1, 'gal', -343, 'do', -29, 'cum', 1, 'en', 28, 'ts', -342, 'with', -343, 'long', -343, 'de', 1, 'p', -29, 'endencies:']"
+        ]
+      },
+      {
+        "index": 111,
+        "operator": "Td",
+        "operands": [
+          "5.161",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 112,
+        "operator": "TJ",
+        "operands": [
+          "['(a)', -556, 'C', 1, 'ho', -29, 'ose', -343, 'b', -28, 'et', 29, 'w', 28, 'een', -342, 'v', 57, 'anilla', -343, 'RNN', -342, 'or', -343, 'LSTM.']"
+        ]
+      },
+      {
+        "index": 113,
+        "operator": "Td",
+        "operands": [
+          "-0.512",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 114,
+        "operator": "TJ",
+        "operands": [
+          "['(b)', -556, 'S', 1, 'tac', 28, 'k', -343, 'la', 29, 'y', 29, 'ers', -343, 'or', -343, 'k', 29, 'eep', -343, 'it', -342, 'shallo', 28, 'w?']"
+        ]
+      },
+      {
+        "index": 115,
+        "operator": "Td",
+        "operands": [
+          "1.024",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 116,
+        "operator": "TJ",
+        "operands": [
+          "['(c)', -556, 'M', 1, 'ak', 28, 'e', -343, 'i', 1, 't', -343]"
+        ]
+      },
+      {
+        "index": 117,
+        "operator": "Tf",
+        "operands": [
+          "/Courier",
+          "5"
+        ]
+      },
+      {
+        "index": 118,
+        "operator": "TJ",
+        "operands": [
+          "['unidirectional']"
+        ]
+      },
+      {
+        "index": 119,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8"
+        ]
+      },
+      {
+        "index": 120,
+        "operator": "TJ",
+        "operands": [
+          "['?']"
+        ]
+      },
+      {
+        "index": 121,
+        "operator": "Td",
+        "operands": [
+          "-5.673",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 122,
+        "operator": "TJ",
+        "operands": [
+          "['Justify', -343, 'eac', 29, 'h', -343, 'c', 29, 'hoice', -342, 'based', -343, 'on', -343, 'mo', -28, 'del', -343, 'b', -28, 'eha', 28, 'vior', -342, 'and', -343, 'task', -342, 'needs.']"
+        ]
+      },
+      {
+        "index": 123,
+        "operator": "Tf",
+        "operands": [
+          "/F53",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 124,
+        "operator": "Td",
+        "operands": [
+          "-21.204",
+          "-19.863"
+        ]
+      },
+      {
+        "index": 125,
+        "operator": "TJ",
+        "operands": [
+          "['Q8.']"
+        ]
+      },
+      {
+        "index": 126,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 127,
+        "operator": "Td",
+        "operands": [
+          "21.204",
+          "0"
+        ]
+      },
+      {
+        "index": 128,
+        "operator": "TJ",
+        "operands": [
+          "['Consider', -342, 'a', -343, 'v', 57, 'anilla', -342, 'RNN', -343, 'with', -343, 're', 1, 'curren', 28, 't', -342, 'w', 28, 'eigh', 29, 't', -343, 'matrix']"
+        ]
+      },
+      {
+        "index": 129,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 130,
+        "operator": "Td",
+        "operands": [
+          "219.158",
+          "0"
+        ]
+      },
+      {
+        "index": 131,
+        "operator": "TJ",
+        "operands": [
+          "['W']"
+        ]
+      },
+      {
+        "index": 132,
+        "operator": "Tf",
+        "operands": [
+          "/F43",
+          "5.9776"
+        ]
+      },
+      {
+        "index": 133,
+        "operator": "Td",
+        "operands": [
+          "8.702",
+          "-1.063"
+        ]
+      },
+      {
+        "index": 134,
+        "operator": "TJ",
+        "operands": [
+          "['h']"
+        ]
+      },
+      {
+        "index": 135,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 136,
+        "operator": "Td",
+        "operands": [
+          "7.908",
+          "1.063"
+        ]
+      },
+      {
+        "index": 137,
+        "operator": "TJ",
+        "operands": [
+          "['and', -343, 'sequen', 1, 'ce', -343, 'length', -343]"
+        ]
+      },
+      {
+        "index": 138,
+        "operator": "Tf",
+        "operands": [
+          "/Courier",
+          "5"
+        ]
+      },
+      {
+        "index": 139,
+        "operator": "TJ",
+        "operands": [
+          "['500']"
+        ]
+      },
+      {
+        "index": 140,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8"
+        ]
+      },
+      {
+        "index": 141,
+        "operator": "TJ",
+        "operands": [
+          "['.', -456, 'Analyze', -343, 'gradien', 29, 't', -343, 'b', -28, 'eha', 28, 'vior:']"
+        ]
+      },
+      {
+        "index": 142,
+        "operator": "Td",
+        "operands": [
+          "-230.607",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 143,
+        "operator": "TJ",
+        "operands": [
+          "['(1)', -556, 'I', 1, 'f']"
+        ]
+      },
+      {
+        "index": 144,
+        "operator": "Tf",
+        "operands": [
+          "/F55",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 145,
+        "operator": "Td",
+        "operands": [
+          "25.97",
+          "0"
+        ]
+      },
+      {
+        "index": 146,
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ]
+      },
+      {
+        "index": 147,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 148,
+        "operator": "Td",
+        "operands": [
+          "4.608",
+          "0"
+        ]
+      },
+      {
+        "index": 149,
+        "operator": "TJ",
+        "operands": [
+          "['W']"
+        ]
+      },
+      {
+        "index": 150,
+        "operator": "Tf",
+        "operands": [
+          "/F43",
+          "5.9776"
+        ]
+      },
+      {
+        "index": 151,
+        "operator": "Td",
+        "operands": [
+          "8.702",
+          "-1.062"
+        ]
+      },
+      {
+        "index": 152,
+        "operator": "TJ",
+        "operands": [
+          "['h']"
+        ]
+      },
+      {
+        "index": 153,
+        "operator": "Tf",
+        "operands": [
+          "/F55",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 154,
+        "operator": "Td",
+        "operands": [
+          "4.836",
+          "1.062"
+        ]
+      },
+      {
+        "index": 155,
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ]
+      },
+      {
+        "index": 156,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 157,
+        "operator": "Td",
+        "operands": [
+          "7.168",
+          "0"
+        ]
+      },
+      {
+        "index": 158,
+        "operator": "TJ",
+        "operands": [
+          "['=', -285, '0']"
+        ]
+      },
+      {
+        "index": 159,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 160,
+        "operator": "Td",
+        "operands": [
+          "14.335",
+          "0"
+        ]
+      },
+      {
+        "index": 161,
+        "operator": "TJ",
+        "operands": [
+          "[':']"
+        ]
+      },
+      {
+        "index": 162,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 163,
+        "operator": "Td",
+        "operands": [
+          "2.56",
+          "0"
+        ]
+      },
+      {
+        "index": 164,
+        "operator": "TJ",
+        "operands": [
+          "['9:', -457, 'Will', -342, 'gradien', 28, 'ts', -342, 'v', 57, 'anish', -343, 'or', -342, 'explo', -29, 'de?', -457, 'J', 1, 'ustify', 85, '.']"
+        ]
+      },
+      {
+        "index": 165,
+        "operator": "Td",
+        "operands": [
+          "-68.179",
+          "-12.951"
+        ]
+      },
+      {
+        "index": 166,
+        "operator": "TJ",
+        "operands": [
+          "['(2)', -556, 'I', 1, 'f']"
+        ]
+      },
+      {
+        "index": 167,
+        "operator": "Tf",
+        "operands": [
+          "/F55",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 168,
+        "operator": "Td",
+        "operands": [
+          "25.97",
+          "0"
+        ]
+      },
+      {
+        "index": 169,
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ]
+      },
+      {
+        "index": 170,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 171,
+        "operator": "Td",
+        "operands": [
+          "4.608",
+          "0"
+        ]
+      },
+      {
+        "index": 172,
+        "operator": "TJ",
+        "operands": [
+          "['W']"
+        ]
+      },
+      {
+        "index": 173,
+        "operator": "Tf",
+        "operands": [
+          "/F43",
+          "5.9776"
+        ]
+      },
+      {
+        "index": 174,
+        "operator": "Td",
+        "operands": [
+          "8.702",
+          "-1.063"
+        ]
+      },
+      {
+        "index": 175,
+        "operator": "TJ",
+        "operands": [
+          "['h']"
+        ]
+      },
+      {
+        "index": 176,
+        "operator": "Tf",
+        "operands": [
+          "/F55",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 177,
+        "operator": "Td",
+        "operands": [
+          "4.836",
+          "1.063"
+        ]
+      },
+      {
+        "index": 178,
+        "operator": "TJ",
+        "operands": [
+          "['k']"
+        ]
+      },
+      {
+        "index": 179,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 180,
+        "operator": "Td",
+        "operands": [
+          "7.168",
+          "0"
+        ]
+      },
+      {
+        "index": 181,
+        "operator": "TJ",
+        "operands": [
+          "['=', -285, '1']"
+        ]
+      },
+      {
+        "index": 182,
+        "operator": "Tf",
+        "operands": [
+          "/F54",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 183,
+        "operator": "Td",
+        "operands": [
+          "14.335",
+          "0"
+        ]
+      },
+      {
+        "index": 184,
+        "operator": "TJ",
+        "operands": [
+          "[':']"
+        ]
+      },
+      {
+        "index": 185,
+        "operator": "Tf",
+        "operands": [
+          "/F50",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 186,
+        "operator": "Td",
+        "operands": [
+          "2.56",
+          "0"
+        ]
+      },
+      {
+        "index": 187,
+        "operator": "TJ",
+        "operands": [
+          "['2:', -457, 'Will', -342, 'gradien', 28, 'ts', -342, 'v', 57, 'anish', -343, 'or', -342, 'explo', -29, 'de?', -457, 'J', 1, 'ustify', 85, '.', -457, 'Suggest', -342, 'an', -343, 'easy', -342, '\\x0cx', -343, 'and', -342, 'explain', -343, 'ho', 29, 'w', -343, 'it', -342, 'helps.']"
+        ]
+      },
+      {
+        "index": 188,
+        "operator": "Tf",
+        "operands": [
+          "/F58",
+          "8.9664"
+        ]
+      },
+      {
+        "index": 189,
+        "operator": "Td",
+        "operands": [
+          "-73.34",
+          "-12.952"
+        ]
+      },
+      {
+        "index": 190,
+        "operator": "TJ",
+        "operands": [
+          "['Hint:', -472, 'Consider', -367, 'eigenvalue', -368, 'e\\x0be', 53, 'cts', -368, 'on', -367, 'gr', 53, 'adient', -368, 'pr', 53, 'op', 52, 'agation', -367, 'over', -367, 'time.']"
+        ]
+      },
+      {
+        "index": 191,
+        "operator": "Tf",
+        "operands": [
+          "/F28",
+          "9.9626"
+        ]
+      },
+      {
+        "index": 192,
+        "operator": "Td",
+        "operands": [
+          "224.602",
+          "-128.383"
+        ]
+      },
+      {
+        "index": 193,
+        "operator": "TJ",
+        "operands": [
+          "['1']"
+        ]
+      },
+      {
+        "index": 194,
+        "operator": "ET",
+        "operands": []
+      }
+    ]
+  }
+}

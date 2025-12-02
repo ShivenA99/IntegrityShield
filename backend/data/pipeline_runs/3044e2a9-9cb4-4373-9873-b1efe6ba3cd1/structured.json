@@ -1,0 +1,1531 @@
+{
+  "pipeline_metadata": {
+    "run_id": "3044e2a9-9cb4-4373-9873-b1efe6ba3cd1",
+    "current_stage": "document_enhancement",
+    "stages_completed": [
+      "smart_reading",
+      "document_enhancement",
+      "smart_substitution",
+      "content_discovery"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-27T09:23:33.713297+00:00",
+    "version": "2.0.0",
+    "config": {},
+    "ai_extraction_enabled": true,
+    "ai_sources_used": [
+      "openai_vision",
+      "mistral_ocr"
+    ]
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3044e2a9-9cb4-4373-9873-b1efe6ba3cd1/demo_paper_1.pdf",
+    "filename": "demo_paper_1.pdf",
+    "pages": 1
+  },
+  "questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "What is the primary aim of Knowledge Representation and Reasoning?",
+      "options": {
+        "A": "To enable computers to process vast amounts of data efficiently.",
+        "B": "To develop advanced machine learning algorithms.",
+        "C": "To understand the nature of intelligence and cognition to simulate human-like abilities in computers.",
+        "D": "To create complex robotic systems for automation."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          72.51112365722656,
+          509.4501953125,
+          85.79512786865234
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?",
+      "options": {
+        "A": "Deductive reasoning",
+        "B": "Abductive reasoning",
+        "C": "Epistemic reasoning",
+        "D": "Default reasoning"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          191.72303771972656,
+          524.49609375,
+          236.7443389892578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2",
+      "gold_answer": "D",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "In propositional logic, what is an 'atom'?",
+      "options": {
+        "A": "A logical connective like 'and' or 'or'.",
+        "B": "A formula composed of multiple propositions.",
+        "C": "The smallest unit to which a truth value (true/false) can be assigned.",
+        "D": "A symbol representing a numerical value."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          326.80364990234375,
+          362.4668273925781,
+          340.087646484375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following connectives is considered a unary propositional connective?",
+      "options": {
+        "A": "Conjunction (∧)",
+        "B": "Implication (→)",
+        "C": "Disjunction (∨)",
+        "D": "Negation (¬)"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          430.1468505859375,
+          507.58001708984375,
+          459.29949951171875
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4",
+      "gold_answer": "D",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "5",
+      "question_type": "mcq_single",
+      "stem_text": "A propositional formula F is a tautology if:",
+      "options": {
+        "A": "At least one interpretation satisfies F.",
+        "B": "F can be reduced to a Conjunctive Normal Form (CNF).",
+        "C": "Every interpretation satisfies F.",
+        "D": "Its negation (¬F) is satisfiable."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          549.3588256835938,
+          363.4505920410156,
+          562.642822265625
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "6",
+      "question_type": "mcq_single",
+      "stem_text": "What does it mean for a propositional formula F to be satisfiable?",
+      "options": {
+        "A": "F is true for all possible interpretations.",
+        "B": "There exists at least one interpretation that satisfies F."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          652.7020263671875,
+          480.7730712890625,
+          665.9860229492188
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "assets": {
+    "images": [],
+    "fonts": [
+      "ArialMT",
+      "MS-PMincho",
+      "TimesNewRomanPS-BoldMT",
+      "TimesNewRomanPSMT"
+    ],
+    "extracted_elements": 46
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3044e2a9-9cb4-4373-9873-b1efe6ba3cd1/enhanced_content_stream.pdf",
+        "size_bytes": 92339,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3044e2a9-9cb4-4373-9873-b1efe6ba3cd1/enhanced_content_stream.pdf",
+        "file_size_bytes": 92339,
+        "visual_quality_score": 0.92,
+        "created_at": "2025-09-27T09:24:09.255995+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3044e2a9-9cb4-4373-9873-b1efe6ba3cd1/enhanced_image_overlay.pdf",
+        "size_bytes": 219948,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/3044e2a9-9cb4-4373-9873-b1efe6ba3cd1/enhanced_image_overlay.pdf",
+        "file_size_bytes": 219948,
+        "visual_quality_score": 0.92,
+        "created_at": "2025-09-27T09:24:09.256201+00:00"
+      }
+    },
+    "debug": {
+      "content_stream": {
+        "decoded_sample": "4XHVWLRQ \u0003 \u0010 \u0003 \u0014\u001d \u0003\u0003 :KDW \u0003 LV \u0003 WKH \u0003 SULPDU\\ \u0003 DLP \u0003 RI \u0003 .QRZOHGJH \u0003 5HSU HVHQWDWLRQ \u0003 DQG \u0003 5HDVRQLQJ\" \u0003 D \u0003 7 R \u0003 HQDEOH \u0003 FRPSXWHUV \u0003 WR \u0003 SURFHVV \u0003 YDVW \u0003 DPRXQWV \u0003 RI \u0003 GDWD \u0003 HI ILFLHQWO\\ \u0011 \u0003 E \u0003 7 R \u0003 GHYHORS \u0003 DGYDQFHG \u0003 PDFKLQH \u0003 OHDUQLQJ \u0003 DOJRULWKPV\u0011 \u0003 F \u0003 7 R \u0003 XQGHUVWDQG \u0003 WKH \u0003 QDWX",
+        "per_font_top_tokens": {},
+        "enhanced_mapping_stats": {
+          "total_entries": 6,
+          "discovered_tokens": 0
+        }
+      },
+      "image_overlay": {
+        "effectiveness_score": 1.0,
+        "mapping_entries_used": 9,
+        "enhanced_mapping_boost": 0
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 104.97,
+      "mapping_build_time_ms": 11.7,
+      "enhancement_stats": {
+        "base_mapping_size": 6,
+        "enhanced_mapping_size": 6,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream": {
+          "duration_ms": 31.51,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 92339
+        },
+        "image_overlay": {
+          "duration_ms": 50.97,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 219948
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 2,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 96263,
+        "total_output_size_bytes": 312287,
+        "size_efficiency": 3.2441020953014137
+      }
+    }
+  },
+  "performance_metrics": {},
+  "content_elements": [
+    {
+      "type": "text",
+      "content": "Question - 1:  What is the primary aim of Knowledge Representation and Reasoning?",
+      "page": 1,
+      "bbox": [
+        72.0,
+        72.51112365722656,
+        509.4501953125,
+        85.79512786865234
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        509.44921875,
+        73.24812316894531,
+        512.5072021484375,
+        85.53512573242188
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. To enable computers to process vast amounts of data efficiently. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        100.37983703613281,
+        418.400390625,
+        113.6638412475586
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. To develop advanced machine learning algorithms. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        116.24842834472656,
+        356.0741882324219,
+        129.5324249267578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. To understand the nature of intelligence and cognition to simulate human-like abilities in ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        132.1171417236328,
+        537.380859375,
+        145.40113830566406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "computers. ",
+      "page": 1,
+      "bbox": [
+        108.0,
+        147.9857940673828,
+        163.98629760742188,
+        161.26979064941406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. To create complex robotic systems for automation.",
+      "page": 1,
+      "bbox": [
+        90.0,
+        163.8544464111328,
+        351.4191589355469,
+        177.13844299316406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        351.421875,
+        164.59144592285156,
+        354.4798889160156,
+        176.87844848632812
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 2:  Which type of reasoning is described as \"jumping to conclusions based on ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        191.72303771972656,
+        524.49609375,
+        205.0070343017578
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "some default assumptions\" when information is insufficient, potentially leading to unsound ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        207.59169006347656,
+        540.0643920898438,
+        220.8756866455078
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "conclusions that may need to be withdrawn?",
+      "page": 1,
+      "bbox": [
+        72.0,
+        223.46034240722656,
+        299.35101318359375,
+        236.7443389892578
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        299.349609375,
+        223.46034240722656,
+        302.349609375,
+        236.7443389892578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. Deductive reasoning ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        251.32899475097656,
+        209.96481323242188,
+        264.6130065917969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. Abductive reasoning ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        267.1976623535156,
+        210.63870239257812,
+        280.4816589355469
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. Epistemic reasoning ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        283.06634521484375,
+        208.640625,
+        296.350341796875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. Default reasoning",
+      "page": 1,
+      "bbox": [
+        90.0,
+        298.9349365234375,
+        193.6336212158203,
+        312.21893310546875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        193.63478088378906,
+        299.67193603515625,
+        196.69277954101562,
+        311.95892333984375
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 3:  In propositional logic, what is an \"atom\"? ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        326.80364990234375,
+        362.4668273925781,
+        340.087646484375
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. A logical connective like 'and' or 'or'. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        354.6722412109375,
+        289.2539367675781,
+        367.95623779296875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. A formula composed of multiple propositions. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        370.5409240722656,
+        333.6387023925781,
+        383.8249206542969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. The smallest unit to which a truth value (true/false) can be assigned. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        386.4095458984375,
+        438.228515625,
+        399.69354248046875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. A symbol representing a numerical value.",
+      "page": 1,
+      "bbox": [
+        90.0,
+        402.2782287597656,
+        308.60003662109375,
+        415.5622253417969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        308.60162353515625,
+        403.01519775390625,
+        311.6596374511719,
+        415.3022155761719
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 4:  Which of the following connectives is considered a unary propositional ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        430.1468505859375,
+        507.58001708984375,
+        443.43084716796875
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "connective?",
+      "page": 1,
+      "bbox": [
+        72.0,
+        446.0155029296875,
+        131.98080444335938,
+        459.29949951171875
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        131.982421875,
+        446.75250244140625,
+        135.04042053222656,
+        459.03948974609375
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. Conjunction (",
+      "page": 1,
+      "bbox": [
+        90.0,
+        473.8842468261719,
+        174.32806396484375,
+        487.1682434082031
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 1,
+      "bbox": [
+        174.328125,
+        474.2682189941406,
+        186.328125,
+        486.2682189941406
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": ") ",
+      "page": 1,
+      "bbox": [
+        186.328125,
+        473.8842468261719,
+        193.32418823242188,
+        487.1682434082031
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. Implication (→) ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        489.7528381347656,
+        189.31057739257812,
+        503.0368347167969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. Disjunction (",
+      "page": 1,
+      "bbox": [
+        90.0,
+        505.6215515136719,
+        170.99407958984375,
+        518.905517578125
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∨",
+      "page": 1,
+      "bbox": [
+        170.99415588378906,
+        506.0055236816406,
+        182.99415588378906,
+        518.0055541992188
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": ") ",
+      "page": 1,
+      "bbox": [
+        182.99415588378906,
+        505.6215515136719,
+        189.99021911621094,
+        518.905517578125
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. Negation (¬)",
+      "page": 1,
+      "bbox": [
+        90.0,
+        521.4901123046875,
+        169.74630737304688,
+        534.7741088867188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        169.74606323242188,
+        522.2271118164062,
+        172.80406188964844,
+        534.5140991210938
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 5:  A propositional formula F is a tautology if:",
+      "page": 1,
+      "bbox": [
+        72.0,
+        549.3588256835938,
+        363.4505920410156,
+        562.642822265625
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        363.4512023925781,
+        550.0958251953125,
+        366.50921630859375,
+        562.3828125
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. At least one interpretation satisfies F. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        577.2274169921875,
+        289.3300476074219,
+        590.5114135742188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. F can be reduced to a Conjunctive Normal Form (CNF). ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        593.0961303710938,
+        380.9414367675781,
+        606.380126953125
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. Every interpretation satisfies F. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        608.9647216796875,
+        260.666015625,
+        622.2487182617188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. Its negation (¬F) is satisfiable.",
+      "page": 1,
+      "bbox": [
+        90.0,
+        624.8333740234375,
+        254.4058380126953,
+        638.1173706054688
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        254.40817260742188,
+        625.5703735351562,
+        257.4661865234375,
+        637.8573608398438
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 6:  What does it mean for a propositional formula F to be satisfiable?",
+      "page": 1,
+      "bbox": [
+        72.0,
+        652.7020263671875,
+        480.7730712890625,
+        665.9860229492188
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        480.77337646484375,
+        653.4390258789062,
+        483.8313903808594,
+        665.7260131835938
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. F is true for all possible interpretations. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        680.5706787109375,
+        299.9648132324219,
+        693.8546752929688
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. There exists at least one interpretation that satisfies F. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        696.4393310546875,
+        368.296875,
+        709.7233276367188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    }
+  ],
+  "ai_extraction": {
+    "source": "gpt5_fusion",
+    "confidence": 0.95,
+    "questions_found": 6,
+    "processing_time_ms": 39612,
+    "cost_cents": 25.532250000000005,
+    "error": null,
+    "raw_response": {
+      "content": "```json\n{\n  \"fusion_analysis\": {\n    \"total_questions_found\": 6,\n    \"source_agreements\": {\n      \"vision_mistral\": 6,\n      \"vision_only\": 0,\n      \"mistral_only\": 0,\n      \"conflicts_resolved\": 0\n    },\n    \"quality_score\": 0.95\n  },\n  \"questions\": [\n    {\n      \"question_number\": \"1\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What is the primary aim of Knowledge Representation and Reasoning?\",\n      \"options\": {\n        \"A\": \"To enable computers to process vast amounts of data efficiently.\",\n        \"B\": \"To develop advanced machine learning algorithms.\",\n        \"C\": \"To understand the nature of intelligence and cognition to simulate human-like abilities in computers.\",\n        \"D\": \"To create complex robotic systems for automation.\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 72.51112365722656, 509.4501953125, 85.79512786865234],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"2\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?\",\n      \"options\": {\n        \"A\": \"Deductive reasoning\",\n        \"B\": \"Abductive reasoning\",\n        \"C\": \"Epistemic reasoning\",\n        \"D\": \"Default reasoning\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 191.72303771972656, 524.49609375, 236.7443389892578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"3\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"In propositional logic, what is an 'atom'?\",\n      \"options\": {\n        \"A\": \"A logical connective like 'and' or 'or'.\",\n        \"B\": \"A formula composed of multiple propositions.\",\n        \"C\": \"The smallest unit to which a truth value (true/false) can be assigned.\",\n        \"D\": \"A symbol representing a numerical value.\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 326.80364990234375, 362.4668273925781, 340.087646484375],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"4\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following connectives is considered a unary propositional connective?\",\n      \"options\": {\n        \"A\": \"Conjunction (\\u2227)\",\n        \"B\": \"Implication (\\u2192)\",\n        \"C\": \"Disjunction (\\u2228)\",\n        \"D\": \"Negation (\\u00ac)\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 430.1468505859375, 507.58001708984375, 459.29949951171875],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"5\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"A propositional formula F is a tautology if:\",\n      \"options\": {\n        \"A\": \"At least one interpretation satisfies F.\",\n        \"B\": \"F can be reduced to a Conjunctive Normal Form (CNF).\",\n        \"C\": \"Every interpretation satisfies F.\",\n        \"D\": \"Its negation (\\u00acF) is satisfiable.\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 549.3588256835938, 363.4505920410156, 562.642822265625],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"6\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What does it mean for a propositional formula F to be satisfiable?\",\n      \"options\": {\n        \"A\": \"F is true for all possible interpretations.\",\n        \"B\": \"There exists at least one interpretation that satisfies F.\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 652.7020263671875, 480.7730712890625, 665.9860229492188],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    }\n  ]\n}\n```",
+      "model": "gpt-4o",
+      "sources_used": [
+        "pymupdf",
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "orchestration": {
+        "extraction_results": {
+          "mistral_ocr": {
+            "questions_count": 6,
+            "confidence": 0.85,
+            "processing_time_ms": 4624
+          },
+          "openai_vision": {
+            "questions_count": 6,
+            "confidence": 0.9,
+            "processing_time_ms": 19468
+          }
+        },
+        "total_processing_time_ms": 59089,
+        "clients_used": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  },
+  "ai_questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "What is the primary aim of Knowledge Representation and Reasoning?",
+      "options": {
+        "A": "To enable computers to process vast amounts of data efficiently.",
+        "B": "To develop advanced machine learning algorithms.",
+        "C": "To understand the nature of intelligence and cognition to simulate human-like abilities in computers.",
+        "D": "To create complex robotic systems for automation."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          72.51112365722656,
+          509.4501953125,
+          85.79512786865234
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1"
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?",
+      "options": {
+        "A": "Deductive reasoning",
+        "B": "Abductive reasoning",
+        "C": "Epistemic reasoning",
+        "D": "Default reasoning"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          191.72303771972656,
+          524.49609375,
+          236.7443389892578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2"
+    },
+    {
+      "question_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "In propositional logic, what is an 'atom'?",
+      "options": {
+        "A": "A logical connective like 'and' or 'or'.",
+        "B": "A formula composed of multiple propositions.",
+        "C": "The smallest unit to which a truth value (true/false) can be assigned.",
+        "D": "A symbol representing a numerical value."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          326.80364990234375,
+          362.4668273925781,
+          340.087646484375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3"
+    },
+    {
+      "question_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following connectives is considered a unary propositional connective?",
+      "options": {
+        "A": "Conjunction (∧)",
+        "B": "Implication (→)",
+        "C": "Disjunction (∨)",
+        "D": "Negation (¬)"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          430.1468505859375,
+          507.58001708984375,
+          459.29949951171875
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4"
+    },
+    {
+      "question_number": "5",
+      "question_type": "mcq_single",
+      "stem_text": "A propositional formula F is a tautology if:",
+      "options": {
+        "A": "At least one interpretation satisfies F.",
+        "B": "F can be reduced to a Conjunctive Normal Form (CNF).",
+        "C": "Every interpretation satisfies F.",
+        "D": "Its negation (¬F) is satisfiable."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          549.3588256835938,
+          363.4505920410156,
+          562.642822265625
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5"
+    },
+    {
+      "question_number": "6",
+      "question_type": "mcq_single",
+      "stem_text": "What does it mean for a propositional formula F to be satisfiable?",
+      "options": {
+        "A": "F is true for all possible interpretations.",
+        "B": "There exists at least one interpretation that satisfies F."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          652.7020263671875,
+          480.7730712890625,
+          665.9860229492188
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 6,
+          "source_agreements": {
+            "vision_mistral": 6,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6"
+    }
+  ],
+  "question_index": [
+    {
+      "q_number": "1",
+      "page": 1,
+      "stem": {
+        "text": "What is the primary aim of Knowledge Representation and Reasoning?",
+        "bbox": [
+          72.0,
+          72.51112365722656,
+          509.4501953125,
+          85.79512786865234
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "To enable computers to process vast amounts of data efficiently."
+        },
+        "B": {
+          "text": "To develop advanced machine learning algorithms."
+        },
+        "C": {
+          "text": "To understand the nature of intelligence and cognition to simulate human-like abilities in computers."
+        },
+        "D": {
+          "text": "To create complex robotic systems for automation."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "2",
+      "page": 1,
+      "stem": {
+        "text": "Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?",
+        "bbox": [
+          72.0,
+          191.72303771972656,
+          524.49609375,
+          236.7443389892578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Deductive reasoning"
+        },
+        "B": {
+          "text": "Abductive reasoning"
+        },
+        "C": {
+          "text": "Epistemic reasoning"
+        },
+        "D": {
+          "text": "Default reasoning"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "3",
+      "page": 1,
+      "stem": {
+        "text": "In propositional logic, what is an 'atom'?",
+        "bbox": [
+          72.0,
+          326.80364990234375,
+          362.4668273925781,
+          340.087646484375
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "A logical connective like 'and' or 'or'."
+        },
+        "B": {
+          "text": "A formula composed of multiple propositions."
+        },
+        "C": {
+          "text": "The smallest unit to which a truth value (true/false) can be assigned."
+        },
+        "D": {
+          "text": "A symbol representing a numerical value."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "4",
+      "page": 1,
+      "stem": {
+        "text": "Which of the following connectives is considered a unary propositional connective?",
+        "bbox": [
+          72.0,
+          430.1468505859375,
+          507.58001708984375,
+          459.29949951171875
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Conjunction (∧)"
+        },
+        "B": {
+          "text": "Implication (→)"
+        },
+        "C": {
+          "text": "Disjunction (∨)"
+        },
+        "D": {
+          "text": "Negation (¬)"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "5",
+      "page": 1,
+      "stem": {
+        "text": "A propositional formula F is a tautology if:",
+        "bbox": [
+          72.0,
+          549.3588256835938,
+          363.4505920410156,
+          562.642822265625
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "At least one interpretation satisfies F."
+        },
+        "B": {
+          "text": "F can be reduced to a Conjunctive Normal Form (CNF)."
+        },
+        "C": {
+          "text": "Every interpretation satisfies F."
+        },
+        "D": {
+          "text": "Its negation (¬F) is satisfiable."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "6",
+      "page": 1,
+      "stem": {
+        "text": "What does it mean for a propositional formula F to be satisfiable?",
+        "bbox": [
+          72.0,
+          652.7020263671875,
+          480.7730712890625,
+          665.9860229492188
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "F is true for all possible interpretations."
+        },
+        "B": {
+          "text": "There exists at least one interpretation that satisfies F."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 6,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

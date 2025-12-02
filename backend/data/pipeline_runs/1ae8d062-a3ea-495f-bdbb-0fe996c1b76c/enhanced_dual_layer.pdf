@@ -1,0 +1,434 @@
+%PDF-1.3
+%‚„œ”
+1 0 obj
+<<
+/Type /Pages
+/Count 2
+/Kids [ 4 0 R 9 0 R ]
+>>
+endobj
+2 0 obj
+<<
+/Producer (PyPDF2)
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Page
+/Resources 5 0 R
+/Contents 8 0 R
+/MediaBox [ 0 0 595.28 841.89 ]
+/Parent 1 0 R
+>>
+endobj
+5 0 obj
+<<
+/ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+/Font <<
+/F1 6 0 R
+/F2 7 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+>>
+endobj
+8 0 obj
+<<
+/Length 2758
+>>
+stream
+2 J
+0.57 w
+BT
+/F1 14 Tf
+ET
+BT
+215.17 795.17 Td
+(General\040Knowledge\040Quiz) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 770.25 Td
+(Instructions\072\040Answer\040all\040questions\056\040Some\040questions\040may\040have\040multiple\040correct\040answers\056) Tj
+ET
+BT
+/F1 14 Tf
+ET
+BT
+215.56 732.8 Td
+(Cybersecurity\040MCQ\040Quiz) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 707.89 Td
+(Instructions\072\040Select\040the\040best\040answer\050s\051\056\040Some\040questions\040may\040have\040multiple\040correct\040answers\056) Tj
+ET
+BT
+/F1 12 Tf
+ET
+BT
+31.19 673.88 Td
+(Q1\056\040Why\040would\040a\040hacker\040use\040a\040proxy\040server\077) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 651.2 Td
+(\050A\051\040To\040create\040a\040stronger\040connection\040with\040the\040target\056) Tj
+ET
+BT
+31.19 628.52 Td
+(\050B\051\040To\040create\040a\040ghost\040server\040on\040the\040network\056) Tj
+ET
+BT
+31.19 605.85 Td
+(\050C\051\040To\040obtain\040a\040remote\040access\040connection\056) Tj
+ET
+BT
+31.19 583.17 Td
+(\050D\051\040To\040hide\040malicious\040activity\040on\040the\040network\056) Tj
+ET
+BT
+/F1 12 Tf
+ET
+BT
+31.19 554.82 Td
+(Q2\056\040What\040type\040of\040symmetric\040key\040algorithm\040uses\040a\040streaming\040cipher\040to\040encrypt\040information\077) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 532.14 Td
+(\050A\051\040RC4) Tj
+ET
+BT
+31.19 509.47 Td
+(\050B\051\040Blowfish) Tj
+ET
+BT
+31.19 486.79 Td
+(\050C\051\040SHA) Tj
+ET
+BT
+31.19 464.11 Td
+(\050D\051\040MD5) Tj
+ET
+BT
+/F1 12 Tf
+ET
+1.091 Tw
+BT
+31.19 435.77 Td
+(Q3\056\040Which\040of\040the\040following\040is\040not\040a\040factor\040in\040securing\040the\040environment\040against\040an\040attack\040on) Tj
+ET
+0 Tw
+BT
+31.19 413.09 Td
+(security\077) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 390.41 Td
+(\050A\051\040The\040education\040of\040the\040attacker) Tj
+ET
+BT
+31.19 367.74 Td
+(\050B\051\040The\040system\040configuration) Tj
+ET
+BT
+31.19 345.06 Td
+(\050C\051\040The\040network\040architecture) Tj
+ET
+BT
+31.19 322.38 Td
+(\050D\051\040The\040business\040strategy\040of\040the\040company) Tj
+ET
+BT
+31.19 299.7 Td
+(\050E\051\040The\040level\040of\040access\040provided\040to\040employees) Tj
+ET
+BT
+/F1 12 Tf
+ET
+BT
+31.19 271.36 Td
+(Q4\056\040What\040type\040of\040attack\040uses\040a\040fraudulent\040server\040with\040a\040relay\040address\077) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 248.68 Td
+(\050A\051\040NTLM) Tj
+ET
+BT
+31.19 226 Td
+(\050B\051\040MITM) Tj
+ET
+BT
+31.19 203.33 Td
+(\050C\051\040NetBIOS) Tj
+ET
+BT
+31.19 180.65 Td
+(\050D\051\040SMB) Tj
+ET
+BT
+/F1 12 Tf
+ET
+BT
+31.19 152.3 Td
+(Q5\056\040What\040port\040is\040used\040to\040connect\040to\040the\040Active\040Directory\040in\040Windows\0402000\077) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 129.63 Td
+(\050A\051\04080) Tj
+ET
+BT
+31.19 106.95 Td
+(\050B\051\040445) Tj
+ET
+BT
+31.19 84.27 Td
+(\050C\051\040139) Tj
+ET
+
+endstream
+endobj
+9 0 obj
+<<
+/Type /Page
+/Resources 5 0 R
+/Contents 10 0 R
+/MediaBox [ 0 0 595.28 841.89 ]
+/Parent 1 0 R
+>>
+endobj
+10 0 obj
+<<
+/Length 2882
+>>
+stream
+2 J
+0.57 w
+BT
+/F2 12 Tf
+ET
+BT
+/F1 14 Tf
+ET
+BT
+215.17 795.17 Td
+(General\040Knowledge\040Quiz) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 770.25 Td
+(Instructions\072\040Answer\040all\040questions\056\040Some\040questions\040may\040have\040multiple\040correct\040answers\056) Tj
+ET
+BT
+31.19 736.24 Td
+(\050D\051\040389) Tj
+ET
+BT
+/F1 12 Tf
+ET
+BT
+31.19 707.89 Td
+(Q6\056\040To\040hide\040information\040inside\040a\040picture\054\040what\040technology\040is\040used\077) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 685.22 Td
+(\050A\051\040Rootkits) Tj
+ET
+BT
+31.19 662.54 Td
+(\050B\051\040Bitmapping) Tj
+ET
+BT
+31.19 639.86 Td
+(\050C\051\040Steganography) Tj
+ET
+BT
+31.19 617.18 Td
+(\050D\051\040Image\040Rendering) Tj
+ET
+BT
+/F1 12 Tf
+ET
+BT
+31.19 588.84 Td
+(Q7\056\040Which\040phase\040of\040hacking\040performs\040actual\040attack\040on\040a\040network\040or\040system\077) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 566.16 Td
+(\050A\051\040Reconnaissance) Tj
+ET
+BT
+31.19 543.48 Td
+(\050B\051\040Maintaining\040Access) Tj
+ET
+BT
+31.19 520.81 Td
+(\050C\051\040Scanning) Tj
+ET
+BT
+31.19 498.13 Td
+(\050D\051\040Gaining\040Access) Tj
+ET
+BT
+/F1 12 Tf
+ET
+1.944 Tw
+BT
+31.19 469.78 Td
+(Q8\056\040Attempting\040to\040gain\040access\040to\040a\040network\040using\040an\040employee\047s\040credentials\040is\040called\040the) Tj
+ET
+0 Tw
+BT
+31.19 447.11 Td
+(\137\137\137\137\137\137\137\137\137\137\137\137\137\040mode\040of\040ethical\040hacking\056) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 424.43 Td
+(\050A\051\040Local\040networking) Tj
+ET
+BT
+31.19 401.75 Td
+(\050B\051\040Social\040engineering) Tj
+ET
+BT
+31.19 379.07 Td
+(\050C\051\040Physical\040entry) Tj
+ET
+BT
+31.19 356.4 Td
+(\050D\051\040Remote\040networking) Tj
+ET
+BT
+/F1 12 Tf
+ET
+0.618 Tw
+BT
+31.19 328.05 Td
+(Q9\056\040Which\040Federal\040Code\040applies\040the\040consequences\040of\040hacking\040activities\040that\040disrupt\040subway) Tj
+ET
+0 Tw
+BT
+31.19 305.37 Td
+(transit\040systems\077) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 282.7 Td
+(\050A\051\040Electronic\040Communications\040Interception\040of\040Oral\040Communications) Tj
+ET
+BT
+31.19 260.02 Td
+(\050B\051\04018\040U\056S\056C\056\040\247\0401029) Tj
+ET
+BT
+31.19 237.34 Td
+(\050C\051\040Cyber\040Security\040Enhancement\040Act\0402002) Tj
+ET
+BT
+31.19 214.66 Td
+(\050D\051\04018\040U\056S\056C\056\040\247\0401030) Tj
+ET
+BT
+/F1 12 Tf
+ET
+BT
+31.19 186.32 Td
+(Q10\056\040Which\040of\040the\040following\040is\040not\040a\040typical\040characteristic\040of\040an\040ethical\040hacker\077) Tj
+ET
+BT
+/F2 12 Tf
+ET
+BT
+31.19 163.64 Td
+(\050A\051\040Excellent\040knowledge\040of\040Windows\056) Tj
+ET
+BT
+31.19 140.96 Td
+(\050B\051\040Understands\040the\040process\040of\040exploiting\040network\040vulnerabilities\056) Tj
+ET
+BT
+31.19 118.29 Td
+(\050C\051\040Patience\054\040persistence\040and\040perseverance\056) Tj
+ET
+BT
+31.19 95.61 Td
+(\050D\051\040Has\040the\040highest\040level\040of\040security\040for\040the\040organization\056) Tj
+ET
+
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000080 00000 n 
+0000000120 00000 n 
+0000000169 00000 n 
+0000000281 00000 n 
+0000000397 00000 n 
+0000000499 00000 n 
+0000000596 00000 n 
+0000003406 00000 n 
+0000003519 00000 n 
+trailer
+<<
+/Size 11
+/Root 3 0 R
+/Info 2 0 R
+>>
+startxref
+6454
+%%EOF

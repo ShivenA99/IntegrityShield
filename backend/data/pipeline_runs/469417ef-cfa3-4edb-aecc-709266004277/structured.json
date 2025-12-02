@@ -1,0 +1,1876 @@
+{
+  "pipeline_metadata": {
+    "run_id": "469417ef-cfa3-4edb-aecc-709266004277",
+    "current_stage": "results_generation",
+    "stages_completed": [
+      "results_generation",
+      "smart_substitution",
+      "smart_reading",
+      "content_discovery"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-27T22:35:48.912472+00:00",
+    "version": "2.0.0",
+    "config": {},
+    "ai_extraction_enabled": true,
+    "ai_sources_used": [
+      "openai_vision",
+      "mistral_ocr"
+    ]
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/quiz_rnn.pdf",
+    "filename": "quiz_rnn.pdf",
+    "pages": 1
+  },
+  "questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "What is the primary benefit of stacking multiple RNN layers (i.e., stacked RNNs)?",
+      "options": {
+        "A": "Faster training",
+        "B": "Lower memory usage",
+        "C": "Better learning of hierarchical features"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          54.0,
+          143.04949951171875,
+          403.86614990234375,
+          154.29949951171875
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 256,
+            "original": "What is the primary benefit of stacking multiple RNN layers (i.e., stacked RNNs)?",
+            "replacement": "What is the primary benefit of stacking multiple RNN layers (i.e., stacked RNNs)? [altered]",
+            "start_pos": 0,
+            "end_pos": 81,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is the main reason RNNs struggle with long-term dependencies?",
+      "options": {
+        "A": "Overfitting",
+        "B": "Vanishing gradients",
+        "C": "Lack of non-linearity"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          54.00000762939453,
+          212.41351318359375,
+          428.20306396484375,
+          223.66351318359375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 257,
+            "original": "Which of the following is the main reason RNNs struggle with long-term dependencies?",
+            "replacement": "Which of the following is the main reason RNNs struggle with long-term dependencies? [altered]",
+            "start_pos": 0,
+            "end_pos": 84,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "What differentiates an LSTM cell from a standard RNN cell?",
+      "options": {
+        "A": "It uses ReLU instead of tanh",
+        "B": "It introduces gates to control the flow of information",
+        "C": "It has fewer parameters"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          54.00001525878906,
+          281.77850341796875,
+          322.6518859863281,
+          293.02850341796875
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 258,
+            "original": "What differentiates an LSTM cell from a standard RNN cell?",
+            "replacement": "What differentiates an LSTM cell from a standard RNN cell? [altered]",
+            "start_pos": 0,
+            "end_pos": 58,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "In a standard LSTM, which gate is responsible for deciding how much of the past memory to keep?",
+      "options": {
+        "A": "Output gate",
+        "B": "Forget gate",
+        "C": "Input gate"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          54.000022888183594,
+          351.1434631347656,
+          476.5605163574219,
+          362.3934631347656
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 259,
+            "original": "In a standard LSTM, which gate is responsible for deciding how much of the past memory to keep?",
+            "replacement": "In a standard LSTM, which gate is responsible for deciding how much of the past memory to keep? [altered]",
+            "start_pos": 0,
+            "end_pos": 95,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "5",
+      "question_type": "short_answer",
+      "stem_text": "Why is the forget gate bias in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-term.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          57.70302963256836,
+          451.3304443359375,
+          556.5713500976562,
+          462.5804443359375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 260,
+            "original": "Why is the forget gate bias in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-term.",
+            "replacement": "Why is the forget gate bias in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-term. [altered]",
+            "start_pos": 0,
+            "end_pos": 119,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "6",
+      "question_type": "short_answer",
+      "stem_text": "Bidirectional RNNs are often used for POS tagging but not machine translation. Explain why, considering input-output.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          57.703025817871094,
+          482.1524658203125,
+          555.4326171875,
+          493.4024658203125
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 261,
+            "original": "Bidirectional RNNs are often used for POS tagging but not machine translation. Explain why, considering input-output.",
+            "replacement": "Bidirectional RNNs are often used for POS tagging but not machine translation. Explain why, considering input-output. [altered]",
+            "start_pos": 0,
+            "end_pos": 117,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "7",
+      "question_type": "short_answer",
+      "stem_text": "Designing an RNN model for variable-length legal documents with long dependencies: (a) Choose between vanilla RNN or LSTM. (b) Stack layers or keep it shallow? (c) Make it bidirectional?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          57.703025817871094,
+          512.9745483398438,
+          420.7203063964844,
+          524.2245483398438
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "7",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 262,
+            "original": "Designing an RNN model for variable-length legal documents with long dependencies: (a) Choose between vanilla RNN or LSTM. (b) Stack layers or keep it shallow? (c) Make it bidirectional?",
+            "replacement": "Designing an RNN model for variable-length legal documents with long dependencies: (a) Choose between vanilla RNN or LSTM. (b) Stack layers or keep it shallow? (c) Make it bidirectional? [altered]",
+            "start_pos": 0,
+            "end_pos": 186,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "8",
+      "question_type": "short_answer",
+      "stem_text": "Consider a vanilla RNN with recurrent weight matrix Wh and sequence length 50. Analyze gradient behavior: (1) If ||Wh||= 0.9: Will gradients vanish or explode? Justify. (2) If ||Wh||= 1.2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          57.703033447265625,
+          584.6425170898438,
+          521.6116333007812,
+          595.8925170898438
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "8",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 263,
+            "original": "Consider a vanilla RNN with recurrent weight matrix Wh and sequence length 50. Analyze gradient behavior: (1) If ||Wh||= 0.9: Will gradients vanish or explode? Justify. (2) If ||Wh||= 1.2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps.",
+            "replacement": "Consider a vanilla RNN with recurrent weight matrix Wh and sequence length 50. Analyze gradient behavior: (1) If ||Wh||= 0.9: Will gradients vanish or explode? Justify. (2) If ||Wh||= 1.2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps. [altered]",
+            "start_pos": 0,
+            "end_pos": 277,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "assets": {
+    "images": [],
+    "fonts": [
+      "CMBX12",
+      "CMR10",
+      "CMR17",
+      "Geneva"
+    ],
+    "extracted_elements": 45
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_content_stream_overlay.pdf",
+        "size_bytes": 72291711,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_content_stream_overlay.pdf",
+        "file_size_bytes": 72291711,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 8,
+        "overlay_targets": 8,
+        "overlay_area_pct": 0.0111,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 72291711,
+          "effectiveness_score": 1.0,
+          "replacements": 8,
+          "matches_found": 8,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 8,
+          "overlay_applied": 8,
+          "overlay_targets": 8,
+          "overlay_area_pct": 0.0111,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:35:48.900861+00:00"
+      },
+      "dual_layer": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_dual_layer.pdf",
+        "size_bytes": 69233723,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_dual_layer.pdf",
+        "file_size_bytes": 69233723,
+        "visual_quality_score": 0.97,
+        "effectiveness_score": 0.85,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 69233723,
+          "effectiveness_score": 0.85
+        },
+        "created_at": "2025-09-27T22:35:48.901018+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_image_overlay.pdf",
+        "size_bytes": 71601595,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_image_overlay.pdf",
+        "file_size_bytes": 71601595,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": 0.01112178026584105,
+        "render_stats": {
+          "mapping_entries": 8,
+          "overlays_applied": 8,
+          "file_size_bytes": 71601595,
+          "effectiveness_score": 1.0,
+          "overlay_area_pct": 0.01112178026584105,
+          "text_pages": 1,
+          "text_tj_hits": 1370,
+          "text_replacements": 0,
+          "text_matches_found": 0,
+          "text_tokens_scanned": 1536
+        },
+        "created_at": "2025-09-27T22:35:48.901143+00:00"
+      },
+      "font_manipulation": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_font_manipulation.pdf",
+        "size_bytes": 69290381,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_font_manipulation.pdf",
+        "file_size_bytes": 69290381,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.75,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 69290381,
+          "effectiveness_score": 0.75
+        },
+        "created_at": "2025-09-27T22:35:48.901263+00:00"
+      },
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_content_stream.pdf",
+        "size_bytes": 72291711,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_content_stream.pdf",
+        "file_size_bytes": 72291711,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 8,
+        "overlay_targets": 8,
+        "overlay_area_pct": 0.0111,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 72291711,
+          "effectiveness_score": 1.0,
+          "replacements": 8,
+          "matches_found": 8,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 8,
+          "overlay_applied": 8,
+          "overlay_targets": 8,
+          "overlay_area_pct": 0.0111,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:35:48.901375+00:00"
+      },
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_pymupdf_overlay.pdf",
+        "size_bytes": 72291711,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/469417ef-cfa3-4edb-aecc-709266004277/enhanced_pymupdf_overlay.pdf",
+        "file_size_bytes": 72291711,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 8,
+        "overlay_targets": 8,
+        "overlay_area_pct": 0.0111,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 72291711,
+          "effectiveness_score": 1.0,
+          "replacements": 8,
+          "textbox_adjustments": 8,
+          "min_fontsize_used": 5.5,
+          "overlay_applied": 8,
+          "overlay_targets": 8,
+          "overlay_area_pct": 0.0111,
+          "raw_targets": 8
+        },
+        "created_at": "2025-09-27T22:35:48.901486+00:00"
+      }
+    },
+    "debug": {
+      "content_stream_overlay": {
+        "decoded_sample": null,
+        "per_font_top_tokens": null,
+        "enhanced_mapping_stats": {
+          "total_entries": 8,
+          "discovered_tokens": 0
+        }
+      },
+      "overlay_layers": {
+        "pymupdf_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 8,
+          "enhanced_mapping_boost": 0
+        },
+        "image_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 8,
+          "enhanced_mapping_boost": 0
+        }
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 5094.55,
+      "mapping_build_time_ms": 134.76,
+      "enhancement_stats": {
+        "base_mapping_size": 8,
+        "enhanced_mapping_size": 8,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream_overlay": {
+          "duration_ms": 733.06,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 72291711
+        },
+        "content_stream": {
+          "duration_ms": 698.32,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 72291711
+        },
+        "pymupdf_overlay": {
+          "duration_ms": 670.04,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 72291711
+        },
+        "image_overlay": {
+          "duration_ms": 1634.13,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 71601595
+        },
+        "dual_layer": {
+          "duration_ms": 1191.52,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 69233723
+        },
+        "font_manipulation": {
+          "duration_ms": 20.44,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 69290381
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 6,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 69290381,
+        "total_output_size_bytes": 427000832,
+        "size_efficiency": 6.162483534330689
+      }
+    },
+    "summary": {
+      "questions": 8,
+      "average_effectiveness": 0.0,
+      "generated_at": "2025-09-27T22:35:48.912472+00:00"
+    }
+  },
+  "performance_metrics": {},
+  "content_elements": [
+    {
+      "type": "text",
+      "content": "RNNs and LSTM Quiz",
+      "page": 1,
+      "bbox": [
+        225.91700744628906,
+        60.784751892089844,
+        386.1062316894531,
+        78.00015258789062
+      ],
+      "font": "CMR17",
+      "size": 17.21540069580078
+    },
+    {
+      "type": "text",
+      "content": "Multiple Choice Questions",
+      "page": 1,
+      "bbox": [
+        54.0,
+        130.90798950195312,
+        241.84915161132812,
+        145.25418090820312
+      ],
+      "font": "CMBX12",
+      "size": 14.346199989318848
+    },
+    {
+      "type": "text",
+      "content": "Descriptive Questions",
+      "page": 1,
+      "bbox": [
+        54.00000762939453,
+        439.1889953613281,
+        207.92039489746094,
+        453.5351867675781
+      ],
+      "font": "CMBX12",
+      "size": 14.346199989318848
+    },
+    {
+      "type": "text",
+      "content": "1",
+      "page": 1,
+      "bbox": [
+        303.5090026855469,
+        760.1019287109375,
+        308.49029541015625,
+        770.0645141601562
+      ],
+      "font": "CMR10",
+      "size": 9.962599754333496
+    },
+    {
+      "type": "text",
+      "content": "Q1. What is the primary benefit of stacking RNN layers​​​​​​​​​ (i.e., stacked RN",
+      "page": 1,
+      "bbox": [
+        54.0,
+        143.04949951171875,
+        403.86614990234375,
+        154.29949951171875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Ns)?",
+      "page": 1,
+      "bbox": [
+        54.0,
+        156.04949951171875,
+        74.09295654296875,
+        167.29949951171875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "A. Faster training",
+      "page": 1,
+      "bbox": [
+        54.0,
+        169.04949951171875,
+        129.1211395263672,
+        180.29949951171875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "B. Lower memory usage",
+      "page": 1,
+      "bbox": [
+        54.0,
+        182.04949951171875,
+        158.6715850830078,
+        193.29949951171875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "C. Better learning of hierarchical features",
+      "page": 1,
+      "bbox": [
+        54.0,
+        195.04949951171875,
+        232.86810302734375,
+        206.29949951171875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Q2. Which of the following is the main reason RNNs struggle with short-term depende",
+      "page": 1,
+      "bbox": [
+        54.00000762939453,
+        212.41351318359375,
+        428.20306396484375,
+        223.66351318359375
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "ncies?",
+      "page": 1,
+      "bbox": [
+        54.00000762939453,
+        225.41351318359375,
+        75.89911651611328,
+        236.66351318359375
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "A. Overfitting",
+      "page": 1,
+      "bbox": [
+        54.00000762939453,
+        238.41351318359375,
+        113.07671356201172,
+        249.66351318359375
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "B. Vanishing gradients",
+      "page": 1,
+      "bbox": [
+        54.00000762939453,
+        251.41351318359375,
+        150.51458740234375,
+        262.66351318359375
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "C. Lack of non-linearity",
+      "page": 1,
+      "bbox": [
+        54.00000762939453,
+        264.41351318359375,
+        154.26742553710938,
+        275.66351318359375
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Q3. What differentiates an convolutional architecture from a standard RNN cel",
+      "page": 1,
+      "bbox": [
+        54.00001525878906,
+        281.77850341796875,
+        322.6518859863281,
+        293.02850341796875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "l?",
+      "page": 1,
+      "bbox": [
+        54.00001525878906,
+        294.77850341796875,
+        61.22578430175781,
+        306.02850341796875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "A. It uses ReLU instead of tanh",
+      "page": 1,
+      "bbox": [
+        54.00001525878906,
+        307.77850341796875,
+        188.88568115234375,
+        319.02850341796875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "B. It introduces gates to control the flow of information",
+      "page": 1,
+      "bbox": [
+        54.00001525878906,
+        320.77850341796875,
+        296.70550537109375,
+        332.02850341796875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "C. It has fewer parameters",
+      "page": 1,
+      "bbox": [
+        54.00001525878906,
+        333.77850341796875,
+        169.2616729736328,
+        345.02850341796875
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Q4. In a standard LSTM, which gate is responsible for deciding how much of the previous memory to ",
+      "page": 1,
+      "bbox": [
+        54.000022888183594,
+        351.1434631347656,
+        476.5605163574219,
+        362.3934631347656
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "keep?",
+      "page": 1,
+      "bbox": [
+        54.000022888183594,
+        364.1434631347656,
+        79.73555755615234,
+        375.3934631347656
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "A. Output gate",
+      "page": 1,
+      "bbox": [
+        54.000022888183594,
+        377.1434631347656,
+        119.4240493774414,
+        388.3934631347656
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "B. Forget gate",
+      "page": 1,
+      "bbox": [
+        54.000022888183594,
+        390.1434631347656,
+        116.6598892211914,
+        401.3934631347656
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "C. Input gate",
+      "page": 1,
+      "bbox": [
+        54.000022888183594,
+        403.1434631347656,
+        110.3185806274414,
+        414.3934631347656
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Q5. Why is the forget gate threshold in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-t",
+      "page": 1,
+      "bbox": [
+        57.70302963256836,
+        451.3304443359375,
+        556.5713500976562,
+        462.5804443359375
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "erm",
+      "page": 1,
+      "bbox": [
+        57.70302963256836,
+        464.3304443359375,
+        74.40625762939453,
+        475.5804443359375
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Q6. Bidirectional RNNs are often used for syntax analysis but not machine translation. Explain why, considering input-",
+      "page": 1,
+      "bbox": [
+        57.703025817871094,
+        482.1524658203125,
+        555.4326171875,
+        493.4024658203125
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "output",
+      "page": 1,
+      "bbox": [
+        57.703025817871094,
+        495.1524658203125,
+        87.05525970458984,
+        506.4024658203125
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Q7. Designing an RNN model for variable-length legal documents with long depende",
+      "page": 1,
+      "bbox": [
+        57.703025817871094,
+        512.9745483398438,
+        420.7203063964844,
+        524.2245483398438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "ncies:",
+      "page": 1,
+      "bbox": [
+        57.703025817871094,
+        525.9745483398438,
+        82.46859741210938,
+        537.2245483398438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "(a) Choose between vanilla RNN or GRU​.",
+      "page": 1,
+      "bbox": [
+        57.703025817871094,
+        538.9745483398438,
+        237.86802673339844,
+        550.2245483398438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "(b) Stack layers or keep it shallow?",
+      "page": 1,
+      "bbox": [
+        57.703025817871094,
+        551.9745483398438,
+        211.18319702148438,
+        563.2245483398438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "(c) Make it bidirectional?",
+      "page": 1,
+      "bbox": [
+        57.703025817871094,
+        564.9745483398438,
+        165.57235717773438,
+        576.2245483398438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Q8. Consider a vanilla RNN with recurrent weight matrix Wh and sequence length 50. Analyze gradient beh",
+      "page": 1,
+      "bbox": [
+        57.703033447265625,
+        584.6425170898438,
+        521.6116333007812,
+        595.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "avior:",
+      "page": 1,
+      "bbox": [
+        57.703033447265625,
+        597.6425170898438,
+        81.5325698852539,
+        608.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "(1) If ",
+      "page": 1,
+      "bbox": [
+        57.703033447265625,
+        610.6425170898438,
+        83.43294525146484,
+        621.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "\u0000",
+      "page": 1,
+      "bbox": [
+        83.43740844726562,
+        610.6425170898438,
+        87.93740844726562,
+        621.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Wh",
+      "page": 1,
+      "bbox": [
+        87.93740844726562,
+        610.6425170898438,
+        101.70540618896484,
+        621.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "\u0000",
+      "page": 1,
+      "bbox": [
+        101.70986938476562,
+        610.6425170898438,
+        106.20986938476562,
+        621.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "= 1.1: Will gradients vanish or explode? Justify.",
+      "page": 1,
+      "bbox": [
+        106.20986938476562,
+        610.6425170898438,
+        312.6145935058594,
+        621.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "(2) If ",
+      "page": 1,
+      "bbox": [
+        57.703033447265625,
+        623.6425170898438,
+        83.43294525146484,
+        634.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "\u0000",
+      "page": 1,
+      "bbox": [
+        83.43740844726562,
+        623.6425170898438,
+        87.93740844726562,
+        634.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "Wh",
+      "page": 1,
+      "bbox": [
+        87.93740844726562,
+        623.6425170898438,
+        101.70540618896484,
+        634.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "\u0000",
+      "page": 1,
+      "bbox": [
+        101.70986938476562,
+        623.6425170898438,
+        106.20986938476562,
+        634.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    },
+    {
+      "type": "text",
+      "content": "= 1.2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps.",
+      "page": 1,
+      "bbox": [
+        106.20986938476562,
+        623.6425170898438,
+        510.1707458496094,
+        634.8925170898438
+      ],
+      "font": "Geneva",
+      "size": 9.0
+    }
+  ],
+  "ai_extraction": {
+    "source": "gpt5_fusion",
+    "confidence": 0.65,
+    "questions_found": 8,
+    "processing_time_ms": 40286,
+    "cost_cents": 24.24975,
+    "error": null,
+    "raw_response": {
+      "content": "```json\n{\n  \"fusion_analysis\": {\n    \"total_questions_found\": 8,\n    \"source_agreements\": {\n      \"vision_mistral\": 0,\n      \"vision_only\": 8,\n      \"mistral_only\": 0,\n      \"conflicts_resolved\": 0\n    },\n    \"quality_score\": 0.95\n  },\n  \"questions\": [\n    {\n      \"question_number\": \"1\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What is the primary benefit of stacking multiple RNN layers (i.e., stacked RNNs)?\",\n      \"options\": {\n        \"A\": \"Faster training\",\n        \"B\": \"Lower memory usage\",\n        \"C\": \"Better learning of hierarchical features\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [54.0, 143.04949951171875, 403.86614990234375, 154.29949951171875],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1\n      }\n    },\n    {\n      \"question_number\": \"2\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following is the main reason RNNs struggle with long-term dependencies?\",\n      \"options\": {\n        \"A\": \"Overfitting\",\n        \"B\": \"Vanishing gradients\",\n        \"C\": \"Lack of non-linearity\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [54.00000762939453, 212.41351318359375, 428.20306396484375, 223.66351318359375],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1\n      }\n    },\n    {\n      \"question_number\": \"3\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What differentiates an LSTM cell from a standard RNN cell?\",\n      \"options\": {\n        \"A\": \"It uses ReLU instead of tanh\",\n        \"B\": \"It introduces gates to control the flow of information\",\n        \"C\": \"It has fewer parameters\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [54.00001525878906, 281.77850341796875, 322.6518859863281, 293.02850341796875],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1\n      }\n    },\n    {\n      \"question_number\": \"4\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"In a standard LSTM, which gate is responsible for deciding how much of the past memory to keep?\",\n      \"options\": {\n        \"A\": \"Output gate\",\n        \"B\": \"Forget gate\",\n        \"C\": \"Input gate\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [54.000022888183594, 351.1434631347656, 476.5605163574219, 362.3934631347656],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1\n      }\n    },\n    {\n      \"question_number\": \"5\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Why is the forget gate bias in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-term.\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [57.70302963256836, 451.3304443359375, 556.5713500976562, 462.5804443359375],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1\n      }\n    },\n    {\n      \"question_number\": \"6\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Bidirectional RNNs are often used for POS tagging but not machine translation. Explain why, considering input-output.\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [57.703025817871094, 482.1524658203125, 555.4326171875, 493.4024658203125],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1\n      }\n    },\n    {\n      \"question_number\": \"7\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Designing an RNN model for variable-length legal documents with long dependencies: (a) Choose between vanilla RNN or LSTM. (b) Stack layers or keep it shallow? (c) Make it bidirectional?\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [57.703025817871094, 512.9745483398438, 420.7203063964844, 524.2245483398438],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1\n      }\n    },\n    {\n      \"question_number\": \"8\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"Consider a vanilla RNN with recurrent weight matrix Wh and sequence length 50. Analyze gradient behavior: (1) If ||Wh||= 0.9: Will gradients vanish or explode? Justify. (2) If ||Wh||= 1.2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps.\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [57.703033447265625, 584.6425170898438, 521.6116333007812, 595.8925170898438],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1\n      }\n    }\n  ]\n}\n```",
+      "model": "gpt-4o",
+      "sources_used": [
+        "pymupdf",
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "orchestration": {
+        "extraction_results": {
+          "mistral_ocr": {
+            "questions_count": 0,
+            "confidence": 0.0,
+            "processing_time_ms": null
+          },
+          "openai_vision": {
+            "questions_count": 8,
+            "confidence": 0.9,
+            "processing_time_ms": 23851
+          }
+        },
+        "total_processing_time_ms": 64142,
+        "clients_used": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  },
+  "ai_questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "What is the primary benefit of stacking multiple RNN layers (i.e., stacked RNNs)?",
+      "options": {
+        "A": "Faster training",
+        "B": "Lower memory usage",
+        "C": "Better learning of hierarchical features"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          54.0,
+          143.04949951171875,
+          403.86614990234375,
+          154.29949951171875
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1"
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is the main reason RNNs struggle with long-term dependencies?",
+      "options": {
+        "A": "Overfitting",
+        "B": "Vanishing gradients",
+        "C": "Lack of non-linearity"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          54.00000762939453,
+          212.41351318359375,
+          428.20306396484375,
+          223.66351318359375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2"
+    },
+    {
+      "question_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "What differentiates an LSTM cell from a standard RNN cell?",
+      "options": {
+        "A": "It uses ReLU instead of tanh",
+        "B": "It introduces gates to control the flow of information",
+        "C": "It has fewer parameters"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          54.00001525878906,
+          281.77850341796875,
+          322.6518859863281,
+          293.02850341796875
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3"
+    },
+    {
+      "question_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "In a standard LSTM, which gate is responsible for deciding how much of the past memory to keep?",
+      "options": {
+        "A": "Output gate",
+        "B": "Forget gate",
+        "C": "Input gate"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          54.000022888183594,
+          351.1434631347656,
+          476.5605163574219,
+          362.3934631347656
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4"
+    },
+    {
+      "question_number": "5",
+      "question_type": "short_answer",
+      "stem_text": "Why is the forget gate bias in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-term.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          57.70302963256836,
+          451.3304443359375,
+          556.5713500976562,
+          462.5804443359375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5"
+    },
+    {
+      "question_number": "6",
+      "question_type": "short_answer",
+      "stem_text": "Bidirectional RNNs are often used for POS tagging but not machine translation. Explain why, considering input-output.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          57.703025817871094,
+          482.1524658203125,
+          555.4326171875,
+          493.4024658203125
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6"
+    },
+    {
+      "question_number": "7",
+      "question_type": "short_answer",
+      "stem_text": "Designing an RNN model for variable-length legal documents with long dependencies: (a) Choose between vanilla RNN or LSTM. (b) Stack layers or keep it shallow? (c) Make it bidirectional?",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          57.703025817871094,
+          512.9745483398438,
+          420.7203063964844,
+          524.2245483398438
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "7"
+    },
+    {
+      "question_number": "8",
+      "question_type": "short_answer",
+      "stem_text": "Consider a vanilla RNN with recurrent weight matrix Wh and sequence length 50. Analyze gradient behavior: (1) If ||Wh||= 0.9: Will gradients vanish or explode? Justify. (2) If ||Wh||= 1.2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps.",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          57.703033447265625,
+          584.6425170898438,
+          521.6116333007812,
+          595.8925170898438
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 8,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 8,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "8"
+    }
+  ],
+  "question_index": [
+    {
+      "q_number": "1",
+      "page": 1,
+      "stem": {
+        "text": "What is the primary benefit of stacking multiple RNN layers (i.e., stacked RNNs)?",
+        "bbox": [
+          54.0,
+          143.04949951171875,
+          403.86614990234375,
+          154.29949951171875
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Faster training"
+        },
+        "B": {
+          "text": "Lower memory usage"
+        },
+        "C": {
+          "text": "Better learning of hierarchical features"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "2",
+      "page": 1,
+      "stem": {
+        "text": "Which of the following is the main reason RNNs struggle with long-term dependencies?",
+        "bbox": [
+          54.00000762939453,
+          212.41351318359375,
+          428.20306396484375,
+          223.66351318359375
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Overfitting"
+        },
+        "B": {
+          "text": "Vanishing gradients"
+        },
+        "C": {
+          "text": "Lack of non-linearity"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "3",
+      "page": 1,
+      "stem": {
+        "text": "What differentiates an LSTM cell from a standard RNN cell?",
+        "bbox": [
+          54.00001525878906,
+          281.77850341796875,
+          322.6518859863281,
+          293.02850341796875
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "It uses ReLU instead of tanh"
+        },
+        "B": {
+          "text": "It introduces gates to control the flow of information"
+        },
+        "C": {
+          "text": "It has fewer parameters"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "4",
+      "page": 1,
+      "stem": {
+        "text": "In a standard LSTM, which gate is responsible for deciding how much of the past memory to keep?",
+        "bbox": [
+          54.000022888183594,
+          351.1434631347656,
+          476.5605163574219,
+          362.3934631347656
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Output gate"
+        },
+        "B": {
+          "text": "Forget gate"
+        },
+        "C": {
+          "text": "Input gate"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "5",
+      "page": 1,
+      "stem": {
+        "text": "Why is the forget gate bias in LSTMs often initialized to a high value (e.g., 2 or 3)? Explain its effect on long-term.",
+        "bbox": [
+          57.70302963256836,
+          451.3304443359375,
+          556.5713500976562,
+          462.5804443359375
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "6",
+      "page": 1,
+      "stem": {
+        "text": "Bidirectional RNNs are often used for POS tagging but not machine translation. Explain why, considering input-output.",
+        "bbox": [
+          57.703025817871094,
+          482.1524658203125,
+          555.4326171875,
+          493.4024658203125
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "7",
+      "page": 1,
+      "stem": {
+        "text": "Designing an RNN model for variable-length legal documents with long dependencies: (a) Choose between vanilla RNN or LSTM. (b) Stack layers or keep it shallow? (c) Make it bidirectional?",
+        "bbox": [
+          57.703025817871094,
+          512.9745483398438,
+          420.7203063964844,
+          524.2245483398438
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "8",
+      "page": 1,
+      "stem": {
+        "text": "Consider a vanilla RNN with recurrent weight matrix Wh and sequence length 50. Analyze gradient behavior: (1) If ||Wh||= 0.9: Will gradients vanish or explode? Justify. (2) If ||Wh||= 1.2: Will gradients vanish or explode? Justify. Suggest an easy fix and explain how it helps.",
+        "bbox": [
+          57.703033447265625,
+          584.6425170898438,
+          521.6116333007812,
+          595.8925170898438
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 8,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

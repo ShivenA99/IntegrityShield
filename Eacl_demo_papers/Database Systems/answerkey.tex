@@ -1,0 +1,98 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Database Systems}}\\[0.25em]
+  {\large \textbf{SQL and Relational Model Quiz -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item \textbf{(C) Third Normal Form (3NF).} 3NF requires no transitive dependencies—non-key attributes must depend only on the primary key, not on other non-key attributes.
+
+  \item \textbf{(B) HAVING.} WHERE filters rows before grouping; HAVING filters groups after GROUP BY aggregation. Example: \texttt{HAVING COUNT(*) > 5}.
+
+  \item \textbf{(B) Values reference existing values in another table.} Foreign keys enforce referential integrity—a value must exist in the referenced table's primary key column.
+
+  \item \textbf{(D) FULL OUTER JOIN.} Returns all rows from both tables: matching rows are combined; non-matching rows have NULLs for the other table's columns.
+
+  \item \textbf{(C) Concurrent transactions don't interfere with each other.} Isolation ensures transactions execute as if they were the only operation, preventing dirty reads, non-repeatable reads, and phantom reads.
+
+  \item \textbf{False.} Primary keys must be unique AND NOT NULL. They uniquely identify each row, so NULL values (representing unknown) are prohibited.
+
+  \item \textbf{True.} DELETE is a DML operation that can be rolled back if issued within an uncommitted transaction. TRUNCATE and DROP typically cannot be rolled back.
+
+  \item \textbf{False.} Indexes improve read performance but add overhead to write operations (INSERT, UPDATE, DELETE). They also consume storage space. Over-indexing can degrade overall performance.
+
+  \item \textbf{Purpose of Normalization:}
+  \begin{itemize}
+    \item Eliminate data redundancy
+    \item Prevent update, insertion, and deletion anomalies
+    \item Ensure data integrity
+    \item Organize data efficiently
+  \end{itemize}
+  
+  \textbf{First Normal Form (1NF):}
+  \begin{itemize}
+    \item Requirement: Atomic values only (no repeating groups or arrays)
+    \item Violation: Student(ID, Name, Courses) where Courses = ``Math, Physics, Chemistry''
+    \item Solution: Create separate rows or a junction table for each course
+  \end{itemize}
+  
+  \textbf{Second Normal Form (2NF):}
+  \begin{itemize}
+    \item Requirement: 1NF + no partial dependencies (non-key attributes depend on entire primary key)
+    \item Violation: OrderItem(OrderID, ProductID, ProductName, Quantity) — ProductName depends only on ProductID
+    \item Solution: Separate into Orders and Products tables
+  \end{itemize}
+  
+  \textbf{Third Normal Form (3NF):}
+  \begin{itemize}
+    \item Requirement: 2NF + no transitive dependencies
+    \item Violation: Employee(ID, DeptID, DeptName, DeptLocation) — DeptName and DeptLocation depend on DeptID, not ID
+    \item Solution: Separate into Employee(ID, DeptID) and Department(DeptID, DeptName, DeptLocation)
+  \end{itemize}
+
+  \item \textbf{ACID Properties:}
+  
+  \textbf{Atomicity:}
+  \begin{itemize}
+    \item Definition: Transaction executes completely or not at all (``all or nothing'')
+    \item Mechanism: Transaction logs, rollback capability
+    \item Example: Bank transfer—both debit and credit must succeed or neither happens
+  \end{itemize}
+  
+  \textbf{Consistency:}
+  \begin{itemize}
+    \item Definition: Transaction brings database from one valid state to another
+    \item Mechanism: Constraints, triggers, validation rules
+    \item Example: Account balance cannot go negative; referential integrity maintained
+  \end{itemize}
+  
+  \textbf{Isolation:}
+  \begin{itemize}
+    \item Definition: Concurrent transactions don't interfere
+    \item Mechanism: Locking (pessimistic), MVCC (optimistic), isolation levels
+    \item Levels: Read Uncommitted, Read Committed, Repeatable Read, Serializable
+    \item Example: Two users updating same account see consistent data
+  \end{itemize}
+  
+  \textbf{Durability:}
+  \begin{itemize}
+    \item Definition: Committed transactions persist even after system failure
+    \item Mechanism: Write-ahead logging (WAL), transaction logs, checkpointing
+    \item Example: Confirmed purchase remains recorded after power outage
+  \end{itemize}
+  
+  \textbf{Implementation mechanisms:} Logging and recovery systems, lock managers, buffer management, and careful protocol design ensure ACID compliance in modern RDBMS.
+
+\end{enumerate}
+
+\end{document}

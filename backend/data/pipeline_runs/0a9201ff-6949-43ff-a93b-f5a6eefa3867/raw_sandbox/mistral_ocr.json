@@ -1,0 +1,20 @@
+{
+  "pages": [
+    {
+      "index": 0,
+      "markdown": "# Question - 1: What is the primary aim of Knowledge Representation and Reasoning? \n\na. To enable computers to process vast amounts of data efficiently.\nb. To develop advanced machine learning algorithms.\nc. To understand the nature of intelligence and cognition to simulate human-like abilities in computers.\nd. To create complex robotic systems for automation.\n\nQuestion - 2: Which type of reasoning is described as \"jumping to conclusions based on some default assumptions\" when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?\na. Deductive reasoning\nb. Abductive reasoning\nc. Epistemic reasoning\nd. Default reasoning\n\n## Question - 3: In propositional logic, what is an \"atom\"?\n\na. A logical connective like 'and' or 'or'.\nb. A formula composed of multiple propositions.\nc. The smallest unit to which a truth value (true/false) can be assigned.\nd. A symbol representing a numerical value.\n\nQuestion - 4: Which of the following connectives is considered a unary propositional connective?\na. Conjunction $(\\wedge)$\nb. Implication $(\\rightarrow)$\nc. Disjunction $(\\sqrt{ })$\nd. Negation $(\\neg)$\n\nQuestion - 5: A propositional formula $F$ is a tautology if:\na. At least one interpretation satisfies F .\nb. F can be reduced to a Conjunctive Normal Form (CNF).\nc. Every interpretation satisfies F .\nd. Its negation $(\\neg \\mathrm{F})$ is satisfiable.\n\nQuestion - 6: What does it mean for a propositional formula $F$ to be satisfiable?\na. F is true for all possible interpretations.\nb. There exists at least one interpretation that satisfies F .",
+      "images": [],
+      "dimensions": {
+        "dpi": 200,
+        "height": 2200,
+        "width": 1700
+      }
+    }
+  ],
+  "model": "mistral-ocr-2505-completion",
+  "usage_info": {
+    "pages_processed": 1,
+    "doc_size_bytes": 96263
+  },
+  "document_annotation": null
+}

@@ -1,0 +1,9 @@
+# GitHub Pages Configuration
+# This disables Jekyll processing so we can serve our React app
+include: []
+exclude: []
+plugins: []
+
+# Site metadata
+title: IntegrityShield - LLM Vulnerability Assessment & Protection Engine
+description: Protecting Educational Assessments from LLM-Based Cheating

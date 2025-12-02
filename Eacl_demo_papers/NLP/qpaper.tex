@@ -1,0 +1,81 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{CSE 576 Quiz 7}}\\[0.25em]
+  {\large \textbf{Transformer Pretraining Quiz}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--4, choose the best option.
+  \item For Questions 5--8, write brief but precise answers.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item Which of the following best explains how multi-head attention improves contextual
+  understanding in Transformers?
+  \begin{enumerate}[label=(\Alph*)]
+    \item By reducing the total number of parameters through parallelization
+    \item By enforcing uniform attention over the sequence to prevent bias
+    \item By increasing computation speed through batch-wise attention
+    \item By enabling different heads to attend to diverse relational patterns across positions
+  \end{enumerate}
+
+  \item Which component of the Transformer architecture is exclusively utilized in GPT, making
+  it more suited for generative tasks?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Decoder layers with masked self-attention
+    \item Encoder layers for input sequence modeling
+    \item A hybrid encoder-decoder combination
+    \item A purely feed-forward architecture
+  \end{enumerate}
+
+  \item What design choice in GPT restricts it from leveraging full bidirectional context, and
+  what consequence does this have?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Encoder-based design; restricts output generation
+    \item Unidirectional left-to-right flow; limits full context understanding
+    \item Bidirectional masking; leads to context overfitting
+    \item Cross-attention dependencies; increase inference latency
+  \end{enumerate}
+
+  \item Which of the following best characterizes the training objectives that enable BERT to
+  capture both deep token-level context and inter-sentence semantics?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Predicting the next token in a left-to-right fashion using unidirectional context
+    \item Learning to generate a target sequence from an input sequence in an encoder-decoder setup
+    \item Jointly optimizing masked token reconstruction and inter-sentence coherence discrimination
+    \item Aligning image features with textual descriptions through cross-modal supervision
+  \end{enumerate}
+
+  \item What are the potential drawbacks of the two-stage process of pretraining on large
+  corpora followed by fine-tuning on specific tasks in Transformer models?
+
+  \item What are the potential drawbacks of GPT’s autoregressive training objective when
+  applied to tasks requiring holistic understanding of text?
+
+  \item BERT utilizes a masked language model (MLM) during pretraining. What is the
+  primary challenge associated with the MLM approach, and how does it affect the
+  model’s downstream performance?
+
+  \item GPT models are known for their unidirectional (left-to-right) processing. How does
+  this design choice impact their performance on tasks like text generation compared to
+  tasks like text classification?
+
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,83 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Computer Networks}}\\[0.25em]
+  {\large \textbf{TCP/IP and Network Architecture Quiz}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--5, choose the best option.
+  \item For Questions 6--8, mark True or False.
+  \item For Questions 9--10, write detailed answers with diagrams where helpful.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item Which layer of the OSI model is responsible for routing packets between networks?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Data Link Layer
+    \item Network Layer
+    \item Transport Layer
+    \item Session Layer
+  \end{enumerate}
+
+  \item TCP provides reliable data transfer through:
+  \begin{enumerate}[label=(\Alph*)]
+    \item Broadcasting to all nodes
+    \item Acknowledgments and retransmissions
+    \item Connectionless communication
+    \item Fixed packet sizes only
+  \end{enumerate}
+
+  \item What is the primary function of DNS?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Encrypting network traffic
+    \item Translating domain names to IP addresses
+    \item Assigning IP addresses dynamically
+    \item Routing packets across networks
+  \end{enumerate}
+
+  \item Which protocol operates at the Transport Layer and provides connectionless, unreliable service?
+  \begin{enumerate}[label=(\Alph*)]
+    \item TCP
+    \item UDP
+    \item IP
+    \item HTTP
+  \end{enumerate}
+
+  \item A subnet mask of 255.255.255.0 (/24) allows for how many usable host addresses?
+  \begin{enumerate}[label=(\Alph*)]
+    \item 256
+    \item 254
+    \item 255
+    \item 128
+  \end{enumerate}
+
+  \item ARP (Address Resolution Protocol) maps IP addresses to MAC addresses. (True/False)
+
+  \item HTTP/2 requires the use of TLS encryption for all communications. (True/False)
+
+  \item A switch operates at the Network Layer and makes forwarding decisions based on IP addresses. (True/False)
+
+  \item Compare and contrast TCP and UDP. Discuss their characteristics, use cases, and explain why certain applications prefer one protocol over the other.
+  \vspace{8em}
+
+  \item Explain the TCP three-way handshake process. Describe each step and the purpose of the SYN, SYN-ACK, and ACK messages. What happens if a packet is lost during this process?
+  \vspace{8em}
+
+\end{enumerate}
+
+\end{document}

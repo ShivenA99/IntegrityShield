@@ -1,0 +1,4581 @@
+{
+  "pipeline_metadata": {
+    "run_id": "a9d950e0-8fb3-46ad-9b78-39522f380780",
+    "current_stage": "results_generation",
+    "stages_completed": [
+      "results_generation",
+      "content_discovery",
+      "smart_substitution",
+      "smart_reading"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-27T21:00:02.363508+00:00",
+    "version": "2.0.0",
+    "config": {},
+    "ai_extraction_enabled": true,
+    "ai_sources_used": [
+      "openai_vision",
+      "mistral_ocr"
+    ]
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/demo_paper.pdf",
+    "filename": "demo_paper.pdf",
+    "pages": 3
+  },
+  "questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "What is the primary aim of Knowledge Representation and Reasoning?",
+      "options": {
+        "A": "To enable computers to process vast amounts of data efficiently.",
+        "B": "To develop advanced machine learning algorithms.",
+        "C": "To understand the nature of intelligence and cognition to simulate human-like abilities in computers.",
+        "D": "To create complex robotic systems for automation."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          72.51112365722656,
+          509.4501953125,
+          85.79512786865234
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "What is the primary aim of Knowledge Representation and Reasoning?",
+            "replacement": "What is the primary aim of Knowledge Representation and Reasoning? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?",
+      "options": {
+        "A": "Deductive reasoning",
+        "B": "Abductive reasoning",
+        "C": "Epistemic reasoning",
+        "D": "Default reasoning"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          191.72303771972656,
+          524.49609375,
+          236.7443389892578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2",
+      "gold_answer": "D",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?",
+            "replacement": "Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "In propositional logic, what is an 'atom'?",
+      "options": {
+        "A": "A logical connective like 'and' or 'or'.",
+        "B": "A formula composed of multiple propositions.",
+        "C": "The smallest unit to which a truth value (true/false) can be assigned.",
+        "D": "A symbol representing a numerical value."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          326.80364990234375,
+          362.4668273925781,
+          340.087646484375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "In propositional logic, what is an 'atom'?",
+            "replacement": "In propositional logic, what is an 'atom'? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following connectives is considered a unary propositional connective?",
+      "options": {
+        "A": "Conjunction (∧)",
+        "B": "Implication (→)",
+        "C": "Disjunction (∨)",
+        "D": "Negation (¬)"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          430.1468505859375,
+          507.58001708984375,
+          459.29949951171875
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4",
+      "gold_answer": "D",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Which of the following connectives is considered a unary propositional connective?",
+            "replacement": "Which of the following connectives is considered a unary propositional connective? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "5",
+      "question_type": "mcq_single",
+      "stem_text": "A propositional formula F is a tautology if:",
+      "options": {
+        "A": "At least one interpretation satisfies F.",
+        "B": "F can be reduced to a Conjunctive Normal Form (CNF).",
+        "C": "Every interpretation satisfies F.",
+        "D": "Its negation (¬F) is satisfiable."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          549.3588256835938,
+          363.4505920410156,
+          562.642822265625
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "A propositional formula F is a tautology if:",
+            "replacement": "A propositional formula F is a tautology if: [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "6",
+      "question_type": "mcq_single",
+      "stem_text": "What does it mean for a propositional formula F to be satisfiable?",
+      "options": {
+        "A": "F is true for all possible interpretations.",
+        "B": "There exists at least one interpretation that satisfies F.",
+        "C": "F contains no logical connectives.",
+        "D": "F can be reduced to an empty clause."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          652.7020263671875,
+          480.7730712890625,
+          665.9860229492188
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "What does it mean for a propositional formula F to be satisfiable?",
+            "replacement": "What does it mean for a propositional formula F to be satisfiable? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "7",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is equivalent to saying that F entails G (F ⊧ G)?",
+      "options": {
+        "A": "F ∧ G is a tautology.",
+        "B": "F ↔ G is satisfiable.",
+        "C": "(F ∧ ¬G) is unsatisfiable.",
+        "D": "¬F ∨ G is a contradiction."
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "7",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Which of the following is equivalent to saying that F entails G (F ⊧ G)?",
+            "replacement": "Which of the following is equivalent to saying that F entails G (F ⊧ G)? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "8",
+      "question_type": "mcq_single",
+      "stem_text": "What is the total number of sub formulas that can be formed for the propositional formula?",
+      "options": {
+        "A": "8",
+        "B": "10",
+        "C": "7",
+        "D": "9"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "equation"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "8",
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "What is the total number of sub formulas that can be formed for the propositional formula?",
+            "replacement": "What is the total number of sub formulas that can be formed for the propositional formula? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "9",
+      "question_type": "mcq_single",
+      "stem_text": "What is a key characteristic of a Herbrand interpretation for a given signature (containing at least one object constant)?",
+      "options": {
+        "A": "Its universe is any non-empty set of individuals.",
+        "B": "Its universe is the set of all ground (variable-free) terms of σ, and every ground term is interpreted as itself.",
+        "C": "It always makes all quantified formulas true.",
+        "D": "It must contain at least one function constant of arity greater than 0."
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "9",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "What is a key characteristic of a Herbrand interpretation for a given signature (containing at least one object constant)?",
+            "replacement": "What is a key characteristic of a Herbrand interpretation for a given signature (containing at least one object constant)? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "10",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following statements about SAT solvers is correct?",
+      "options": {
+        "A": "SAT solvers only accept formulas in Disjunctive Normal Form (DNF).",
+        "B": "SAT solvers decide satisfiability of propositional formulas, often using DPLL.",
+        "C": "SAT solvers can only handle problems with at most 100 variables.",
+        "D": "SAT solvers are inefficient and rarely used in practice."
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "10",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Which of the following statements about SAT solvers is correct?",
+            "replacement": "Which of the following statements about SAT solvers is correct? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "11",
+      "question_type": "true_false",
+      "stem_text": "Every atom, ⊤, ⊥, and any recursive combination of formulas with connectives are considered valid formulas in propositional logic.",
+      "options": {
+        "A": "True",
+        "B": "False"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "11",
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Every atom, ⊤, ⊥, and any recursive combination of formulas with connectives are considered valid formulas in propositional logic.",
+            "replacement": "Every atom, ⊤, ⊥, and any recursive combination of formulas with connectives are considered valid formulas in propositional logic. [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "12",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following statements is a tautology?",
+      "options": {
+        "A": "(p → q) ∧ (p ∧ ¬q)",
+        "B": "(p → q) → (¬p ∨ q)",
+        "C": "(p → (q → p))",
+        "D": "¬p ∨ p"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.9,
+      "sources_detected": [
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Only found in Mistral OCR, used for text and position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "12",
+      "gold_answer": "D",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Which of the following statements is a tautology?",
+            "replacement": "Which of the following statements is a tautology? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "13",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is a key limitation of propositional logic that First-Order Logic overcomes?",
+      "options": {
+        "A": "Inability to represent negation",
+        "B": "Inability to express relations between individuals and relations",
+        "C": "Inability to use logical connectives such as ∧ and ∨",
+        "D": "Inability to reason with truth values"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "13",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Which of the following is a key limitation of propositional logic that First-Order Logic overcomes?",
+            "replacement": "Which of the following is a key limitation of propositional logic that First-Order Logic overcomes? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "14",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is a valid term in FOL?",
+      "options": {
+        "A": "∀x P(x)",
+        "B": "P(x) ∧ Q(y)",
+        "C": "father(john)"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "14",
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Which of the following is a valid term in FOL?",
+            "replacement": "Which of the following is a valid term in FOL? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "15",
+      "question_type": "mcq_single",
+      "stem_text": "What is the Herbrand Universe of a signature σ?",
+      "options": {
+        "A": "The set of all formulas in σ",
+        "B": "The set of all predicates in σ",
+        "C": "The set of all ground terms of σ",
+        "D": "The set of all interpretations over σ"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "15",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "What is the Herbrand Universe of a signature σ?",
+            "replacement": "What is the Herbrand Universe of a signature σ? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "16",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is an example of a terminological axiom in FOL?",
+      "options": {
+        "A": "∀x (Teenager(x) → ¬Adult(x))",
+        "B": "Child(John)",
+        "C": "Affects(JRA, Mary)",
+        "D": "¬Affects(JRA, Mary)"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "16",
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Which of the following is an example of a terminological axiom in FOL?",
+            "replacement": "Which of the following is an example of a terminological axiom in FOL? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "17",
+      "question_type": "mcq_single",
+      "stem_text": "What are some of the free occurrences of a variable in the below formula?",
+      "options": {
+        "A": "4,7",
+        "B": "2,3",
+        "C": "1,6,7",
+        "D": "None of the above"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "equation"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "17",
+      "gold_answer": "D",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "What are some of the free occurrences of a variable in the below formula?",
+            "replacement": "What are some of the free occurrences of a variable in the below formula? [altered]"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "assets": {
+    "images": [],
+    "fonts": [
+      "ArialMT",
+      "MS-PMincho",
+      "TimesNewRomanPS-BoldMT",
+      "TimesNewRomanPSMT"
+    ],
+    "extracted_elements": 155
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_content_stream_overlay.pdf",
+        "size_bytes": 265677,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_content_stream_overlay.pdf",
+        "file_size_bytes": 265677,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 0,
+        "overlay_targets": 0,
+        "overlay_area_pct": 0.0,
+        "render_stats": {
+          "mapping_entries": 17,
+          "file_size_bytes": 265677,
+          "effectiveness_score": 1.0,
+          "replacements": 9,
+          "matches_found": 9,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 9,
+          "overlay_applied": 0,
+          "overlay_targets": 0,
+          "overlay_area_pct": 0.0,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T21:00:02.354228+00:00"
+      },
+      "dual_layer": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_dual_layer.pdf",
+        "size_bytes": 243031,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_dual_layer.pdf",
+        "file_size_bytes": 243031,
+        "visual_quality_score": 0.97,
+        "effectiveness_score": 0.85,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 17,
+          "file_size_bytes": 243031,
+          "effectiveness_score": 0.85
+        },
+        "created_at": "2025-09-27T21:00:02.354355+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_image_overlay.pdf",
+        "size_bytes": 108412,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_image_overlay.pdf",
+        "file_size_bytes": 108412,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.0,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": 0.0,
+        "render_stats": {
+          "mapping_entries": 0,
+          "overlays_applied": 0,
+          "file_size_bytes": 108412,
+          "effectiveness_score": 0.0,
+          "overlay_area_pct": 0.0,
+          "text_pages": 3,
+          "text_tj_hits": 1501,
+          "text_replacements": 0,
+          "text_matches_found": 0,
+          "text_tokens_scanned": 4167
+        },
+        "created_at": "2025-09-27T21:00:02.354472+00:00"
+      },
+      "font_manipulation": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_font_manipulation.pdf",
+        "size_bytes": 119744,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_font_manipulation.pdf",
+        "file_size_bytes": 119744,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.75,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 17,
+          "file_size_bytes": 119744,
+          "effectiveness_score": 0.75
+        },
+        "created_at": "2025-09-27T21:00:02.354587+00:00"
+      },
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_content_stream.pdf",
+        "size_bytes": 265677,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_content_stream.pdf",
+        "file_size_bytes": 265677,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 0,
+        "overlay_targets": 0,
+        "overlay_area_pct": 0.0,
+        "render_stats": {
+          "mapping_entries": 17,
+          "file_size_bytes": 265677,
+          "effectiveness_score": 1.0,
+          "replacements": 9,
+          "matches_found": 9,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 9,
+          "overlay_applied": 0,
+          "overlay_targets": 0,
+          "overlay_area_pct": 0.0,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T21:00:02.354700+00:00"
+      },
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_pymupdf_overlay.pdf",
+        "size_bytes": 0,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/a9d950e0-8fb3-46ad-9b78-39522f380780/enhanced_pymupdf_overlay.pdf",
+        "file_size_bytes": 0,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.0,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "error": "name 'total_targets' is not defined",
+          "file_size_bytes": 0,
+          "effectiveness_score": 0.0
+        },
+        "created_at": "2025-09-27T21:00:02.354813+00:00"
+      }
+    },
+    "debug": {
+      "content_stream_overlay": {
+        "decoded_sample": null,
+        "per_font_top_tokens": null,
+        "enhanced_mapping_stats": {
+          "total_entries": 17,
+          "discovered_tokens": 0
+        }
+      },
+      "overlay_layers": {
+        "pymupdf_overlay": {
+          "effectiveness_score": 0.0,
+          "mapping_entries_used": null,
+          "enhanced_mapping_boost": 0
+        },
+        "image_overlay": {
+          "effectiveness_score": 0.0,
+          "mapping_entries_used": 0,
+          "enhanced_mapping_boost": 0
+        }
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 412.71,
+      "mapping_build_time_ms": 27.42,
+      "enhancement_stats": {
+        "base_mapping_size": 17,
+        "enhanced_mapping_size": 17,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream_overlay": {
+          "duration_ms": 51.8,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 265677
+        },
+        "content_stream": {
+          "duration_ms": 55.04,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 265677
+        },
+        "pymupdf_overlay": {
+          "duration_ms": 45.36,
+          "success": false,
+          "error": "name 'total_targets' is not defined",
+          "output_size_bytes": 0
+        },
+        "image_overlay": {
+          "duration_ms": 124.61,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 108412
+        },
+        "dual_layer": {
+          "duration_ms": 96.09,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 243031
+        },
+        "font_manipulation": {
+          "duration_ms": 1.07,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 119744
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 5,
+        "failed_renderers": 1,
+        "success_rate": 0.8333333333333334
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 119744,
+        "total_output_size_bytes": 1002541,
+        "size_efficiency": 8.372369388027792
+      }
+    },
+    "summary": {
+      "questions": 17,
+      "average_effectiveness": 0.0,
+      "generated_at": "2025-09-27T21:00:02.363508+00:00"
+    }
+  },
+  "performance_metrics": {},
+  "content_elements": [
+    {
+      "type": "text",
+      "content": "Question - 1:  What is the primary aim of Knowledge Representation and Reasoning?",
+      "page": 1,
+      "bbox": [
+        72.0,
+        72.51112365722656,
+        509.4501953125,
+        85.79512786865234
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        509.44921875,
+        73.24812316894531,
+        512.5072021484375,
+        85.53512573242188
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. To enable computers to process vast amounts of data efficiently. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        100.37983703613281,
+        418.400390625,
+        113.6638412475586
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. To develop advanced machine learning algorithms. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        116.24842834472656,
+        356.0741882324219,
+        129.5324249267578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. To understand the nature of intelligence and cognition to simulate human-like abilities in ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        132.1171417236328,
+        537.380859375,
+        145.40113830566406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "computers. ",
+      "page": 1,
+      "bbox": [
+        108.0,
+        147.9857940673828,
+        163.98629760742188,
+        161.26979064941406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. To create complex robotic systems for automation.",
+      "page": 1,
+      "bbox": [
+        90.0,
+        163.8544464111328,
+        351.4191589355469,
+        177.13844299316406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        351.421875,
+        164.59144592285156,
+        354.4798889160156,
+        176.87844848632812
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 2:  Which type of reasoning is described as \"jumping to conclusions based on ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        191.72303771972656,
+        524.49609375,
+        205.0070343017578
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "some default assumptions\" when information is insufficient, potentially leading to unsound ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        207.59169006347656,
+        540.0643920898438,
+        220.8756866455078
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "conclusions that may need to be withdrawn?",
+      "page": 1,
+      "bbox": [
+        72.0,
+        223.46034240722656,
+        299.35101318359375,
+        236.7443389892578
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        299.349609375,
+        223.46034240722656,
+        302.349609375,
+        236.7443389892578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. Deductive reasoning ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        251.32899475097656,
+        209.96481323242188,
+        264.6130065917969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. Abductive reasoning ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        267.1976623535156,
+        210.63870239257812,
+        280.4816589355469
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. Epistemic reasoning ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        283.06634521484375,
+        208.640625,
+        296.350341796875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. Default reasoning",
+      "page": 1,
+      "bbox": [
+        90.0,
+        298.9349365234375,
+        193.6336212158203,
+        312.21893310546875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        193.63478088378906,
+        299.67193603515625,
+        196.69277954101562,
+        311.95892333984375
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 3:  In propositional logic, what is an \"atom\"? ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        326.80364990234375,
+        362.4668273925781,
+        340.087646484375
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. A logical connective like 'and' or 'or'. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        354.6722412109375,
+        289.2539367675781,
+        367.95623779296875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. A formula composed of multiple propositions. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        370.5409240722656,
+        333.6387023925781,
+        383.8249206542969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. The smallest unit to which a truth value (true/false) can be assigned. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        386.4095458984375,
+        438.228515625,
+        399.69354248046875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. A symbol representing a numerical value.",
+      "page": 1,
+      "bbox": [
+        90.0,
+        402.2782287597656,
+        308.60003662109375,
+        415.5622253417969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        308.60162353515625,
+        403.01519775390625,
+        311.6596374511719,
+        415.3022155761719
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 4:  Which of the following connectives is considered a unary propositional ",
+      "page": 1,
+      "bbox": [
+        72.0,
+        430.1468505859375,
+        507.58001708984375,
+        443.43084716796875
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "connective?",
+      "page": 1,
+      "bbox": [
+        72.0,
+        446.0155029296875,
+        131.98080444335938,
+        459.29949951171875
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        131.982421875,
+        446.75250244140625,
+        135.04042053222656,
+        459.03948974609375
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. Conjunction (",
+      "page": 1,
+      "bbox": [
+        90.0,
+        473.8842468261719,
+        174.32806396484375,
+        487.1682434082031
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 1,
+      "bbox": [
+        174.328125,
+        474.2682189941406,
+        186.328125,
+        486.2682189941406
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": ") ",
+      "page": 1,
+      "bbox": [
+        186.328125,
+        473.8842468261719,
+        193.32418823242188,
+        487.1682434082031
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. Implication (→) ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        489.7528381347656,
+        189.31057739257812,
+        503.0368347167969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. Disjunction (",
+      "page": 1,
+      "bbox": [
+        90.0,
+        505.6215515136719,
+        170.99407958984375,
+        518.905517578125
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∨",
+      "page": 1,
+      "bbox": [
+        170.99415588378906,
+        506.0055236816406,
+        182.99415588378906,
+        518.0055541992188
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": ") ",
+      "page": 1,
+      "bbox": [
+        182.99415588378906,
+        505.6215515136719,
+        189.99021911621094,
+        518.905517578125
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. Negation (¬)",
+      "page": 1,
+      "bbox": [
+        90.0,
+        521.4901123046875,
+        169.74630737304688,
+        534.7741088867188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        169.74606323242188,
+        522.2271118164062,
+        172.80406188964844,
+        534.5140991210938
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 5:  A propositional formula F is a tautology if:",
+      "page": 1,
+      "bbox": [
+        72.0,
+        549.3588256835938,
+        363.4505920410156,
+        562.642822265625
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        363.4512023925781,
+        550.0958251953125,
+        366.50921630859375,
+        562.3828125
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. At least one interpretation satisfies F. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        577.2274169921875,
+        289.3300476074219,
+        590.5114135742188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. F can be reduced to a Conjunctive Normal Form (CNF). ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        593.0961303710938,
+        380.9414367675781,
+        606.380126953125
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. Every interpretation satisfies F. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        608.9647216796875,
+        260.666015625,
+        622.2487182617188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. Its negation (¬F) is satisfiable.",
+      "page": 1,
+      "bbox": [
+        90.0,
+        624.8333740234375,
+        254.4058380126953,
+        638.1173706054688
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        254.40817260742188,
+        625.5703735351562,
+        257.4661865234375,
+        637.8573608398438
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 6:  What does it mean for a propositional formula F to be satisfiable?",
+      "page": 1,
+      "bbox": [
+        72.0,
+        652.7020263671875,
+        480.7730712890625,
+        665.9860229492188
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 1,
+      "bbox": [
+        480.77337646484375,
+        653.4390258789062,
+        483.8313903808594,
+        665.7260131835938
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. F is true for all possible interpretations. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        680.5706787109375,
+        299.9648132324219,
+        693.8546752929688
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. There exists at least one interpretation that satisfies F. ",
+      "page": 1,
+      "bbox": [
+        90.0,
+        696.4393310546875,
+        368.296875,
+        709.7233276367188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. F contains no logical connectives. ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        72.51112365722656,
+        273.96087646484375,
+        85.79512786865234
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. F can be reduced to an empty clause.",
+      "page": 2,
+      "bbox": [
+        90.0,
+        88.37983703613281,
+        285.2620544433594,
+        101.6638412475586
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        285.2637023925781,
+        89.11683654785156,
+        288.32171630859375,
+        101.40383911132812
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 7:  Which of the following is equivalent to saying that F entails G (F ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        116.24842834472656,
+        476.34375,
+        129.5324249267578
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "⊨",
+      "page": 2,
+      "bbox": [
+        476.34375,
+        116.63243103027344,
+        482.34375,
+        128.63243103027344
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " G)?",
+      "page": 2,
+      "bbox": [
+        482.34375,
+        116.24842834472656,
+        504.6733703613281,
+        129.5324249267578
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        504.67376708984375,
+        116.98542785644531,
+        507.7317810058594,
+        129.27243041992188
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. F ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        144.1171417236328,
+        117.673828125,
+        157.40113830566406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 2,
+      "bbox": [
+        117.673828125,
+        144.5011444091797,
+        129.673828125,
+        156.5011444091797
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " G is a tautology. ",
+      "page": 2,
+      "bbox": [
+        129.673828125,
+        144.1171417236328,
+        214.21875,
+        157.40113830566406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. F ↔ G is satisfiable. ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        159.98573303222656,
+        209.99415588378906,
+        173.2697296142578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. (F ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        175.8544464111328,
+        121.669921875,
+        189.13844299316406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 2,
+      "bbox": [
+        121.669921875,
+        176.2384490966797,
+        133.669921875,
+        188.2384490966797
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ¬G) is unsatisfiable. ",
+      "page": 2,
+      "bbox": [
+        133.669921875,
+        175.8544464111328,
+        236.75393676757812,
+        189.13844299316406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. ¬F ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        191.72303771972656,
+        124.44141387939453,
+        205.0070343017578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∨",
+      "page": 2,
+      "bbox": [
+        124.44141387939453,
+        192.10704040527344,
+        136.44140625,
+        204.10704040527344
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " G is a contradiction.",
+      "page": 2,
+      "bbox": [
+        136.44140625,
+        191.72303771972656,
+        236.74468994140625,
+        205.0070343017578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        236.74807739257812,
+        192.4600372314453,
+        239.8060760498047,
+        204.74703979492188
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 8: What is the total number of sub formulas that can be formed for the ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        219.5917510986328,
+        492.978515625,
+        232.87574768066406
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "propositional formula? ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        235.4604034423828,
+        193.125,
+        248.74440002441406
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "¬(p ",
+      "page": 2,
+      "bbox": [
+        251.49606323242188,
+        251.32899475097656,
+        272.0039367675781,
+        264.6130065917969
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 2,
+      "bbox": [
+        272.0039367675781,
+        251.71299743652344,
+        284.0039367675781,
+        263.7129821777344
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " q) ",
+      "page": 2,
+      "bbox": [
+        284.0039367675781,
+        251.32899475097656,
+        300.6737976074219,
+        264.6130065917969
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∨",
+      "page": 2,
+      "bbox": [
+        300.6737976074219,
+        251.71299743652344,
+        312.6737976074219,
+        263.7129821777344
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " (r → ¬p) ",
+      "page": 2,
+      "bbox": [
+        312.6737976074219,
+        251.32899475097656,
+        363.5039367675781,
+        264.6130065917969
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. 8 ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        279.1976623535156,
+        117.0,
+        292.4816589355469
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. 10 ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        295.06634521484375,
+        123.0,
+        308.350341796875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. 7 ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        310.9349365234375,
+        117.0,
+        324.21893310546875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. 9",
+      "page": 2,
+      "bbox": [
+        90.0,
+        326.80364990234375,
+        114.0,
+        340.087646484375
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        114.0,
+        327.5406494140625,
+        117.05799865722656,
+        339.82763671875
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 9: What is a key characteristic of a Herbrand interpretation for a given ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        354.6722412109375,
+        495.38671875,
+        367.95623779296875
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "signature σ (containing at least one object constant)?",
+      "page": 2,
+      "bbox": [
+        72.0,
+        370.5408935546875,
+        341.29180908203125,
+        383.82489013671875
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        341.291015625,
+        371.27789306640625,
+        344.3490295410156,
+        383.56488037109375
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "a. Its universe is any non-empty set of individuals. ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        398.4095458984375,
+        341.630859375,
+        411.69354248046875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. Its universe is the set of all ground (variable-free) terms of σ, and every ground term is ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        414.2782287597656,
+        526.9981079101562,
+        427.5622253417969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "interpreted as itself. ",
+      "page": 2,
+      "bbox": [
+        108.0,
+        430.1468811035156,
+        205.96290588378906,
+        443.4308776855469
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. It always makes all quantified formulas true.  ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        446.0155334472656,
+        328.265625,
+        459.2995300292969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. It must contain at least one function constant of arity greater than 0.",
+      "page": 2,
+      "bbox": [
+        90.0,
+        461.8842468261719,
+        432.896484375,
+        475.1682434082031
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        432.896484375,
+        462.6212158203125,
+        435.9544982910156,
+        474.9082336425781
+      ],
+      "font": "ArialMT",
+      "size": 11.000001907348633
+    },
+    {
+      "type": "text",
+      "content": "Question - 10: Which of the following statements about SAT solvers is correct? ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        489.7528381347656,
+        476.525390625,
+        503.0368347167969
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. SAT solvers only accept formulas in Disjunctive Normal Form (DNF). ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        517.6215209960938,
+        450.28125,
+        530.905517578125
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. SAT solvers decide satisfiability of propositional formulas, often using DPLL. ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        533.4901123046875,
+        486.615234375,
+        546.7741088867188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. SAT solvers can only handle problems with at most 100 variables. ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        549.3588256835938,
+        428.6133117675781,
+        562.642822265625
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. SAT solvers are inefficient and rarely used in practice. ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        565.2274169921875,
+        371.677734375,
+        578.5114135742188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Question - 11: Every atom, ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        593.0961303710938,
+        211.98629760742188,
+        606.380126953125
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "⊤",
+      "page": 2,
+      "bbox": [
+        211.98629760742188,
+        593.4801635742188,
+        217.98629760742188,
+        605.4801635742188
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": ", ",
+      "page": 2,
+      "bbox": [
+        217.98629760742188,
+        593.0961303710938,
+        223.98629760742188,
+        606.380126953125
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "⊥",
+      "page": 2,
+      "bbox": [
+        223.98629760742188,
+        593.4801635742188,
+        235.98629760742188,
+        605.4801635742188
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": ", and any recursive combination of formulas with ",
+      "page": 2,
+      "bbox": [
+        235.98629760742188,
+        593.0961303710938,
+        490.76953125,
+        606.380126953125
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "connectives are considered valid formulas in propositional logic. ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        608.9647827148438,
+        402.3398132324219,
+        622.248779296875
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        624.8333740234375,
+        75.0,
+        638.1173706054688
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. True ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        640.7020263671875,
+        133.23046875,
+        653.9860229492188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. False ",
+      "page": 2,
+      "bbox": [
+        90.0,
+        656.5706787109375,
+        136.330078125,
+        669.8546752929688
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        672.4393310546875,
+        75.0,
+        685.7233276367188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Question - 12: Which of the following statements is a tautology? ",
+      "page": 2,
+      "bbox": [
+        72.0,
+        688.3079833984375,
+        400.99224853515625,
+        701.5919799804688
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. (p → q) ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        72.51112365722656,
+        148.9921875,
+        85.79512786865234
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 3,
+      "bbox": [
+        148.99215698242188,
+        72.89512634277344,
+        160.99215698242188,
+        84.89512634277344
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " (p ",
+      "page": 3,
+      "bbox": [
+        160.99221801757812,
+        72.51112365722656,
+        176.98831176757812,
+        85.79512786865234
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 3,
+      "bbox": [
+        176.98831176757812,
+        72.89512634277344,
+        188.98831176757812,
+        84.89512634277344
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ¬q) ",
+      "page": 3,
+      "bbox": [
+        188.98831176757812,
+        72.51112365722656,
+        211.75192260742188,
+        85.79512786865234
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. (p → q) → (¬p ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        88.37983703613281,
+        183.75584411621094,
+        101.6638412475586
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∨",
+      "page": 3,
+      "bbox": [
+        183.75584411621094,
+        88.76383972167969,
+        195.75584411621094,
+        100.76383972167969
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " q) ",
+      "page": 3,
+      "bbox": [
+        195.75584411621094,
+        88.37983703613281,
+        211.75192260742188,
+        101.6638412475586
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. (p → (q → p)) ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        104.24842834472656,
+        180.984375,
+        117.53243255615234
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. ¬p ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        120.11714172363281,
+        123.767578125,
+        133.40113830566406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∨",
+      "page": 3,
+      "bbox": [
+        123.767578125,
+        120.50114440917969,
+        135.767578125,
+        132.5011444091797
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " p ",
+      "page": 3,
+      "bbox": [
+        135.767578125,
+        120.11714172363281,
+        147.767578125,
+        133.40113830566406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Question - 13: Which of the following is a key limitation of propositional logic that ",
+      "page": 3,
+      "bbox": [
+        72.0,
+        147.98573303222656,
+        494.79498291015625,
+        161.2697296142578
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "First-Order Logic overcomes? ",
+      "page": 3,
+      "bbox": [
+        72.0,
+        163.85438537597656,
+        230.05665588378906,
+        177.1383819580078
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. Inability to represent negation ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        191.72303771972656,
+        255.28709411621094,
+        205.0070343017578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. Inability to express relations between individuals and relations ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        207.5917510986328,
+        411.25787353515625,
+        220.87574768066406
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. Inability to use logical connectives such as ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        223.46034240722656,
+        316.2773132324219,
+        236.7443389892578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 3,
+      "bbox": [
+        316.2773132324219,
+        223.84434509277344,
+        328.2773132324219,
+        235.84434509277344
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " and ",
+      "page": 3,
+      "bbox": [
+        328.2773132324219,
+        223.46034240722656,
+        351.603515625,
+        236.7443389892578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∨",
+      "page": 3,
+      "bbox": [
+        351.603515625,
+        223.84434509277344,
+        363.603515625,
+        235.84434509277344
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 3,
+      "bbox": [
+        363.603515625,
+        223.46034240722656,
+        366.603515625,
+        236.7443389892578
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. Inability to reason with truth values ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        239.32899475097656,
+        281.9648132324219,
+        252.6129913330078
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Question - 14: Which of the following is a valid term in FOL? ",
+      "page": 3,
+      "bbox": [
+        72.0,
+        267.1976623535156,
+        389.0039367675781,
+        280.4816589355469
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        295.06634521484375,
+        101.326171875,
+        308.350341796875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∀",
+      "page": 3,
+      "bbox": [
+        108.0,
+        295.4503173828125,
+        120.0,
+        307.4503173828125
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "x P(x) ",
+      "page": 3,
+      "bbox": [
+        120.0,
+        295.06634521484375,
+        152.66603088378906,
+        308.350341796875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. P(x) ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        310.9349365234375,
+        131.666015625,
+        324.21893310546875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 3,
+      "bbox": [
+        131.666015625,
+        311.31890869140625,
+        143.666015625,
+        323.31890869140625
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " Q(y) ",
+      "page": 3,
+      "bbox": [
+        143.666015625,
+        310.9349365234375,
+        172.32418823242188,
+        324.21893310546875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. father(john) ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        326.80364990234375,
+        168.30471801757812,
+        340.087646484375
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Question - 15: What is the Herbrand Universe of a signature σ? ",
+      "page": 3,
+      "bbox": [
+        72.0,
+        354.6722412109375,
+        399.63287353515625,
+        367.95623779296875
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. The set of all formulas in σ ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        382.5409240722656,
+        241.43557739257812,
+        395.8249206542969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. The set of all predicates in σ.  ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        398.4095458984375,
+        253.41793823242188,
+        411.69354248046875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. The set of all ground terms of  σ.  ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        414.2782287597656,
+        272.0976867675781,
+        427.5622253417969
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. The set of all interpretations over σ ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        430.1468505859375,
+        280.078125,
+        443.43084716796875
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Question - 16: Which of the following is an example of a terminological axiom in FOL? ",
+      "page": 3,
+      "bbox": [
+        72.0,
+        458.0155334472656,
+        518.6543579101562,
+        471.2995300292969
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        485.8842468261719,
+        101.326171875,
+        499.1682434082031
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∀",
+      "page": 3,
+      "bbox": [
+        108.0,
+        486.2682189941406,
+        120.0,
+        498.2682189941406
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "x (Teenager(x) → ¬Adult(x)) ",
+      "page": 3,
+      "bbox": [
+        120.0,
+        485.8842468261719,
+        263.8710632324219,
+        499.1682434082031
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. Child(John) ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        501.7528381347656,
+        168.33396911621094,
+        515.0368041992188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. Affects(JRA, Mary) ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        517.6215209960938,
+        207.421875,
+        530.905517578125
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. ¬Affects(JRA, Mary) ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        533.4901123046875,
+        214.18942260742188,
+        546.7741088867188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Question - 17: What are some of the free occurrences of a variable in the below formula? ",
+      "page": 3,
+      "bbox": [
+        72.0,
+        561.3588256835938,
+        528.2518920898438,
+        574.642822265625
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∀",
+      "page": 3,
+      "bbox": [
+        218.0185546875,
+        589.6114501953125,
+        230.0185546875,
+        601.6114501953125
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "x (P(x) → Q(x, y)) ",
+      "page": 3,
+      "bbox": [
+        230.0185546875,
+        589.2274169921875,
+        324.6591796875,
+        602.5114135742188
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∧",
+      "page": 3,
+      "bbox": [
+        324.6591796875,
+        589.6114501953125,
+        336.6591796875,
+        601.6114501953125
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": " ",
+      "page": 3,
+      "bbox": [
+        336.6591796875,
+        589.2274169921875,
+        339.6591796875,
+        602.5114135742188
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "∃",
+      "page": 3,
+      "bbox": [
+        339.6591796875,
+        589.6114501953125,
+        351.6591796875,
+        601.6114501953125
+      ],
+      "font": "MS-PMincho",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "y R(y, z) ",
+      "page": 3,
+      "bbox": [
+        351.6591796875,
+        589.2274169921875,
+        396.9814453125,
+        602.5114135742188
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "                                                      1      2            3  4         5      6  7 ",
+      "page": 3,
+      "bbox": [
+        72.0,
+        617.0961303710938,
+        390.0,
+        630.380126953125
+      ],
+      "font": "TimesNewRomanPS-BoldMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "a. 4,7 ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        644.9647216796875,
+        126.0,
+        658.2487182617188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "b. 2,3 ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        660.8333740234375,
+        126.0,
+        674.1173706054688
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "c. 1,6,7 ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        676.7020263671875,
+        135.0,
+        689.9860229492188
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "d. None of the above ",
+      "page": 3,
+      "bbox": [
+        90.0,
+        692.5706787109375,
+        199.30081176757812,
+        705.8546752929688
+      ],
+      "font": "TimesNewRomanPSMT",
+      "size": 12.0
+    }
+  ],
+  "ai_extraction": {
+    "source": "gpt5_fusion",
+    "confidence": 0.95,
+    "questions_found": 17,
+    "processing_time_ms": 97957,
+    "cost_cents": 50.1795,
+    "error": null,
+    "raw_response": {
+      "content": "```json\n{\n  \"fusion_analysis\": {\n    \"total_questions_found\": 17,\n    \"source_agreements\": {\n      \"vision_mistral\": 17,\n      \"vision_only\": 0,\n      \"mistral_only\": 0,\n      \"conflicts_resolved\": 0\n    },\n    \"quality_score\": 0.95\n  },\n  \"questions\": [\n    {\n      \"question_number\": \"1\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What is the primary aim of Knowledge Representation and Reasoning?\",\n      \"options\": {\n        \"A\": \"To enable computers to process vast amounts of data efficiently.\",\n        \"B\": \"To develop advanced machine learning algorithms.\",\n        \"C\": \"To understand the nature of intelligence and cognition to simulate human-like abilities in computers.\",\n        \"D\": \"To create complex robotic systems for automation.\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 72.51112365722656, 509.4501953125, 85.79512786865234],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"2\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?\",\n      \"options\": {\n        \"A\": \"Deductive reasoning\",\n        \"B\": \"Abductive reasoning\",\n        \"C\": \"Epistemic reasoning\",\n        \"D\": \"Default reasoning\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 191.72303771972656, 524.49609375, 236.7443389892578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"3\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"In propositional logic, what is an 'atom'?\",\n      \"options\": {\n        \"A\": \"A logical connective like 'and' or 'or'.\",\n        \"B\": \"A formula composed of multiple propositions.\",\n        \"C\": \"The smallest unit to which a truth value (true/false) can be assigned.\",\n        \"D\": \"A symbol representing a numerical value.\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 326.80364990234375, 362.4668273925781, 340.087646484375],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"4\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following connectives is considered a unary propositional connective?\",\n      \"options\": {\n        \"A\": \"Conjunction (∧)\",\n        \"B\": \"Implication (→)\",\n        \"C\": \"Disjunction (∨)\",\n        \"D\": \"Negation (¬)\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 430.1468505859375, 507.58001708984375, 459.29949951171875],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"5\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"A propositional formula F is a tautology if:\",\n      \"options\": {\n        \"A\": \"At least one interpretation satisfies F.\",\n        \"B\": \"F can be reduced to a Conjunctive Normal Form (CNF).\",\n        \"C\": \"Every interpretation satisfies F.\",\n        \"D\": \"Its negation (¬F) is satisfiable.\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 549.3588256835938, 363.4505920410156, 562.642822265625],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"6\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What does it mean for a propositional formula F to be satisfiable?\",\n      \"options\": {\n        \"A\": \"F is true for all possible interpretations.\",\n        \"B\": \"There exists at least one interpretation that satisfies F.\",\n        \"C\": \"F contains no logical connectives.\",\n        \"D\": \"F can be reduced to an empty clause.\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [72.0, 652.7020263671875, 480.7730712890625, 665.9860229492188],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"7\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following is equivalent to saying that F entails G (F ⊧ G)?\",\n      \"options\": {\n        \"A\": \"F ∧ G is a tautology.\",\n        \"B\": \"F ↔ G is satisfiable.\",\n        \"C\": \"(F ∧ ¬G) is unsatisfiable.\",\n        \"D\": \"¬F ∨ G is a contradiction.\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"8\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What is the total number of sub formulas that can be formed for the propositional formula?\",\n      \"options\": {\n        \"A\": \"8\",\n        \"B\": \"10\",\n        \"C\": \"7\",\n        \"D\": \"9\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [\"equation\"],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"9\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What is a key characteristic of a Herbrand interpretation for a given signature (containing at least one object constant)?\",\n      \"options\": {\n        \"A\": \"Its universe is any non-empty set of individuals.\",\n        \"B\": \"Its universe is the set of all ground (variable-free) terms of σ, and every ground term is interpreted as itself.\",\n        \"C\": \"It always makes all quantified formulas true.\",\n        \"D\": \"It must contain at least one function constant of arity greater than 0.\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"10\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following statements about SAT solvers is correct?\",\n      \"options\": {\n        \"A\": \"SAT solvers only accept formulas in Disjunctive Normal Form (DNF).\",\n        \"B\": \"SAT solvers decide satisfiability of propositional formulas, often using DPLL.\",\n        \"C\": \"SAT solvers can only handle problems with at most 100 variables.\",\n        \"D\": \"SAT solvers are inefficient and rarely used in practice.\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"11\",\n      \"question_type\": \"true_false\",\n      \"stem_text\": \"Every atom, ⊤, ⊥, and any recursive combination of formulas with connectives are considered valid formulas in propositional logic.\",\n      \"options\": {\n        \"A\": \"True\",\n        \"B\": \"False\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"12\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following statements is a tautology?\",\n      \"options\": {\n        \"A\": \"(p → q) ∧ (p ∧ ¬q)\",\n        \"B\": \"(p → q) → (¬p ∨ q)\",\n        \"C\": \"(p → (q → p))\",\n        \"D\": \"¬p ∨ p\"\n      },\n      \"positioning\": {\n        \"page\": 3,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.9,\n      \"sources_detected\": [\"mistral_ocr\"],\n      \"fusion_notes\": \"Only found in Mistral OCR, used for text and position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1\n      }\n    },\n    {\n      \"question_number\": \"13\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following is a key limitation of propositional logic that First-Order Logic overcomes?\",\n      \"options\": {\n        \"A\": \"Inability to represent negation\",\n        \"B\": \"Inability to express relations between individuals and relations\",\n        \"C\": \"Inability to use logical connectives such as ∧ and ∨\",\n        \"D\": \"Inability to reason with truth values\"\n      },\n      \"positioning\": {\n        \"page\": 3,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"14\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following is a valid term in FOL?\",\n      \"options\": {\n        \"A\": \"∀x P(x)\",\n        \"B\": \"P(x) ∧ Q(y)\",\n        \"C\": \"father(john)\"\n      },\n      \"positioning\": {\n        \"page\": 3,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"15\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What is the Herbrand Universe of a signature σ?\",\n      \"options\": {\n        \"A\": \"The set of all formulas in σ\",\n        \"B\": \"The set of all predicates in σ\",\n        \"C\": \"The set of all ground terms of σ\",\n        \"D\": \"The set of all interpretations over σ\"\n      },\n      \"positioning\": {\n        \"page\": 3,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"16\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"Which of the following is an example of a terminological axiom in FOL?\",\n      \"options\": {\n        \"A\": \"∀x (Teenager(x) → ¬Adult(x))\",\n        \"B\": \"Child(John)\",\n        \"C\": \"Affects(JRA, Mary)\",\n        \"D\": \"¬Affects(JRA, Mary)\"\n      },\n      \"positioning\": {\n        \"page\": 3,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    },\n    {\n      \"question_number\": \"17\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"What are some of the free occurrences of a variable in the below formula?\",\n      \"options\": {\n        \"A\": \"4,7\",\n        \"B\": \"2,3\",\n        \"C\": \"1,6,7\",\n        \"D\": \"None of the above\"\n      },\n      \"positioning\": {\n        \"page\": 3,\n        \"bbox\": [72.0, 116.24842834472656, 476.34375, 129.5324249267578],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\", \"mistral_ocr\"],\n      \"fusion_notes\": \"Merged from 2 sources, used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [\"equation\"],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 2\n      }\n    }\n  ]\n}\n```",
+      "model": "gpt-4o",
+      "sources_used": [
+        "pymupdf",
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "orchestration": {
+        "extraction_results": {
+          "mistral_ocr": {
+            "questions_count": 17,
+            "confidence": 0.85,
+            "processing_time_ms": 11368
+          },
+          "openai_vision": {
+            "questions_count": 17,
+            "confidence": 0.9,
+            "processing_time_ms": 56853
+          }
+        },
+        "total_processing_time_ms": 154823,
+        "clients_used": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  },
+  "ai_questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "What is the primary aim of Knowledge Representation and Reasoning?",
+      "options": {
+        "A": "To enable computers to process vast amounts of data efficiently.",
+        "B": "To develop advanced machine learning algorithms.",
+        "C": "To understand the nature of intelligence and cognition to simulate human-like abilities in computers.",
+        "D": "To create complex robotic systems for automation."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          72.51112365722656,
+          509.4501953125,
+          85.79512786865234
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1"
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?",
+      "options": {
+        "A": "Deductive reasoning",
+        "B": "Abductive reasoning",
+        "C": "Epistemic reasoning",
+        "D": "Default reasoning"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          191.72303771972656,
+          524.49609375,
+          236.7443389892578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2"
+    },
+    {
+      "question_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "In propositional logic, what is an 'atom'?",
+      "options": {
+        "A": "A logical connective like 'and' or 'or'.",
+        "B": "A formula composed of multiple propositions.",
+        "C": "The smallest unit to which a truth value (true/false) can be assigned.",
+        "D": "A symbol representing a numerical value."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          326.80364990234375,
+          362.4668273925781,
+          340.087646484375
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3"
+    },
+    {
+      "question_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following connectives is considered a unary propositional connective?",
+      "options": {
+        "A": "Conjunction (∧)",
+        "B": "Implication (→)",
+        "C": "Disjunction (∨)",
+        "D": "Negation (¬)"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          430.1468505859375,
+          507.58001708984375,
+          459.29949951171875
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4"
+    },
+    {
+      "question_number": "5",
+      "question_type": "mcq_single",
+      "stem_text": "A propositional formula F is a tautology if:",
+      "options": {
+        "A": "At least one interpretation satisfies F.",
+        "B": "F can be reduced to a Conjunctive Normal Form (CNF).",
+        "C": "Every interpretation satisfies F.",
+        "D": "Its negation (¬F) is satisfiable."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          549.3588256835938,
+          363.4505920410156,
+          562.642822265625
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5"
+    },
+    {
+      "question_number": "6",
+      "question_type": "mcq_single",
+      "stem_text": "What does it mean for a propositional formula F to be satisfiable?",
+      "options": {
+        "A": "F is true for all possible interpretations.",
+        "B": "There exists at least one interpretation that satisfies F.",
+        "C": "F contains no logical connectives.",
+        "D": "F can be reduced to an empty clause."
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          72.0,
+          652.7020263671875,
+          480.7730712890625,
+          665.9860229492188
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6"
+    },
+    {
+      "question_number": "7",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is equivalent to saying that F entails G (F ⊧ G)?",
+      "options": {
+        "A": "F ∧ G is a tautology.",
+        "B": "F ↔ G is satisfiable.",
+        "C": "(F ∧ ¬G) is unsatisfiable.",
+        "D": "¬F ∨ G is a contradiction."
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "7"
+    },
+    {
+      "question_number": "8",
+      "question_type": "mcq_single",
+      "stem_text": "What is the total number of sub formulas that can be formed for the propositional formula?",
+      "options": {
+        "A": "8",
+        "B": "10",
+        "C": "7",
+        "D": "9"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "equation"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "8"
+    },
+    {
+      "question_number": "9",
+      "question_type": "mcq_single",
+      "stem_text": "What is a key characteristic of a Herbrand interpretation for a given signature (containing at least one object constant)?",
+      "options": {
+        "A": "Its universe is any non-empty set of individuals.",
+        "B": "Its universe is the set of all ground (variable-free) terms of σ, and every ground term is interpreted as itself.",
+        "C": "It always makes all quantified formulas true.",
+        "D": "It must contain at least one function constant of arity greater than 0."
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "9"
+    },
+    {
+      "question_number": "10",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following statements about SAT solvers is correct?",
+      "options": {
+        "A": "SAT solvers only accept formulas in Disjunctive Normal Form (DNF).",
+        "B": "SAT solvers decide satisfiability of propositional formulas, often using DPLL.",
+        "C": "SAT solvers can only handle problems with at most 100 variables.",
+        "D": "SAT solvers are inefficient and rarely used in practice."
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "10"
+    },
+    {
+      "question_number": "11",
+      "question_type": "true_false",
+      "stem_text": "Every atom, ⊤, ⊥, and any recursive combination of formulas with connectives are considered valid formulas in propositional logic.",
+      "options": {
+        "A": "True",
+        "B": "False"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "11"
+    },
+    {
+      "question_number": "12",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following statements is a tautology?",
+      "options": {
+        "A": "(p → q) ∧ (p ∧ ¬q)",
+        "B": "(p → q) → (¬p ∨ q)",
+        "C": "(p → (q → p))",
+        "D": "¬p ∨ p"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.9,
+      "sources_detected": [
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Only found in Mistral OCR, used for text and position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "12"
+    },
+    {
+      "question_number": "13",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is a key limitation of propositional logic that First-Order Logic overcomes?",
+      "options": {
+        "A": "Inability to represent negation",
+        "B": "Inability to express relations between individuals and relations",
+        "C": "Inability to use logical connectives such as ∧ and ∨",
+        "D": "Inability to reason with truth values"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "13"
+    },
+    {
+      "question_number": "14",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is a valid term in FOL?",
+      "options": {
+        "A": "∀x P(x)",
+        "B": "P(x) ∧ Q(y)",
+        "C": "father(john)"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "14"
+    },
+    {
+      "question_number": "15",
+      "question_type": "mcq_single",
+      "stem_text": "What is the Herbrand Universe of a signature σ?",
+      "options": {
+        "A": "The set of all formulas in σ",
+        "B": "The set of all predicates in σ",
+        "C": "The set of all ground terms of σ",
+        "D": "The set of all interpretations over σ"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "15"
+    },
+    {
+      "question_number": "16",
+      "question_type": "mcq_single",
+      "stem_text": "Which of the following is an example of a terminological axiom in FOL?",
+      "options": {
+        "A": "∀x (Teenager(x) → ¬Adult(x))",
+        "B": "Child(John)",
+        "C": "Affects(JRA, Mary)",
+        "D": "¬Affects(JRA, Mary)"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "16"
+    },
+    {
+      "question_number": "17",
+      "question_type": "mcq_single",
+      "stem_text": "What are some of the free occurrences of a variable in the below formula?",
+      "options": {
+        "A": "4,7",
+        "B": "2,3",
+        "C": "1,6,7",
+        "D": "None of the above"
+      },
+      "positioning": {
+        "page": 3,
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "fusion_notes": "Merged from 2 sources, used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [
+          "equation"
+        ],
+        "complexity": "medium",
+        "source_agreements": 2,
+        "fusion_analysis": {
+          "total_questions_found": 17,
+          "source_agreements": {
+            "vision_mistral": 17,
+            "vision_only": 0,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "17"
+    }
+  ],
+  "question_index": [
+    {
+      "q_number": "1",
+      "page": 1,
+      "stem": {
+        "text": "What is the primary aim of Knowledge Representation and Reasoning?",
+        "bbox": [
+          72.0,
+          72.51112365722656,
+          509.4501953125,
+          85.79512786865234
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "To enable computers to process vast amounts of data efficiently."
+        },
+        "B": {
+          "text": "To develop advanced machine learning algorithms."
+        },
+        "C": {
+          "text": "To understand the nature of intelligence and cognition to simulate human-like abilities in computers."
+        },
+        "D": {
+          "text": "To create complex robotic systems for automation."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "2",
+      "page": 1,
+      "stem": {
+        "text": "Which type of reasoning is described as 'jumping to conclusions based on some default assumptions' when information is insufficient, potentially leading to unsound conclusions that may need to be withdrawn?",
+        "bbox": [
+          72.0,
+          191.72303771972656,
+          524.49609375,
+          236.7443389892578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Deductive reasoning"
+        },
+        "B": {
+          "text": "Abductive reasoning"
+        },
+        "C": {
+          "text": "Epistemic reasoning"
+        },
+        "D": {
+          "text": "Default reasoning"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "3",
+      "page": 1,
+      "stem": {
+        "text": "In propositional logic, what is an 'atom'?",
+        "bbox": [
+          72.0,
+          326.80364990234375,
+          362.4668273925781,
+          340.087646484375
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "A logical connective like 'and' or 'or'."
+        },
+        "B": {
+          "text": "A formula composed of multiple propositions."
+        },
+        "C": {
+          "text": "The smallest unit to which a truth value (true/false) can be assigned."
+        },
+        "D": {
+          "text": "A symbol representing a numerical value."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "4",
+      "page": 1,
+      "stem": {
+        "text": "Which of the following connectives is considered a unary propositional connective?",
+        "bbox": [
+          72.0,
+          430.1468505859375,
+          507.58001708984375,
+          459.29949951171875
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Conjunction (∧)"
+        },
+        "B": {
+          "text": "Implication (→)"
+        },
+        "C": {
+          "text": "Disjunction (∨)"
+        },
+        "D": {
+          "text": "Negation (¬)"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "5",
+      "page": 1,
+      "stem": {
+        "text": "A propositional formula F is a tautology if:",
+        "bbox": [
+          72.0,
+          549.3588256835938,
+          363.4505920410156,
+          562.642822265625
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "At least one interpretation satisfies F."
+        },
+        "B": {
+          "text": "F can be reduced to a Conjunctive Normal Form (CNF)."
+        },
+        "C": {
+          "text": "Every interpretation satisfies F."
+        },
+        "D": {
+          "text": "Its negation (¬F) is satisfiable."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "6",
+      "page": 1,
+      "stem": {
+        "text": "What does it mean for a propositional formula F to be satisfiable?",
+        "bbox": [
+          72.0,
+          652.7020263671875,
+          480.7730712890625,
+          665.9860229492188
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "F is true for all possible interpretations."
+        },
+        "B": {
+          "text": "There exists at least one interpretation that satisfies F."
+        },
+        "C": {
+          "text": "F contains no logical connectives."
+        },
+        "D": {
+          "text": "F can be reduced to an empty clause."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "7",
+      "page": 2,
+      "stem": {
+        "text": "Which of the following is equivalent to saying that F entails G (F ⊧ G)?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "F ∧ G is a tautology."
+        },
+        "B": {
+          "text": "F ↔ G is satisfiable."
+        },
+        "C": {
+          "text": "(F ∧ ¬G) is unsatisfiable."
+        },
+        "D": {
+          "text": "¬F ∨ G is a contradiction."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "8",
+      "page": 2,
+      "stem": {
+        "text": "What is the total number of sub formulas that can be formed for the propositional formula?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "8"
+        },
+        "B": {
+          "text": "10"
+        },
+        "C": {
+          "text": "7"
+        },
+        "D": {
+          "text": "9"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "9",
+      "page": 2,
+      "stem": {
+        "text": "What is a key characteristic of a Herbrand interpretation for a given signature (containing at least one object constant)?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Its universe is any non-empty set of individuals."
+        },
+        "B": {
+          "text": "Its universe is the set of all ground (variable-free) terms of σ, and every ground term is interpreted as itself."
+        },
+        "C": {
+          "text": "It always makes all quantified formulas true."
+        },
+        "D": {
+          "text": "It must contain at least one function constant of arity greater than 0."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "10",
+      "page": 2,
+      "stem": {
+        "text": "Which of the following statements about SAT solvers is correct?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "SAT solvers only accept formulas in Disjunctive Normal Form (DNF)."
+        },
+        "B": {
+          "text": "SAT solvers decide satisfiability of propositional formulas, often using DPLL."
+        },
+        "C": {
+          "text": "SAT solvers can only handle problems with at most 100 variables."
+        },
+        "D": {
+          "text": "SAT solvers are inefficient and rarely used in practice."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "11",
+      "page": 2,
+      "stem": {
+        "text": "Every atom, ⊤, ⊥, and any recursive combination of formulas with connectives are considered valid formulas in propositional logic.",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "True"
+        },
+        "B": {
+          "text": "False"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "12",
+      "page": 3,
+      "stem": {
+        "text": "Which of the following statements is a tautology?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "(p → q) ∧ (p ∧ ¬q)"
+        },
+        "B": {
+          "text": "(p → q) → (¬p ∨ q)"
+        },
+        "C": {
+          "text": "(p → (q → p))"
+        },
+        "D": {
+          "text": "¬p ∨ p"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "13",
+      "page": 3,
+      "stem": {
+        "text": "Which of the following is a key limitation of propositional logic that First-Order Logic overcomes?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Inability to represent negation"
+        },
+        "B": {
+          "text": "Inability to express relations between individuals and relations"
+        },
+        "C": {
+          "text": "Inability to use logical connectives such as ∧ and ∨"
+        },
+        "D": {
+          "text": "Inability to reason with truth values"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "14",
+      "page": 3,
+      "stem": {
+        "text": "Which of the following is a valid term in FOL?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "∀x P(x)"
+        },
+        "B": {
+          "text": "P(x) ∧ Q(y)"
+        },
+        "C": {
+          "text": "father(john)"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "15",
+      "page": 3,
+      "stem": {
+        "text": "What is the Herbrand Universe of a signature σ?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "The set of all formulas in σ"
+        },
+        "B": {
+          "text": "The set of all predicates in σ"
+        },
+        "C": {
+          "text": "The set of all ground terms of σ"
+        },
+        "D": {
+          "text": "The set of all interpretations over σ"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "16",
+      "page": 3,
+      "stem": {
+        "text": "Which of the following is an example of a terminological axiom in FOL?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "∀x (Teenager(x) → ¬Adult(x))"
+        },
+        "B": {
+          "text": "Child(John)"
+        },
+        "C": {
+          "text": "Affects(JRA, Mary)"
+        },
+        "D": {
+          "text": "¬Affects(JRA, Mary)"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    },
+    {
+      "q_number": "17",
+      "page": 3,
+      "stem": {
+        "text": "What are some of the free occurrences of a variable in the below formula?",
+        "bbox": [
+          72.0,
+          116.24842834472656,
+          476.34375,
+          129.5324249267578
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "4,7"
+        },
+        "B": {
+          "text": "2,3"
+        },
+        "C": {
+          "text": "1,6,7"
+        },
+        "D": {
+          "text": "None of the above"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 17,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

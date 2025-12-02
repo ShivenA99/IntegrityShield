@@ -1,0 +1,109 @@
+{
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 6,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  },
+  "pipeline_metadata": {
+    "current_stage": "smart_substitution",
+    "stages_completed": [
+      "smart_substitution"
+    ],
+    "last_updated": "2025-09-27T06:00:14.171525+00:00"
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/865c133a-0f6e-469f-a614-7b03d82cc23f/enhanced_content_stream.pdf",
+        "size_bytes": 92339,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/865c133a-0f6e-469f-a614-7b03d82cc23f/enhanced_content_stream.pdf",
+        "file_size_bytes": 92339,
+        "visual_quality_score": 0.92,
+        "created_at": "2025-09-27T09:10:59.231098+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/865c133a-0f6e-469f-a614-7b03d82cc23f/enhanced_image_overlay.pdf",
+        "size_bytes": 374410,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/865c133a-0f6e-469f-a614-7b03d82cc23f/enhanced_image_overlay.pdf",
+        "file_size_bytes": 374410,
+        "visual_quality_score": 0.92,
+        "created_at": "2025-09-27T09:10:59.231224+00:00"
+      }
+    },
+    "debug": {
+      "content_stream": {
+        "decoded_sample": "4XHVWLRQ \u0003 \u0010 \u0003 \u0014\u001d \u0003\u0003 :KDW \u0003 LV \u0003 WKH \u0003 SULPDU\\ \u0003 DLP \u0003 RI \u0003 .QRZOHGJH \u0003 5HSU HVHQWDWLRQ \u0003 DQG \u0003 5HDVRQLQJ\" \u0003 D \u0003 7 R \u0003 HQDEOH \u0003 FRPSXWHUV \u0003 WR \u0003 SURFHVV \u0003 YDVW \u0003 DPRXQWV \u0003 RI \u0003 GDWD \u0003 HI ILFLHQWO\\ \u0011 \u0003 E \u0003 7 R \u0003 GHYHORS \u0003 DGYDQFHG \u0003 PDFKLQH \u0003 OHDUQLQJ \u0003 DOJRULWKPV\u0011 \u0003 F \u0003 7 R \u0003 XQGHUVWDQG \u0003 WKH \u0003 QDWX",
+        "per_font_top_tokens": {},
+        "enhanced_mapping_stats": {
+          "total_entries": 6,
+          "discovered_tokens": 0
+        }
+      },
+      "image_overlay": {
+        "effectiveness_score": 1.0,
+        "mapping_entries_used": 14,
+        "enhanced_mapping_boost": 0
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 140.61,
+      "mapping_build_time_ms": 12.98,
+      "enhancement_stats": {
+        "base_mapping_size": 6,
+        "enhanced_mapping_size": 6,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream": {
+          "duration_ms": 27.23,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 92339
+        },
+        "image_overlay": {
+          "duration_ms": 93.05,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 374410
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 2,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 96263,
+        "total_output_size_bytes": 466749,
+        "size_efficiency": 4.848685372365291
+      }
+    }
+  }
+}

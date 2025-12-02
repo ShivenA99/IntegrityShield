@@ -1,0 +1,75 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Introduction to Python Programming}}\\[0.25em]
+  {\large \textbf{Data Structures Quiz -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item \textbf{(C) Tuple.} Tuples are immutable in Python, meaning their elements cannot be changed after creation. Lists, dictionaries, and sets are all mutable.
+
+  \item \textbf{(C) 3.} When duplicate keys exist in a dictionary literal, the last value overwrites earlier ones. The key \texttt{'a'} is assigned 3 in the final assignment.
+
+  \item \textbf{(C) \texttt{append()}.} The \texttt{append()} method adds a single element to the end of a list. \texttt{insert()} adds at a specific index, \texttt{extend()} adds multiple elements, and \texttt{add()} is for sets.
+
+  \item \textbf{(B) 3.} Sets automatically remove duplicate elements. The set \texttt{\{1, 2, 3, 2, 1\}} reduces to \texttt{\{1, 2, 3\}}, which has length 3.
+
+  \item \textbf{(B) \texttt{d = \{\}}.} Empty curly braces create an empty dictionary. \texttt{[]} creates a list, \texttt{set()} creates an empty set, and \texttt{dict[]} is invalid syntax.
+
+  \item \textbf{True.} Python lists are heterogeneous and can store elements of any data type, including mixed types like \texttt{[1, "hello", 3.14, True]}.
+
+  \item \textbf{True.} Dictionary keys must be unique and hashable. If a duplicate key is assigned, the new value overwrites the old. Values have no uniqueness constraint.
+
+  \item \textbf{False.} Sets are unordered collections, so \texttt{pop()} removes and returns an arbitrary element, not necessarily the last one added. The removal order is not guaranteed.
+
+  \item \textbf{Mutability:} Lists are mutable (can be modified after creation), while tuples are immutable (cannot be changed once created).
+  
+  \textbf{Syntax:} Lists use square brackets \texttt{[1, 2, 3]}, tuples use parentheses \texttt{(1, 2, 3)}.
+  
+  \textbf{Use cases:} Lists are ideal for collections that need modification (e.g., maintaining a shopping cart). Tuples are suitable for fixed data (e.g., coordinates, database records) and can serve as dictionary keys.
+  
+  \textbf{Performance:} Tuples have slightly faster iteration and lower memory overhead due to their immutability.
+  
+  \textbf{Example:}
+  \begin{verbatim}
+    # List modification (allowed)
+    my_list = [1, 2, 3]
+    my_list[0] = 10  # Works
+    
+    # Tuple modification (error)
+    my_tuple = (1, 2, 3)
+    my_tuple[0] = 10  # TypeError
+  \end{verbatim}
+
+  \item \textbf{Hash table mechanism:} Python dictionaries use hash tables for O(1) average-case lookup. When a key is added, Python computes its hash value to determine the storage location.
+  
+  \textbf{Valid keys:} Keys must be hashable (immutable types like strings, numbers, tuples). Lists and sets cannot be keys because they are mutable.
+  
+  \textbf{Operations:}
+  \begin{verbatim}
+    # Creating and adding
+    student = {'name': 'Alice', 'age': 20}
+    student['grade'] = 'A'  # Add new key-value
+    
+    # Updating
+    student['age'] = 21  # Update existing
+    
+    # Deleting
+    del student['grade']  # Remove key-value pair
+    removed = student.pop('age')  # Remove and return value
+  \end{verbatim}
+  
+  \textbf{Key uniqueness:} Duplicate keys overwrite previous values; \texttt{\{'a': 1, 'a': 2\}} results in \texttt{\{'a': 2\}}.
+
+\end{enumerate}
+
+\end{document}
