@@ -10,8 +10,10 @@ from ..data_management.structured_data_manager import StructuredDataManager
 
 
 # Optional: paste API keys here for sandbox-only runs (otherwise env vars are used)
-OPENAI_API_KEY_OVERRIDE = "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"
-MISTRAL_API_KEY_OVERRIDE = "5ury6VLedRPtm8RJotxrJ6NmooxQg6Ri"  # e.g., "mistral-..."
+# SECURITY: Never commit API keys to version control!
+# Set these via environment variables or local .env file instead
+OPENAI_API_KEY_OVERRIDE = os.getenv("OPENAI_API_KEY_OVERRIDE") or None
+MISTRAL_API_KEY_OVERRIDE = os.getenv("MISTRAL_API_KEY_OVERRIDE") or None
 
 
 
