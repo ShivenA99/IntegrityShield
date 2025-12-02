@@ -446,13 +446,19 @@ class GoldAnswerGenerationService:
                 if question.get("question_id") is not None:
                     metadata["question_id"] = question.get("question_id")
 
-            response = await self._client.responses.create(
-                model=self._model_name,
-                input=messages,
-                reasoning={"effort": self._reasoning_effort},
-                max_output_tokens=700,
-                metadata=metadata,
-            )
+            # Build request parameters
+            request_params = {
+                "model": self._model_name,
+                "input": messages,
+                "max_output_tokens": 700,
+                "metadata": metadata,
+            }
+
+            # Only add reasoning parameter for models that support it (o1-mini, o1-preview, gpt-4o-mini)
+            if any(model_name in self._model_name.lower() for model_name in ["o1-mini", "o1-preview", "gpt-4o-mini"]):
+                request_params["reasoning"] = {"effort": self._reasoning_effort}
+
+            response = await self._client.responses.create(**request_params)
             response_id = getattr(response, "id", None)
             if question:
                 q_num = question.get("question_number") or question.get("q_number") or "unknown"

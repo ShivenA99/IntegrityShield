@@ -17,6 +17,27 @@ from .enhancement_methods import RENDERERS
 from .enhancement_methods.base_renderer import BaseRenderer
 
 
+def get_method_display_name(mode: str, method_name: str, all_methods: List[str]) -> str:
+    """
+    Generate a friendly display name for an enhancement method based on mode.
+
+    Args:
+        mode: Pipeline mode ("detection" or "prevention")
+        method_name: The method identifier (e.g., "latex_icw")
+        all_methods: List of all methods in the current mode (for determining index)
+
+    Returns:
+        Display name like "Detection 1", "Prevention 2", etc.
+    """
+    try:
+        method_index = all_methods.index(method_name) + 1
+        mode_label = mode.capitalize()
+        return f"{mode_label} {method_index}"
+    except (ValueError, IndexError):
+        # Fallback if method not found in list
+        return f"{mode.capitalize()} ({method_name})"
+
+
 class PdfCreationService:
     def __init__(self) -> None:
         self.logger = get_logger(__name__)
@@ -105,9 +126,11 @@ class PdfCreationService:
 
         for method in methods_to_add:
             pdf_path = enhanced_pdf_path(run.id, method)
+            display_name = get_method_display_name(mode or "detection", method, configured)
             enhanced = EnhancedPDF(
                 pipeline_run_id=run.id,
                 method_name=method,
+                display_name=display_name,
                 file_path=str(pdf_path),
                 generation_config={"method": method},
             )

@@ -127,7 +127,7 @@ class BaseConfig:
         },
     }
     WEBSOCKET_URL_PREFIX = "/ws"
-    POST_FUSER_MODEL = os.getenv("POST_FUSER_MODEL", "gpt-5")
+    POST_FUSER_MODEL = os.getenv("POST_FUSER_MODEL", "gpt-4o")
     DEMO_ASSETS_PATH = os.getenv("FAIRTESTAI_DEMO_ASSETS_PATH")
     MANUAL_INPUT_DIR = Path(
         os.getenv(
@@ -146,24 +146,24 @@ class BaseConfig:
         if prompt.strip()
     ]
     LLM_REPORT_MODEL_OVERRIDES = {
-        "openai": os.getenv("FAIRTESTAI_REPORT_OPENAI_MODEL", "gpt-4.1"),
-        "anthropic": os.getenv("FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
-        "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "models/gemini-1.5-pro"),
+        "openai": os.getenv("FAIRTESTAI_REPORT_OPENAI_MODEL", "gpt-4o-mini"),
+        "anthropic": os.getenv("FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-sonnet-4-5-20250929"),
+        "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "gemini-2.5-flash"),
         "grok": os.getenv("FAIRTESTAI_REPORT_GROK_MODEL", "grok-2-latest"),
     }
     LLM_REPORT_MODEL_FALLBACKS = {
         "anthropic": os.getenv(
-            "FAIRTESTAI_REPORT_ANTHROPIC_MODEL", "claude-3-5-haiku-20241022"
+            "FAIRTESTAI_REPORT_ANTHROPIC_FALLBACK_MODEL", "claude-3-5-sonnet-20241022"
         ),
-        "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_MODEL", "models/gemini-1.5-pro"),
-        "grok": os.getenv("FAIRTESTAI_REPORT_GROK_MODEL", "grok-2-latest"),
+        "google": os.getenv("FAIRTESTAI_REPORT_GOOGLE_FALLBACK_MODEL", "gemini-1.5-flash"),
+        "grok": os.getenv("FAIRTESTAI_REPORT_GROK_FALLBACK_MODEL", "grok-beta"),
     }
-    LLM_REPORT_SCORING_MODEL = os.getenv("FAIRTESTAI_REPORT_SCORING_MODEL", "gpt-5.1")
+    LLM_REPORT_SCORING_MODEL = os.getenv("FAIRTESTAI_REPORT_SCORING_MODEL", "gpt-4o")
     LLM_REPORT_SCORING_REASONING = os.getenv(
         "FAIRTESTAI_REPORT_SCORING_REASONING", "medium"
     )
     ENABLE_GOLD_ANSWER_GENERATION = os.getenv("FAIRTESTAI_ENABLE_GOLD_ANSWERS", "true").lower() == "true"
-    GOLD_ANSWER_MODEL = os.getenv("FAIRTESTAI_GOLD_ANSWER_MODEL", "gpt-5.1")
+    GOLD_ANSWER_MODEL = os.getenv("FAIRTESTAI_GOLD_ANSWER_MODEL", "gpt-4o")
     GOLD_ANSWER_REASONING = os.getenv("FAIRTESTAI_GOLD_ANSWER_REASONING", "medium")
     _gold_force_refresh = os.getenv("FAIRTESTAI_GOLD_ANSWER_FORCE_REFRESH")
     if _gold_force_refresh is None:

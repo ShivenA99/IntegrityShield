@@ -276,7 +276,7 @@ QUESTION_TYPE_KEYWORDS = {
 # =============================================================================
 
 # Enable/disable LaTeX reconstruction features
-ENABLE_LATEX_RECONSTRUCTION = False  # Default: disabled (opt-in)
+ENABLE_LATEX_RECONSTRUCTION = True  # Default: enabled for FairTestAI pipeline integration
 
 # LaTeX generation settings
 LATEX_INCLUDE_IMAGES = True          # Extract and include images in LaTeX

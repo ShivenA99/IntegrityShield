@@ -105,3 +105,19 @@ data/manual_inputs/
 # !README.md
 
 
+
+# Temporary files from development
+*.pid
+*.log
+*_server.log
+backend/test_*.py
+backend/verify_*.py
+
+# Database files (runtime data, not code)
+*.db-shm
+*.db-wal
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

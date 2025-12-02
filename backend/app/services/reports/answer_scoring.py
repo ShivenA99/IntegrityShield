@@ -320,9 +320,10 @@ class AnswerScoringService:
             f"Full schema definition: {schema_instruction}",
         ])
 
-        response = self.client.responses.create(
-            model=self.model,
-            input=[
+        # Build request parameters
+        request_params = {
+            "model": self.model,
+            "input": [
                 {
                     "role": "system",
                     "content": [{"type": "input_text", "text": system_text}],
@@ -332,10 +333,15 @@ class AnswerScoringService:
                     "content": [{"type": "input_text", "text": json.dumps(payload, ensure_ascii=False)}],
                 },
             ],
-            reasoning={"effort": self.reasoning_effort},
-            max_output_tokens=900,
-            metadata={"task": "report_scoring"},
-        )
+            "max_output_tokens": 900,
+            "metadata": {"task": "report_scoring"},
+        }
+
+        # Only add reasoning parameter for models that support it (o1-mini, o1-preview, gpt-4o-mini)
+        if any(model_name in self.model.lower() for model_name in ["o1-mini", "o1-preview", "gpt-4o-mini"]):
+            request_params["reasoning"] = {"effort": self.reasoning_effort}
+
+        response = self.client.responses.create(**request_params)
 
         response_id = getattr(response, "id", None)
         provider_count = len(provider_answers)
