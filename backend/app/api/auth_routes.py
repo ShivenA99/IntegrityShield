@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import re
+import threading
+import uuid
 from http import HTTPStatus
 from typing import Any
 
@@ -42,73 +45,124 @@ def validate_password(password: str) -> tuple[bool, str]:
 
 @bp.post("/register")
 def register():
-    """Register a new user."""
-    data = request.get_json() or {}
-    email = (data.get("email") or "").strip().lower()
-    password = data.get("password") or ""
-    name = (data.get("name") or "").strip()
-
-    # Validation
-    if not email:
-        return jsonify({"error": "Email is required"}), HTTPStatus.BAD_REQUEST
-    if not validate_email(email):
-        return jsonify({"error": "Invalid email format"}), HTTPStatus.BAD_REQUEST
-    if not password:
-        return jsonify({"error": "Password is required"}), HTTPStatus.BAD_REQUEST
-
-    is_valid, error_msg = validate_password(password)
-    if not is_valid:
-        return jsonify({"error": error_msg}), HTTPStatus.BAD_REQUEST
-
-    # Check if user already exists
-    if User.query.filter_by(email=email).first():
-        return jsonify({"error": "Email already registered"}), HTTPStatus.CONFLICT
-
-    # Create user
-    try:
-        user = User(email=email, name=name or email.split("@")[0])
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-
-        token = generate_token(user)
-        return (
-            jsonify(
-                {
-                    "token": token,
-                    "user": user.to_dict(),
-                }
-            ),
-            HTTPStatus.CREATED,
-        )
-    except IntegrityError:
-        db.session.rollback()
-        return jsonify({"error": "Email already registered"}), HTTPStatus.CONFLICT
-    except Exception as exc:
-        current_app.logger.exception("Registration error")
-        db.session.rollback()
-        return jsonify({"error": "Registration failed"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    """DEPRECATED: Email/password registration is no longer supported."""
+    return jsonify({
+        "error": "Email/password registration is no longer supported",
+        "message": "Please use /auth/login-with-key to authenticate with your OpenAI API key",
+        "new_endpoint": "/auth/login-with-key"
+    }), HTTPStatus.GONE
 
 
 @bp.post("/login")
 def login():
-    """Login a user."""
+    """DEPRECATED: Email/password login is no longer supported."""
+    return jsonify({
+        "error": "Email/password login is no longer supported",
+        "message": "Please use /auth/login-with-key to authenticate with your OpenAI API key",
+        "new_endpoint": "/auth/login-with-key"
+    }), HTTPStatus.GONE
+
+
+@bp.post("/login-with-key")
+def login_with_openai_key():
+    """Authenticate user with OpenAI API key."""
     data = request.get_json() or {}
-    email = (data.get("email") or "").strip().lower()
-    password = data.get("password") or ""
+    api_key = (data.get("openai_api_key") or "").strip()
+    email = (data.get("email") or "").strip().lower() if data.get("email") else None
 
-    if not email or not password:
-        return jsonify({"error": "Email and password are required"}), HTTPStatus.BAD_REQUEST
+    # Validate key format
+    if not api_key or not api_key.startswith("sk-"):
+        return jsonify({"error": "Invalid OpenAI API key format (must start with 'sk-')"}), HTTPStatus.BAD_REQUEST
 
-    user = User.query.filter_by(email=email).first()
-    if not user or not user.check_password(password):
-        return jsonify({"error": "Invalid email or password"}), HTTPStatus.UNAUTHORIZED
+    # Validate email if provided
+    if email and not validate_email(email):
+        return jsonify({"error": "Invalid email format"}), HTTPStatus.BAD_REQUEST
 
-    if not user.is_active:
-        return jsonify({"error": "Account is inactive"}), HTTPStatus.FORBIDDEN
+    # Validate key against OpenAI API
+    from ..utils.api_key_validation import validate_openai_key
 
-    token = generate_token(user)
-    return jsonify({"token": token, "user": user.to_dict()})
+    # Run async validation with event loop handling
+    try:
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        if loop.is_running():
+            # If loop is already running, use threading approach
+            result_container = {"is_valid": False, "error_msg": None, "done": False}
+
+            def run_validation():
+                new_loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(new_loop)
+                try:
+                    is_valid, error_msg = new_loop.run_until_complete(validate_openai_key(api_key))
+                    result_container["is_valid"] = is_valid
+                    result_container["error_msg"] = error_msg
+                finally:
+                    new_loop.close()
+                    result_container["done"] = True
+
+            thread = threading.Thread(target=run_validation)
+            thread.start()
+            thread.join(timeout=15)  # 15 second timeout
+
+            if not result_container["done"]:
+                return jsonify({"error": "OpenAI API validation timeout"}), HTTPStatus.REQUEST_TIMEOUT
+
+            is_valid = result_container["is_valid"]
+            error_msg = result_container["error_msg"]
+        else:
+            is_valid, error_msg = loop.run_until_complete(validate_openai_key(api_key))
+    except Exception as exc:
+        current_app.logger.exception("Error validating OpenAI key")
+        return jsonify({"error": f"Validation error: {str(exc)[:200]}"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    if not is_valid:
+        return jsonify({
+            "error": "Invalid OpenAI API key",
+            "details": error_msg or "OpenAI API key validation failed"
+        }), HTTPStatus.UNAUTHORIZED
+
+    # Find or create user by key hash
+    key_hash = User.hash_openai_key(api_key)
+    user = User.query.filter_by(openai_key_hash=key_hash).first()
+
+    try:
+        if user:
+            # Existing user - update key and email
+            user.set_openai_key(api_key)
+            if email:
+                user.email = email
+            user.is_active = True
+        else:
+            # New user - create
+            user = User(
+                id=str(uuid.uuid4()),
+                email=email,
+                name=email.split("@")[0] if email else f"User_{key_hash[:8]}",
+                is_active=True
+            )
+            user.set_openai_key(api_key)
+            db.session.add(user)
+
+        db.session.commit()
+
+        # Generate JWT token
+        token = generate_token(user)
+
+        return jsonify({
+            "token": token,
+            "user": user.to_dict()
+        }), HTTPStatus.OK
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"error": "User creation failed (duplicate key)"}), HTTPStatus.CONFLICT
+    except Exception as exc:
+        current_app.logger.exception("Login with key error")
+        db.session.rollback()
+        return jsonify({"error": "Authentication failed"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 @bp.get("/me")
@@ -123,6 +177,83 @@ def get_current_user_info(current_user: User):
 def logout(current_user: User):
     """Logout (client should discard token)."""
     return jsonify({"message": "Logged out successfully"})
+
+
+@bp.post("/validate-session")
+@require_auth
+def validate_session(current_user: User):
+    """Validate that user's OpenAI key is still valid."""
+    from ..utils.api_key_validation import validate_openai_key
+
+    # Get user's OpenAI key
+    openai_key = current_user.get_openai_key()
+    if not openai_key:
+        # User doesn't have OpenAI key - mark inactive
+        current_user.is_active = False
+        db.session.commit()
+        return jsonify({
+            "valid": False,
+            "error": "No OpenAI API key found"
+        }), HTTPStatus.UNAUTHORIZED
+
+    # Run async validation with event loop handling
+    try:
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        if loop.is_running():
+            # If loop is already running, use threading approach
+            result_container = {"is_valid": False, "error_msg": None, "done": False}
+
+            def run_validation():
+                new_loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(new_loop)
+                try:
+                    is_valid, error_msg = new_loop.run_until_complete(validate_openai_key(openai_key))
+                    result_container["is_valid"] = is_valid
+                    result_container["error_msg"] = error_msg
+                finally:
+                    new_loop.close()
+                    result_container["done"] = True
+
+            thread = threading.Thread(target=run_validation)
+            thread.start()
+            thread.join(timeout=15)  # 15 second timeout
+
+            if not result_container["done"]:
+                return jsonify({
+                    "valid": False,
+                    "error": "OpenAI API validation timeout"
+                }), HTTPStatus.REQUEST_TIMEOUT
+
+            is_valid = result_container["is_valid"]
+            error_msg = result_container["error_msg"]
+        else:
+            is_valid, error_msg = loop.run_until_complete(validate_openai_key(openai_key))
+    except Exception as exc:
+        current_app.logger.exception("Error validating OpenAI key in session")
+        return jsonify({
+            "valid": False,
+            "error": f"Validation error: {str(exc)[:200]}"
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    if not is_valid:
+        # Mark user as inactive and force logout
+        current_user.is_active = False
+        db.session.commit()
+        return jsonify({
+            "valid": False,
+            "error": error_msg or "OpenAI API key is no longer valid"
+        }), HTTPStatus.UNAUTHORIZED
+
+    # Key is valid - return success
+    return jsonify({
+        "valid": True,
+        "user": current_user.to_dict()
+    }), HTTPStatus.OK
 
 
 # API Key Management Routes
