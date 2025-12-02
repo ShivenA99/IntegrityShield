@@ -1,0 +1,169 @@
+{
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 8,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  },
+  "pipeline_metadata": {
+    "current_stage": "smart_substitution",
+    "stages_completed": [
+      "smart_substitution"
+    ],
+    "last_updated": "2025-09-28T10:29:00.808432+00:00"
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/redaction-rewrite-overlay/final.pdf",
+        "size_bytes": 313060,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/redaction-rewrite-overlay/final.pdf",
+        "relative_path": "artifacts/redaction-rewrite-overlay/final.pdf",
+        "file_size_bytes": 313060,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 8,
+        "overlay_targets": 8,
+        "overlay_area_pct": 0.0009,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 313060,
+          "effectiveness_score": 1.0,
+          "replacements": 8,
+          "textbox_adjustments": 8,
+          "min_fontsize_used": 5.506642918762178,
+          "overlay_applied": 8,
+          "overlay_targets": 8,
+          "overlay_area_pct": 0.0009,
+          "raw_targets": 8,
+          "artifacts": {
+            "after_redaction": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/redaction-rewrite-overlay/after_redaction.pdf",
+            "after_rewrite": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/redaction-rewrite-overlay/after_rewrite.pdf",
+            "final": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/redaction-rewrite-overlay/final.pdf"
+          }
+        },
+        "created_at": "2025-09-28T10:31:28.409509+00:00"
+      },
+      "content_stream_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/stream_rewrite-overlay/final.pdf",
+        "size_bytes": 313060,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/stream_rewrite-overlay/final.pdf",
+        "relative_path": "artifacts/stream_rewrite-overlay/final.pdf",
+        "file_size_bytes": 313060,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 8,
+        "overlay_targets": 8,
+        "overlay_area_pct": 0.0009,
+        "render_stats": {
+          "mapping_entries": 8,
+          "file_size_bytes": 313060,
+          "effectiveness_score": 1.0,
+          "replacements": 8,
+          "matches_found": 8,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 8,
+          "overlay_applied": 8,
+          "overlay_targets": 8,
+          "overlay_area_pct": 0.0009,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {},
+          "artifacts": {
+            "after_stream_rewrite": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/stream_rewrite-overlay/after_stream_rewrite.pdf",
+            "final": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/stream_rewrite-overlay/final.pdf"
+          }
+        },
+        "created_at": "2025-09-28T10:31:28.409735+00:00"
+      }
+    },
+    "artifacts": {
+      "pymupdf_overlay": {
+        "after_redaction": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/redaction-rewrite-overlay/after_redaction.pdf",
+        "after_rewrite": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/redaction-rewrite-overlay/after_rewrite.pdf",
+        "final": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/redaction-rewrite-overlay/final.pdf"
+      },
+      "content_stream_overlay": {
+        "after_stream_rewrite": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/stream_rewrite-overlay/after_stream_rewrite.pdf",
+        "final": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/d25417a3-1402-4420-aef0-7f6a9000c663/artifacts/stream_rewrite-overlay/final.pdf"
+      }
+    },
+    "debug": {
+      "content_stream_overlay": {
+        "decoded_sample": null,
+        "per_font_top_tokens": null,
+        "enhanced_mapping_stats": {
+          "total_entries": 8,
+          "discovered_tokens": 0
+        }
+      },
+      "overlay_layers": {
+        "pymupdf_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 8,
+          "enhanced_mapping_boost": 0
+        }
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 207.89,
+      "mapping_build_time_ms": 17.83,
+      "enhancement_stats": {
+        "base_mapping_size": 8,
+        "enhanced_mapping_size": 8,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream_overlay": {
+          "duration_ms": 77.18,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 313060
+        },
+        "pymupdf_overlay": {
+          "duration_ms": 103.22,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 313060
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 2,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 100635,
+        "total_output_size_bytes": 626120,
+        "size_efficiency": 6.221692254185919
+      }
+    }
+  }
+}

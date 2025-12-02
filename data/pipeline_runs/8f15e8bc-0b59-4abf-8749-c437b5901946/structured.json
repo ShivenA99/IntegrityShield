@@ -1,0 +1,299 @@
+{
+  "pipeline_metadata": {
+    "run_id": "8f15e8bc-0b59-4abf-8749-c437b5901946",
+    "current_stage": "document_enhancement",
+    "stages_completed": [
+      "document_enhancement",
+      "smart_substitution",
+      "content_discovery",
+      "smart_reading"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-27T11:59:15.996464+00:00",
+    "version": "2.0.0",
+    "config": {}
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/demo_paper_1.pdf",
+    "filename": "demo_paper_1.pdf"
+  },
+  "questions": [
+    {
+      "question_id": "autogen-1",
+      "q_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "Synthetic question 1",
+      "options": {},
+      "manipulation_targets": [],
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Knowledge",
+            "replacement": "Information"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_id": "autogen-2",
+      "q_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "Synthetic question 2",
+      "options": {},
+      "manipulation_targets": [],
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "reasoning",
+            "replacement": "thinking"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_id": "autogen-3",
+      "q_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "Synthetic question 3",
+      "options": {},
+      "manipulation_targets": [],
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "atom",
+            "replacement": "element"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_id": "autogen-4",
+      "q_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "Synthetic question 4",
+      "options": {},
+      "manipulation_targets": [],
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "Negation",
+            "replacement": "Not"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_id": "autogen-5",
+      "q_number": "5",
+      "question_type": "mcq_single",
+      "stem_text": "Synthetic question 5",
+      "options": {},
+      "manipulation_targets": [],
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "original": "tautology",
+            "replacement": "universal"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "assets": {
+    "images": [],
+    "fonts": []
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "dual_layer": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_dual_layer.pdf",
+        "size_bytes": 138614,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_dual_layer.pdf",
+        "file_size_bytes": 138614,
+        "visual_quality_score": 0.97,
+        "effectiveness_score": 0.85,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 5,
+          "file_size_bytes": 138614,
+          "effectiveness_score": 0.85
+        },
+        "created_at": "2025-09-27T11:59:16.242964+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_image_overlay.pdf",
+        "size_bytes": 303103,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_image_overlay.pdf",
+        "file_size_bytes": 303103,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": 0.0013003789968992667,
+        "render_stats": {
+          "mapping_entries": 9,
+          "overlays_applied": 9,
+          "file_size_bytes": 303103,
+          "effectiveness_score": 1.0,
+          "overlay_area_pct": 0.0013003789968992667,
+          "text_pages": 1,
+          "text_tj_hits": 506,
+          "text_replacements": 0,
+          "text_matches_found": 0,
+          "text_tokens_scanned": 1538
+        },
+        "created_at": "2025-09-27T11:59:16.243089+00:00"
+      },
+      "font_manipulation": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_font_manipulation.pdf",
+        "size_bytes": 96263,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_font_manipulation.pdf",
+        "file_size_bytes": 96263,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.75,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 5,
+          "file_size_bytes": 96263,
+          "effectiveness_score": 0.75
+        },
+        "created_at": "2025-09-27T11:59:16.243201+00:00"
+      },
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_content_stream.pdf",
+        "size_bytes": 138364,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_content_stream.pdf",
+        "file_size_bytes": 138364,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 0,
+        "overlay_targets": 0,
+        "overlay_area_pct": 0.0,
+        "render_stats": {
+          "mapping_entries": 5,
+          "file_size_bytes": 138364,
+          "effectiveness_score": 1.0,
+          "replacements": 8,
+          "matches_found": 8,
+          "tokens_scanned": 1536,
+          "overlay_applied": 0,
+          "overlay_targets": 0,
+          "overlay_area_pct": 0.0,
+          "fallback_pages": {},
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T11:59:16.243311+00:00"
+      },
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_pymupdf_overlay.pdf",
+        "size_bytes": 156999,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/8f15e8bc-0b59-4abf-8749-c437b5901946/enhanced_pymupdf_overlay.pdf",
+        "file_size_bytes": 156999,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 0,
+        "overlay_targets": 0,
+        "overlay_area_pct": 0.0,
+        "render_stats": {
+          "mapping_entries": 5,
+          "file_size_bytes": 156999,
+          "effectiveness_score": 1.0,
+          "replacements": 11,
+          "overlay_applied": 0,
+          "overlay_targets": 0,
+          "overlay_area_pct": 0.0,
+          "raw_targets": 11
+        },
+        "created_at": "2025-09-27T11:59:16.243418+00:00"
+      }
+    },
+    "debug": {
+      "content_stream": {
+        "decoded_sample": null,
+        "per_font_top_tokens": null,
+        "enhanced_mapping_stats": {
+          "total_entries": 5,
+          "discovered_tokens": 0
+        }
+      },
+      "image_overlay": {
+        "effectiveness_score": 1.0,
+        "mapping_entries_used": 9,
+        "enhanced_mapping_boost": 0
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 236.78,
+      "mapping_build_time_ms": 19.36,
+      "enhancement_stats": {
+        "base_mapping_size": 5,
+        "enhanced_mapping_size": 5,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream": {
+          "duration_ms": 68.21,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 138364
+        },
+        "image_overlay": {
+          "duration_ms": 75.07,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 303103
+        },
+        "dual_layer": {
+          "duration_ms": 26.0,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 138614
+        },
+        "font_manipulation": {
+          "duration_ms": 1.04,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 96263
+        },
+        "pymupdf_overlay": {
+          "duration_ms": 39.2,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 156999
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 5,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 96263,
+        "total_output_size_bytes": 833343,
+        "size_efficiency": 8.656939841891484
+      }
+    }
+  },
+  "performance_metrics": {}
+}

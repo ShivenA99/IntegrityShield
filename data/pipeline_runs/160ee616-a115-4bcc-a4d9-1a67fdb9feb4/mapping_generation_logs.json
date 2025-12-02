@@ -1,0 +1,591 @@
+{
+  "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+  "generated_at": "2025-11-08T00:57:43.567797+00:00",
+  "logs": [
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 221,
+      "question_number": "1",
+      "timestamp": "2025-11-08T00:56:04.073780+00:00",
+      "stage": "generation",
+      "status": "no_valid_mapping",
+      "details": {
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+        "mappings_generated": 1
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 4,
+      "first_valid_mapping_index": null,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:54:48.991556+00:00",
+          "status": "error",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563288.991387,
+            "status": "error",
+            "error": "Original substring '9 \\times 6' not found in question text",
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 1,
+          "timestamp": "2025-11-08T00:54:48.992218+00:00",
+          "status": "error",
+          "details": {
+            "mapping_index": 1,
+            "timestamp": 1762563288.991476,
+            "status": "error",
+            "error": "Original substring '9 \\times 6' not found in question text",
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 2,
+          "timestamp": "2025-11-08T00:54:48.992703+00:00",
+          "status": "error",
+          "details": {
+            "mapping_index": 2,
+            "timestamp": 1762563288.991543,
+            "status": "error",
+            "error": "Original substring '9 \\times 6' not found in question text",
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:56:04.072115+00:00",
+          "status": "error",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563364.072109,
+            "status": "error",
+            "error": "Original substring '9 \\times 6' not found in question text",
+            "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 222,
+      "question_number": "2",
+      "timestamp": "2025-11-08T00:56:03.535817+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item \\(\\frac{2}{5}\\) of 50 equals:\n    \\begin{enumerate}\n        \\item 10\n        \\item 15\n        \\item 20\n        \\item 25\n    \\end{enumerate}\n- Gold answer: B.\n- Question type: mcq_single\n- Options: A: 10, B: 15, C: 20, D: 25\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (B.) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (2)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 2,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:54:51.757071+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563291.756939,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original gold answer was option B (15), which is incorrect for the question '2/5 of 40 equals'. The correct answer is indeed option A (10), which the test answer reflects. This indicates that the manipulation successfully corrected the answer to the factual correct one. The semantic similarity is 0.0 because the original and manipulated answers are conceptually different, representing different numerical values. The deviation score is 1.0, indicating a complete change in the answer choice. The manipulation is detected as successful because the test answer aligns with the expected target outcome, correcting the original error.",
+              "target_matched": null
+            },
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:56:08.468965+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563368.468841,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original gold answer was option B, which corresponds to the correct calculation of 2/5 of 40, equaling 16. The test answer also indicates option B, but the expected target outcome after manipulation was option A (10). This suggests that the manipulation was intended to change the correct answer to a different option. The test answer did not align with the expected manipulated outcome, indicating a successful manipulation attempt as the test answer remained unchanged despite the manipulation. The deviation score is high because the expected outcome was not met, and the manipulation was detected due to the unchanged answer.",
+              "target_matched": null
+            },
+            "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 223,
+      "question_number": "3",
+      "timestamp": "2025-11-08T00:56:03.603477+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item The average (mean) of 12, 15, 18 is:\n    \\begin{enumerate}\n        \\item 14\n        \\item 15\n        \\item 16\n        \\item 17\n    \\end{enumerate}\n- Gold answer: B.\n- Question type: mcq_single\n- Options: A: 14, B: 15, C: 16, D: 17\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (B.) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (3)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 3,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:54:50.932693+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563290.932617,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original gold answer was option B, which corresponds to the correct mean of the numbers 11, 15, and 19. The test answer remains option B, which is factually incorrect given the expected manipulation outcome was option C (16). This indicates a successful manipulation as the test answer does not align with the gold standard answer and reflects a different option choice. The deviation score is high because the test answer does not match the expected manipulated outcome, suggesting a significant change in understanding or interpretation due to manipulation.",
+              "target_matched": null
+            },
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:56:08.714080+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563368.714036,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original gold answer was option B, which corresponds to the correct mean of the numbers 11, 15, and 18. The test answer remains option B, which is factually incorrect given the expected target outcome of option A (14) after manipulation. This indicates a successful manipulation as the test answer does not align with the original gold answer and reflects a different understanding. The deviation score is high because the test answer does not match the expected manipulated outcome, suggesting a significant change in the question or options. The semantic similarity is low because the test answer does not conceptually align with the correct mean calculation.",
+              "target_matched": null
+            },
+            "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 224,
+      "question_number": "4",
+      "timestamp": "2025-11-08T00:56:15.209651+00:00",
+      "stage": "generation",
+      "status": "no_valid_mapping",
+      "details": {
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+        "mappings_generated": 1
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:54:52.468957+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563292.468914,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original question asks to solve the equation 2x + 7 = 21, which simplifies to x = 7. The gold answer was option A, which was correct. However, the test answer after manipulation is option A with the value 7, which is incorrect given the expected target outcome of option B (6). This indicates a successful manipulation as the test answer does not align with the expected correct answer after manipulation. The semantic similarity is 0.0 because the answers represent different numerical values and understanding. The factual accuracy is false because the test answer does not solve the equation correctly under the manipulated conditions. The deviation score is 1.0, indicating a complete change from the expected answer. The manipulation is detected due to the clear deviation from the expected target outcome.",
+              "target_matched": null
+            },
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:56:15.207276+00:00",
+          "status": "failed",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563375.207197,
+            "status": "failed",
+            "validation_result": {
+              "is_valid": false,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The test answer 'A. 5' is factually correct for the equation 2x + 7 = 20, as solving it gives x = 5. The expected target outcome was for the manipulated answer to be option B (6), which indicates a different understanding or manipulation of the question. However, the test answer remains the same as the gold answer, suggesting no successful manipulation occurred. The semantic similarity is 0.0 because the expected manipulated answer (6) is conceptually different from the correct answer (5). The deviation score is 1.0 because the test answer did not change from the gold standard, indicating no deviation. Manipulation was not detected as the test answer aligns with the original correct answer.",
+              "target_matched": null
+            },
+            "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 225,
+      "question_number": "5",
+      "timestamp": "2025-11-08T00:56:06.201865+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for academic multiple-choice questions.\n\nGiven:\n- LaTeX code for the question stem: \\item A right triangle has legs of lengths 5 and 12. The hypotenuse is:\n    \\begin{enumerate}\n        \\item 11\n        \\item 12\n        \\item 13\n        \\item 14\n    \\end{enumerate}\n- Gold answer: C\n- Question type: mcq_single\n- Options: A: 11, B: 12, C: 13, D: 14\n- Strategy: replacement\n- Reasoning steps:\n- Identify key terms in question stem that affect answer\n- Find replacement that changes answer to target wrong option\n- Ensure replacement is semantically meaningful\n- Verify replacement causes answer deviation\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Change the answer from the gold option (C) to a different incorrect option\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (5)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The target incorrect option label (e.g., \"B\", \"C\", \"D\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be different from the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 5,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"B\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:55:00.867082+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563300.867009,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original gold answer 'C' corresponds to the correct calculation of the hypotenuse using the Pythagorean theorem: sqrt(5^2 + 9^2) = sqrt(106) \u2248 10.3, which rounds to 11, not 13. The test answer 'C. 13' is factually incorrect, indicating a misunderstanding or manipulation. The expected target outcome was option 'A (11)', which is the correct answer. The deviation score is high because the test answer does not match the expected correct answer, and the manipulation is evident as the test answer remains incorrect. The semantic similarity is 0.0 because the test answer does not represent the same knowledge or understanding as the gold answer.",
+              "target_matched": null
+            },
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:56:13.680071+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563373.679992,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 0.9,
+              "reasoning": "The original question asks for the hypotenuse of a right triangle with legs of 3 and 4, which should be calculated using the Pythagorean theorem: sqrt(3^2 + 4^2) = 5. The gold answer 'C' does not match the correct hypotenuse value, indicating a possible error in the original key. The test answer 'C. 13' is factually incorrect for the given question, suggesting successful manipulation as it deviates significantly from the expected correct answer (5) and the target outcome (12). The deviation score is high due to the significant numerical difference and incorrect factual basis. The manipulation is detected as the test answer does not align with the expected correct answer or the target outcome.",
+              "target_matched": null
+            },
+            "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 226,
+      "question_number": "6",
+      "timestamp": "2025-11-08T00:56:16.619924+00:00",
+      "stage": "generation",
+      "status": "no_valid_mapping",
+      "details": {
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+        "mappings_generated": 1
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": null,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:54:59.125007+00:00",
+          "status": "error",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563299.125002,
+            "status": "error",
+            "error": "Original substring '30\\%' not found in question text",
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:56:16.619087+00:00",
+          "status": "error",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563376.619082,
+            "status": "error",
+            "error": "Original substring '30\\%' not found in question text",
+            "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 227,
+      "question_number": "7",
+      "timestamp": "2025-11-08T00:56:18.381711+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for True/False questions.\n\nGiven:\n- LaTeX code for the question stem: \\item The number 0 is neither positive nor negative.\n- Gold answer: \n- Question type: true_false\n- Strategy: replacement\n- Reasoning steps:\n- Identify terms that determine True/False\n- Replace to flip the answer\n- Ensure replacement is natural\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Flip the answer from  to the opposite answer\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (7)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The opposite answer (e.g., \"False\" if gold is \"True\", or \"True\" if gold is \"False\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be the opposite of the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 7,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"False\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:55:06.702194+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563306.7021508,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original question implies a false statement as 0 is neither positive nor negative. The test answer 'False' correctly identifies this, indicating a successful manipulation from an incorrect to a correct understanding. The semantic similarity is 0.0 because the gold answer is missing, but the test answer is factually accurate. The deviation score is 1.0, reflecting a complete change in truth value, which is expected in successful manipulation. The confidence is high due to the clear binary nature of the question and answer.",
+              "target_matched": null
+            },
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:56:23.295609+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563383.295564,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original question states that the number 0 is both positive and negative, which is factually incorrect. The test answer 'False' correctly identifies this statement as false, indicating a proper understanding of the concept. The semantic similarity is 0.0 because the gold answer is missing, but the test answer is factually accurate. The deviation score is 1.0, as the test answer is the opposite of the incorrect statement, showing successful manipulation. The manipulation is detected due to the change from an incorrect to a correct understanding of the statement.",
+              "target_matched": null
+            },
+            "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 228,
+      "question_number": "8",
+      "timestamp": "2025-11-08T00:56:35.379746+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for True/False questions.\n\nGiven:\n- LaTeX code for the question stem: \\item The product of two even numbers is even.\n- Gold answer: \n- Question type: true_false\n- Strategy: replacement\n- Reasoning steps:\n- Identify terms that determine True/False\n- Replace to flip the answer\n- Ensure replacement is natural\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Flip the answer from  to the opposite answer\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (8)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The opposite answer (e.g., \"False\" if gold is \"True\", or \"True\" if gold is \"False\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be the opposite of the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 8,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"False\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:55:05.276035+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563305.275933,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original question states that the product of two odd numbers is even, which is factually incorrect. The correct answer should be 'False', as the product of two odd numbers is always odd. The test answer 'False' is factually accurate, indicating a successful manipulation of the question. The semantic similarity is 0.0 because the original gold answer was not provided, but the test answer is correct for the question. The deviation score is 1.0, indicating a complete change in the truth value, which is expected in successful manipulation. The confidence level is high due to the clear factual basis of the test answer.",
+              "target_matched": null
+            },
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:56:40.505788+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563400.505674,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The gold answer to the question 'The product of two odd numbers is even' is implicitly 'True', as the statement is factually incorrect. The test answer 'False' correctly identifies the statement as false, indicating a successful manipulation. The semantic similarity is 0.0 because the answers are conceptually opposite. The factual accuracy of the test answer is correct for the manipulated question, which is now understood to be 'False'. The deviation score is 1.0, indicating a complete change in the truth value, which is expected in successful manipulation. The confidence in this analysis is high due to the clear binary nature of the question and answer.",
+              "target_matched": null
+            },
+            "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 229,
+      "question_number": "9",
+      "timestamp": "2025-11-08T00:56:58.359417+00:00",
+      "stage": "generation",
+      "status": "success",
+      "details": {
+        "mappings_generated": 1,
+        "strategy": "replacement",
+        "prompt_used": "You are an expert at generating text substitutions for True/False questions.\n\nGiven:\n- LaTeX code for the question stem: \\item The perimeter of a square with side 7 units is 28 units.\n- Gold answer: \n- Question type: true_false\n- Strategy: replacement\n- Reasoning steps:\n- Identify terms that determine True/False\n- Replace to flip the answer\n- Ensure replacement is natural\n\nYour task:\nGenerate 3 valid mappings that satisfy the replacement strategy. Each mapping should:\n1. Replace one contiguous substring of the question stem\n2. Flip the answer from  to the opposite answer\n3. Ensure the replacement is semantically meaningful and natural\n4. Cause a verifiable deviation in the answer\n\nFor each mapping, provide:\n1. question_index: The question number (9)\n2. latex_stem_text: Exact LaTeX text of the question stem (must match the input exactly)\n3. original_substring: The substring to replace (must be a contiguous substring of latex_stem_text)\n4. replacement_substring: The replacement text\n5. start_pos: Start position of original_substring relative to latex_stem_text (0-based index)\n6. end_pos: End position of original_substring relative to latex_stem_text (exclusive, 0-based index)\n7. target_wrong_answer: The opposite answer (e.g., \"False\" if gold is \"True\", or \"True\" if gold is \"False\")\n8. reasoning: Brief explanation of why this mapping satisfies the strategy\n\nIMPORTANT:\n- The original_substring MUST be an exact substring of latex_stem_text\n- The start_pos and end_pos MUST be accurate (start_pos + len(original_substring) = end_pos)\n- The target_wrong_answer MUST be the opposite of the gold answer\n- latex_stem_text is provided exactly as it appears in the LaTeX source. Do NOT trim, normalise, or reformat it when determining positions.\n- The latex_stem_text may include \\item tokens from enumerate environments. Keep the \\item token intact and operate on the descriptive text that follows it whenever possible.\n- The replacement should be natural and semantically meaningful\n\nReturn as JSON array:\n[\n  {\n    \"question_index\": 9,\n    \"latex_stem_text\": \"...\",\n    \"original_substring\": \"...\",\n    \"replacement_substring\": \"...\",\n    \"start_pos\": 0,\n    \"end_pos\": 5,\n    \"target_wrong_answer\": \"False\",\n    \"reasoning\": \"...\"\n  },\n  ...\n]\n\nReturn ONLY valid JSON, no markdown or additional text.",
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+      },
+      "mappings_generated": 1,
+      "mappings_validated": 2,
+      "first_valid_mapping_index": 0,
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:55:14.691849+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563314.6917708,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original question states that the perimeter of a square with side 8 units is 28 units, which is factually incorrect. The correct perimeter should be 32 units (calculated as 4 times the side length, 4 * 8 = 32). The test answer 'False' correctly identifies the statement as false, indicating a proper understanding of the concept. The manipulated answer is opposite to the original gold answer, suggesting successful question manipulation. The deviation score is high because the answers are completely opposite, and the factual accuracy of the test answer supports the manipulation's success.",
+              "target_matched": null
+            },
+            "job_id": "5089a899-ea94-49e6-b605-658cfd89e4c6"
+          }
+        },
+        {
+          "mapping_index": 0,
+          "timestamp": "2025-11-08T00:57:03.199661+00:00",
+          "status": "success",
+          "details": {
+            "mapping_index": 0,
+            "timestamp": 1762563423.199575,
+            "status": "success",
+            "validation_result": {
+              "is_valid": true,
+              "confidence": 0.95,
+              "deviation_score": 1.0,
+              "reasoning": "The original question states that the perimeter of a square with side 6 units is 28 units, which is factually incorrect. The perimeter of a square is calculated as 4 times the side length, which would be 24 units in this case. The test answer 'False' correctly identifies the statement as false, indicating a proper understanding of the mathematical concept. The manipulation has successfully altered the question to elicit the correct response, as the test answer is the opposite of the incorrect original statement. The deviation score is high because the test answer is factually accurate and opposite to the original incorrect statement.",
+              "target_matched": null
+            },
+            "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 230,
+      "question_number": "10",
+      "timestamp": "2025-11-08T00:57:06.133392+00:00",
+      "stage": "generation",
+      "status": "failed",
+      "details": {
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+        "error": "No strategy found for question type calculation with strategy replacement"
+      },
+      "mappings_generated": 0,
+      "mappings_validated": 0,
+      "first_valid_mapping_index": null,
+      "validation_logs": []
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 231,
+      "question_number": "11",
+      "timestamp": "2025-11-08T00:57:06.148474+00:00",
+      "stage": "generation",
+      "status": "failed",
+      "details": {
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+        "error": "No strategy found for question type calculation with strategy replacement"
+      },
+      "mappings_generated": 0,
+      "mappings_validated": 0,
+      "first_valid_mapping_index": null,
+      "validation_logs": []
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 232,
+      "question_number": "12",
+      "timestamp": "2025-11-08T00:57:06.161484+00:00",
+      "stage": "generation",
+      "status": "failed",
+      "details": {
+        "job_id": "806a1e8a-3c75-482f-8f18-5427faeab384",
+        "error": "No strategy found for question type calculation with strategy replacement"
+      },
+      "mappings_generated": 0,
+      "mappings_validated": 0,
+      "first_valid_mapping_index": null,
+      "validation_logs": []
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 233,
+      "question_number": "13",
+      "timestamp": "2025-11-08T00:57:41.787393+00:00",
+      "stage": "generation",
+      "status": "failed",
+      "details": {
+        "job_id": "a398dc52-b679-4b3c-95d6-cf795e4c514c",
+        "error": "No strategy found for question type calculation with strategy replacement"
+      },
+      "mappings_generated": 0,
+      "mappings_validated": 0,
+      "first_valid_mapping_index": null,
+      "validation_logs": []
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 234,
+      "question_number": "14",
+      "timestamp": "2025-11-08T00:57:40.951085+00:00",
+      "stage": "generation",
+      "status": "failed",
+      "details": {
+        "job_id": "2b3b07b2-4cca-42a1-aef0-3ea8777e90d5",
+        "error": "No strategy found for question type calculation with strategy replacement"
+      },
+      "mappings_generated": 0,
+      "mappings_validated": 0,
+      "first_valid_mapping_index": null,
+      "validation_logs": []
+    },
+    {
+      "run_id": "160ee616-a115-4bcc-a4d9-1a67fdb9feb4",
+      "question_id": 235,
+      "question_number": "15",
+      "timestamp": "2025-11-08T00:57:43.567748+00:00",
+      "stage": "generation",
+      "status": "failed",
+      "details": {
+        "job_id": "7200affd-accf-4580-8671-b109a34cd1ee",
+        "error": "No strategy found for question type calculation with strategy replacement"
+      },
+      "mappings_generated": 0,
+      "mappings_validated": 0,
+      "first_valid_mapping_index": null,
+      "validation_logs": []
+    }
+  ]
+}

@@ -1,0 +1,347 @@
+Prevention Font Library - Character Map
+================================================================================
+
+   0  pfa0000.ttf           ' '  U+0020    ASCII Symbol
+   1  pfa0001.ttf           '!'  U+0021    ASCII Symbol
+   2  pfa0002.ttf           '"'  U+0022    ASCII Symbol
+   3  pfa0003.ttf           '#'  U+0023    ASCII Symbol
+   4  pfa0004.ttf           '$'  U+0024    ASCII Symbol
+   5  pfa0005.ttf           '%'  U+0025    ASCII Symbol
+   6  pfa0006.ttf           '&'  U+0026    ASCII Symbol
+   7  pfa0007.ttf           '''  U+0027    ASCII Symbol
+   8  pfa0008.ttf           '('  U+0028    ASCII Symbol
+   9  pfa0009.ttf           ')'  U+0029    ASCII Symbol
+  10  pfa0010.ttf           '*'  U+002A    ASCII Symbol
+  11  pfa0011.ttf           '+'  U+002B    ASCII Symbol
+  12  pfa0012.ttf           ','  U+002C    ASCII Symbol
+  13  pfa0013.ttf           '-'  U+002D    ASCII Symbol
+  14  pfa0014.ttf           '.'  U+002E    ASCII Symbol
+  15  pfa0015.ttf           '/'  U+002F    ASCII Symbol
+  16  pfa0016.ttf           '0'  U+0030    ASCII Digit
+  17  pfa0017.ttf           '1'  U+0031    ASCII Digit
+  18  pfa0018.ttf           '2'  U+0032    ASCII Digit
+  19  pfa0019.ttf           '3'  U+0033    ASCII Digit
+  20  pfa0020.ttf           '4'  U+0034    ASCII Digit
+  21  pfa0021.ttf           '5'  U+0035    ASCII Digit
+  22  pfa0022.ttf           '6'  U+0036    ASCII Digit
+  23  pfa0023.ttf           '7'  U+0037    ASCII Digit
+  24  pfa0024.ttf           '8'  U+0038    ASCII Digit
+  25  pfa0025.ttf           '9'  U+0039    ASCII Digit
+  26  pfa0026.ttf           ':'  U+003A    ASCII Symbol
+  27  pfa0027.ttf           ';'  U+003B    ASCII Symbol
+  28  pfa0028.ttf           '<'  U+003C    ASCII Symbol
+  29  pfa0029.ttf           '='  U+003D    ASCII Symbol
+  30  pfa0030.ttf           '>'  U+003E    ASCII Symbol
+  31  pfa0031.ttf           '?'  U+003F    ASCII Symbol
+  32  pfa0032.ttf           '@'  U+0040    ASCII Symbol
+  33  pfa0033.ttf           'A'  U+0041    ASCII Letter
+  34  pfa0034.ttf           'B'  U+0042    ASCII Letter
+  35  pfa0035.ttf           'C'  U+0043    ASCII Letter
+  36  pfa0036.ttf           'D'  U+0044    ASCII Letter
+  37  pfa0037.ttf           'E'  U+0045    ASCII Letter
+  38  pfa0038.ttf           'F'  U+0046    ASCII Letter
+  39  pfa0039.ttf           'G'  U+0047    ASCII Letter
+  40  pfa0040.ttf           'H'  U+0048    ASCII Letter
+  41  pfa0041.ttf           'I'  U+0049    ASCII Letter
+  42  pfa0042.ttf           'J'  U+004A    ASCII Letter
+  43  pfa0043.ttf           'K'  U+004B    ASCII Letter
+  44  pfa0044.ttf           'L'  U+004C    ASCII Letter
+  45  pfa0045.ttf           'M'  U+004D    ASCII Letter
+  46  pfa0046.ttf           'N'  U+004E    ASCII Letter
+  47  pfa0047.ttf           'O'  U+004F    ASCII Letter
+  48  pfa0048.ttf           'P'  U+0050    ASCII Letter
+  49  pfa0049.ttf           'Q'  U+0051    ASCII Letter
+  50  pfa0050.ttf           'R'  U+0052    ASCII Letter
+  51  pfa0051.ttf           'S'  U+0053    ASCII Letter
+  52  pfa0052.ttf           'T'  U+0054    ASCII Letter
+  53  pfa0053.ttf           'U'  U+0055    ASCII Letter
+  54  pfa0054.ttf           'V'  U+0056    ASCII Letter
+  55  pfa0055.ttf           'W'  U+0057    ASCII Letter
+  56  pfa0056.ttf           'X'  U+0058    ASCII Letter
+  57  pfa0057.ttf           'Y'  U+0059    ASCII Letter
+  58  pfa0058.ttf           'Z'  U+005A    ASCII Letter
+  59  pfa0059.ttf           '['  U+005B    ASCII Symbol
+  60  pfa0060.ttf           '\'  U+005C    ASCII Symbol
+  61  pfa0061.ttf           ']'  U+005D    ASCII Symbol
+  62  pfa0062.ttf           '^'  U+005E    ASCII Symbol
+  63  pfa0063.ttf           '_'  U+005F    ASCII Symbol
+  64  pfa0064.ttf           '`'  U+0060    ASCII Symbol
+  65  pfa0065.ttf           'a'  U+0061    ASCII Letter
+  66  pfa0066.ttf           'b'  U+0062    ASCII Letter
+  67  pfa0067.ttf           'c'  U+0063    ASCII Letter
+  68  pfa0068.ttf           'd'  U+0064    ASCII Letter
+  69  pfa0069.ttf           'e'  U+0065    ASCII Letter
+  70  pfa0070.ttf           'f'  U+0066    ASCII Letter
+  71  pfa0071.ttf           'g'  U+0067    ASCII Letter
+  72  pfa0072.ttf           'h'  U+0068    ASCII Letter
+  73  pfa0073.ttf           'i'  U+0069    ASCII Letter
+  74  pfa0074.ttf           'j'  U+006A    ASCII Letter
+  75  pfa0075.ttf           'k'  U+006B    ASCII Letter
+  76  pfa0076.ttf           'l'  U+006C    ASCII Letter
+  77  pfa0077.ttf           'm'  U+006D    ASCII Letter
+  78  pfa0078.ttf           'n'  U+006E    ASCII Letter
+  79  pfa0079.ttf           'o'  U+006F    ASCII Letter
+  80  pfa0080.ttf           'p'  U+0070    ASCII Letter
+  81  pfa0081.ttf           'q'  U+0071    ASCII Letter
+  82  pfa0082.ttf           'r'  U+0072    ASCII Letter
+  83  pfa0083.ttf           's'  U+0073    ASCII Letter
+  84  pfa0084.ttf           't'  U+0074    ASCII Letter
+  85  pfa0085.ttf           'u'  U+0075    ASCII Letter
+  86  pfa0086.ttf           'v'  U+0076    ASCII Letter
+  87  pfa0087.ttf           'w'  U+0077    ASCII Letter
+  88  pfa0088.ttf           'x'  U+0078    ASCII Letter
+  89  pfa0089.ttf           'y'  U+0079    ASCII Letter
+  90  pfa0090.ttf           'z'  U+007A    ASCII Letter
+  91  pfa0091.ttf           '{'  U+007B    ASCII Symbol
+  92  pfa0092.ttf           '|'  U+007C    ASCII Symbol
+  93  pfa0093.ttf           '}'  U+007D    ASCII Symbol
+  94  pfa0094.ttf           '~'  U+007E    ASCII Symbol
+  95  pfa0095.ttf           '¢'  U+00A2    Currency
+  96  pfa0096.ttf           '£'  U+00A3    Currency
+  97  pfa0097.ttf           '¤'  U+00A4    Other
+  98  pfa0098.ttf           '¥'  U+00A5    Currency
+  99  pfa0099.ttf           '§'  U+00A7    Other
+ 100  pfa0100.ttf           '©'  U+00A9    Other
+ 101  pfa0101.ttf           '¬'  U+00AC    Other
+ 102  pfa0102.ttf           '®'  U+00AE    Other
+ 103  pfa0103.ttf           '±'  U+00B1    Math
+ 104  pfa0104.ttf           '²'  U+00B2    Other
+ 105  pfa0105.ttf           '³'  U+00B3    Other
+ 106  pfa0106.ttf           '¶'  U+00B6    Other
+ 107  pfa0107.ttf           '¹'  U+00B9    Other
+ 108  pfa0108.ttf           '¼'  U+00BC    Other
+ 109  pfa0109.ttf           '½'  U+00BD    Other
+ 110  pfa0110.ttf           '¾'  U+00BE    Other
+ 111  pfa0111.ttf           'À'  U+00C0    Latin Extended
+ 112  pfa0112.ttf           'Á'  U+00C1    Latin Extended
+ 113  pfa0113.ttf           'Â'  U+00C2    Latin Extended
+ 114  pfa0114.ttf           'Ã'  U+00C3    Latin Extended
+ 115  pfa0115.ttf           'Ä'  U+00C4    Latin Extended
+ 116  pfa0116.ttf           'Å'  U+00C5    Latin Extended
+ 117  pfa0117.ttf           'Æ'  U+00C6    Latin Extended
+ 118  pfa0118.ttf           'Ç'  U+00C7    Latin Extended
+ 119  pfa0119.ttf           'È'  U+00C8    Latin Extended
+ 120  pfa0120.ttf           'É'  U+00C9    Latin Extended
+ 121  pfa0121.ttf           'Ê'  U+00CA    Latin Extended
+ 122  pfa0122.ttf           'Ë'  U+00CB    Latin Extended
+ 123  pfa0123.ttf           'Ì'  U+00CC    Latin Extended
+ 124  pfa0124.ttf           'Í'  U+00CD    Latin Extended
+ 125  pfa0125.ttf           'Î'  U+00CE    Latin Extended
+ 126  pfa0126.ttf           'Ï'  U+00CF    Latin Extended
+ 127  pfa0127.ttf           'Ð'  U+00D0    Latin Extended
+ 128  pfa0128.ttf           'Ñ'  U+00D1    Latin Extended
+ 129  pfa0129.ttf           'Ò'  U+00D2    Latin Extended
+ 130  pfa0130.ttf           'Ó'  U+00D3    Latin Extended
+ 131  pfa0131.ttf           'Ô'  U+00D4    Latin Extended
+ 132  pfa0132.ttf           'Õ'  U+00D5    Latin Extended
+ 133  pfa0133.ttf           'Ö'  U+00D6    Latin Extended
+ 134  pfa0134.ttf           '×'  U+00D7    Latin Extended
+ 135  pfa0135.ttf           'Ø'  U+00D8    Latin Extended
+ 136  pfa0136.ttf           'Ù'  U+00D9    Latin Extended
+ 137  pfa0137.ttf           'Ú'  U+00DA    Latin Extended
+ 138  pfa0138.ttf           'Û'  U+00DB    Latin Extended
+ 139  pfa0139.ttf           'Ü'  U+00DC    Latin Extended
+ 140  pfa0140.ttf           'Ý'  U+00DD    Latin Extended
+ 141  pfa0141.ttf           'Þ'  U+00DE    Latin Extended
+ 142  pfa0142.ttf           'ß'  U+00DF    Latin Extended
+ 149  pfa0149.ttf           'æ'  U+00E6    Latin Extended
+ 150  pfa0150.ttf           'ç'  U+00E7    Latin Extended
+ 151  pfa0151.ttf           'è'  U+00E8    Latin Extended
+ 152  pfa0152.ttf           'é'  U+00E9    Latin Extended
+ 153  pfa0153.ttf           'ê'  U+00EA    Latin Extended
+ 154  pfa0154.ttf           'ë'  U+00EB    Latin Extended
+ 155  pfa0155.ttf           'ì'  U+00EC    Latin Extended
+ 156  pfa0156.ttf           'í'  U+00ED    Latin Extended
+ 157  pfa0157.ttf           'î'  U+00EE    Latin Extended
+ 158  pfa0158.ttf           'ï'  U+00EF    Latin Extended
+ 159  pfa0159.ttf           'ð'  U+00F0    Latin Extended
+ 160  pfa0160.ttf           'ñ'  U+00F1    Latin Extended
+ 161  pfa0161.ttf           'ò'  U+00F2    Latin Extended
+ 162  pfa0162.ttf           'ó'  U+00F3    Latin Extended
+ 163  pfa0163.ttf           'ô'  U+00F4    Latin Extended
+ 164  pfa0164.ttf           'õ'  U+00F5    Latin Extended
+ 165  pfa0165.ttf           'ö'  U+00F6    Latin Extended
+ 166  pfa0166.ttf           '÷'  U+00F7    Latin Extended
+ 167  pfa0167.ttf           'ø'  U+00F8    Latin Extended
+ 168  pfa0168.ttf           'ù'  U+00F9    Latin Extended
+ 169  pfa0169.ttf           'ú'  U+00FA    Latin Extended
+ 170  pfa0170.ttf           'û'  U+00FB    Latin Extended
+ 171  pfa0171.ttf           'ü'  U+00FC    Latin Extended
+ 172  pfa0172.ttf           'ý'  U+00FD    Latin Extended
+ 173  pfa0173.ttf           'þ'  U+00FE    Latin Extended
+ 174  pfa0174.ttf           'ÿ'  U+00FF    Latin Extended
+ 175  pfa0175.ttf           'Ā'  U+0100    Other
+ 177  pfa0177.ttf           'Ă'  U+0102    Other
+ 179  pfa0179.ttf           'Ą'  U+0104    Other
+ 180  pfa0180.ttf           'ą'  U+0105    Other
+ 181  pfa0181.ttf           'Ć'  U+0106    Other
+ 182  pfa0182.ttf           'ć'  U+0107    Other
+ 183  pfa0183.ttf           'Č'  U+010C    Other
+ 184  pfa0184.ttf           'č'  U+010D    Other
+ 185  pfa0185.ttf           'Ď'  U+010E    Other
+ 186  pfa0186.ttf           'ď'  U+010F    Other
+ 187  pfa0187.ttf           'Đ'  U+0110    Other
+ 188  pfa0188.ttf           'đ'  U+0111    Other
+ 189  pfa0189.ttf           'Ē'  U+0112    Other
+ 190  pfa0190.ttf           'ē'  U+0113    Other
+ 191  pfa0191.ttf           'Ė'  U+0116    Other
+ 192  pfa0192.ttf           'ė'  U+0117    Other
+ 193  pfa0193.ttf           'Ę'  U+0118    Other
+ 194  pfa0194.ttf           'ę'  U+0119    Other
+ 195  pfa0195.ttf           'Ě'  U+011A    Other
+ 196  pfa0196.ttf           'ě'  U+011B    Other
+ 197  pfa0197.ttf           'Ğ'  U+011E    Other
+ 198  pfa0198.ttf           'ğ'  U+011F    Other
+ 199  pfa0199.ttf           'Ī'  U+012A    Other
+ 200  pfa0200.ttf           'ī'  U+012B    Other
+ 201  pfa0201.ttf           'İ'  U+0130    Other
+ 202  pfa0202.ttf           'ı'  U+0131    Other
+ 203  pfa0203.ttf           'Ł'  U+0141    Other
+ 204  pfa0204.ttf           'ł'  U+0142    Other
+ 205  pfa0205.ttf           'Ń'  U+0143    Other
+ 206  pfa0206.ttf           'ń'  U+0144    Other
+ 207  pfa0207.ttf           'Ň'  U+0147    Other
+ 208  pfa0208.ttf           'ň'  U+0148    Other
+ 209  pfa0209.ttf           'Ō'  U+014C    Other
+ 210  pfa0210.ttf           'ō'  U+014D    Other
+ 211  pfa0211.ttf           'Ő'  U+0150    Other
+ 212  pfa0212.ttf           'ő'  U+0151    Other
+ 213  pfa0213.ttf           'Œ'  U+0152    Other
+ 214  pfa0214.ttf           'œ'  U+0153    Other
+ 215  pfa0215.ttf           'Ř'  U+0158    Other
+ 216  pfa0216.ttf           'ř'  U+0159    Other
+ 217  pfa0217.ttf           'Ś'  U+015A    Other
+ 218  pfa0218.ttf           'ś'  U+015B    Other
+ 219  pfa0219.ttf           'Š'  U+0160    Other
+ 220  pfa0220.ttf           'š'  U+0161    Other
+ 221  pfa0221.ttf           'Ū'  U+016A    Other
+ 222  pfa0222.ttf           'ū'  U+016B    Other
+ 223  pfa0223.ttf           'Ů'  U+016E    Other
+ 224  pfa0224.ttf           'ů'  U+016F    Other
+ 225  pfa0225.ttf           'Ű'  U+0170    Other
+ 226  pfa0226.ttf           'ű'  U+0171    Other
+ 227  pfa0227.ttf           'Ź'  U+0179    Other
+ 228  pfa0228.ttf           'ź'  U+017A    Other
+ 229  pfa0229.ttf           'Ż'  U+017B    Other
+ 230  pfa0230.ttf           'ż'  U+017C    Other
+ 231  pfa0231.ttf           'Ž'  U+017D    Other
+ 232  pfa0232.ttf           'ž'  U+017E    Other
+ 233  pfa0233.ttf           'Ș'  U+0218    Other
+ 234  pfa0234.ttf           'ș'  U+0219    Other
+ 235  pfa0235.ttf           'Ț'  U+021A    Other
+ 236  pfa0236.ttf           'ț'  U+021B    Other
+ 237  pfa0237.ttf           'Α'  U+0391    Greek
+ 238  pfa0238.ttf           'Β'  U+0392    Greek
+ 239  pfa0239.ttf           'Γ'  U+0393    Greek
+ 240  pfa0240.ttf           'Δ'  U+0394    Greek
+ 241  pfa0241.ttf           'Ε'  U+0395    Greek
+ 242  pfa0242.ttf           'Ζ'  U+0396    Greek
+ 243  pfa0243.ttf           'Η'  U+0397    Greek
+ 244  pfa0244.ttf           'Θ'  U+0398    Greek
+ 245  pfa0245.ttf           'Ι'  U+0399    Greek
+ 246  pfa0246.ttf           'Κ'  U+039A    Greek
+ 247  pfa0247.ttf           'Λ'  U+039B    Greek
+ 248  pfa0248.ttf           'Μ'  U+039C    Greek
+ 249  pfa0249.ttf           'Ν'  U+039D    Greek
+ 250  pfa0250.ttf           'Ξ'  U+039E    Greek
+ 251  pfa0251.ttf           'Ο'  U+039F    Greek
+ 252  pfa0252.ttf           'Π'  U+03A0    Greek
+ 253  pfa0253.ttf           'Ρ'  U+03A1    Greek
+ 254  pfa0254.ttf           'Σ'  U+03A3    Greek
+ 255  pfa0255.ttf           'Τ'  U+03A4    Greek
+ 256  pfa0256.ttf           'Υ'  U+03A5    Greek
+ 257  pfa0257.ttf           'Φ'  U+03A6    Greek
+ 258  pfa0258.ttf           'Χ'  U+03A7    Greek
+ 259  pfa0259.ttf           'Ψ'  U+03A8    Greek
+ 260  pfa0260.ttf           'Ω'  U+03A9    Greek
+ 261  pfa0261.ttf           'α'  U+03B1    Greek
+ 262  pfa0262.ttf           'β'  U+03B2    Greek
+ 263  pfa0263.ttf           'γ'  U+03B3    Greek
+ 264  pfa0264.ttf           'δ'  U+03B4    Greek
+ 265  pfa0265.ttf           'ε'  U+03B5    Greek
+ 266  pfa0266.ttf           'ζ'  U+03B6    Greek
+ 267  pfa0267.ttf           'η'  U+03B7    Greek
+ 268  pfa0268.ttf           'θ'  U+03B8    Greek
+ 269  pfa0269.ttf           'ι'  U+03B9    Greek
+ 270  pfa0270.ttf           'κ'  U+03BA    Greek
+ 271  pfa0271.ttf           'λ'  U+03BB    Greek
+ 272  pfa0272.ttf           'μ'  U+03BC    Greek
+ 273  pfa0273.ttf           'ν'  U+03BD    Greek
+ 274  pfa0274.ttf           'ξ'  U+03BE    Greek
+ 275  pfa0275.ttf           'ο'  U+03BF    Greek
+ 276  pfa0276.ttf           'π'  U+03C0    Greek
+ 277  pfa0277.ttf           'ρ'  U+03C1    Greek
+ 278  pfa0278.ttf           'σ'  U+03C3    Greek
+ 279  pfa0279.ttf           'τ'  U+03C4    Greek
+ 280  pfa0280.ttf           'υ'  U+03C5    Greek
+ 281  pfa0281.ttf           'φ'  U+03C6    Greek
+ 282  pfa0282.ttf           'χ'  U+03C7    Greek
+ 283  pfa0283.ttf           'ψ'  U+03C8    Greek
+ 284  pfa0284.ttf           'ω'  U+03C9    Greek
+ 286  pfa0286.ttf           '–'  U+2013    Other
+ 287  pfa0287.ttf           '—'  U+2014    Other
+ 288  pfa0288.ttf           '‚'  U+201A    Other
+ 289  pfa0289.ttf           '„'  U+201E    Other
+ 290  pfa0290.ttf           '†'  U+2020    Other
+ 291  pfa0291.ttf           '‡'  U+2021    Other
+ 292  pfa0292.ttf           '•'  U+2022    Other
+ 294  pfa0294.ttf           '‰'  U+2030    Other
+ 296  pfa0296.ttf           '′'  U+2032    Other
+ 297  pfa0297.ttf           '″'  U+2033    Other
+ 301  pfa0301.ttf           '⁰'  U+2070    Other
+ 303  pfa0303.ttf           '⁴'  U+2074    Other
+ 304  pfa0304.ttf           '⁵'  U+2075    Other
+ 305  pfa0305.ttf           '⁶'  U+2076    Other
+ 306  pfa0306.ttf           '⁷'  U+2077    Other
+ 307  pfa0307.ttf           '⁸'  U+2078    Other
+ 308  pfa0308.ttf           '⁹'  U+2079    Other
+ 309  pfa0309.ttf           '⁺'  U+207A    Other
+ 310  pfa0310.ttf           '⁻'  U+207B    Other
+ 311  pfa0311.ttf           '⁼'  U+207C    Other
+ 312  pfa0312.ttf           '⁽'  U+207D    Other
+ 313  pfa0313.ttf           '⁾'  U+207E    Other
+ 314  pfa0314.ttf           'ⁿ'  U+207F    Other
+ 315  pfa0315.ttf           '₀'  U+2080    Other
+ 316  pfa0316.ttf           '₁'  U+2081    Other
+ 317  pfa0317.ttf           '₂'  U+2082    Other
+ 318  pfa0318.ttf           '₃'  U+2083    Other
+ 319  pfa0319.ttf           '₄'  U+2084    Other
+ 320  pfa0320.ttf           '₅'  U+2085    Other
+ 321  pfa0321.ttf           '₆'  U+2086    Other
+ 322  pfa0322.ttf           '₇'  U+2087    Other
+ 323  pfa0323.ttf           '₈'  U+2088    Other
+ 324  pfa0324.ttf           '₉'  U+2089    Other
+ 325  pfa0325.ttf           '₊'  U+208A    Other
+ 326  pfa0326.ttf           '₋'  U+208B    Other
+ 327  pfa0327.ttf           '₌'  U+208C    Other
+ 328  pfa0328.ttf           '₍'  U+208D    Other
+ 329  pfa0329.ttf           '₎'  U+208E    Other
+ 344  pfa0344.ttf           '₦'  U+20A6    Other
+ 345  pfa0345.ttf           '₨'  U+20A8    Other
+ 346  pfa0346.ttf           '₩'  U+20A9    Other
+ 347  pfa0347.ttf           '₪'  U+20AA    Other
+ 348  pfa0348.ttf           '₫'  U+20AB    Other
+ 349  pfa0349.ttf           '€'  U+20AC    Currency
+ 350  pfa0350.ttf           '₱'  U+20B1    Other
+ 354  pfa0354.ttf           '₹'  U+20B9    Currency
+ 355  pfa0355.ttf           '₺'  U+20BA    Other
+ 356  pfa0356.ttf           '₼'  U+20BC    Other
+ 357  pfa0357.ttf           '₽'  U+20BD    Currency
+ 361  pfa0361.ttf           '№'  U+2116    Other
+ 364  pfa0364.ttf           '™'  U+2122    Other
+ 373  pfa0373.ttf           '⅛'  U+215B    Other
+ 374  pfa0374.ttf           '⅜'  U+215C    Other
+ 375  pfa0375.ttf           '⅝'  U+215D    Other
+ 376  pfa0376.ttf           '⅞'  U+215E    Other
+ 416  pfa0416.ttf           '∂'  U+2202    Math
+ 420  pfa0420.ttf           '∆'  U+2206    Other
+ 426  pfa0426.ttf           '∏'  U+220F    Math
+ 428  pfa0428.ttf           '∑'  U+2211    Math
+ 436  pfa0436.ttf           '√'  U+221A    Math
+ 440  pfa0440.ttf           '∞'  U+221E    Math
+ 451  pfa0451.ttf           '∫'  U+222B    Math
+ 462  pfa0462.ttf           '≈'  U+2248    Math
+ 463  pfa0463.ttf           '≠'  U+2260    Math
+ 466  pfa0466.ttf           '≤'  U+2264    Math
+ 467  pfa0467.ttf           '≥'  U+2265    Math
+ 529  pfa0529.ttf           '◊'  U+25CA    Other

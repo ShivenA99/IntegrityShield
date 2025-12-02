@@ -1,0 +1,94 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Classical Mechanics}}\\[0.25em]
+  {\large \textbf{Newton's Laws and Energy Quiz -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item \textbf{(C) 10 N.} Using Newton's Second Law: $F = ma = 5 \text{ kg} \times 2 \text{ m/s}^2 = 10$ N.
+
+  \item \textbf{(C) Centripetal acceleration toward the center.} Even at constant speed, direction changes continuously, requiring acceleration toward the center: $a_c = v^2/r$.
+
+  \item \textbf{(C) Quadruples.} Kinetic energy $KE = \frac{1}{2}mv^2$. If $v \rightarrow 2v$, then $KE \rightarrow \frac{1}{2}m(2v)^2 = 4 \times \frac{1}{2}mv^2$.
+
+  \item \textbf{(C) For every action, there is an equal and opposite reaction.} Newton's Third Law states forces always occur in pairs of equal magnitude and opposite direction acting on different objects.
+
+  \item \textbf{(B) Velocity is zero but acceleration is $g$ downward.} At the apex, instantaneous velocity is zero, but gravitational acceleration ($g = 9.8$ m/s\textsuperscript{2}) acts continuously throughout the motion.
+
+  \item \textbf{True.} Work $W = F \cdot d \cdot \cos\theta$. When $\theta = 90°$, $\cos 90° = 0$, so $W = 0$. Example: centripetal force does no work on circular motion.
+
+  \item \textbf{False.} Momentum is conserved in all collisions (elastic and inelastic) when no external forces act. Kinetic energy is conserved only in elastic collisions.
+
+  \item \textbf{False.} In free fall (neglecting air resistance), an object experiences constant acceleration ($g$), not constant velocity. Velocity continuously increases.
+
+  \item \textbf{Derivation:}
+  
+  Starting with Newton's Second Law: $F = ma$
+  
+  For displacement $d$ in the direction of force:
+  \begin{align*}
+  W &= F \cdot d = ma \cdot d
+  \end{align*}
+  
+  Using kinematic equation $v^2 = v_0^2 + 2ad$:
+  \begin{align*}
+  ad &= \frac{v^2 - v_0^2}{2}
+  \end{align*}
+  
+  Substituting:
+  \begin{align*}
+  W &= m \cdot \frac{v^2 - v_0^2}{2} = \frac{1}{2}mv^2 - \frac{1}{2}mv_0^2 = \Delta KE
+  \end{align*}
+  
+  \textbf{Work-Energy Theorem:} $W_{net} = \Delta KE = KE_f - KE_i$
+  
+  \textbf{Physical significance:}
+  \begin{itemize}
+    \item Net work done on an object equals change in kinetic energy
+    \item Positive work increases kinetic energy (speeds up object)
+    \item Negative work decreases kinetic energy (slows down object)
+    \item Provides energy-based alternative to force analysis
+    \item Useful when forces vary with position
+  \end{itemize}
+
+  \item \textbf{Principle:} In an isolated system with only conservative forces, the total mechanical energy (kinetic + potential) remains constant:
+  \begin{align*}
+  E_{total} = KE + PE = \text{constant}
+  \end{align*}
+  
+  \textbf{Conditions for conservation:}
+  \begin{itemize}
+    \item Only conservative forces do work (gravity, spring force)
+    \item No non-conservative forces (friction, air resistance, applied forces)
+    \item System is isolated (no external work)
+  \end{itemize}
+  
+  \textbf{Pendulum example:}
+  \begin{itemize}
+    \item At maximum height: $KE = 0$, $PE = mgh_{max}$ (all potential)
+    \item At lowest point: $KE = \frac{1}{2}mv_{max}^2$, $PE = 0$ (all kinetic)
+    \item Energy transforms between KE and PE: $mgh = \frac{1}{2}mv^2$
+    \item Maximum speed: $v_{max} = \sqrt{2gh}$
+  \end{itemize}
+  
+  \textbf{Roller coaster example:}
+  \begin{itemize}
+    \item At top of first hill (height $h_1$): $E = mgh_1$ (starting from rest)
+    \item At any other point (height $h_2$): $mgh_1 = \frac{1}{2}mv^2 + mgh_2$
+    \item Speed at height $h_2$: $v = \sqrt{2g(h_1 - h_2)}$
+    \item Coaster cannot rise higher than starting height without external work
+  \end{itemize}
+
+\end{enumerate}
+
+\end{document}

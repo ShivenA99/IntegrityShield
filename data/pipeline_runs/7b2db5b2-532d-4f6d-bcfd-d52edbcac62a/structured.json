@@ -1,0 +1,5040 @@
+{
+  "pipeline_metadata": {
+    "run_id": "7b2db5b2-532d-4f6d-bcfd-d52edbcac62a",
+    "current_stage": "results_generation",
+    "stages_completed": [
+      "results_generation",
+      "smart_substitution",
+      "content_discovery",
+      "document_enhancement",
+      "smart_reading"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-11-08T00:40:28.198358+00:00",
+    "version": "2.0.0",
+    "config": {},
+    "ai_extraction_enabled": true,
+    "ai_sources_used": [
+      "data_extraction_pipeline"
+    ],
+    "data_extraction_outputs": {
+      "tex": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/ASU_Physics Quiz.tex",
+      "assets": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/ASU_Physics Quiz_assets",
+      "pdf": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/ASU_Physics Quiz_reconstructed.pdf",
+      "json": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/ASU_Physics Quiz_extracted.json"
+    }
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/ASU_Physics Quiz.pdf",
+    "filename": "ASU_Physics Quiz.pdf",
+    "pages": 2,
+    "latex_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/ASU_Physics Quiz.tex",
+    "assets_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/ASU_Physics Quiz_assets"
+  },
+  "questions": [
+    {
+      "question_number": "1",
+      "q_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "The unit of electrical resistance is:",
+      "options": {
+        "A": "Ampere",
+        "B": "Ohm",
+        "C": "Coulomb",
+        "D": "Volt"
+      },
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          282.59002685546875,
+          275.92999267578125,
+          296.0420227050781
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          282.59002685546875,
+          275.92999267578125,
+          296.0420227050781
+        ],
+        "stem_spans": [
+          "page0:block4:line1:span0",
+          "page0:block4:line1:span1",
+          "page0:block4:line1:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            297.469970703125,
+            167.66000366210938,
+            310.9219665527344
+          ],
+          "B": [
+            108.0199966430664,
+            312.3499755859375,
+            153.02000427246094,
+            325.8019714355469
+          ],
+          "C": [
+            108.0199966430664,
+            327.2300109863281,
+            173.66000366210938,
+            340.6820068359375
+          ],
+          "D": [
+            108.0199966430664,
+            342.1099853515625,
+            148.82000732421875,
+            355.5619812011719
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page0:block4:line1:span0",
+          "page0:block4:line1:span1",
+          "page0:block4:line1:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        282.59002685546875,
+        275.92999267578125,
+        296.0420227050781
+      ],
+      "stem_spans": [
+        "page0:block4:line1:span0",
+        "page0:block4:line1:span1",
+        "page0:block4:line1:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "remember",
+        "topic": "Electricity",
+        "subtopic": "Units",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": 1
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 0,
+      "source_identifier": "span-page0:block4:line1:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "ef9ed472-7601-4e52-89a5-a8196b6cb79f",
+            "context": "question_stem",
+            "end_pos": 39,
+            "original": "electrical resistance",
+            "reasoning": "Replacing 'electrical resistance' with 'electric current' changes the context of the question, making 'Ampere' the correct answer instead of 'Ohm'.",
+            "start_pos": 18,
+            "validated": true,
+            "confidence": 0.95,
+            "validation": {
+              "is_valid": true,
+              "reasoning": "The test answer 'A. Ampere' is factually correct for the question 'The unit of electric current is:', whereas the gold answer 'B' corresponds to 'Ohm', which is incorrect. The semantic similarity is low (0.10) because the concepts of 'Ampere' and 'Ohm' are fundamentally different, representing different physical quantities. The deviation score is high (0.90) because the test answer represents a completely different option from the gold answer, indicating successful manipulation. The manipulation is detected as the test answer aligns with the expected target outcome of option A, differing from the original gold answer. The confidence in this analysis is high (0.95) due to the clear factual correctness and distinct option change.",
+              "confidence": 0.95,
+              "target_matched": null,
+              "deviation_score": 0.9
+            },
+            "replacement": "electric current",
+            "question_index": 1,
+            "deviation_score": 0.9,
+            "latex_stem_text": "\\item The unit of electrical resistance is:\n    \\begin{enumerate}\n        \\item Ampere\n        \\item Ohm\n        \\item Coulomb\n        \\item Volt\n    \\end{enumerate}",
+            "source_identifier": "span-page0:block4:line1:span0",
+            "target_wrong_answer": "A",
+            "validation_reasoning": "The test answer 'A. Ampere' is factually correct for the question 'The unit of electric current is:', whereas the gold answer 'B' corresponds to 'Ohm', which is incorrect. The semantic similarity is low (0.10) because the concepts of 'Ampere' and 'Ohm' are fundamentally different, representing different physical quantities. The deviation score is high (0.90) because the test answer represents a completely different option from the gold answer, indicating successful manipulation. The manipulation is detected as the test answer aligns with the expected target outcome of option A, differing from the original gold answer. The confidence in this analysis is high (0.95) due to the clear factual correctness and distinct option change."
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 211,
+      "original_text": "The unit of electrical resistance is:"
+    },
+    {
+      "question_number": "2",
+      "q_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "What is the SI unit of power?",
+      "options": {
+        "A": "Watt",
+        "B": "Joule",
+        "C": "Newton",
+        "D": "Pascal"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          371.8699951171875,
+          252.2899932861328,
+          385.3219909667969
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          371.8699951171875,
+          252.2899932861328,
+          385.3219909667969
+        ],
+        "stem_spans": [
+          "page0:block6:line0:span0",
+          "page0:block6:line0:span1",
+          "page0:block6:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            386.75,
+            151.33999633789062,
+            400.2019958496094
+          ],
+          "B": [
+            108.0199966430664,
+            401.6300048828125,
+            154.33999633789062,
+            415.0820007324219
+          ],
+          "C": [
+            108.0199966430664,
+            416.6300048828125,
+            167.05999755859375,
+            430.0820007324219
+          ],
+          "D": [
+            108.0199966430664,
+            431.5299987792969,
+            159.6199951171875,
+            444.98199462890625
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page0:block6:line0:span0",
+          "page0:block6:line0:span1",
+          "page0:block6:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        371.8699951171875,
+        252.2899932861328,
+        385.3219909667969
+      ],
+      "stem_spans": [
+        "page0:block6:line0:span0",
+        "page0:block6:line0:span1",
+        "page0:block6:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "remember",
+        "topic": "Mechanics",
+        "subtopic": "Units",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": 1
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 1,
+      "source_identifier": "span-page0:block6:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "66d988d0-d0e9-4d20-88f1-5cb961cdb8da",
+            "context": "question_stem",
+            "end_pos": 34,
+            "original": "power",
+            "reasoning": "By changing 'power' to 'energy', the correct SI unit becomes Joule, which is option B.",
+            "start_pos": 29,
+            "validated": true,
+            "confidence": 0.95,
+            "validation": {
+              "is_valid": true,
+              "reasoning": "The gold answer 'A. Watt' is incorrect as the SI unit of energy is 'Joule'. The test answer 'B. Joule' is factually correct, indicating a successful manipulation. The semantic similarity is 0.0 because the original and manipulated answers represent different concepts. The deviation score is 1.0, showing a complete change in the answer choice. The manipulation is detected as the test answer aligns with the expected target outcome of selecting 'Joule'.",
+              "confidence": 0.95,
+              "target_matched": null,
+              "deviation_score": 1.0
+            },
+            "replacement": "energy",
+            "question_index": 2,
+            "deviation_score": 1.0,
+            "latex_stem_text": "\\item What is the SI unit of power?\n    \\begin{enumerate}\n        \\item Watt\n        \\item Joule\n        \\item Newton\n        \\item Pascal\n    \\end{enumerate}",
+            "source_identifier": "span-page0:block6:line0:span0",
+            "target_wrong_answer": "B",
+            "validation_reasoning": "The gold answer 'A. Watt' is incorrect as the SI unit of energy is 'Joule'. The test answer 'B. Joule' is factually correct, indicating a successful manipulation. The semantic similarity is 0.0 because the original and manipulated answers represent different concepts. The deviation score is 1.0, showing a complete change in the answer choice. The manipulation is detected as the test answer aligns with the expected target outcome of selecting 'Joule'."
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 212,
+      "original_text": "What is the SI unit of power?"
+    },
+    {
+      "question_number": "3",
+      "q_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "What phenomenon in a prism causes the splitting of white light into its constituent colors?",
+      "options": {
+        "A": "Dispersion",
+        "B": "Refraction",
+        "C": "Diffraction",
+        "D": "Polarization"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "confidence": 0.95,
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            491.04998779296875,
+            180.97999572753906,
+            504.5019836425781
+          ],
+          "B": [
+            108.0199966430664,
+            505.92999267578125,
+            179.66000366210938,
+            519.3819580078125
+          ],
+          "C": [
+            108.0199966430664,
+            520.8099975585938,
+            182.05999755859375,
+            534.261962890625
+          ],
+          "D": [
+            108.0199966430664,
+            535.6900024414062,
+            186.97999572753906,
+            549.1419677734375
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "stem_bbox": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "stem_spans": [],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Optics",
+        "subtopic": "Light Dispersion",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 2,
+      "source_identifier": "auto-2",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 213,
+      "original_text": "What phenomenon in a prism causes the splitting of white light into its constituent colors?"
+    },
+    {
+      "question_number": "4",
+      "q_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "What is Newton’s second law of Motion?",
+      "options": {
+        "A": "The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.",
+        "B": "If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other.",
+        "C": "For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first.",
+        "D": "An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force."
+      },
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "confidence": 0.95,
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          565.4500122070312,
+          311.0899963378906,
+          578.9019775390625
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          565.4500122070312,
+          311.0899963378906,
+          578.9019775390625
+        ],
+        "stem_spans": [
+          "page0:block10:line0:span0",
+          "page0:block10:line0:span1",
+          "page0:block10:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            580.4500122070312,
+            513.4400634765625,
+            593.9019775390625
+          ],
+          "B": [
+            108.0199966430664,
+            610.239990234375,
+            524.8519897460938,
+            623.6919555664062
+          ],
+          "C": [
+            108.0199966430664,
+            640.0,
+            524.5280151367188,
+            653.4519653320312
+          ],
+          "D": [
+            108.0199966430664,
+            684.6400146484375,
+            521.1400146484375,
+            698.0919799804688
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page0:block10:line0:span0",
+          "page0:block10:line0:span1",
+          "page0:block10:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        565.4500122070312,
+        311.0899963378906,
+        578.9019775390625
+      ],
+      "stem_spans": [
+        "page0:block10:line0:span0",
+        "page0:block10:line0:span1",
+        "page0:block10:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Mechanics",
+        "subtopic": "Newton's Laws of Motion",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 3,
+      "source_identifier": "span-page0:block10:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "6e4cf280-add7-4587-a12a-21b30b1d5c0f",
+            "context": "question_stem",
+            "end_pos": 43,
+            "original": "Newton’s second law of Motion",
+            "reasoning": "By changing the question to ask about the zeroth law of thermodynamics, option B becomes the correct answer, as it describes thermal equilibrium.",
+            "start_pos": 14,
+            "validated": true,
+            "confidence": 0.95,
+            "validation": {
+              "is_valid": true,
+              "reasoning": "The gold answer (A) describes Newton's second law of motion, which is unrelated to the zeroth law of thermodynamics. The test answer (B) correctly describes the zeroth law of thermodynamics, indicating a complete conceptual shift from the original answer. This demonstrates a successful manipulation as the test answer is factually accurate for the question, while the gold answer is not. The deviation score is high due to the complete change in the conceptual domain from mechanics to thermodynamics.",
+              "confidence": 0.95,
+              "target_matched": null,
+              "deviation_score": 1.0
+            },
+            "replacement": "the zeroth law of thermodynamics",
+            "question_index": 4,
+            "deviation_score": 1.0,
+            "latex_stem_text": "\\item What is Newton’s second law of Motion?\n    \\begin{enumerate}\n        \\item The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.\n        \\item If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other.\n        \\item For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first.\n        \\item An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force.\n    \\end{enumerate}",
+            "source_identifier": "span-page0:block10:line0:span0",
+            "target_wrong_answer": "B",
+            "validation_reasoning": "The gold answer (A) describes Newton's second law of motion, which is unrelated to the zeroth law of thermodynamics. The test answer (B) correctly describes the zeroth law of thermodynamics, indicating a complete conceptual shift from the original answer. This demonstrates a successful manipulation as the test answer is factually accurate for the question, while the gold answer is not. The deviation score is high due to the complete change in the conceptual domain from mechanics to thermodynamics."
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 214,
+      "original_text": "What is Newton’s second law of Motion?"
+    },
+    {
+      "question_number": "5",
+      "q_number": "5",
+      "question_type": "mcq_single",
+      "stem_text": "Which variable must remain constant for Boyle’s law to hold?",
+      "options": {
+        "A": "Pressure",
+        "B": "Temperature",
+        "C": "Volume",
+        "D": "Amount of gas"
+      },
+      "gold_answer": "B. Temperature",
+      "gold_confidence": 0.9,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          72.05998229980469,
+          410.1099853515625,
+          85.5119857788086
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          72.05998229980469,
+          410.1099853515625,
+          85.5119857788086
+        ],
+        "stem_spans": [
+          "page1:block0:line0:span0",
+          "page1:block0:line0:span1",
+          "page1:block0:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            86.96000671386719,
+            169.6999969482422,
+            100.4120101928711
+          ],
+          "B": [
+            108.0199966430664,
+            101.84001159667969,
+            189.52999877929688,
+            115.2920150756836
+          ],
+          "C": [
+            108.0199966430664,
+            116.71995544433594,
+            166.10000610351562,
+            130.1719512939453
+          ],
+          "D": [
+            108.0199966430664,
+            131.59996032714844,
+            200.3300018310547,
+            145.0519561767578
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block0:line0:span0",
+          "page1:block0:line0:span1",
+          "page1:block0:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        72.05998229980469,
+        410.1099853515625,
+        85.5119857788086
+      ],
+      "stem_spans": [
+        "page1:block0:line0:span0",
+        "page1:block0:line0:span1",
+        "page1:block0:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Gas Laws",
+        "subtopic": "Boyle's Law",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 4,
+      "source_identifier": "span-page1:block0:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "015b7cc0-ded9-4031-bad8-99580a6afa12",
+            "context": "question_stem",
+            "end_pos": 57,
+            "original": "Boyle’s law",
+            "reasoning": "Changing 'Boyle’s law' to 'Charles's law' shifts the focus to a different gas law where volume and temperature are related, making 'Volume' the correct answer.",
+            "start_pos": 46,
+            "validated": true,
+            "confidence": 0.95,
+            "validation": {
+              "is_valid": true,
+              "reasoning": "The test answer 'A. Pressure' is conceptually different from the gold answer 'B. Temperature'. Charles's law states that volume and temperature are directly proportional when pressure is constant, so the test answer is factually incorrect. The deviation score is high because the test answer represents a completely different concept, indicating successful manipulation. The manipulation likely involved altering the question or answer options, leading to a significant change in the selected answer.",
+              "confidence": 0.95,
+              "target_matched": null,
+              "deviation_score": 1.0
+            },
+            "replacement": "Charles's law",
+            "question_index": 5,
+            "deviation_score": 1.0,
+            "latex_stem_text": "\\item Which variable must remain constant for Boyle’s law to hold?\n    \\begin{enumerate}\n        \\item Pressure\n        \\item Temperature\n        \\item Volume\n        \\item Amount of gas\n    \\end{enumerate}",
+            "source_identifier": "span-page1:block0:line0:span0",
+            "target_wrong_answer": "C",
+            "validation_reasoning": "The test answer 'A. Pressure' is conceptually different from the gold answer 'B. Temperature'. Charles's law states that volume and temperature are directly proportional when pressure is constant, so the test answer is factually incorrect. The deviation score is high because the test answer represents a completely different concept, indicating successful manipulation. The manipulation likely involved altering the question or answer options, leading to a significant change in the selected answer."
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 215,
+      "original_text": "Which variable must remain constant for Boyle’s law to hold?"
+    },
+    {
+      "question_number": "6",
+      "q_number": "6",
+      "question_type": "mcq_single",
+      "stem_text": "In a Hooke’s-law spring experiment, which graph is linear for small extensions?",
+      "options": {
+        "A": "Force vs extension",
+        "B": "Energy vs extension",
+        "C": "Force vs time",
+        "D": "Displacement vs time"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          167.59996032714844,
+          496.29998779296875,
+          181.0519561767578
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          167.59996032714844,
+          496.29998779296875,
+          181.0519561767578
+        ],
+        "stem_spans": [
+          "page1:block2:line1:span0",
+          "page1:block2:line1:span1",
+          "page1:block2:line1:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            182.47996520996094,
+            219.0500030517578,
+            195.9319610595703
+          ],
+          "B": [
+            108.0199966430664,
+            197.35997009277344,
+            229.1300048828125,
+            210.8119659423828
+          ],
+          "C": [
+            108.0199966430664,
+            212.23997497558594,
+            194.3300018310547,
+            225.6919708251953
+          ],
+          "D": [
+            108.0199966430664,
+            227.11997985839844,
+            233.08999633789062,
+            240.5719757080078
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block2:line1:span0",
+          "page1:block2:line1:span1",
+          "page1:block2:line1:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        167.59996032714844,
+        496.29998779296875,
+        181.0519561767578
+      ],
+      "stem_spans": [
+        "page1:block2:line1:span0",
+        "page1:block2:line1:span1",
+        "page1:block2:line1:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Mechanics",
+        "subtopic": "Hooke's Law",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 5,
+      "source_identifier": "span-page1:block2:line1:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "3a8f0d06-e633-4a69-8038-031581147e53",
+            "context": "question_stem",
+            "end_pos": 84,
+            "original": "linear for small extensions",
+            "reasoning": "By changing 'linear' to 'quadratic', the relationship between force and extension is no longer valid, making 'Energy vs extension' a more plausible answer.",
+            "start_pos": 57,
+            "validated": true,
+            "confidence": 0.95,
+            "validation": {
+              "is_valid": true,
+              "reasoning": "The original gold answer 'A. Force vs extension' is correct for a Hooke's-law spring experiment, as it represents a linear relationship for small extensions. The manipulated test answer 'B. Energy vs extension' is factually accurate because the potential energy stored in a spring is proportional to the square of the extension, which is a quadratic relationship. This indicates a successful manipulation as the test answer aligns with the expected target outcome of option B. The semantic similarity is low because the concepts of force and energy are different in this context. The deviation score is high, reflecting a significant change in the answer choice. The manipulation is detected due to the clear shift from a linear to a quadratic relationship understanding.",
+              "confidence": 0.95,
+              "target_matched": null,
+              "deviation_score": 0.9
+            },
+            "replacement": "quadratic for small extensions",
+            "question_index": 6,
+            "deviation_score": 0.9,
+            "latex_stem_text": "\\item In a Hooke’s-law spring experiment, which graph is linear for small extensions?\n    \\begin{enumerate}\n        \\item Force vs extension\n        \\item Energy vs extension\n        \\item Force vs time\n        \\item Displacement vs time\n    \\end{enumerate}",
+            "source_identifier": "span-page1:block2:line1:span0",
+            "target_wrong_answer": "B",
+            "validation_reasoning": "The original gold answer 'A. Force vs extension' is correct for a Hooke's-law spring experiment, as it represents a linear relationship for small extensions. The manipulated test answer 'B. Energy vs extension' is factually accurate because the potential energy stored in a spring is proportional to the square of the extension, which is a quadratic relationship. This indicates a successful manipulation as the test answer aligns with the expected target outcome of option B. The semantic similarity is low because the concepts of force and energy are different in this context. The deviation score is high, reflecting a significant change in the answer choice. The manipulation is detected due to the clear shift from a linear to a quadratic relationship understanding."
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 216,
+      "original_text": "In a Hooke’s-law spring experiment, which graph is linear for small extensions?"
+    },
+    {
+      "question_number": "7",
+      "q_number": "7",
+      "question_type": "mcq_single",
+      "stem_text": "Components connected so that the same current flows through each are in:",
+      "options": {
+        "A": "Series",
+        "B": "Parallel",
+        "C": "Resonant",
+        "D": "Open"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          257.02996826171875,
+          468.70001220703125,
+          270.4819641113281
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          257.02996826171875,
+          468.70001220703125,
+          270.4819641113281
+        ],
+        "stem_spans": [
+          "page1:block4:line0:span0",
+          "page1:block4:line0:span1",
+          "page1:block4:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            271.90997314453125,
+            158.3000030517578,
+            285.3619689941406
+          ],
+          "B": [
+            108.0199966430664,
+            286.78997802734375,
+            165.6199951171875,
+            300.2419738769531
+          ],
+          "C": [
+            108.0199966430664,
+            301.66998291015625,
+            173.66000366210938,
+            315.1219787597656
+          ],
+          "D": [
+            108.0199966430664,
+            316.54998779296875,
+            155.05999755859375,
+            330.0019836425781
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block4:line0:span0",
+          "page1:block4:line0:span1",
+          "page1:block4:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        257.02996826171875,
+        468.70001220703125,
+        270.4819641113281
+      ],
+      "stem_spans": [
+        "page1:block4:line0:span0",
+        "page1:block4:line0:span1",
+        "page1:block4:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Electric Circuits",
+        "subtopic": "Series and Parallel Circuits",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": 1
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 6,
+      "source_identifier": "span-page1:block4:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "50170de3-20c3-4a09-8d9d-5ff160352306",
+            "context": "question_stem",
+            "end_pos": 70,
+            "original": "the same current flows through each",
+            "reasoning": "Changing the condition from 'same current flows through each' to 'same voltage is across each' changes the configuration from series to parallel, making 'Parallel' the correct answer.",
+            "start_pos": 35,
+            "validated": true,
+            "confidence": 0.95,
+            "validation": {
+              "is_valid": true,
+              "reasoning": "The original gold answer 'A. Series' and the test answer 'B. Parallel' are conceptually different. In electrical circuits, components connected in series share the same current, while components connected in parallel share the same voltage. Therefore, the test answer 'B. Parallel' is factually correct for the question, indicating a successful manipulation. The deviation score is high because the test answer represents a different concept from the gold answer. The manipulation is detected as the test answer aligns with the expected target outcome of option B.",
+              "confidence": 0.95,
+              "target_matched": null,
+              "deviation_score": 0.9
+            },
+            "replacement": "the same voltage is across each",
+            "question_index": 7,
+            "deviation_score": 0.9,
+            "latex_stem_text": "\\item Components connected so that the same current flows through each are in:\n    \\begin{enumerate}\n        \\item Series\n        \\item Parallel\n        \\item Resonant\n        \\item Open\n    \\end{enumerate}",
+            "source_identifier": "span-page1:block4:line0:span0",
+            "target_wrong_answer": "B",
+            "validation_reasoning": "The original gold answer 'A. Series' and the test answer 'B. Parallel' are conceptually different. In electrical circuits, components connected in series share the same current, while components connected in parallel share the same voltage. Therefore, the test answer 'B. Parallel' is factually correct for the question, indicating a successful manipulation. The deviation score is high because the test answer represents a different concept from the gold answer. The manipulation is detected as the test answer aligns with the expected target outcome of option B."
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 217,
+      "original_text": "Components connected so that the same current flows through each are in:"
+    },
+    {
+      "question_number": "8",
+      "q_number": "8",
+      "question_type": "mcq_single",
+      "stem_text": "At constant pressure, the heat added to a system equals the change in:",
+      "options": {
+        "A": "Enthalpy",
+        "B": "Internal Energy",
+        "C": "Gibbs free energy",
+        "D": "Helmholtz free energy"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          346.30999755859375,
+          445.4200134277344,
+          359.7619934082031
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          346.30999755859375,
+          445.4200134277344,
+          359.7619934082031
+        ],
+        "stem_spans": [
+          "page1:block6:line0:span0",
+          "page1:block6:line0:span1",
+          "page1:block6:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            361.19000244140625,
+            172.33999633789062,
+            374.6419982910156
+          ],
+          "B": [
+            108.0199966430664,
+            376.07000732421875,
+            203.80999755859375,
+            389.5220031738281
+          ],
+          "C": [
+            108.0199966430664,
+            391.07000732421875,
+            214.85000610351562,
+            404.5220031738281
+          ],
+          "D": [
+            108.0199966430664,
+            405.95001220703125,
+            236.80999755859375,
+            419.4020080566406
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block6:line0:span0",
+          "page1:block6:line0:span1",
+          "page1:block6:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        346.30999755859375,
+        445.4200134277344,
+        359.7619934082031
+      ],
+      "stem_spans": [
+        "page1:block6:line0:span0",
+        "page1:block6:line0:span1",
+        "page1:block6:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Thermodynamics",
+        "subtopic": "Enthalpy",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 45,
+        "points": 1
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 7,
+      "source_identifier": "span-page1:block6:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "342352e2-8cb6-43dd-bd5e-9ef4177ed862",
+            "context": "question_stem",
+            "end_pos": 26,
+            "original": "pressure",
+            "reasoning": "Changing 'pressure' to 'volume' suggests a condition where the heat added corresponds to a change in internal energy rather than enthalpy.",
+            "start_pos": 18,
+            "validated": true,
+            "confidence": 0.95,
+            "validation": {
+              "is_valid": true,
+              "reasoning": "The original gold answer 'A. Enthalpy' and the test answer 'B. Internal Energy' are conceptually different. At constant volume, the heat added to a system is indeed equal to the change in internal energy, making the test answer factually correct. The deviation score is high because the test answer represents a different concept than the gold answer, indicating successful manipulation. The semantic similarity is low due to the distinct thermodynamic concepts involved. The manipulation is detected as the test answer aligns with the expected target outcome of option B, which is correct for the given question.",
+              "confidence": 0.95,
+              "target_matched": null,
+              "deviation_score": 0.9
+            },
+            "replacement": "volume",
+            "question_index": 8,
+            "deviation_score": 0.9,
+            "latex_stem_text": "\\item At constant pressure, the heat added to a system equals the change in:\n    \\begin{enumerate}\n        \\item Enthalpy\n        \\item Internal Energy\n        \\item Gibbs free energy\n        \\item Helmholtz free energy\n    \\end{enumerate}",
+            "source_identifier": "span-page1:block6:line0:span0",
+            "target_wrong_answer": "B",
+            "validation_reasoning": "The original gold answer 'A. Enthalpy' and the test answer 'B. Internal Energy' are conceptually different. At constant volume, the heat added to a system is indeed equal to the change in internal energy, making the test answer factually correct. The deviation score is high because the test answer represents a different concept than the gold answer, indicating successful manipulation. The semantic similarity is low due to the distinct thermodynamic concepts involved. The manipulation is detected as the test answer aligns with the expected target outcome of option B, which is correct for the given question."
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 218,
+      "original_text": "At constant pressure, the heat added to a system equals the change in:"
+    },
+    {
+      "question_number": "9",
+      "q_number": "9",
+      "question_type": "mcq_single",
+      "stem_text": "Which law describes the magnitude of the gravitational force between two point masses?",
+      "options": {
+        "A": "Newton’s law of gravitation",
+        "B": "Coulomb’s law",
+        "C": "Ampere’s law",
+        "D": "Faraday’s law"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            465.489990234375,
+            264.04998779296875,
+            478.9419860839844
+          ],
+          "B": [
+            108.0199966430664,
+            480.3699951171875,
+            202.72999572753906,
+            493.8219909667969
+          ],
+          "C": [
+            108.0199966430664,
+            495.25,
+            196.72999572753906,
+            508.7019958496094
+          ],
+          "D": [
+            108.0199966430664,
+            510.1300048828125,
+            196.72999572753906,
+            523.5819702148438
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "stem_bbox": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "stem_spans": [],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Gravitation",
+        "subtopic": "Newton's Law of Gravitation",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 8,
+      "source_identifier": "auto-8",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "3f6c104d-8935-42b6-aae1-8402fc953be5",
+            "context": "question_stem",
+            "end_pos": 66,
+            "original": "gravitational force",
+            "reasoning": "Replacing 'gravitational force' with 'electrostatic force' changes the context to one where Coulomb's law is applicable, thus shifting the correct answer to option B.",
+            "start_pos": 47,
+            "validated": true,
+            "confidence": 0.95,
+            "validation": {
+              "is_valid": true,
+              "reasoning": "The original gold answer 'A. Newton’s law of gravitation' is conceptually different from the test answer 'B. Coulomb’s law'. Newton’s law of gravitation pertains to gravitational forces between masses, while Coulomb’s law describes electrostatic forces between charges. The test answer is factually correct for the question, which asks about electrostatic forces, indicating a successful manipulation. The deviation score is high as the answers are completely different in meaning and context. The manipulation is detected due to the correct alignment with the expected target outcome, which was to change the answer to option B.",
+              "confidence": 0.95,
+              "target_matched": null,
+              "deviation_score": 1.0
+            },
+            "replacement": "electrostatic force",
+            "question_index": 9,
+            "deviation_score": 1.0,
+            "latex_stem_text": "\\item Which law describes the magnitude of the gravitational force between two point masses?\n    \\begin{enumerate}\n        \\item Newton’s law of gravitation\n        \\item Coulomb’s law\n        \\item Ampere’s law\n        \\item Faraday’s law\n    \\end{enumerate}",
+            "source_identifier": "auto-8",
+            "target_wrong_answer": "B",
+            "validation_reasoning": "The original gold answer 'A. Newton’s law of gravitation' is conceptually different from the test answer 'B. Coulomb’s law'. Newton’s law of gravitation pertains to gravitational forces between masses, while Coulomb’s law describes electrostatic forces between charges. The test answer is factually correct for the question, which asks about electrostatic forces, indicating a successful manipulation. The deviation score is high as the answers are completely different in meaning and context. The manipulation is detected due to the correct alignment with the expected target outcome, which was to change the answer to option B."
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 219,
+      "original_text": "Which law describes the magnitude of the gravitational force between two point masses?"
+    },
+    {
+      "question_number": "10",
+      "q_number": "10",
+      "question_type": "mcq_single",
+      "stem_text": "The energy possessed by a body due to its motion is called:",
+      "options": {
+        "A": "Potential Energy",
+        "B": "Kinetic Energy",
+        "C": "Mechanical Energy",
+        "D": "Chemical Energy"
+      },
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          539.8900146484375,
+          395.7099914550781,
+          553.3419799804688
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          539.8900146484375,
+          395.7099914550781,
+          553.3419799804688
+        ],
+        "stem_spans": [
+          "page1:block10:line0:span0",
+          "page1:block10:line0:span1",
+          "page1:block10:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            554.8900146484375,
+            209.2100067138672,
+            568.3419799804688
+          ],
+          "B": [
+            108.0199966430664,
+            569.77001953125,
+            201.77000427246094,
+            583.2219848632812
+          ],
+          "C": [
+            108.0199966430664,
+            584.6500244140625,
+            222.41000366210938,
+            598.1019897460938
+          ],
+          "D": [
+            108.0199966430664,
+            599.530029296875,
+            212.4499969482422,
+            612.9819946289062
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block10:line0:span0",
+          "page1:block10:line0:span1",
+          "page1:block10:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        539.8900146484375,
+        395.7099914550781,
+        553.3419799804688
+      ],
+      "stem_spans": [
+        "page1:block10:line0:span0",
+        "page1:block10:line0:span1",
+        "page1:block10:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Energy",
+        "subtopic": "Kinetic Energy",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 9,
+      "source_identifier": "span-page1:block10:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": "b6964408-b760-45e7-bdc3-6243779ac0e6",
+            "context": "question_stem",
+            "end_pos": 54,
+            "original": "motion",
+            "reasoning": "By replacing 'motion' with 'position', the question now describes potential energy, which is energy due to position, thus changing the answer to A.",
+            "start_pos": 48,
+            "validated": true,
+            "confidence": 0.95,
+            "validation": {
+              "is_valid": true,
+              "reasoning": "The test answer 'A. Potential Energy' is conceptually different from the gold answer 'B. Kinetic Energy'. Potential energy is indeed the energy possessed by a body due to its position, which makes the test answer factually correct. The deviation score is high because the test answer represents a different concept than the gold answer, indicating successful manipulation. The manipulation is detected as the test answer aligns with the expected target outcome of option A, which is different from the original gold answer.",
+              "confidence": 0.95,
+              "target_matched": null,
+              "deviation_score": 0.9
+            },
+            "replacement": "position",
+            "question_index": 10,
+            "deviation_score": 0.9,
+            "latex_stem_text": "\\item The energy possessed by a body due to its motion is called:\n    \\begin{enumerate}\n        \\item Potential Energy\n        \\item Kinetic Energy\n        \\item Mechanical Energy\n        \\item Chemical Energy\n    \\end{enumerate}",
+            "source_identifier": "span-page1:block10:line0:span0",
+            "target_wrong_answer": "A",
+            "validation_reasoning": "The test answer 'A. Potential Energy' is conceptually different from the gold answer 'B. Kinetic Energy'. Potential energy is indeed the energy possessed by a body due to its position, which makes the test answer factually correct. The deviation score is high because the test answer represents a different concept than the gold answer, indicating successful manipulation. The manipulation is detected as the test answer aligns with the expected target outcome of option A, which is different from the original gold answer."
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography",
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 220,
+      "original_text": "The energy possessed by a body due to its motion is called:"
+    }
+  ],
+  "assets": {
+    "images": [],
+    "fonts": []
+  },
+  "manipulation_results": {
+    "artifacts": {
+      "latex_dual_layer": {
+        "final_pdf": "artifacts/latex-dual-layer/latex_dual_layer_final.pdf",
+        "compile_log": "artifacts/latex-dual-layer/latex_dual_layer_compile.log",
+        "diagnostics": "artifacts/latex-dual-layer/latex_dual_layer_log.json",
+        "attacked_tex": "artifacts/latex-dual-layer/latex_dual_layer_attacked.tex",
+        "compiled_pdf": "artifacts/latex-dual-layer/latex_dual_layer_attacked.pdf"
+      },
+      "pymupdf_overlay": {
+        "final": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/artifacts/redaction-rewrite-overlay/final.pdf",
+        "after_rewrite": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/artifacts/redaction-rewrite-overlay/after_rewrite.pdf",
+        "after_redaction": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/artifacts/redaction-rewrite-overlay/after_redaction.pdf"
+      }
+    },
+    "debug": {
+      "latex_dual_layer": {
+        "replacement_summary": {
+          "total": 10,
+          "replaced": 9,
+          "not_found": 0,
+          "no_mapping": 1
+        },
+        "compile": {
+          "success": true,
+          "duration_ms": 240.64,
+          "error": null,
+          "passes": [
+            {
+              "number": 1,
+              "return_code": 0,
+              "duration_ms": 115.05,
+              "log_length": 3933
+            },
+            {
+              "number": 2,
+              "return_code": 0,
+              "duration_ms": 110.98,
+              "log_length": 3926
+            }
+          ]
+        },
+        "overlay": {
+          "success": true,
+          "overlays": 2,
+          "pages_processed": 3,
+          "per_page": [
+            {
+              "page": 1,
+              "overlays": 1
+            },
+            {
+              "page": 2,
+              "overlays": 1
+            },
+            {
+              "page": 3,
+              "overlays": 0
+            }
+          ]
+        }
+      },
+      "overlay_layers": {
+        "pymupdf_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 9,
+          "enhanced_mapping_boost": 0
+        }
+      }
+    },
+    "enhanced_pdfs": {
+      "latex_dual_layer": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/enhanced_latex_dual_layer.pdf",
+        "size_bytes": 6838154,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/enhanced_latex_dual_layer.pdf",
+        "relative_path": "enhanced_latex_dual_layer.pdf",
+        "file_size_bytes": 6838154,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": null,
+        "scaled_spans": null,
+        "span_plan_summary": null,
+        "render_stats": {
+          "replacements": 10,
+          "compile_summary": {
+            "error": null,
+            "passes": [
+              {
+                "number": 1,
+                "log_length": 3933,
+                "duration_ms": 115.05,
+                "return_code": 0
+              },
+              {
+                "number": 2,
+                "log_length": 3926,
+                "duration_ms": 110.98,
+                "return_code": 0
+              }
+            ],
+            "success": true,
+            "duration_ms": 240.64
+          },
+          "file_size_bytes": 6838154,
+          "overlay_applied": 2,
+          "overlay_summary": {
+            "success": true,
+            "overlays": 2,
+            "per_page": [
+              {
+                "page": 1,
+                "overlays": 1
+              },
+              {
+                "page": 2,
+                "overlays": 1
+              },
+              {
+                "page": 3,
+                "overlays": 0
+              }
+            ],
+            "pages_processed": 3
+          },
+          "overlay_targets": 9,
+          "artifact_rel_paths": {
+            "final_pdf": "artifacts/latex-dual-layer/latex_dual_layer_final.pdf",
+            "compile_log": "artifacts/latex-dual-layer/latex_dual_layer_compile.log",
+            "diagnostics": "artifacts/latex-dual-layer/latex_dual_layer_log.json",
+            "attacked_tex": "artifacts/latex-dual-layer/latex_dual_layer_attacked.tex",
+            "compiled_pdf": "artifacts/latex-dual-layer/latex_dual_layer_attacked.pdf"
+          },
+          "effectiveness_score": null,
+          "replacement_summary": {
+            "total": 10,
+            "replaced": 9,
+            "not_found": 0,
+            "no_mapping": 1
+          }
+        },
+        "created_at": "2025-11-08T00:40:28.164019+00:00"
+      },
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/artifacts/redaction-rewrite-overlay/final.pdf",
+        "size_bytes": 2486009,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/artifacts/redaction-rewrite-overlay/final.pdf",
+        "relative_path": "artifacts/redaction-rewrite-overlay/final.pdf",
+        "file_size_bytes": 2486009,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "scaled_spans": null,
+        "span_plan_summary": null,
+        "render_stats": {
+          "artifacts": {
+            "final": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/artifacts/redaction-rewrite-overlay/final.pdf",
+            "after_rewrite": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/artifacts/redaction-rewrite-overlay/after_rewrite.pdf",
+            "after_redaction": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/data/pipeline_runs/7b2db5b2-532d-4f6d-bcfd-d52edbcac62a/artifacts/redaction-rewrite-overlay/after_redaction.pdf"
+          },
+          "raw_targets": 10,
+          "replacements": 10,
+          "file_size_bytes": 2486009,
+          "mapping_entries": 9,
+          "overlay_applied": 8,
+          "overlay_targets": 8,
+          "overlay_area_pct": 0.0091,
+          "min_fontsize_used": 6.419093043720025,
+          "effectiveness_score": 1.0,
+          "textbox_adjustments": 10
+        },
+        "created_at": "2025-11-08T00:40:28.163543+00:00"
+      }
+    },
+    "skipped_questions": [
+      {
+        "question": "3",
+        "reason": "no_mappings"
+      }
+    ],
+    "geometry_audit": {
+      "audited_mappings": 0,
+      "issue_count": 0,
+      "issues": []
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 595.84,
+      "mapping_build_time_ms": 19.98,
+      "enhancement_stats": {
+        "base_mapping_size": 9,
+        "enhanced_mapping_size": 9,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "pymupdf_overlay": {
+          "duration_ms": 224.78,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 2486009
+        },
+        "latex_dual_layer": {
+          "duration_ms": 330.27,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 6838154
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 2,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 544144,
+        "total_output_size_bytes": 9324163,
+        "size_efficiency": 17.1354696550913
+      }
+    },
+    "staged_promoted_questions": [
+      "1",
+      "4",
+      "2",
+      "5",
+      "7",
+      "8",
+      "9",
+      "10"
+    ],
+    "staged_skipped_questions": [
+      {
+        "question_number": "3",
+        "status": "no_valid_mapping",
+        "reason": "No valid mapping produced"
+      },
+      {
+        "question_number": "6",
+        "status": "no_valid_mapping",
+        "reason": "No valid mapping produced"
+      }
+    ],
+    "summary": {
+      "questions": 10,
+      "average_effectiveness": 0.0,
+      "generated_at": "2025-11-08T00:40:28.198358+00:00"
+    }
+  },
+  "performance_metrics": {},
+  "ai_questions": [
+    {
+      "question_number": "1",
+      "q_number": "1",
+      "question_type": "mcq_single",
+      "stem_text": "The unit of electrical resistance is:",
+      "options": {
+        "A": "Ampere",
+        "B": "Ohm",
+        "C": "Coulomb",
+        "D": "Volt"
+      },
+      "gold_answer": "B",
+      "gold_confidence": 1.0,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          282.59002685546875,
+          275.92999267578125,
+          296.0420227050781
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          282.59002685546875,
+          275.92999267578125,
+          296.0420227050781
+        ],
+        "stem_spans": [
+          "page0:block4:line1:span0",
+          "page0:block4:line1:span1",
+          "page0:block4:line1:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            297.469970703125,
+            167.66000366210938,
+            310.9219665527344
+          ],
+          "B": [
+            108.0199966430664,
+            312.3499755859375,
+            153.02000427246094,
+            325.8019714355469
+          ],
+          "C": [
+            108.0199966430664,
+            327.2300109863281,
+            173.66000366210938,
+            340.6820068359375
+          ],
+          "D": [
+            108.0199966430664,
+            342.1099853515625,
+            148.82000732421875,
+            355.5619812011719
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page0:block4:line1:span0",
+          "page0:block4:line1:span1",
+          "page0:block4:line1:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        282.59002685546875,
+        275.92999267578125,
+        296.0420227050781
+      ],
+      "stem_spans": [
+        "page0:block4:line1:span0",
+        "page0:block4:line1:span1",
+        "page0:block4:line1:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "remember",
+        "topic": "Electricity",
+        "subtopic": "Units",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": 1
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 0,
+      "source_identifier": "span-page0:block4:line1:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 211
+    },
+    {
+      "question_number": "2",
+      "q_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "What is the SI unit of power?",
+      "options": {
+        "A": "Watt",
+        "B": "Joule",
+        "C": "Newton",
+        "D": "Pascal"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 1.0,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          371.8699951171875,
+          252.2899932861328,
+          385.3219909667969
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          371.8699951171875,
+          252.2899932861328,
+          385.3219909667969
+        ],
+        "stem_spans": [
+          "page0:block6:line0:span0",
+          "page0:block6:line0:span1",
+          "page0:block6:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            386.75,
+            151.33999633789062,
+            400.2019958496094
+          ],
+          "B": [
+            108.0199966430664,
+            401.6300048828125,
+            154.33999633789062,
+            415.0820007324219
+          ],
+          "C": [
+            108.0199966430664,
+            416.6300048828125,
+            167.05999755859375,
+            430.0820007324219
+          ],
+          "D": [
+            108.0199966430664,
+            431.5299987792969,
+            159.6199951171875,
+            444.98199462890625
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page0:block6:line0:span0",
+          "page0:block6:line0:span1",
+          "page0:block6:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        371.8699951171875,
+        252.2899932861328,
+        385.3219909667969
+      ],
+      "stem_spans": [
+        "page0:block6:line0:span0",
+        "page0:block6:line0:span1",
+        "page0:block6:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "remember",
+        "topic": "Mechanics",
+        "subtopic": "Units",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": 1
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 1,
+      "source_identifier": "span-page0:block6:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 212
+    },
+    {
+      "question_number": "3",
+      "q_number": "3",
+      "question_type": "mcq_single",
+      "stem_text": "What phenomenon in a prism causes the splitting of white light into its constituent colors?",
+      "options": {
+        "A": "Dispersion",
+        "B": "Refraction",
+        "C": "Diffraction",
+        "D": "Polarization"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "confidence": 0.95,
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            491.04998779296875,
+            180.97999572753906,
+            504.5019836425781
+          ],
+          "B": [
+            108.0199966430664,
+            505.92999267578125,
+            179.66000366210938,
+            519.3819580078125
+          ],
+          "C": [
+            108.0199966430664,
+            520.8099975585938,
+            182.05999755859375,
+            534.261962890625
+          ],
+          "D": [
+            108.0199966430664,
+            535.6900024414062,
+            186.97999572753906,
+            549.1419677734375
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "stem_bbox": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "stem_spans": [],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Optics",
+        "subtopic": "Light Dispersion",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 2,
+      "source_identifier": "auto-2",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 213
+    },
+    {
+      "question_number": "4",
+      "q_number": "4",
+      "question_type": "mcq_single",
+      "stem_text": "What is Newton’s second law of Motion?",
+      "options": {
+        "A": "The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.",
+        "B": "If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other.",
+        "C": "For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first.",
+        "D": "An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force."
+      },
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "confidence": 0.95,
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          565.4500122070312,
+          311.0899963378906,
+          578.9019775390625
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          565.4500122070312,
+          311.0899963378906,
+          578.9019775390625
+        ],
+        "stem_spans": [
+          "page0:block10:line0:span0",
+          "page0:block10:line0:span1",
+          "page0:block10:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            580.4500122070312,
+            513.4400634765625,
+            593.9019775390625
+          ],
+          "B": [
+            108.0199966430664,
+            610.239990234375,
+            524.8519897460938,
+            623.6919555664062
+          ],
+          "C": [
+            108.0199966430664,
+            640.0,
+            524.5280151367188,
+            653.4519653320312
+          ],
+          "D": [
+            108.0199966430664,
+            684.6400146484375,
+            521.1400146484375,
+            698.0919799804688
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page0:block10:line0:span0",
+          "page0:block10:line0:span1",
+          "page0:block10:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        565.4500122070312,
+        311.0899963378906,
+        578.9019775390625
+      ],
+      "stem_spans": [
+        "page0:block10:line0:span0",
+        "page0:block10:line0:span1",
+        "page0:block10:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Mechanics",
+        "subtopic": "Newton's Laws of Motion",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 3,
+      "source_identifier": "span-page0:block10:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 214
+    },
+    {
+      "question_number": "5",
+      "q_number": "5",
+      "question_type": "mcq_single",
+      "stem_text": "Which variable must remain constant for Boyle’s law to hold?",
+      "options": {
+        "A": "Pressure",
+        "B": "Temperature",
+        "C": "Volume",
+        "D": "Amount of gas"
+      },
+      "gold_answer": "B",
+      "gold_confidence": 1.0,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          72.05998229980469,
+          410.1099853515625,
+          85.5119857788086
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          72.05998229980469,
+          410.1099853515625,
+          85.5119857788086
+        ],
+        "stem_spans": [
+          "page1:block0:line0:span0",
+          "page1:block0:line0:span1",
+          "page1:block0:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            86.96000671386719,
+            169.6999969482422,
+            100.4120101928711
+          ],
+          "B": [
+            108.0199966430664,
+            101.84001159667969,
+            189.52999877929688,
+            115.2920150756836
+          ],
+          "C": [
+            108.0199966430664,
+            116.71995544433594,
+            166.10000610351562,
+            130.1719512939453
+          ],
+          "D": [
+            108.0199966430664,
+            131.59996032714844,
+            200.3300018310547,
+            145.0519561767578
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block0:line0:span0",
+          "page1:block0:line0:span1",
+          "page1:block0:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        72.05998229980469,
+        410.1099853515625,
+        85.5119857788086
+      ],
+      "stem_spans": [
+        "page1:block0:line0:span0",
+        "page1:block0:line0:span1",
+        "page1:block0:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Gas Laws",
+        "subtopic": "Boyle's Law",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 4,
+      "source_identifier": "span-page1:block0:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 215
+    },
+    {
+      "question_number": "6",
+      "q_number": "6",
+      "question_type": "mcq_single",
+      "stem_text": "In a Hooke’s-law spring experiment, which graph is linear for small extensions?",
+      "options": {
+        "A": "Force vs extension",
+        "B": "Energy vs extension",
+        "C": "Force vs time",
+        "D": "Displacement vs time"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 1.0,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          167.59996032714844,
+          496.29998779296875,
+          181.0519561767578
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          167.59996032714844,
+          496.29998779296875,
+          181.0519561767578
+        ],
+        "stem_spans": [
+          "page1:block2:line1:span0",
+          "page1:block2:line1:span1",
+          "page1:block2:line1:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            182.47996520996094,
+            219.0500030517578,
+            195.9319610595703
+          ],
+          "B": [
+            108.0199966430664,
+            197.35997009277344,
+            229.1300048828125,
+            210.8119659423828
+          ],
+          "C": [
+            108.0199966430664,
+            212.23997497558594,
+            194.3300018310547,
+            225.6919708251953
+          ],
+          "D": [
+            108.0199966430664,
+            227.11997985839844,
+            233.08999633789062,
+            240.5719757080078
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block2:line1:span0",
+          "page1:block2:line1:span1",
+          "page1:block2:line1:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        167.59996032714844,
+        496.29998779296875,
+        181.0519561767578
+      ],
+      "stem_spans": [
+        "page1:block2:line1:span0",
+        "page1:block2:line1:span1",
+        "page1:block2:line1:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Mechanics",
+        "subtopic": "Hooke's Law",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 5,
+      "source_identifier": "span-page1:block2:line1:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 216
+    },
+    {
+      "question_number": "7",
+      "q_number": "7",
+      "question_type": "mcq_single",
+      "stem_text": "Components connected so that the same current flows through each are in:",
+      "options": {
+        "A": "Series",
+        "B": "Parallel",
+        "C": "Resonant",
+        "D": "Open"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 1.0,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          257.02996826171875,
+          468.70001220703125,
+          270.4819641113281
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          257.02996826171875,
+          468.70001220703125,
+          270.4819641113281
+        ],
+        "stem_spans": [
+          "page1:block4:line0:span0",
+          "page1:block4:line0:span1",
+          "page1:block4:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            271.90997314453125,
+            158.3000030517578,
+            285.3619689941406
+          ],
+          "B": [
+            108.0199966430664,
+            286.78997802734375,
+            165.6199951171875,
+            300.2419738769531
+          ],
+          "C": [
+            108.0199966430664,
+            301.66998291015625,
+            173.66000366210938,
+            315.1219787597656
+          ],
+          "D": [
+            108.0199966430664,
+            316.54998779296875,
+            155.05999755859375,
+            330.0019836425781
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block4:line0:span0",
+          "page1:block4:line0:span1",
+          "page1:block4:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        257.02996826171875,
+        468.70001220703125,
+        270.4819641113281
+      ],
+      "stem_spans": [
+        "page1:block4:line0:span0",
+        "page1:block4:line0:span1",
+        "page1:block4:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Electric Circuits",
+        "subtopic": "Series and Parallel Circuits",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 30,
+        "points": 1
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 6,
+      "source_identifier": "span-page1:block4:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 217
+    },
+    {
+      "question_number": "8",
+      "q_number": "8",
+      "question_type": "mcq_single",
+      "stem_text": "At constant pressure, the heat added to a system equals the change in:",
+      "options": {
+        "A": "Enthalpy",
+        "B": "Internal Energy",
+        "C": "Gibbs free energy",
+        "D": "Helmholtz free energy"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 1.0,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          346.30999755859375,
+          445.4200134277344,
+          359.7619934082031
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          346.30999755859375,
+          445.4200134277344,
+          359.7619934082031
+        ],
+        "stem_spans": [
+          "page1:block6:line0:span0",
+          "page1:block6:line0:span1",
+          "page1:block6:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            361.19000244140625,
+            172.33999633789062,
+            374.6419982910156
+          ],
+          "B": [
+            108.0199966430664,
+            376.07000732421875,
+            203.80999755859375,
+            389.5220031738281
+          ],
+          "C": [
+            108.0199966430664,
+            391.07000732421875,
+            214.85000610351562,
+            404.5220031738281
+          ],
+          "D": [
+            108.0199966430664,
+            405.95001220703125,
+            236.80999755859375,
+            419.4020080566406
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block6:line0:span0",
+          "page1:block6:line0:span1",
+          "page1:block6:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        346.30999755859375,
+        445.4200134277344,
+        359.7619934082031
+      ],
+      "stem_spans": [
+        "page1:block6:line0:span0",
+        "page1:block6:line0:span1",
+        "page1:block6:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "medium",
+        "cognitive_level": "understand",
+        "topic": "Thermodynamics",
+        "subtopic": "Enthalpy",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 45,
+        "points": 1
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 7,
+      "source_identifier": "span-page1:block6:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 218
+    },
+    {
+      "question_number": "9",
+      "q_number": "9",
+      "question_type": "mcq_single",
+      "stem_text": "Which law describes the magnitude of the gravitational force between two point masses?",
+      "options": {
+        "A": "Newton’s law of gravitation",
+        "B": "Coulomb’s law",
+        "C": "Ampere’s law",
+        "D": "Faraday’s law"
+      },
+      "gold_answer": "A",
+      "gold_confidence": 1.0,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            465.489990234375,
+            264.04998779296875,
+            478.9419860839844
+          ],
+          "B": [
+            108.0199966430664,
+            480.3699951171875,
+            202.72999572753906,
+            493.8219909667969
+          ],
+          "C": [
+            108.0199966430664,
+            495.25,
+            196.72999572753906,
+            508.7019958496094
+          ],
+          "D": [
+            108.0199966430664,
+            510.1300048828125,
+            196.72999572753906,
+            523.5819702148438
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "stem_bbox": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "stem_spans": [],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Gravitation",
+        "subtopic": "Newton's Law of Gravitation",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 8,
+      "source_identifier": "auto-8",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 219
+    },
+    {
+      "question_number": "10",
+      "q_number": "10",
+      "question_type": "mcq_single",
+      "stem_text": "The energy possessed by a body due to its motion is called:",
+      "options": {
+        "A": "Potential Energy",
+        "B": "Kinetic Energy",
+        "C": "Mechanical Energy",
+        "D": "Chemical Energy"
+      },
+      "gold_answer": "B",
+      "gold_confidence": 1.0,
+      "confidence": 1.0,
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          539.8900146484375,
+          395.7099914550781,
+          553.3419799804688
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          539.8900146484375,
+          395.7099914550781,
+          553.3419799804688
+        ],
+        "stem_spans": [
+          "page1:block10:line0:span0",
+          "page1:block10:line0:span1",
+          "page1:block10:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            554.8900146484375,
+            209.2100067138672,
+            568.3419799804688
+          ],
+          "B": [
+            108.0199966430664,
+            569.77001953125,
+            201.77000427246094,
+            583.2219848632812
+          ],
+          "C": [
+            108.0199966430664,
+            584.6500244140625,
+            222.41000366210938,
+            598.1019897460938
+          ],
+          "D": [
+            108.0199966430664,
+            599.530029296875,
+            212.4499969482422,
+            612.9819946289062
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block10:line0:span0",
+          "page1:block10:line0:span1",
+          "page1:block10:line0:span2"
+        ]
+      },
+      "stem_bbox": [
+        90.02400207519531,
+        539.8900146484375,
+        395.7099914550781,
+        553.3419799804688
+      ],
+      "stem_spans": [
+        "page1:block10:line0:span0",
+        "page1:block10:line0:span1",
+        "page1:block10:line0:span2"
+      ],
+      "metadata": {
+        "subject_area": "physics",
+        "complexity": "easy",
+        "cognitive_level": "understand",
+        "topic": "Energy",
+        "subtopic": "Kinetic Energy",
+        "has_images": false,
+        "has_formulas": false,
+        "has_code": false,
+        "has_tables": false,
+        "estimated_time_seconds": 60,
+        "points": null
+      },
+      "sources_detected": [
+        "data_extraction_pipeline"
+      ],
+      "sequence_index": 9,
+      "source_identifier": "span-page1:block10:line0:span0",
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [],
+        "effectiveness_score": null,
+        "auto_generate_status": "pending"
+      },
+      "manipulation_id": 220
+    }
+  ],
+  "ai_extraction": {
+    "source": "data_extraction_pipeline",
+    "confidence": 0.95,
+    "questions_found": 10,
+    "processing_time_ms": 0,
+    "cost_cents": 0,
+    "error": null,
+    "raw_response": {
+      "docid": "47034711-7f5e-4f50-8813-67cc88508147",
+      "document_name": "ASU_Physics Quiz",
+      "institution_name": "ASU",
+      "domain": "Physics",
+      "topic": "Weekly Quiz 1",
+      "number_of_pages": "2",
+      "total_questions": "10",
+      "questions": [
+        {
+          "question_number": 1,
+          "question_type": "mcq_single",
+          "stem_text": "The unit of electrical resistance is:",
+          "options": {
+            "A": "Ampere",
+            "B": "Ohm",
+            "C": "Coulomb",
+            "D": "Volt"
+          },
+          "sub_questions": null,
+          "gold_answer": "B",
+          "gold_confidence": 1.0,
+          "answer_explanation": "The Ohm is the SI unit of electrical resistance.",
+          "positioning": {
+            "page": 1,
+            "bbox": [
+              90.02400207519531,
+              282.59002685546875,
+              275.92999267578125,
+              296.0420227050781
+            ],
+            "stem_bbox": [
+              90.02400207519531,
+              282.59002685546875,
+              275.92999267578125,
+              296.0420227050781
+            ],
+            "stem_spans": [
+              "page0:block4:line1:span0",
+              "page0:block4:line1:span1",
+              "page0:block4:line1:span2"
+            ],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                297.469970703125,
+                167.66000366210938,
+                310.9219665527344
+              ],
+              "B": [
+                108.0199966430664,
+                312.3499755859375,
+                153.02000427246094,
+                325.8019714355469
+              ],
+              "C": [
+                108.0199966430664,
+                327.2300109863281,
+                173.66000366210938,
+                340.6820068359375
+              ],
+              "D": [
+                108.0199966430664,
+                342.1099853515625,
+                148.82000732421875,
+                355.5619812011719
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "electrical resistance",
+              "context": "stem",
+              "alternatives": [
+                "conductance",
+                "capacitance"
+              ],
+              "importance": "critical",
+              "bbox": [
+                90.02400207519531,
+                282.59002685546875,
+                275.92999267578125,
+                296.0420227050781
+              ],
+              "span_ids": [
+                "page0:block4:line1:span0",
+                "page0:block4:line1:span1",
+                "page0:block4:line1:span2"
+              ],
+              "char_start": 15,
+              "char_end": 36
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "easy",
+            "cognitive_level": "remember",
+            "topic": "Electricity",
+            "subtopic": "Units",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 30,
+            "points": 1
+          },
+          "confidence": 1.0,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.9,
+            "structure_confidence": 1.0
+          },
+          "original_text": "1. The unit of electrical resistance is: a. Ampere b. Ohm c. Coulomb d. Volt",
+          "page_number": 1,
+          "source_page": "page_1"
+        },
+        {
+          "question_number": 2,
+          "question_type": "mcq_single",
+          "stem_text": "What is the SI unit of power?",
+          "options": {
+            "A": "Watt",
+            "B": "Joule",
+            "C": "Newton",
+            "D": "Pascal"
+          },
+          "sub_questions": null,
+          "gold_answer": "A",
+          "gold_confidence": 1.0,
+          "answer_explanation": "The Watt is the SI unit of power.",
+          "positioning": {
+            "page": 1,
+            "bbox": [
+              90.02400207519531,
+              371.8699951171875,
+              252.2899932861328,
+              385.3219909667969
+            ],
+            "stem_bbox": [
+              90.02400207519531,
+              371.8699951171875,
+              252.2899932861328,
+              385.3219909667969
+            ],
+            "stem_spans": [
+              "page0:block6:line0:span0",
+              "page0:block6:line0:span1",
+              "page0:block6:line0:span2"
+            ],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                386.75,
+                151.33999633789062,
+                400.2019958496094
+              ],
+              "B": [
+                108.0199966430664,
+                401.6300048828125,
+                154.33999633789062,
+                415.0820007324219
+              ],
+              "C": [
+                108.0199966430664,
+                416.6300048828125,
+                167.05999755859375,
+                430.0820007324219
+              ],
+              "D": [
+                108.0199966430664,
+                431.5299987792969,
+                159.6199951171875,
+                444.98199462890625
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "SI unit",
+              "context": "stem",
+              "alternatives": [
+                "metric unit",
+                "imperial unit"
+              ],
+              "importance": "high",
+              "bbox": [
+                90.02400207519531,
+                371.8699951171875,
+                252.2899932861328,
+                385.3219909667969
+              ],
+              "span_ids": [
+                "page0:block6:line0:span0",
+                "page0:block6:line0:span1",
+                "page0:block6:line0:span2"
+              ],
+              "char_start": 15,
+              "char_end": 22
+            },
+            {
+              "term": "power",
+              "context": "stem",
+              "alternatives": [
+                "energy",
+                "force"
+              ],
+              "importance": "critical",
+              "bbox": [
+                90.02400207519531,
+                371.8699951171875,
+                252.2899932861328,
+                385.3219909667969
+              ],
+              "span_ids": [
+                "page0:block6:line0:span0",
+                "page0:block6:line0:span1",
+                "page0:block6:line0:span2"
+              ],
+              "char_start": 26,
+              "char_end": 31
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "easy",
+            "cognitive_level": "remember",
+            "topic": "Mechanics",
+            "subtopic": "Units",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 30,
+            "points": 1
+          },
+          "confidence": 1.0,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.9,
+            "structure_confidence": 1.0
+          },
+          "original_text": "2. What is the SI unit of power? a. Watt b. Joule c. Newton d. Pascal",
+          "page_number": 1,
+          "source_page": "page_1"
+        },
+        {
+          "question_number": 3,
+          "question_type": "mcq_single",
+          "stem_text": "What phenomenon in a prism causes the splitting of white light into its constituent colors?",
+          "options": {
+            "A": "Dispersion",
+            "B": "Refraction",
+            "C": "Diffraction",
+            "D": "Polarization"
+          },
+          "sub_questions": null,
+          "gold_answer": "A",
+          "gold_confidence": 0.9,
+          "answer_explanation": "Dispersion occurs when different wavelengths of light are refracted by different amounts, causing the splitting of white light into its constituent colors.",
+          "positioning": {
+            "page": 1,
+            "bbox": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "stem_bbox": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "stem_spans": [],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                491.04998779296875,
+                180.97999572753906,
+                504.5019836425781
+              ],
+              "B": [
+                108.0199966430664,
+                505.92999267578125,
+                179.66000366210938,
+                519.3819580078125
+              ],
+              "C": [
+                108.0199966430664,
+                520.8099975585938,
+                182.05999755859375,
+                534.261962890625
+              ],
+              "D": [
+                108.0199966430664,
+                535.6900024414062,
+                186.97999572753906,
+                549.1419677734375
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "dispersion",
+              "context": "option_A",
+              "alternatives": [
+                "refraction",
+                "diffraction",
+                "polarization"
+              ],
+              "importance": "critical",
+              "bbox": [
+                108.0199966430664,
+                491.04998779296875,
+                180.97999572753906,
+                504.5019836425781
+              ],
+              "span_ids": [
+                "page0:block9:line1:span0",
+                "page0:block9:line1:span1",
+                "page0:block9:line1:span2"
+              ],
+              "char_start": 98,
+              "char_end": 108
+            },
+            {
+              "term": "prism",
+              "context": "stem",
+              "alternatives": [
+                "lens",
+                "mirror"
+              ],
+              "importance": "high",
+              "bbox": [
+                90.02400207519531,
+                461.2900085449219,
+                506.5400390625,
+                474.74200439453125
+              ],
+              "span_ids": [
+                "page0:block8:line0:span0",
+                "page0:block8:line0:span1",
+                "page0:block8:line0:span2"
+              ],
+              "char_start": 24,
+              "char_end": 29
+            },
+            {
+              "term": "white light",
+              "context": "stem",
+              "alternatives": [
+                "monochromatic light",
+                "colored light"
+              ],
+              "importance": "medium",
+              "bbox": [
+                90.02400207519531,
+                461.2900085449219,
+                506.5400390625,
+                474.74200439453125
+              ],
+              "span_ids": [
+                "page0:block8:line0:span0",
+                "page0:block8:line0:span1",
+                "page0:block8:line0:span2"
+              ],
+              "char_start": 54,
+              "char_end": 65
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "medium",
+            "cognitive_level": "understand",
+            "topic": "Optics",
+            "subtopic": "Light Dispersion",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 60,
+            "points": null
+          },
+          "confidence": 0.95,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.3,
+            "structure_confidence": 1.0
+          },
+          "original_text": "3. What phenomenon in a prism causes the splitting of white light into its constituent colors? a. Dispersion b. Refraction c. Diffraction d. Polarization",
+          "page_number": 1,
+          "source_page": "page_1"
+        },
+        {
+          "question_number": 4,
+          "question_type": "mcq_single",
+          "stem_text": "What is Newton’s second law of Motion?",
+          "options": {
+            "A": "The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.",
+            "B": "If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other.",
+            "C": "For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first.",
+            "D": "An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force."
+          },
+          "sub_questions": null,
+          "gold_answer": "A",
+          "gold_confidence": 0.9,
+          "answer_explanation": "Newton's second law states that the acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.",
+          "positioning": {
+            "page": 1,
+            "bbox": [
+              90.02400207519531,
+              565.4500122070312,
+              311.0899963378906,
+              578.9019775390625
+            ],
+            "stem_bbox": [
+              90.02400207519531,
+              565.4500122070312,
+              311.0899963378906,
+              578.9019775390625
+            ],
+            "stem_spans": [
+              "page0:block10:line0:span0",
+              "page0:block10:line0:span1",
+              "page0:block10:line0:span2"
+            ],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                580.4500122070312,
+                513.4400634765625,
+                593.9019775390625
+              ],
+              "B": [
+                108.0199966430664,
+                610.239990234375,
+                524.8519897460938,
+                623.6919555664062
+              ],
+              "C": [
+                108.0199966430664,
+                640.0,
+                524.5280151367188,
+                653.4519653320312
+              ],
+              "D": [
+                108.0199966430664,
+                684.6400146484375,
+                521.1400146484375,
+                698.0919799804688
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "Newton’s second law",
+              "context": "stem",
+              "alternatives": [
+                "Newton’s first law",
+                "Newton’s third law"
+              ],
+              "importance": "critical",
+              "bbox": [
+                90.02400207519531,
+                565.4500122070312,
+                311.0899963378906,
+                578.9019775390625
+              ],
+              "span_ids": [
+                "page0:block10:line0:span0",
+                "page0:block10:line0:span1",
+                "page0:block10:line0:span2"
+              ],
+              "char_start": 11,
+              "char_end": 30
+            },
+            {
+              "term": "acceleration",
+              "context": "option_A",
+              "alternatives": [
+                "velocity",
+                "speed"
+              ],
+              "importance": "high",
+              "bbox": [
+                108.0199966430664,
+                580.4500122070312,
+                513.4400634765625,
+                593.9019775390625
+              ],
+              "span_ids": [
+                "page0:block11:line0:span0",
+                "page0:block11:line0:span1",
+                "page0:block11:line0:span2"
+              ],
+              "char_start": 49,
+              "char_end": 61
+            },
+            {
+              "term": "net force",
+              "context": "option_A",
+              "alternatives": [
+                "gravitational force",
+                "frictional force"
+              ],
+              "importance": "high",
+              "bbox": [
+                108.0199966430664,
+                580.4500122070312,
+                513.4400634765625,
+                593.9019775390625
+              ],
+              "span_ids": [
+                "page0:block11:line0:span0",
+                "page0:block11:line0:span1",
+                "page0:block11:line0:span2"
+              ],
+              "char_start": 107,
+              "char_end": 116
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "medium",
+            "cognitive_level": "understand",
+            "topic": "Mechanics",
+            "subtopic": "Newton's Laws of Motion",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 60,
+            "points": null
+          },
+          "confidence": 0.95,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.9,
+            "structure_confidence": 1.0
+          },
+          "original_text": "4. What is Newton’s second law of Motion? a. The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass. b. If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other. c. For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first. d. An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force.",
+          "page_number": 1,
+          "source_page": "page_1"
+        },
+        {
+          "question_number": 5,
+          "question_type": "mcq_single",
+          "stem_text": "Which variable must remain constant for Boyle’s law to hold?",
+          "options": {
+            "A": "Pressure",
+            "B": "Temperature",
+            "C": "Volume",
+            "D": "Amount of gas"
+          },
+          "sub_questions": null,
+          "gold_answer": "B",
+          "gold_confidence": 1.0,
+          "answer_explanation": "Boyle's law states that the pressure and volume of a gas are inversely proportional at constant temperature.",
+          "positioning": {
+            "page": 2,
+            "bbox": [
+              90.02400207519531,
+              72.05998229980469,
+              410.1099853515625,
+              85.5119857788086
+            ],
+            "stem_bbox": [
+              90.02400207519531,
+              72.05998229980469,
+              410.1099853515625,
+              85.5119857788086
+            ],
+            "stem_spans": [
+              "page1:block0:line0:span0",
+              "page1:block0:line0:span1",
+              "page1:block0:line0:span2"
+            ],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                86.96000671386719,
+                169.6999969482422,
+                100.4120101928711
+              ],
+              "B": [
+                108.0199966430664,
+                101.84001159667969,
+                189.52999877929688,
+                115.2920150756836
+              ],
+              "C": [
+                108.0199966430664,
+                116.71995544433594,
+                166.10000610351562,
+                130.1719512939453
+              ],
+              "D": [
+                108.0199966430664,
+                131.59996032714844,
+                200.3300018310547,
+                145.0519561767578
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "Boyle’s law",
+              "context": "stem",
+              "alternatives": [
+                "Charles's law",
+                "Avogadro's law"
+              ],
+              "importance": "critical",
+              "bbox": [
+                90.02400207519531,
+                72.05998229980469,
+                410.1099853515625,
+                85.5119857788086
+              ],
+              "span_ids": [
+                "page1:block0:line0:span0",
+                "page1:block0:line0:span1",
+                "page1:block0:line0:span2"
+              ],
+              "char_start": 43,
+              "char_end": 54
+            },
+            {
+              "term": "constant",
+              "context": "stem",
+              "alternatives": [
+                "variable",
+                "changing"
+              ],
+              "importance": "high",
+              "bbox": [
+                90.02400207519531,
+                72.05998229980469,
+                410.1099853515625,
+                85.5119857788086
+              ],
+              "span_ids": [
+                "page1:block0:line0:span0",
+                "page1:block0:line0:span1",
+                "page1:block0:line0:span2"
+              ],
+              "char_start": 30,
+              "char_end": 38
+            },
+            {
+              "term": "variable",
+              "context": "stem",
+              "alternatives": [
+                "parameter",
+                "factor"
+              ],
+              "importance": "medium",
+              "bbox": [
+                90.02400207519531,
+                72.05998229980469,
+                410.1099853515625,
+                85.5119857788086
+              ],
+              "span_ids": [
+                "page1:block0:line0:span0",
+                "page1:block0:line0:span1",
+                "page1:block0:line0:span2"
+              ],
+              "char_start": 9,
+              "char_end": 17
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "medium",
+            "cognitive_level": "understand",
+            "topic": "Gas Laws",
+            "subtopic": "Boyle's Law",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 60,
+            "points": null
+          },
+          "confidence": 1.0,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.9,
+            "structure_confidence": 1.0
+          },
+          "original_text": "5. Which variable must remain constant for Boyle’s law to hold? \na. Pressure \nb. Temperature \nc. Volume \nd. Amount of gas",
+          "page_number": 2,
+          "source_page": "page_2"
+        },
+        {
+          "question_number": 6,
+          "question_type": "mcq_single",
+          "stem_text": "In a Hooke’s-law spring experiment, which graph is linear for small extensions?",
+          "options": {
+            "A": "Force vs extension",
+            "B": "Energy vs extension",
+            "C": "Force vs time",
+            "D": "Displacement vs time"
+          },
+          "sub_questions": null,
+          "gold_answer": "A",
+          "gold_confidence": 1.0,
+          "answer_explanation": "Hooke's law states that the force exerted by a spring is proportional to its extension, resulting in a linear Force vs extension graph.",
+          "positioning": {
+            "page": 2,
+            "bbox": [
+              90.02400207519531,
+              167.59996032714844,
+              496.29998779296875,
+              181.0519561767578
+            ],
+            "stem_bbox": [
+              90.02400207519531,
+              167.59996032714844,
+              496.29998779296875,
+              181.0519561767578
+            ],
+            "stem_spans": [
+              "page1:block2:line1:span0",
+              "page1:block2:line1:span1",
+              "page1:block2:line1:span2"
+            ],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                182.47996520996094,
+                219.0500030517578,
+                195.9319610595703
+              ],
+              "B": [
+                108.0199966430664,
+                197.35997009277344,
+                229.1300048828125,
+                210.8119659423828
+              ],
+              "C": [
+                108.0199966430664,
+                212.23997497558594,
+                194.3300018310547,
+                225.6919708251953
+              ],
+              "D": [
+                108.0199966430664,
+                227.11997985839844,
+                233.08999633789062,
+                240.5719757080078
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "Hooke’s-law",
+              "context": "stem",
+              "alternatives": [
+                "Newton's law",
+                "Boyle's law"
+              ],
+              "importance": "critical",
+              "bbox": [
+                90.02400207519531,
+                167.59996032714844,
+                496.29998779296875,
+                181.0519561767578
+              ],
+              "span_ids": [
+                "page1:block2:line1:span0",
+                "page1:block2:line1:span1",
+                "page1:block2:line1:span2"
+              ],
+              "char_start": 8,
+              "char_end": 19
+            },
+            {
+              "term": "linear",
+              "context": "stem",
+              "alternatives": [
+                "non-linear",
+                "exponential"
+              ],
+              "importance": "high",
+              "bbox": [
+                90.02400207519531,
+                167.59996032714844,
+                496.29998779296875,
+                181.0519561767578
+              ],
+              "span_ids": [
+                "page1:block2:line1:span0",
+                "page1:block2:line1:span1",
+                "page1:block2:line1:span2"
+              ],
+              "char_start": 54,
+              "char_end": 60
+            },
+            {
+              "term": "extensions",
+              "context": "stem",
+              "alternatives": [
+                "compressions",
+                "deformations"
+              ],
+              "importance": "medium",
+              "bbox": [
+                90.02400207519531,
+                167.59996032714844,
+                496.29998779296875,
+                181.0519561767578
+              ],
+              "span_ids": [
+                "page1:block2:line1:span0",
+                "page1:block2:line1:span1",
+                "page1:block2:line1:span2"
+              ],
+              "char_start": 71,
+              "char_end": 81
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "medium",
+            "cognitive_level": "understand",
+            "topic": "Mechanics",
+            "subtopic": "Hooke's Law",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 60,
+            "points": null
+          },
+          "confidence": 1.0,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.9,
+            "structure_confidence": 1.0
+          },
+          "original_text": "6. In a Hooke’s-law spring experiment, which graph is linear for small extensions? \na. Force vs extension \nb. Energy vs extension  \nc. Force vs time \nd. Displacement vs time",
+          "page_number": 2,
+          "source_page": "page_2"
+        },
+        {
+          "question_number": 7,
+          "question_type": "mcq_single",
+          "stem_text": "Components connected so that the same current flows through each are in:",
+          "options": {
+            "A": "Series",
+            "B": "Parallel",
+            "C": "Resonant",
+            "D": "Open"
+          },
+          "sub_questions": null,
+          "gold_answer": "A",
+          "gold_confidence": 1.0,
+          "answer_explanation": "In a series circuit, the same current flows through all components.",
+          "positioning": {
+            "page": 2,
+            "bbox": [
+              90.02400207519531,
+              257.02996826171875,
+              468.70001220703125,
+              270.4819641113281
+            ],
+            "stem_bbox": [
+              90.02400207519531,
+              257.02996826171875,
+              468.70001220703125,
+              270.4819641113281
+            ],
+            "stem_spans": [
+              "page1:block4:line0:span0",
+              "page1:block4:line0:span1",
+              "page1:block4:line0:span2"
+            ],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                271.90997314453125,
+                158.3000030517578,
+                285.3619689941406
+              ],
+              "B": [
+                108.0199966430664,
+                286.78997802734375,
+                165.6199951171875,
+                300.2419738769531
+              ],
+              "C": [
+                108.0199966430664,
+                301.66998291015625,
+                173.66000366210938,
+                315.1219787597656
+              ],
+              "D": [
+                108.0199966430664,
+                316.54998779296875,
+                155.05999755859375,
+                330.0019836425781
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "current",
+              "context": "stem",
+              "alternatives": [
+                "voltage",
+                "resistance"
+              ],
+              "importance": "critical",
+              "bbox": [
+                90.02400207519531,
+                257.02996826171875,
+                468.70001220703125,
+                270.4819641113281
+              ],
+              "span_ids": [
+                "page1:block4:line0:span0",
+                "page1:block4:line0:span1",
+                "page1:block4:line0:span2"
+              ],
+              "char_start": 41,
+              "char_end": 48
+            },
+            {
+              "term": "series",
+              "context": "option_A",
+              "alternatives": [
+                "parallel",
+                "resonant"
+              ],
+              "importance": "high",
+              "bbox": [
+                108.0199966430664,
+                271.90997314453125,
+                158.3000030517578,
+                285.3619689941406
+              ],
+              "span_ids": [
+                "page1:block5:line0:span0",
+                "page1:block5:line0:span1",
+                "page1:block5:line0:span2"
+              ],
+              "char_start": 79,
+              "char_end": 85
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "easy",
+            "cognitive_level": "understand",
+            "topic": "Electric Circuits",
+            "subtopic": "Series and Parallel Circuits",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 30,
+            "points": 1
+          },
+          "confidence": 1.0,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.9,
+            "structure_confidence": 1.0
+          },
+          "original_text": "7. Components connected so that the same current flows through each are in: a. Series b. Parallel c. Resonant d. Open",
+          "page_number": 2,
+          "source_page": "page_2"
+        },
+        {
+          "question_number": 8,
+          "question_type": "mcq_single",
+          "stem_text": "At constant pressure, the heat added to a system equals the change in:",
+          "options": {
+            "A": "Enthalpy",
+            "B": "Internal Energy",
+            "C": "Gibbs free energy",
+            "D": "Helmholtz free energy"
+          },
+          "sub_questions": null,
+          "gold_answer": "A",
+          "gold_confidence": 1.0,
+          "answer_explanation": "At constant pressure, the heat added to a system is equal to the change in enthalpy.",
+          "positioning": {
+            "page": 2,
+            "bbox": [
+              90.02400207519531,
+              346.30999755859375,
+              445.4200134277344,
+              359.7619934082031
+            ],
+            "stem_bbox": [
+              90.02400207519531,
+              346.30999755859375,
+              445.4200134277344,
+              359.7619934082031
+            ],
+            "stem_spans": [
+              "page1:block6:line0:span0",
+              "page1:block6:line0:span1",
+              "page1:block6:line0:span2"
+            ],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                361.19000244140625,
+                172.33999633789062,
+                374.6419982910156
+              ],
+              "B": [
+                108.0199966430664,
+                376.07000732421875,
+                203.80999755859375,
+                389.5220031738281
+              ],
+              "C": [
+                108.0199966430664,
+                391.07000732421875,
+                214.85000610351562,
+                404.5220031738281
+              ],
+              "D": [
+                108.0199966430664,
+                405.95001220703125,
+                236.80999755859375,
+                419.4020080566406
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "enthalpy",
+              "context": "option_A",
+              "alternatives": [
+                "internal energy",
+                "Gibbs free energy"
+              ],
+              "importance": "critical",
+              "bbox": [
+                108.0199966430664,
+                361.19000244140625,
+                172.33999633789062,
+                374.6419982910156
+              ],
+              "span_ids": [
+                "page1:block7:line0:span0",
+                "page1:block7:line0:span1",
+                "page1:block7:line0:span2"
+              ],
+              "char_start": 77,
+              "char_end": 85
+            },
+            {
+              "term": "constant pressure",
+              "context": "stem",
+              "alternatives": [
+                "constant volume",
+                "constant temperature"
+              ],
+              "importance": "high",
+              "bbox": [
+                90.02400207519531,
+                346.30999755859375,
+                445.4200134277344,
+                359.7619934082031
+              ],
+              "span_ids": [
+                "page1:block6:line0:span0",
+                "page1:block6:line0:span1",
+                "page1:block6:line0:span2"
+              ],
+              "char_start": 6,
+              "char_end": 23
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "medium",
+            "cognitive_level": "understand",
+            "topic": "Thermodynamics",
+            "subtopic": "Enthalpy",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 45,
+            "points": 1
+          },
+          "confidence": 1.0,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.9,
+            "structure_confidence": 1.0
+          },
+          "original_text": "8. At constant pressure, the heat added to a system equals the change in: a. Enthalpy b. Internal Energy c. Gibbs free energy d. Helmholtz free energy",
+          "page_number": 2,
+          "source_page": "page_2"
+        },
+        {
+          "question_number": 9,
+          "question_type": "mcq_single",
+          "stem_text": "Which law describes the magnitude of the gravitational force between two point masses?",
+          "options": {
+            "A": "Newton’s law of gravitation",
+            "B": "Coulomb’s law",
+            "C": "Ampere’s law",
+            "D": "Faraday’s law"
+          },
+          "sub_questions": null,
+          "gold_answer": "A",
+          "gold_confidence": 1.0,
+          "answer_explanation": "Newton’s law of gravitation describes the gravitational force between two masses.",
+          "positioning": {
+            "page": 2,
+            "bbox": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "stem_bbox": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "stem_spans": [],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                465.489990234375,
+                264.04998779296875,
+                478.9419860839844
+              ],
+              "B": [
+                108.0199966430664,
+                480.3699951171875,
+                202.72999572753906,
+                493.8219909667969
+              ],
+              "C": [
+                108.0199966430664,
+                495.25,
+                196.72999572753906,
+                508.7019958496094
+              ],
+              "D": [
+                108.0199966430664,
+                510.1300048828125,
+                196.72999572753906,
+                523.5819702148438
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "gravitational force",
+              "context": "stem",
+              "alternatives": [
+                "electromagnetic force",
+                "nuclear force"
+              ],
+              "importance": "critical",
+              "bbox": [
+                90.02400207519531,
+                435.7300109863281,
+                496.05999755859375,
+                449.1820068359375
+              ],
+              "span_ids": [
+                "page1:block8:line0:span0",
+                "page1:block8:line0:span1",
+                "page1:block8:line0:span2"
+              ],
+              "char_start": 44,
+              "char_end": 63
+            },
+            {
+              "term": "point masses",
+              "context": "stem",
+              "alternatives": [
+                "extended bodies",
+                "particles"
+              ],
+              "importance": "high",
+              "bbox": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "span_ids": [],
+              "char_start": 76,
+              "char_end": 88
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "easy",
+            "cognitive_level": "understand",
+            "topic": "Gravitation",
+            "subtopic": "Newton's Law of Gravitation",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 60,
+            "points": null
+          },
+          "confidence": 1.0,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.3,
+            "structure_confidence": 1.0
+          },
+          "original_text": "9. Which law describes the magnitude of the gravitational force between two point masses? \na. Newton’s law of gravitation \nb. Coulomb’s law \nc. Ampere’s law \nd. Faraday’s law",
+          "page_number": 2,
+          "source_page": "page_2"
+        },
+        {
+          "question_number": 10,
+          "question_type": "mcq_single",
+          "stem_text": "The energy possessed by a body due to its motion is called:",
+          "options": {
+            "A": "Potential Energy",
+            "B": "Kinetic Energy",
+            "C": "Mechanical Energy",
+            "D": "Chemical Energy"
+          },
+          "sub_questions": null,
+          "gold_answer": "B",
+          "gold_confidence": 1.0,
+          "answer_explanation": "Kinetic energy is the energy possessed by an object due to its motion.",
+          "positioning": {
+            "page": 2,
+            "bbox": [
+              90.02400207519531,
+              539.8900146484375,
+              395.7099914550781,
+              553.3419799804688
+            ],
+            "stem_bbox": [
+              90.02400207519531,
+              539.8900146484375,
+              395.7099914550781,
+              553.3419799804688
+            ],
+            "stem_spans": [
+              "page1:block10:line0:span0",
+              "page1:block10:line0:span1",
+              "page1:block10:line0:span2"
+            ],
+            "option_bboxes": {
+              "A": [
+                108.0199966430664,
+                554.8900146484375,
+                209.2100067138672,
+                568.3419799804688
+              ],
+              "B": [
+                108.0199966430664,
+                569.77001953125,
+                201.77000427246094,
+                583.2219848632812
+              ],
+              "C": [
+                108.0199966430664,
+                584.6500244140625,
+                222.41000366210938,
+                598.1019897460938
+              ],
+              "D": [
+                108.0199966430664,
+                599.530029296875,
+                212.4499969482422,
+                612.9819946289062
+              ]
+            },
+            "extraction_order": 0,
+            "method": "gpt4_vision_chunked_boundary_safe"
+          },
+          "formulas": [],
+          "visual_elements": [],
+          "tables": null,
+          "code_snippets": null,
+          "key_terms": [
+            {
+              "term": "energy",
+              "context": "stem",
+              "alternatives": [
+                "power",
+                "force"
+              ],
+              "importance": "critical",
+              "bbox": [
+                108.0199966430664,
+                197.35997009277344,
+                229.1300048828125,
+                210.8119659423828
+              ],
+              "span_ids": [
+                "page1:block3:line1:span0",
+                "page1:block3:line1:span1",
+                "page1:block3:line1:span2"
+              ],
+              "char_start": 8,
+              "char_end": 14
+            },
+            {
+              "term": "motion",
+              "context": "stem",
+              "alternatives": [
+                "rest",
+                "equilibrium"
+              ],
+              "importance": "high",
+              "bbox": [
+                90.02400207519531,
+                539.8900146484375,
+                395.7099914550781,
+                553.3419799804688
+              ],
+              "span_ids": [
+                "page1:block10:line0:span0",
+                "page1:block10:line0:span1",
+                "page1:block10:line0:span2"
+              ],
+              "char_start": 46,
+              "char_end": 52
+            }
+          ],
+          "numerical_values": null,
+          "metadata": {
+            "subject_area": "physics",
+            "complexity": "easy",
+            "cognitive_level": "understand",
+            "topic": "Energy",
+            "subtopic": "Kinetic Energy",
+            "has_images": false,
+            "has_formulas": false,
+            "has_code": false,
+            "has_tables": false,
+            "estimated_time_seconds": 60,
+            "points": null
+          },
+          "confidence": 1.0,
+          "extraction_quality": {
+            "text_quality": 1.0,
+            "positioning_quality": 0.9,
+            "structure_confidence": 1.0
+          },
+          "original_text": "10. The energy possessed by a body due to its motion is called: \na. Potential Energy \nb. Kinetic Energy \nc. Mechanical Energy \nd. Chemical Energy",
+          "page_number": 2,
+          "source_page": "page_2"
+        }
+      ]
+    }
+  },
+  "content_elements": [],
+  "question_index": [
+    {
+      "manipulation_id": 211,
+      "sequence_index": 0,
+      "source_identifier": "span-page0:block4:line1:span0",
+      "q_number": "1",
+      "page": 1,
+      "stem": {
+        "text": "The unit of electrical resistance is:",
+        "bbox": [
+          90.02400207519531,
+          282.59002685546875,
+          275.92999267578125,
+          296.0420227050781
+        ],
+        "spans": [
+          "page0:block4:line1:span0",
+          "page0:block4:line1:span1",
+          "page0:block4:line1:span2"
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Ampere"
+        },
+        "B": {
+          "text": "Ohm"
+        },
+        "C": {
+          "text": "Coulomb"
+        },
+        "D": {
+          "text": "Volt"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          282.59002685546875,
+          275.92999267578125,
+          296.0420227050781
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          282.59002685546875,
+          275.92999267578125,
+          296.0420227050781
+        ],
+        "stem_spans": [
+          "page0:block4:line1:span0",
+          "page0:block4:line1:span1",
+          "page0:block4:line1:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            297.469970703125,
+            167.66000366210938,
+            310.9219665527344
+          ],
+          "B": [
+            108.0199966430664,
+            312.3499755859375,
+            153.02000427246094,
+            325.8019714355469
+          ],
+          "C": [
+            108.0199966430664,
+            327.2300109863281,
+            173.66000366210938,
+            340.6820068359375
+          ],
+          "D": [
+            108.0199966430664,
+            342.1099853515625,
+            148.82000732421875,
+            355.5619812011719
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page0:block4:line1:span0",
+          "page0:block4:line1:span1",
+          "page0:block4:line1:span2"
+        ]
+      },
+      "question_number": "1",
+      "stem_spans": [
+        "page0:block4:line1:span0",
+        "page0:block4:line1:span1",
+        "page0:block4:line1:span2"
+      ],
+      "stem_bbox": [
+        90.02400207519531,
+        282.59002685546875,
+        275.92999267578125,
+        296.0420227050781
+      ]
+    },
+    {
+      "manipulation_id": 212,
+      "sequence_index": 1,
+      "source_identifier": "span-page0:block6:line0:span0",
+      "q_number": "2",
+      "page": 1,
+      "stem": {
+        "text": "What is the SI unit of power?",
+        "bbox": [
+          90.02400207519531,
+          371.8699951171875,
+          252.2899932861328,
+          385.3219909667969
+        ],
+        "spans": [
+          "page0:block6:line0:span0",
+          "page0:block6:line0:span1",
+          "page0:block6:line0:span2"
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Watt"
+        },
+        "B": {
+          "text": "Joule"
+        },
+        "C": {
+          "text": "Newton"
+        },
+        "D": {
+          "text": "Pascal"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          371.8699951171875,
+          252.2899932861328,
+          385.3219909667969
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          371.8699951171875,
+          252.2899932861328,
+          385.3219909667969
+        ],
+        "stem_spans": [
+          "page0:block6:line0:span0",
+          "page0:block6:line0:span1",
+          "page0:block6:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            386.75,
+            151.33999633789062,
+            400.2019958496094
+          ],
+          "B": [
+            108.0199966430664,
+            401.6300048828125,
+            154.33999633789062,
+            415.0820007324219
+          ],
+          "C": [
+            108.0199966430664,
+            416.6300048828125,
+            167.05999755859375,
+            430.0820007324219
+          ],
+          "D": [
+            108.0199966430664,
+            431.5299987792969,
+            159.6199951171875,
+            444.98199462890625
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page0:block6:line0:span0",
+          "page0:block6:line0:span1",
+          "page0:block6:line0:span2"
+        ]
+      },
+      "question_number": "2",
+      "stem_spans": [
+        "page0:block6:line0:span0",
+        "page0:block6:line0:span1",
+        "page0:block6:line0:span2"
+      ],
+      "stem_bbox": [
+        90.02400207519531,
+        371.8699951171875,
+        252.2899932861328,
+        385.3219909667969
+      ]
+    },
+    {
+      "manipulation_id": 213,
+      "sequence_index": 2,
+      "source_identifier": "auto-2",
+      "q_number": "3",
+      "page": 1,
+      "stem": {
+        "text": "What phenomenon in a prism causes the splitting of white light into its constituent colors?",
+        "bbox": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Dispersion"
+        },
+        "B": {
+          "text": "Refraction"
+        },
+        "C": {
+          "text": "Diffraction"
+        },
+        "D": {
+          "text": "Polarization"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            491.04998779296875,
+            180.97999572753906,
+            504.5019836425781
+          ],
+          "B": [
+            108.0199966430664,
+            505.92999267578125,
+            179.66000366210938,
+            519.3819580078125
+          ],
+          "C": [
+            108.0199966430664,
+            520.8099975585938,
+            182.05999755859375,
+            534.261962890625
+          ],
+          "D": [
+            108.0199966430664,
+            535.6900024414062,
+            186.97999572753906,
+            549.1419677734375
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "question_number": "3",
+      "stem_bbox": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "manipulation_id": 214,
+      "sequence_index": 3,
+      "source_identifier": "span-page0:block10:line0:span0",
+      "q_number": "4",
+      "page": 1,
+      "stem": {
+        "text": "What is Newton’s second law of Motion?",
+        "bbox": [
+          90.02400207519531,
+          565.4500122070312,
+          311.0899963378906,
+          578.9019775390625
+        ],
+        "spans": [
+          "page0:block10:line0:span0",
+          "page0:block10:line0:span1",
+          "page0:block10:line0:span2"
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass."
+        },
+        "B": {
+          "text": "If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other."
+        },
+        "C": {
+          "text": "For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first."
+        },
+        "D": {
+          "text": "An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force."
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          90.02400207519531,
+          565.4500122070312,
+          311.0899963378906,
+          578.9019775390625
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          565.4500122070312,
+          311.0899963378906,
+          578.9019775390625
+        ],
+        "stem_spans": [
+          "page0:block10:line0:span0",
+          "page0:block10:line0:span1",
+          "page0:block10:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            580.4500122070312,
+            513.4400634765625,
+            593.9019775390625
+          ],
+          "B": [
+            108.0199966430664,
+            610.239990234375,
+            524.8519897460938,
+            623.6919555664062
+          ],
+          "C": [
+            108.0199966430664,
+            640.0,
+            524.5280151367188,
+            653.4519653320312
+          ],
+          "D": [
+            108.0199966430664,
+            684.6400146484375,
+            521.1400146484375,
+            698.0919799804688
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page0:block10:line0:span0",
+          "page0:block10:line0:span1",
+          "page0:block10:line0:span2"
+        ]
+      },
+      "question_number": "4",
+      "stem_spans": [
+        "page0:block10:line0:span0",
+        "page0:block10:line0:span1",
+        "page0:block10:line0:span2"
+      ],
+      "stem_bbox": [
+        90.02400207519531,
+        565.4500122070312,
+        311.0899963378906,
+        578.9019775390625
+      ]
+    },
+    {
+      "manipulation_id": 215,
+      "sequence_index": 4,
+      "source_identifier": "span-page1:block0:line0:span0",
+      "q_number": "5",
+      "page": 2,
+      "stem": {
+        "text": "Which variable must remain constant for Boyle’s law to hold?",
+        "bbox": [
+          90.02400207519531,
+          72.05998229980469,
+          410.1099853515625,
+          85.5119857788086
+        ],
+        "spans": [
+          "page1:block0:line0:span0",
+          "page1:block0:line0:span1",
+          "page1:block0:line0:span2"
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Pressure"
+        },
+        "B": {
+          "text": "Temperature"
+        },
+        "C": {
+          "text": "Volume"
+        },
+        "D": {
+          "text": "Amount of gas"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          72.05998229980469,
+          410.1099853515625,
+          85.5119857788086
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          72.05998229980469,
+          410.1099853515625,
+          85.5119857788086
+        ],
+        "stem_spans": [
+          "page1:block0:line0:span0",
+          "page1:block0:line0:span1",
+          "page1:block0:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            86.96000671386719,
+            169.6999969482422,
+            100.4120101928711
+          ],
+          "B": [
+            108.0199966430664,
+            101.84001159667969,
+            189.52999877929688,
+            115.2920150756836
+          ],
+          "C": [
+            108.0199966430664,
+            116.71995544433594,
+            166.10000610351562,
+            130.1719512939453
+          ],
+          "D": [
+            108.0199966430664,
+            131.59996032714844,
+            200.3300018310547,
+            145.0519561767578
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block0:line0:span0",
+          "page1:block0:line0:span1",
+          "page1:block0:line0:span2"
+        ]
+      },
+      "question_number": "5",
+      "stem_spans": [
+        "page1:block0:line0:span0",
+        "page1:block0:line0:span1",
+        "page1:block0:line0:span2"
+      ],
+      "stem_bbox": [
+        90.02400207519531,
+        72.05998229980469,
+        410.1099853515625,
+        85.5119857788086
+      ]
+    },
+    {
+      "manipulation_id": 216,
+      "sequence_index": 5,
+      "source_identifier": "span-page1:block2:line1:span0",
+      "q_number": "6",
+      "page": 2,
+      "stem": {
+        "text": "In a Hooke’s-law spring experiment, which graph is linear for small extensions?",
+        "bbox": [
+          90.02400207519531,
+          167.59996032714844,
+          496.29998779296875,
+          181.0519561767578
+        ],
+        "spans": [
+          "page1:block2:line1:span0",
+          "page1:block2:line1:span1",
+          "page1:block2:line1:span2"
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Force vs extension"
+        },
+        "B": {
+          "text": "Energy vs extension"
+        },
+        "C": {
+          "text": "Force vs time"
+        },
+        "D": {
+          "text": "Displacement vs time"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          167.59996032714844,
+          496.29998779296875,
+          181.0519561767578
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          167.59996032714844,
+          496.29998779296875,
+          181.0519561767578
+        ],
+        "stem_spans": [
+          "page1:block2:line1:span0",
+          "page1:block2:line1:span1",
+          "page1:block2:line1:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            182.47996520996094,
+            219.0500030517578,
+            195.9319610595703
+          ],
+          "B": [
+            108.0199966430664,
+            197.35997009277344,
+            229.1300048828125,
+            210.8119659423828
+          ],
+          "C": [
+            108.0199966430664,
+            212.23997497558594,
+            194.3300018310547,
+            225.6919708251953
+          ],
+          "D": [
+            108.0199966430664,
+            227.11997985839844,
+            233.08999633789062,
+            240.5719757080078
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block2:line1:span0",
+          "page1:block2:line1:span1",
+          "page1:block2:line1:span2"
+        ]
+      },
+      "question_number": "6",
+      "stem_spans": [
+        "page1:block2:line1:span0",
+        "page1:block2:line1:span1",
+        "page1:block2:line1:span2"
+      ],
+      "stem_bbox": [
+        90.02400207519531,
+        167.59996032714844,
+        496.29998779296875,
+        181.0519561767578
+      ]
+    },
+    {
+      "manipulation_id": 217,
+      "sequence_index": 6,
+      "source_identifier": "span-page1:block4:line0:span0",
+      "q_number": "7",
+      "page": 2,
+      "stem": {
+        "text": "Components connected so that the same current flows through each are in:",
+        "bbox": [
+          90.02400207519531,
+          257.02996826171875,
+          468.70001220703125,
+          270.4819641113281
+        ],
+        "spans": [
+          "page1:block4:line0:span0",
+          "page1:block4:line0:span1",
+          "page1:block4:line0:span2"
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Series"
+        },
+        "B": {
+          "text": "Parallel"
+        },
+        "C": {
+          "text": "Resonant"
+        },
+        "D": {
+          "text": "Open"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          257.02996826171875,
+          468.70001220703125,
+          270.4819641113281
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          257.02996826171875,
+          468.70001220703125,
+          270.4819641113281
+        ],
+        "stem_spans": [
+          "page1:block4:line0:span0",
+          "page1:block4:line0:span1",
+          "page1:block4:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            271.90997314453125,
+            158.3000030517578,
+            285.3619689941406
+          ],
+          "B": [
+            108.0199966430664,
+            286.78997802734375,
+            165.6199951171875,
+            300.2419738769531
+          ],
+          "C": [
+            108.0199966430664,
+            301.66998291015625,
+            173.66000366210938,
+            315.1219787597656
+          ],
+          "D": [
+            108.0199966430664,
+            316.54998779296875,
+            155.05999755859375,
+            330.0019836425781
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block4:line0:span0",
+          "page1:block4:line0:span1",
+          "page1:block4:line0:span2"
+        ]
+      },
+      "question_number": "7",
+      "stem_spans": [
+        "page1:block4:line0:span0",
+        "page1:block4:line0:span1",
+        "page1:block4:line0:span2"
+      ],
+      "stem_bbox": [
+        90.02400207519531,
+        257.02996826171875,
+        468.70001220703125,
+        270.4819641113281
+      ]
+    },
+    {
+      "manipulation_id": 218,
+      "sequence_index": 7,
+      "source_identifier": "span-page1:block6:line0:span0",
+      "q_number": "8",
+      "page": 2,
+      "stem": {
+        "text": "At constant pressure, the heat added to a system equals the change in:",
+        "bbox": [
+          90.02400207519531,
+          346.30999755859375,
+          445.4200134277344,
+          359.7619934082031
+        ],
+        "spans": [
+          "page1:block6:line0:span0",
+          "page1:block6:line0:span1",
+          "page1:block6:line0:span2"
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Enthalpy"
+        },
+        "B": {
+          "text": "Internal Energy"
+        },
+        "C": {
+          "text": "Gibbs free energy"
+        },
+        "D": {
+          "text": "Helmholtz free energy"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          346.30999755859375,
+          445.4200134277344,
+          359.7619934082031
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          346.30999755859375,
+          445.4200134277344,
+          359.7619934082031
+        ],
+        "stem_spans": [
+          "page1:block6:line0:span0",
+          "page1:block6:line0:span1",
+          "page1:block6:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            361.19000244140625,
+            172.33999633789062,
+            374.6419982910156
+          ],
+          "B": [
+            108.0199966430664,
+            376.07000732421875,
+            203.80999755859375,
+            389.5220031738281
+          ],
+          "C": [
+            108.0199966430664,
+            391.07000732421875,
+            214.85000610351562,
+            404.5220031738281
+          ],
+          "D": [
+            108.0199966430664,
+            405.95001220703125,
+            236.80999755859375,
+            419.4020080566406
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block6:line0:span0",
+          "page1:block6:line0:span1",
+          "page1:block6:line0:span2"
+        ]
+      },
+      "question_number": "8",
+      "stem_spans": [
+        "page1:block6:line0:span0",
+        "page1:block6:line0:span1",
+        "page1:block6:line0:span2"
+      ],
+      "stem_bbox": [
+        90.02400207519531,
+        346.30999755859375,
+        445.4200134277344,
+        359.7619934082031
+      ]
+    },
+    {
+      "manipulation_id": 219,
+      "sequence_index": 8,
+      "source_identifier": "auto-8",
+      "q_number": "9",
+      "page": 2,
+      "stem": {
+        "text": "Which law describes the magnitude of the gravitational force between two point masses?",
+        "bbox": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Newton’s law of gravitation"
+        },
+        "B": {
+          "text": "Coulomb’s law"
+        },
+        "C": {
+          "text": "Ampere’s law"
+        },
+        "D": {
+          "text": "Faraday’s law"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "stem_bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "stem_spans": [],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            465.489990234375,
+            264.04998779296875,
+            478.9419860839844
+          ],
+          "B": [
+            108.0199966430664,
+            480.3699951171875,
+            202.72999572753906,
+            493.8219909667969
+          ],
+          "C": [
+            108.0199966430664,
+            495.25,
+            196.72999572753906,
+            508.7019958496094
+          ],
+          "D": [
+            108.0199966430664,
+            510.1300048828125,
+            196.72999572753906,
+            523.5819702148438
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe"
+      },
+      "question_number": "9",
+      "stem_bbox": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "manipulation_id": 220,
+      "sequence_index": 9,
+      "source_identifier": "span-page1:block10:line0:span0",
+      "q_number": "10",
+      "page": 2,
+      "stem": {
+        "text": "The energy possessed by a body due to its motion is called:",
+        "bbox": [
+          90.02400207519531,
+          539.8900146484375,
+          395.7099914550781,
+          553.3419799804688
+        ],
+        "spans": [
+          "page1:block10:line0:span0",
+          "page1:block10:line0:span1",
+          "page1:block10:line0:span2"
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Potential Energy"
+        },
+        "B": {
+          "text": "Kinetic Energy"
+        },
+        "C": {
+          "text": "Mechanical Energy"
+        },
+        "D": {
+          "text": "Chemical Energy"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "data_extraction_pipeline"
+        ]
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          90.02400207519531,
+          539.8900146484375,
+          395.7099914550781,
+          553.3419799804688
+        ],
+        "stem_bbox": [
+          90.02400207519531,
+          539.8900146484375,
+          395.7099914550781,
+          553.3419799804688
+        ],
+        "stem_spans": [
+          "page1:block10:line0:span0",
+          "page1:block10:line0:span1",
+          "page1:block10:line0:span2"
+        ],
+        "option_bboxes": {
+          "A": [
+            108.0199966430664,
+            554.8900146484375,
+            209.2100067138672,
+            568.3419799804688
+          ],
+          "B": [
+            108.0199966430664,
+            569.77001953125,
+            201.77000427246094,
+            583.2219848632812
+          ],
+          "C": [
+            108.0199966430664,
+            584.6500244140625,
+            222.41000366210938,
+            598.1019897460938
+          ],
+          "D": [
+            108.0199966430664,
+            599.530029296875,
+            212.4499969482422,
+            612.9819946289062
+          ]
+        },
+        "extraction_order": 0,
+        "method": "gpt4_vision_chunked_boundary_safe",
+        "span_ids": [
+          "page1:block10:line0:span0",
+          "page1:block10:line0:span1",
+          "page1:block10:line0:span2"
+        ]
+      },
+      "question_number": "10",
+      "stem_spans": [
+        "page1:block10:line0:span0",
+        "page1:block10:line0:span1",
+        "page1:block10:line0:span2"
+      ],
+      "stem_bbox": [
+        90.02400207519531,
+        539.8900146484375,
+        395.7099914550781,
+        553.3419799804688
+      ]
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 10,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

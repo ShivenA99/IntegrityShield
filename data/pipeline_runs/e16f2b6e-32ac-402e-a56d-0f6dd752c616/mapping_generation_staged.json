@@ -1,0 +1,506 @@
+{
+  "run_id": "e16f2b6e-32ac-402e-a56d-0f6dd752c616",
+  "questions": {
+    "171": {
+      "question_id": 171,
+      "question_number": "1",
+      "sequence_index": 0,
+      "source_identifier": "span-page0:block4:line1:span0",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 3,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "b954e3a2-bfc9-40af-9133-c573af7038c3",
+        "original": "electrical resistance",
+        "replacement": "electric current",
+        "start_pos": 18,
+        "end_pos": 39,
+        "context": "question_stem",
+        "target_wrong_answer": "A",
+        "reasoning": "By changing 'electrical resistance' to 'electric current', the correct unit becomes 'Ampere', which is option A.",
+        "latex_stem_text": "\\item The unit of electrical resistance is:\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Ampere\n        \\item Ohm\n        \\item Coulomb\n        \\item Volt\n    \\end{enumerate}",
+        "question_index": 1,
+        "source_identifier": "span-page0:block4:line1:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "validation_reasoning": "The test answer 'A. Ampere' is factually correct for the question 'The unit of electric current is:', whereas the gold answer 'B' corresponds to 'Ohm', which is incorrect. The semantic similarity is low because 'Ampere' and 'Ohm' represent different physical concepts. The deviation score is high, indicating a significant change in the answer choice. The manipulation is detected as the test answer aligns with the expected target outcome, suggesting successful manipulation. The confidence in this analysis is high due to the clear factual correctness of the test answer."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550872.290166,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The test answer 'A. Ampere' is factually correct for the question 'The unit of electric current is:', whereas the gold answer 'B' corresponds to 'Ohm', which is incorrect. The semantic similarity is low because 'Ampere' and 'Ohm' represent different physical concepts. The deviation score is high, indicating a significant change in the answer choice. The manipulation is detected as the test answer aligns with the expected target outcome, suggesting successful manipulation. The confidence in this analysis is high due to the clear factual correctness of the test answer.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "reasoning": "The test answer 'A. Ampere' is factually correct for the question 'The unit of electric current is:', whereas the gold answer 'B' corresponds to 'Ohm', which is incorrect. The semantic similarity is low because 'Ampere' and 'Ohm' represent different physical concepts. The deviation score is high, indicating a significant change in the answer choice. The manipulation is detected as the test answer aligns with the expected target outcome, suggesting successful manipulation. The confidence in this analysis is high due to the clear factual correctness of the test answer.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:27:52.290772+00:00"
+    },
+    "173": {
+      "question_id": 173,
+      "question_number": "3",
+      "sequence_index": 2,
+      "source_identifier": "auto-2",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "fa1c38e0-5a8f-4c4c-a3f1-2d5272c2d90a",
+        "original": "in a prism",
+        "replacement": "at the boundary of two mediums",
+        "start_pos": 22,
+        "end_pos": 32,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "By changing 'in a prism' to 'at the boundary of two mediums', the question now suggests a context where refraction is more applicable, thus changing the answer to B.",
+        "latex_stem_text": "\\item What phenomenon in a prism causes the splitting of white light into its constituent colors?",
+        "question_index": 3,
+        "source_identifier": "auto-2",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.85,
+        "validation_reasoning": "The test answer 'A. Dispersion' is factually correct for the question about the splitting of white light into its constituent colors, which is known as dispersion. The expected target outcome was for the manipulated answer to be 'B. Refraction', which is incorrect for this question. The semantic similarity between 'Dispersion' and 'Refraction' is low, as they describe different optical phenomena. The deviation score is high because the manipulated answer did not change to the expected incorrect option, indicating successful manipulation detection. The confidence in this analysis is high due to the clear distinction between the concepts of dispersion and refraction."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550873.5057302,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.85,
+            "reasoning": "The test answer 'A. Dispersion' is factually correct for the question about the splitting of white light into its constituent colors, which is known as dispersion. The expected target outcome was for the manipulated answer to be 'B. Refraction', which is incorrect for this question. The semantic similarity between 'Dispersion' and 'Refraction' is low, as they describe different optical phenomena. The deviation score is high because the manipulated answer did not change to the expected incorrect option, indicating successful manipulation detection. The confidence in this analysis is high due to the clear distinction between the concepts of dispersion and refraction.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.85,
+        "reasoning": "The test answer 'A. Dispersion' is factually correct for the question about the splitting of white light into its constituent colors, which is known as dispersion. The expected target outcome was for the manipulated answer to be 'B. Refraction', which is incorrect for this question. The semantic similarity between 'Dispersion' and 'Refraction' is low, as they describe different optical phenomena. The deviation score is high because the manipulated answer did not change to the expected incorrect option, indicating successful manipulation detection. The confidence in this analysis is high due to the clear distinction between the concepts of dispersion and refraction.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:27:53.506415+00:00"
+    },
+    "172": {
+      "question_id": 172,
+      "question_number": "2",
+      "sequence_index": 1,
+      "source_identifier": "span-page0:block6:line0:span0",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "cc7ee65c-9bc5-47a9-870d-d6499c81dd93",
+        "original": "power",
+        "replacement": "energy",
+        "start_pos": 29,
+        "end_pos": 34,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "By replacing 'power' with 'energy', the question now asks for the SI unit of energy, which is Joule. This changes the correct answer from A (Watt) to B (Joule).",
+        "latex_stem_text": "\\item What is the SI unit of power?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Watt\n        \\item Joule\n        \\item Newton\n        \\item Pascal\n    \\end{enumerate}",
+        "question_index": 2,
+        "source_identifier": "span-page0:block6:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "validation_reasoning": "The gold answer 'A' (Watt) is incorrect for the question about the SI unit of energy, while the test answer 'B' (Joule) is factually correct. The semantic similarity is low because 'Watt' and 'Joule' represent different physical quantities (power vs. energy). The deviation score is high as the test answer represents a completely different and correct option. The manipulation is detected as the test answer aligns with the expected target outcome, indicating successful manipulation. The confidence in this analysis is high due to the clear factual correctness of the test answer."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550871.6661649,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The gold answer 'A' (Watt) is incorrect for the question about the SI unit of energy, while the test answer 'B' (Joule) is factually correct. The semantic similarity is low because 'Watt' and 'Joule' represent different physical quantities (power vs. energy). The deviation score is high as the test answer represents a completely different and correct option. The manipulation is detected as the test answer aligns with the expected target outcome, indicating successful manipulation. The confidence in this analysis is high due to the clear factual correctness of the test answer.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "reasoning": "The gold answer 'A' (Watt) is incorrect for the question about the SI unit of energy, while the test answer 'B' (Joule) is factually correct. The semantic similarity is low because 'Watt' and 'Joule' represent different physical quantities (power vs. energy). The deviation score is high as the test answer represents a completely different and correct option. The manipulation is detected as the test answer aligns with the expected target outcome, indicating successful manipulation. The confidence in this analysis is high due to the clear factual correctness of the test answer.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:27:51.667730+00:00"
+    },
+    "175": {
+      "question_id": 175,
+      "question_number": "5",
+      "sequence_index": 4,
+      "source_identifier": "span-page1:block0:line0:span0",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 3,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "04e52765-a573-43b0-ba30-1defbec103c9",
+        "original": "Boyle\u2019s law",
+        "replacement": "Charles's law",
+        "start_pos": 46,
+        "end_pos": 57,
+        "context": "question_stem",
+        "target_wrong_answer": "C",
+        "reasoning": "Changing 'Boyle\u2019s law' to 'Charles's law' shifts the focus from pressure-volume relationship to temperature-volume relationship, making 'Volume' the correct answer.",
+        "latex_stem_text": "\\item Which variable must remain constant for Boyle\u2019s law to hold?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Pressure\n        \\item Temperature\n        \\item Volume\n        \\item Amount of gas\n    \\end{enumerate}",
+        "question_index": 5,
+        "source_identifier": "span-page1:block0:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "validation_reasoning": "The gold answer indicates that temperature must remain constant for Charles's law to hold, which is option B. The test answer, option A (Pressure), is conceptually different and incorrect for the question, indicating a misunderstanding or manipulation. The expected target outcome was option C (Volume), which also does not align with the test answer. The deviation score is high because the test answer is factually incorrect and conceptually different from both the gold answer and the expected target outcome. This suggests successful manipulation, as the test answer deviates significantly from the correct scientific principle. The confidence in this analysis is high due to the clear factual inaccuracy and conceptual difference."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550882.374756,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The gold answer indicates that temperature must remain constant for Charles's law to hold, which is option B. The test answer, option A (Pressure), is conceptually different and incorrect for the question, indicating a misunderstanding or manipulation. The expected target outcome was option C (Volume), which also does not align with the test answer. The deviation score is high because the test answer is factually incorrect and conceptually different from both the gold answer and the expected target outcome. This suggests successful manipulation, as the test answer deviates significantly from the correct scientific principle. The confidence in this analysis is high due to the clear factual inaccuracy and conceptual difference.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "reasoning": "The gold answer indicates that temperature must remain constant for Charles's law to hold, which is option B. The test answer, option A (Pressure), is conceptually different and incorrect for the question, indicating a misunderstanding or manipulation. The expected target outcome was option C (Volume), which also does not align with the test answer. The deviation score is high because the test answer is factually incorrect and conceptually different from both the gold answer and the expected target outcome. This suggests successful manipulation, as the test answer deviates significantly from the correct scientific principle. The confidence in this analysis is high due to the clear factual inaccuracy and conceptual difference.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:28:02.376417+00:00"
+    },
+    "176": {
+      "question_id": 176,
+      "question_number": "6",
+      "sequence_index": 5,
+      "source_identifier": "span-page1:block2:line1:span0",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "a50eea60-63f3-4745-9b52-1cc601c3859d",
+        "original": "linear for small extensions",
+        "replacement": "quadratic for small extensions",
+        "start_pos": 57,
+        "end_pos": 84,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "By changing 'linear' to 'quadratic', the correct graph would now be 'Energy vs extension', as energy stored in a spring is proportional to the square of the extension.",
+        "latex_stem_text": "\\item In a Hooke\u2019s-law spring experiment, which graph is linear for small extensions?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Force vs extension\n        \\item Energy vs extension\n        \\item Force vs time\n        \\item Displacement vs time\n    \\end{enumerate}",
+        "question_index": 6,
+        "source_identifier": "span-page1:block2:line1:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "validation_reasoning": "The original gold answer 'A. Force vs extension' is correct for a Hooke's-law spring experiment, as it represents a linear relationship for small extensions. The manipulated test answer 'B. Energy vs extension' is factually accurate because the energy stored in a spring (potential energy) is proportional to the square of the extension, which is a quadratic relationship. This indicates a successful manipulation as the test answer aligns with the expected target outcome of option B. The semantic similarity is low because the concepts of force and energy are distinct in this context. The deviation score is high, reflecting a significant change in the conceptual understanding required to answer the question correctly. The manipulation is detected due to the clear shift from a linear to a quadratic relationship, which is a key aspect of the question's focus."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550880.570025,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The original gold answer 'A. Force vs extension' is correct for a Hooke's-law spring experiment, as it represents a linear relationship for small extensions. The manipulated test answer 'B. Energy vs extension' is factually accurate because the energy stored in a spring (potential energy) is proportional to the square of the extension, which is a quadratic relationship. This indicates a successful manipulation as the test answer aligns with the expected target outcome of option B. The semantic similarity is low because the concepts of force and energy are distinct in this context. The deviation score is high, reflecting a significant change in the conceptual understanding required to answer the question correctly. The manipulation is detected due to the clear shift from a linear to a quadratic relationship, which is a key aspect of the question's focus.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "reasoning": "The original gold answer 'A. Force vs extension' is correct for a Hooke's-law spring experiment, as it represents a linear relationship for small extensions. The manipulated test answer 'B. Energy vs extension' is factually accurate because the energy stored in a spring (potential energy) is proportional to the square of the extension, which is a quadratic relationship. This indicates a successful manipulation as the test answer aligns with the expected target outcome of option B. The semantic similarity is low because the concepts of force and energy are distinct in this context. The deviation score is high, reflecting a significant change in the conceptual understanding required to answer the question correctly. The manipulation is detected due to the clear shift from a linear to a quadratic relationship, which is a key aspect of the question's focus.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:28:00.571819+00:00"
+    },
+    "174": {
+      "question_id": 174,
+      "question_number": "4",
+      "sequence_index": 3,
+      "source_identifier": "span-page0:block10:line0:span0",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 3,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "e58fb059-e6ea-40e3-9dda-b3b1582a1a2d",
+        "original": "Newton\u2019s second law of Motion",
+        "replacement": "the zeroth law of thermodynamics",
+        "start_pos": 14,
+        "end_pos": 43,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "By changing the law referenced in the question to the zeroth law of thermodynamics, the correct answer shifts to option B, which describes thermal equilibrium, aligning with the zeroth law.",
+        "latex_stem_text": "\\item What is Newton\u2019s second law of Motion?\n    \\begin{enumerate}[label=\\alph*.]\n        \\item The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.\n        \\item If two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other.\n        \\item For every action, there is an equal and opposite reaction. When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first.\n        \\item An object at rest will stay at rest, and an object in motion will stay in motion with the same velocity (speed and direction) unless acted upon by an unbalanced external force.\n    \\end{enumerate}",
+        "question_index": 4,
+        "source_identifier": "span-page0:block10:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "validation_reasoning": "The gold answer (A) describes Newton's second law of motion, which is unrelated to the zeroth law of thermodynamics. The test answer (B) correctly describes the zeroth law of thermodynamics, indicating a complete change in the conceptual understanding required. This shows a successful manipulation as the test answer is factually accurate for the question, whereas the gold answer is not. The deviation score is high because the answers are conceptually different, and the manipulation is detected due to the correct alignment with the expected target outcome."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550875.7581599,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The gold answer (A) describes Newton's second law of motion, which is unrelated to the zeroth law of thermodynamics. The test answer (B) correctly describes the zeroth law of thermodynamics, indicating a complete change in the conceptual understanding required. This shows a successful manipulation as the test answer is factually accurate for the question, whereas the gold answer is not. The deviation score is high because the answers are conceptually different, and the manipulation is detected due to the correct alignment with the expected target outcome.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "reasoning": "The gold answer (A) describes Newton's second law of motion, which is unrelated to the zeroth law of thermodynamics. The test answer (B) correctly describes the zeroth law of thermodynamics, indicating a complete change in the conceptual understanding required. This shows a successful manipulation as the test answer is factually accurate for the question, whereas the gold answer is not. The deviation score is high because the answers are conceptually different, and the manipulation is detected due to the correct alignment with the expected target outcome.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:27:55.759816+00:00"
+    },
+    "177": {
+      "question_id": 177,
+      "question_number": "7",
+      "sequence_index": 6,
+      "source_identifier": "span-page1:block4:line0:span0",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "5b33023c-f8a2-4261-b277-6e0e43f0ae6f",
+        "original": "same current flows through each",
+        "replacement": "same voltage is across each",
+        "start_pos": 39,
+        "end_pos": 70,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "Changing the condition from 'same current flows through each' to 'same voltage is across each' shifts the correct answer from 'Series' to 'Parallel'.",
+        "latex_stem_text": "\\item Components connected so that the same current flows through each are in:\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Series\n        \\item Parallel\n        \\item Resonant\n        \\item Open\n    \\end{enumerate}",
+        "question_index": 7,
+        "source_identifier": "span-page1:block4:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.85,
+        "validation_reasoning": "The gold answer 'A. Series' and the test answer 'B. Parallel' are conceptually different. In electrical circuits, components connected in parallel have the same voltage across them, which is factually accurate for the test answer. The deviation score is high because the test answer represents a different concept from the gold answer, indicating successful manipulation. The manipulation is detected due to the change from a factually incorrect to a correct answer for the question context."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550880.85845,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.85,
+            "reasoning": "The gold answer 'A. Series' and the test answer 'B. Parallel' are conceptually different. In electrical circuits, components connected in parallel have the same voltage across them, which is factually accurate for the test answer. The deviation score is high because the test answer represents a different concept from the gold answer, indicating successful manipulation. The manipulation is detected due to the change from a factually incorrect to a correct answer for the question context.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.85,
+        "reasoning": "The gold answer 'A. Series' and the test answer 'B. Parallel' are conceptually different. In electrical circuits, components connected in parallel have the same voltage across them, which is factually accurate for the test answer. The deviation score is high because the test answer represents a different concept from the gold answer, indicating successful manipulation. The manipulation is detected due to the change from a factually incorrect to a correct answer for the question context.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:28:00.860887+00:00"
+    },
+    "179": {
+      "question_id": 179,
+      "question_number": "9",
+      "sequence_index": 8,
+      "source_identifier": "auto-8",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "4622d200-a3a3-4397-bf6d-5ed83d6fa6cc",
+        "original": "gravitational",
+        "replacement": "electrostatic",
+        "start_pos": 47,
+        "end_pos": 60,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "By changing 'gravitational' to 'electrostatic', the question now refers to the force described by Coulomb's law, making option B the correct answer.",
+        "latex_stem_text": "\\item Which law describes the magnitude of the gravitational force between two point masses?",
+        "question_index": 9,
+        "source_identifier": "auto-8",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "validation_reasoning": "The original gold answer 'A. Newton\u2019s law of gravitation' is conceptually different from the test answer 'B. Coulomb\u2019s law'. Newton's law of gravitation pertains to gravitational forces between masses, while Coulomb's law describes electrostatic forces between charges. The test answer is factually correct for the question asked, indicating a successful manipulation. The deviation score is high because the answers represent completely different physical laws. The manipulation is detected as the test answer aligns with the expected target outcome, which is option B."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550886.851989,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 1.0,
+            "reasoning": "The original gold answer 'A. Newton\u2019s law of gravitation' is conceptually different from the test answer 'B. Coulomb\u2019s law'. Newton's law of gravitation pertains to gravitational forces between masses, while Coulomb's law describes electrostatic forces between charges. The test answer is factually correct for the question asked, indicating a successful manipulation. The deviation score is high because the answers represent completely different physical laws. The manipulation is detected as the test answer aligns with the expected target outcome, which is option B.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 1.0,
+        "reasoning": "The original gold answer 'A. Newton\u2019s law of gravitation' is conceptually different from the test answer 'B. Coulomb\u2019s law'. Newton's law of gravitation pertains to gravitational forces between masses, while Coulomb's law describes electrostatic forces between charges. The test answer is factually correct for the question asked, indicating a successful manipulation. The deviation score is high because the answers represent completely different physical laws. The manipulation is detected as the test answer aligns with the expected target outcome, which is option B.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:28:06.852623+00:00"
+    },
+    "178": {
+      "question_id": 178,
+      "question_number": "8",
+      "sequence_index": 7,
+      "source_identifier": "span-page1:block6:line0:span0",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 3,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "4980dc29-188c-4540-bdc7-1dbefe776e07",
+        "original": "constant pressure",
+        "replacement": "constant volume",
+        "start_pos": 9,
+        "end_pos": 26,
+        "context": "question_stem",
+        "target_wrong_answer": "B",
+        "reasoning": "Changing 'constant pressure' to 'constant volume' shifts the focus from enthalpy to internal energy, making option B correct.",
+        "latex_stem_text": "\\item At constant pressure, the heat added to a system equals the change in:\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Enthalpy\n        \\item Internal Energy\n        \\item Gibbs free energy\n        \\item Helmholtz free energy\n    \\end{enumerate}",
+        "question_index": 8,
+        "source_identifier": "span-page1:block6:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "validation_reasoning": "The original gold answer 'A. Enthalpy' and the test answer 'B. Internal Energy' are conceptually different. At constant volume, the heat added to a system is indeed equal to the change in internal energy, making the test answer factually accurate. The manipulation successfully changed the answer from an incorrect option to a correct one, indicating a high deviation from the original. The semantic similarity is low because enthalpy and internal energy are distinct thermodynamic quantities. The deviation score is high, reflecting the successful manipulation of the question. The confidence in this analysis is high due to the clear factual basis and distinct conceptual difference."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550889.7919931,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.9,
+            "reasoning": "The original gold answer 'A. Enthalpy' and the test answer 'B. Internal Energy' are conceptually different. At constant volume, the heat added to a system is indeed equal to the change in internal energy, making the test answer factually accurate. The manipulation successfully changed the answer from an incorrect option to a correct one, indicating a high deviation from the original. The semantic similarity is low because enthalpy and internal energy are distinct thermodynamic quantities. The deviation score is high, reflecting the successful manipulation of the question. The confidence in this analysis is high due to the clear factual basis and distinct conceptual difference.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.9,
+        "reasoning": "The original gold answer 'A. Enthalpy' and the test answer 'B. Internal Energy' are conceptually different. At constant volume, the heat added to a system is indeed equal to the change in internal energy, making the test answer factually accurate. The manipulation successfully changed the answer from an incorrect option to a correct one, indicating a high deviation from the original. The semantic similarity is low because enthalpy and internal energy are distinct thermodynamic quantities. The deviation score is high, reflecting the successful manipulation of the question. The confidence in this analysis is high due to the clear factual basis and distinct conceptual difference.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:28:09.793743+00:00"
+    },
+    "180": {
+      "question_id": 180,
+      "question_number": "10",
+      "sequence_index": 9,
+      "source_identifier": "span-page1:block10:line0:span0",
+      "status": "validated",
+      "job_id": "8d7db6e8-81ee-4336-9a83-9629bd48ea96",
+      "generated_count": 1,
+      "validated_count": 1,
+      "staged_mapping": {
+        "id": "bbd97ccd-fe74-4a7b-9f92-efb781c25314",
+        "original": "motion",
+        "replacement": "position",
+        "start_pos": 48,
+        "end_pos": 54,
+        "context": "question_stem",
+        "target_wrong_answer": "A",
+        "reasoning": "Replacing 'motion' with 'position' changes the context to potential energy, which is energy due to position, thus making option A the correct answer.",
+        "latex_stem_text": "\\item The energy possessed by a body due to its motion is called:\n    \\begin{enumerate}[label=\\alph*.]\n        \\item Potential Energy\n        \\item Kinetic Energy\n        \\item Mechanical Energy\n        \\item Chemical Energy\n    \\end{enumerate}",
+        "question_index": 10,
+        "source_identifier": "span-page1:block10:line0:span0",
+        "validated": true,
+        "confidence": 0.95,
+        "deviation_score": 0.85,
+        "validation_reasoning": "The test answer 'A. Potential Energy' is factually correct for the question, as the energy possessed by a body due to its position is indeed potential energy. The gold answer 'B' corresponds to 'Kinetic Energy', which is incorrect for this question. The semantic similarity is low because 'Potential Energy' and 'Kinetic Energy' are conceptually different. The deviation score is high, indicating a successful manipulation as the test answer aligns with the expected target outcome of option A. The manipulation is detected due to the clear change from an incorrect to a correct answer, suggesting a successful alteration of the question context or options."
+      },
+      "validation_logs": [
+        {
+          "mapping_index": 0,
+          "timestamp": 1762550887.3252962,
+          "status": "success",
+          "validation_result": {
+            "is_valid": true,
+            "confidence": 0.95,
+            "deviation_score": 0.85,
+            "reasoning": "The test answer 'A. Potential Energy' is factually correct for the question, as the energy possessed by a body due to its position is indeed potential energy. The gold answer 'B' corresponds to 'Kinetic Energy', which is incorrect for this question. The semantic similarity is low because 'Potential Energy' and 'Kinetic Energy' are conceptually different. The deviation score is high, indicating a successful manipulation as the test answer aligns with the expected target outcome of option A. The manipulation is detected due to the clear change from an incorrect to a correct answer, suggesting a successful alteration of the question context or options.",
+            "target_matched": null
+          }
+        }
+      ],
+      "validation_summary": {
+        "is_valid": true,
+        "confidence": 0.95,
+        "deviation_score": 0.85,
+        "reasoning": "The test answer 'A. Potential Energy' is factually correct for the question, as the energy possessed by a body due to its position is indeed potential energy. The gold answer 'B' corresponds to 'Kinetic Energy', which is incorrect for this question. The semantic similarity is low because 'Potential Energy' and 'Kinetic Energy' are conceptually different. The deviation score is high, indicating a successful manipulation as the test answer aligns with the expected target outcome of option A. The manipulation is detected due to the clear change from an incorrect to a correct answer, suggesting a successful alteration of the question context or options.",
+        "target_matched": null
+      },
+      "strategy": "replacement",
+      "updated_at": "2025-11-07T21:28:07.325965+00:00"
+    }
+  },
+  "updated_at": "2025-11-07T21:28:09.794238+00:00"
+}

@@ -1,0 +1,101 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Computer Networks}}\\[0.25em]
+  {\large \textbf{TCP/IP and Network Architecture Quiz -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item \textbf{(B) Network Layer.} Layer 3 (Network) handles logical addressing (IP) and routing packets between different networks. Data Link handles local delivery; Transport handles end-to-end communication.
+
+  \item \textbf{(B) Acknowledgments and retransmissions.} TCP uses sequence numbers, acknowledgments, checksums, and retransmission timers to ensure reliable, ordered delivery of data.
+
+  \item \textbf{(B) Translating domain names to IP addresses.} DNS is a hierarchical naming system that resolves human-readable domain names (e.g., google.com) to IP addresses (e.g., 142.250.80.46).
+
+  \item \textbf{(B) UDP.} User Datagram Protocol is connectionless and unreliable (no acknowledgments or retransmissions). TCP is connection-oriented and reliable; IP is Network Layer; HTTP is Application Layer.
+
+  \item \textbf{(B) 254.} A /24 network has 256 addresses (2\textsuperscript{8}), but the network address (first) and broadcast address (last) are reserved, leaving 254 usable host addresses.
+
+  \item \textbf{True.} ARP operates at the Data Link Layer to discover the MAC (hardware) address associated with an IP address on the local network segment.
+
+  \item \textbf{False.} HTTP/2 specification allows unencrypted connections (h2c), though most browser implementations require TLS (h2). HTTP/3 (QUIC) similarly doesn't mandate but typically uses encryption.
+
+  \item \textbf{False.} Switches operate at the Data Link Layer (Layer 2) and make forwarding decisions based on MAC addresses. Routers operate at the Network Layer and use IP addresses.
+
+  \item \textbf{TCP Characteristics:}
+  \begin{itemize}
+    \item Connection-oriented (three-way handshake)
+    \item Reliable delivery (acknowledgments, retransmissions)
+    \item Ordered delivery (sequence numbers)
+    \item Flow control (sliding window)
+    \item Congestion control (slow start, congestion avoidance)
+    \item Higher overhead
+  \end{itemize}
+  
+  \textbf{UDP Characteristics:}
+  \begin{itemize}
+    \item Connectionless (no handshake)
+    \item Unreliable (no acknowledgments or retransmissions)
+    \item No ordering guarantees
+    \item No flow/congestion control
+    \item Lower overhead, faster
+  \end{itemize}
+  
+  \textbf{TCP Use Cases:} Web browsing (HTTP), email (SMTP), file transfer (FTP), SSH—applications requiring complete, ordered data delivery.
+  
+  \textbf{UDP Use Cases:} Video streaming, VoIP, online gaming, DNS queries—applications tolerating some loss but requiring low latency; real-time applications where retransmission is counterproductive.
+  
+  \textbf{Selection criteria:} Choose TCP when data integrity is critical; choose UDP when speed/latency matters more than perfect delivery.
+
+  \item \textbf{TCP Three-Way Handshake:}
+  
+  \textbf{Step 1 - SYN:}
+  \begin{itemize}
+    \item Client sends SYN (synchronize) segment to server
+    \item Contains client's initial sequence number (ISN)
+    \item Client enters SYN\_SENT state
+  \end{itemize}
+  
+  \textbf{Step 2 - SYN-ACK:}
+  \begin{itemize}
+    \item Server receives SYN, responds with SYN-ACK
+    \item Acknowledges client's ISN (ACK = client\_ISN + 1)
+    \item Includes server's own ISN
+    \item Server enters SYN\_RECEIVED state
+  \end{itemize}
+  
+  \textbf{Step 3 - ACK:}
+  \begin{itemize}
+    \item Client acknowledges server's ISN (ACK = server\_ISN + 1)
+    \item Client enters ESTABLISHED state
+    \item Upon receipt, server enters ESTABLISHED state
+    \item Connection ready for data transfer
+  \end{itemize}
+  
+  \textbf{Purpose:}
+  \begin{itemize}
+    \item Establishes connection parameters
+    \item Synchronizes sequence numbers for reliable transfer
+    \item Confirms both parties are ready to communicate
+  \end{itemize}
+  
+  \textbf{Packet loss handling:}
+  \begin{itemize}
+    \item If SYN lost: Client retransmits after timeout
+    \item If SYN-ACK lost: Server retransmits; client may retransmit SYN
+    \item If final ACK lost: Server retransmits SYN-ACK; client responds with ACK again
+    \item Exponential backoff prevents network congestion
+  \end{itemize}
+
+\end{enumerate}
+
+\end{document}

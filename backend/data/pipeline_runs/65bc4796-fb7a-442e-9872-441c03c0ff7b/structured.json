@@ -1,0 +1,2330 @@
+{
+  "pipeline_metadata": {
+    "run_id": "65bc4796-fb7a-442e-9872-441c03c0ff7b",
+    "current_stage": "results_generation",
+    "stages_completed": [
+      "results_generation",
+      "smart_substitution",
+      "smart_reading",
+      "content_discovery"
+    ],
+    "total_processing_time_ms": 0,
+    "last_updated": "2025-09-27T22:34:32.057987+00:00",
+    "version": "2.0.0",
+    "config": {},
+    "ai_extraction_enabled": true,
+    "ai_sources_used": [
+      "openai_vision",
+      "mistral_ocr"
+    ]
+  },
+  "document": {
+    "source_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/general_knowledge_quiz.pdf",
+    "filename": "general_knowledge_quiz.pdf",
+    "pages": 2
+  },
+  "questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_multi",
+      "stem_text": "Which of the following are programming languages?",
+      "options": {
+        "A": "Python",
+        "B": "HTML",
+        "C": "Java",
+        "D": "CSS"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          92.81,
+          431.26,
+          109.33
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "computer science",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1",
+      "gold_answer": "A, C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 246,
+            "original": "Which of the following are programming languages?",
+            "replacement": "Which of the following are programming languages? [altered]",
+            "start_pos": 0,
+            "end_pos": 49,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "The capital of France is:",
+      "options": {
+        "A": "Berlin",
+        "B": "Madrid",
+        "C": "Paris",
+        "D": "Rome"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          211.87,
+          191.25,
+          228.39
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "geography",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2",
+      "gold_answer": "C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 247,
+            "original": "The capital of France is:",
+            "replacement": "The capital of France is: [altered]",
+            "start_pos": 0,
+            "end_pos": 25,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "3",
+      "question_type": "true_false",
+      "stem_text": "The Sun is a star.",
+      "options": {
+        "A": "True",
+        "B": "False"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          330.92,
+          224.59,
+          347.44
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "astronomy",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3",
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 248,
+            "original": "The Sun is a star.",
+            "replacement": "The Sun is a star. [altered]",
+            "start_pos": 0,
+            "end_pos": 18,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "4",
+      "question_type": "true_false",
+      "stem_text": "Water freezes at 0°C.",
+      "options": {
+        "A": "True",
+        "B": "False"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          404.62,
+          244.06,
+          421.14
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "science",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4",
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 249,
+            "original": "Water freezes at 0°C.",
+            "replacement": "Water freezes at 0°C. [altered]",
+            "start_pos": 0,
+            "end_pos": 21,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "5",
+      "question_type": "matching",
+      "stem_text": "Match the countries with their capitals:",
+      "options": {
+        "1": "Japan",
+        "2": "Canada",
+        "3": "Australia",
+        "A": "Ottawa",
+        "B": "Canberra",
+        "C": "Tokyo"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          478.32,
+          275.92,
+          494.84
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "geography",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5",
+      "gold_answer": "C, A, B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 250,
+            "original": "Match the countries with their capitals:",
+            "replacement": "Match the countries with their capitals: [altered]",
+            "start_pos": 0,
+            "end_pos": 40,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "6",
+      "question_type": "mcq_multi",
+      "stem_text": "Which of these are planets in our Solar System?",
+      "options": {
+        "A": "Mars",
+        "B": "Venus",
+        "C": "Pluto",
+        "D": "Jupiter"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          642.73,
+          406.62,
+          659.25
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "astronomy",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6",
+      "gold_answer": "A",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 251,
+            "original": "Which of these are planets in our Solar System?",
+            "replacement": "Which of these are planets in our Solar System? [altered]",
+            "start_pos": 0,
+            "end_pos": 47,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "7",
+      "question_type": "short_answer",
+      "stem_text": "The largest ocean on Earth is:",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          761.79,
+          225.25,
+          778.31
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "geography",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "7",
+      "gold_answer": null,
+      "gold_confidence": null,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 252,
+            "original": "The largest ocean on Earth is:",
+            "replacement": "The largest ocean on Earth is: [altered]",
+            "start_pos": 0,
+            "end_pos": 30,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "8",
+      "question_type": "true_false",
+      "stem_text": "Humans have walked on Mars.",
+      "options": {
+        "A": "True",
+        "B": "False"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          31.19,
+          189.19,
+          299.28,
+          205.71
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "general knowledge",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "8",
+      "gold_answer": "B",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 253,
+            "original": "Humans have walked on Mars.",
+            "replacement": "Humans have walked on Mars. [altered]",
+            "start_pos": 0,
+            "end_pos": 27,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "9",
+      "question_type": "matching",
+      "stem_text": "Match the inventions with their inventors:",
+      "options": {
+        "1": "Telephone",
+        "2": "Light Bulb",
+        "3": "Airplane",
+        "A": "Wright Brothers",
+        "B": "Alexander Graham Bell",
+        "C": "Thomas Edison"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          31.19,
+          262.89,
+          291.24,
+          279.41
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "general knowledge",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "9",
+      "gold_answer": "1B, 2C, 3A",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 254,
+            "original": "Match the inventions with their inventors:",
+            "replacement": "Match the inventions with their inventors: [altered]",
+            "start_pos": 0,
+            "end_pos": 42,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    },
+    {
+      "question_number": "10",
+      "question_type": "mcq_multi",
+      "stem_text": "Which of the following are mammals?",
+      "options": {
+        "A": "Dolphin",
+        "B": "Crocodile",
+        "C": "Bat",
+        "D": "Shark"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          31.19,
+          427.3,
+          353.26,
+          443.82
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "general knowledge",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "10",
+      "gold_answer": "A, C",
+      "gold_confidence": 0.9,
+      "manipulation": {
+        "method": "smart_substitution",
+        "substring_mappings": [
+          {
+            "id": 255,
+            "original": "Which of the following are mammals?",
+            "replacement": "Which of the following are mammals? [altered]",
+            "start_pos": 0,
+            "end_pos": 35,
+            "context": "question_stem"
+          }
+        ],
+        "effectiveness_score": null,
+        "character_strategy": "unicode_steganography"
+      }
+    }
+  ],
+  "assets": {
+    "images": [],
+    "fonts": [
+      "Helvetica",
+      "Helvetica-Bold"
+    ],
+    "extracted_elements": 52
+  },
+  "manipulation_results": {
+    "enhanced_pdfs": {
+      "content_stream_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_content_stream_overlay.pdf",
+        "size_bytes": 1981500,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_content_stream_overlay.pdf",
+        "file_size_bytes": 1981500,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 10,
+        "overlay_targets": 10,
+        "overlay_area_pct": 0.0073,
+        "render_stats": {
+          "mapping_entries": 10,
+          "file_size_bytes": 1981500,
+          "effectiveness_score": 1.0,
+          "replacements": 20,
+          "matches_found": 20,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 19,
+          "overlay_applied": 10,
+          "overlay_targets": 10,
+          "overlay_area_pct": 0.0073,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:34:32.049577+00:00"
+      },
+      "dual_layer": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_dual_layer.pdf",
+        "size_bytes": 5932,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_dual_layer.pdf",
+        "file_size_bytes": 5932,
+        "visual_quality_score": 0.97,
+        "effectiveness_score": 0.85,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 10,
+          "file_size_bytes": 5932,
+          "effectiveness_score": 0.85
+        },
+        "created_at": "2025-09-27T22:34:32.049697+00:00"
+      },
+      "image_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_image_overlay.pdf",
+        "size_bytes": 1947436,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_image_overlay.pdf",
+        "file_size_bytes": 1947436,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": 0.0072863051047707805,
+        "render_stats": {
+          "mapping_entries": 10,
+          "overlays_applied": 10,
+          "file_size_bytes": 1947436,
+          "effectiveness_score": 1.0,
+          "overlay_area_pct": 0.0072863051047707805,
+          "text_pages": 2,
+          "text_tj_hits": 52,
+          "text_replacements": 10,
+          "text_matches_found": 10,
+          "text_tokens_scanned": 1089
+        },
+        "created_at": "2025-09-27T22:34:32.049807+00:00"
+      },
+      "font_manipulation": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_font_manipulation.pdf",
+        "size_bytes": 2447,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_font_manipulation.pdf",
+        "file_size_bytes": 2447,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 0.75,
+        "overlay_applied": null,
+        "overlay_targets": null,
+        "overlay_area_pct": null,
+        "render_stats": {
+          "mapping_entries": 10,
+          "file_size_bytes": 2447,
+          "effectiveness_score": 0.75
+        },
+        "created_at": "2025-09-27T22:34:32.049911+00:00"
+      },
+      "content_stream": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_content_stream.pdf",
+        "size_bytes": 1981500,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_content_stream.pdf",
+        "file_size_bytes": 1981500,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 10,
+        "overlay_targets": 10,
+        "overlay_area_pct": 0.0073,
+        "render_stats": {
+          "mapping_entries": 10,
+          "file_size_bytes": 1981500,
+          "effectiveness_score": 1.0,
+          "replacements": 20,
+          "matches_found": 20,
+          "tokens_scanned": 0,
+          "typography_scaled_segments": 19,
+          "overlay_applied": 10,
+          "overlay_targets": 10,
+          "overlay_area_pct": 0.0073,
+          "fallback_pages": {
+            "rewrite_engine": "pymupdf"
+          },
+          "font_gaps": {}
+        },
+        "created_at": "2025-09-27T22:34:32.050017+00:00"
+      },
+      "pymupdf_overlay": {
+        "path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_pymupdf_overlay.pdf",
+        "size_bytes": 1981500,
+        "file_path": "/Users/shivenagarwal/Downloads/fairtestai_-llm-assessment-vulnerability-simulator-main/backend/data/pipeline_runs/65bc4796-fb7a-442e-9872-441c03c0ff7b/enhanced_pymupdf_overlay.pdf",
+        "file_size_bytes": 1981500,
+        "visual_quality_score": 0.92,
+        "effectiveness_score": 1.0,
+        "overlay_applied": 10,
+        "overlay_targets": 10,
+        "overlay_area_pct": 0.0073,
+        "render_stats": {
+          "mapping_entries": 10,
+          "file_size_bytes": 1981500,
+          "effectiveness_score": 1.0,
+          "replacements": 20,
+          "textbox_adjustments": 19,
+          "min_fontsize_used": 5.5,
+          "overlay_applied": 10,
+          "overlay_targets": 10,
+          "overlay_area_pct": 0.0073,
+          "raw_targets": 20
+        },
+        "created_at": "2025-09-27T22:34:32.050123+00:00"
+      }
+    },
+    "debug": {
+      "content_stream_overlay": {
+        "decoded_sample": null,
+        "per_font_top_tokens": null,
+        "enhanced_mapping_stats": {
+          "total_entries": 10,
+          "discovered_tokens": 0
+        }
+      },
+      "overlay_layers": {
+        "pymupdf_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 10,
+          "enhanced_mapping_boost": 0
+        },
+        "image_overlay": {
+          "effectiveness_score": 1.0,
+          "mapping_entries_used": 10,
+          "enhanced_mapping_boost": 0
+        }
+      }
+    },
+    "comprehensive_metrics": {
+      "overall_duration_ms": 229.97,
+      "mapping_build_time_ms": 5.74,
+      "enhancement_stats": {
+        "base_mapping_size": 10,
+        "enhanced_mapping_size": 10,
+        "discovered_tokens_count": 0,
+        "enhancement_ratio": 1.0,
+        "discovery_coverage": 0.0
+      },
+      "performance_metrics": {
+        "content_stream_overlay": {
+          "duration_ms": 63.97,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 1981500
+        },
+        "content_stream": {
+          "duration_ms": 56.42,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 1981500
+        },
+        "pymupdf_overlay": {
+          "duration_ms": 55.92,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 1981500
+        },
+        "image_overlay": {
+          "duration_ms": 35.06,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 1947436
+        },
+        "dual_layer": {
+          "duration_ms": 2.83,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 5932
+        },
+        "font_manipulation": {
+          "duration_ms": 0.78,
+          "success": true,
+          "error": null,
+          "output_size_bytes": 2447
+        }
+      },
+      "success_summary": {
+        "successful_renderers": 6,
+        "failed_renderers": 0,
+        "success_rate": 1.0
+      },
+      "size_metrics": {
+        "original_pdf_size_bytes": 2447,
+        "total_output_size_bytes": 7900315,
+        "size_efficiency": 3228.57172047405
+      }
+    },
+    "summary": {
+      "questions": 10,
+      "average_effectiveness": 0.0,
+      "generated_at": "2025-09-27T22:34:32.057987+00:00"
+    }
+  },
+  "performance_metrics": {},
+  "content_elements": [
+    {
+      "type": "text",
+      "content": "General Knowledge Quiz",
+      "page": 1,
+      "bbox": [
+        215.1699981689453,
+        31.740032196044922,
+        380.1039123535156,
+        51.01803207397461
+      ],
+      "font": "Helvetica-Bold",
+      "size": 14.0
+    },
+    {
+      "type": "text",
+      "content": "Instructions: Answer all questions. Some questions may have multiple correct answers.",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        58.740013122558594,
+        493.3579406738281,
+        75.22801208496094
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q1. (Multi-select) Which of the following are programming languages?",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        92.81002807617188,
+        431.2579650878906,
+        109.33402252197266
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Python",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        115.43001556396484,
+        87.87799072265625,
+        131.9180145263672
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) HTML",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        138.11001586914062,
+        83.18600463867188,
+        154.59800720214844
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Java",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        160.77999877929688,
+        76.5260009765625,
+        177.2679901123047
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) CSS",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        183.45999145507812,
+        75.85399627685547,
+        199.94798278808594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q2. The capital of France is:",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        211.87002563476562,
+        191.24598693847656,
+        228.39402770996094
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Berlin",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        234.48001098632812,
+        81.19400787353516,
+        250.96800231933594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) Madrid",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        257.1600036621094,
+        87.19400024414062,
+        273.64801025390625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Paris",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        279.8399963378906,
+        78.51800537109375,
+        296.3280029296875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) Rome",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        302.5100402832031,
+        83.18600463867188,
+        318.998046875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q3. (True/False) The Sun is a star.",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        330.9200134277344,
+        224.59396362304688,
+        347.4440002441406
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) True",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        353.5400085449219,
+        75.19400024414062,
+        370.02801513671875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) False",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        376.22003173828125,
+        79.86199951171875,
+        392.7080383300781
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q4. (True/False) Water freezes at 0°C.",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        404.6200256347656,
+        244.05796813964844,
+        421.1440124511719
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) True",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        427.2400207519531,
+        75.19400024414062,
+        443.72802734375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) False",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        449.9200134277344,
+        79.86199951171875,
+        466.40802001953125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q5. Match the countries with their capitals:",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        478.32000732421875,
+        275.9179992675781,
+        494.843994140625
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "1. Japan",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        501.0000305175781,
+        79.21400451660156,
+        517.5240478515625
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "2. Canada",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        523.6799926757812,
+        87.87799072265625,
+        540.2040405273438
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "3. Australia",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        546.3499755859375,
+        95.88198852539062,
+        562.8740234375
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "A. Ottawa",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        568.969970703125,
+        83.88198852539062,
+        585.4580078125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "B. Canberra",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        591.6500244140625,
+        95.88200378417969,
+        608.1380615234375
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "C. Tokyo",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        614.3299560546875,
+        79.20199584960938,
+        630.8179931640625
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q6. (Multi-select) Which of these are planets in our Solar System?",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        642.72998046875,
+        406.6219482421875,
+        659.2540283203125
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Mars",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        665.3499755859375,
+        77.18600463867188,
+        681.8380126953125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) Venus",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        688.0299682617188,
+        84.54200744628906,
+        704.5180053710938
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Pluto",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        710.7000122070312,
+        78.52999877929688,
+        727.1880493164062
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) Jupiter",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        733.3800048828125,
+        87.19400024414062,
+        749.8680419921875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q7. The largest ocean on Earth is:",
+      "page": 1,
+      "bbox": [
+        31.190000534057617,
+        761.7899780273438,
+        225.2539825439453,
+        778.3140258789062
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "General Knowledge Quiz",
+      "page": 2,
+      "bbox": [
+        215.1699981689453,
+        31.740032196044922,
+        380.1039123535156,
+        51.01803207397461
+      ],
+      "font": "Helvetica-Bold",
+      "size": 14.0
+    },
+    {
+      "type": "text",
+      "content": "Instructions: Answer all questions. Some questions may have multiple correct answers.",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        58.740013122558594,
+        493.3579406738281,
+        75.22801208496094
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Atlantic Ocean",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        92.7500228881836,
+        128.55799865722656,
+        109.23802185058594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) Indian Ocean",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        115.43001556396484,
+        121.89799499511719,
+        131.9180145263672
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Pacific Ocean",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        138.11001586914062,
+        125.20999145507812,
+        154.59800720214844
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) Arctic Ocean",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        160.77999877929688,
+        119.8699951171875,
+        177.2679901123047
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q8. (True/False) Humans have walked on Mars.",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        189.19003295898438,
+        299.2819519042969,
+        205.7140350341797
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) True",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        211.81002807617188,
+        75.19400024414062,
+        228.2980194091797
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) False",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        234.48001098632812,
+        79.86199951171875,
+        250.96800231933594
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q9. Match the inventions with their inventors:",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        262.8900451660156,
+        291.24200439453125,
+        279.4140319824219
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "1. Telephone",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        285.5700378417969,
+        104.54600524902344,
+        302.0940246582031
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "2. Light Bulb",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        308.2400207519531,
+        103.86199951171875,
+        324.7640075683594
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "3. Airplane",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        330.9200134277344,
+        92.54598999023438,
+        347.4440002441406
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "A. Wright Brothers",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        353.5400085449219,
+        129.21798706054688,
+        370.02801513671875
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "B. Alexander Graham Bell",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        376.22003173828125,
+        169.9099884033203,
+        392.7080383300781
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "C. Thomas Edison",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        398.8900146484375,
+        129.88999938964844,
+        415.3780212402344
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "Q10. (Multi-select) Which of the following are mammals?",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        427.3000183105469,
+        353.2579650878906,
+        443.8240051269531
+      ],
+      "font": "Helvetica-Bold",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(A) Dolphin",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        449.9200134277344,
+        91.20199584960938,
+        466.40802001953125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(B) Crocodile",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        472.59002685546875,
+        101.197998046875,
+        489.0780334472656
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(C) Bat",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        495.27001953125,
+        69.19400024414062,
+        511.7580261230469
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    },
+    {
+      "type": "text",
+      "content": "(D) Shark",
+      "page": 2,
+      "bbox": [
+        31.190000534057617,
+        517.949951171875,
+        82.5260009765625,
+        534.43798828125
+      ],
+      "font": "Helvetica",
+      "size": 12.0
+    }
+  ],
+  "ai_extraction": {
+    "source": "gpt5_fusion",
+    "confidence": 0.7,
+    "questions_found": 10,
+    "processing_time_ms": 48323,
+    "cost_cents": 26.62275,
+    "error": null,
+    "raw_response": {
+      "content": "```json\n{\n  \"fusion_analysis\": {\n    \"total_questions_found\": 10,\n    \"source_agreements\": {\n      \"vision_mistral\": 0,\n      \"vision_only\": 10,\n      \"mistral_only\": 0,\n      \"conflicts_resolved\": 0\n    },\n    \"quality_score\": 0.95\n  },\n  \"questions\": [\n    {\n      \"question_number\": \"1\",\n      \"question_type\": \"mcq_multi\",\n      \"stem_text\": \"Which of the following are programming languages?\",\n      \"options\": {\n        \"A\": \"Python\",\n        \"B\": \"HTML\",\n        \"C\": \"Java\",\n        \"D\": \"CSS\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 92.81, 431.26, 109.33],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"computer science\"\n      }\n    },\n    {\n      \"question_number\": \"2\",\n      \"question_type\": \"mcq_single\",\n      \"stem_text\": \"The capital of France is:\",\n      \"options\": {\n        \"A\": \"Berlin\",\n        \"B\": \"Madrid\",\n        \"C\": \"Paris\",\n        \"D\": \"Rome\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 211.87, 191.25, 228.39],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"geography\"\n      }\n    },\n    {\n      \"question_number\": \"3\",\n      \"question_type\": \"true_false\",\n      \"stem_text\": \"The Sun is a star.\",\n      \"options\": {\n        \"A\": \"True\",\n        \"B\": \"False\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 330.92, 224.59, 347.44],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"astronomy\"\n      }\n    },\n    {\n      \"question_number\": \"4\",\n      \"question_type\": \"true_false\",\n      \"stem_text\": \"Water freezes at 0°C.\",\n      \"options\": {\n        \"A\": \"True\",\n        \"B\": \"False\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 404.62, 244.06, 421.14],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"science\"\n      }\n    },\n    {\n      \"question_number\": \"5\",\n      \"question_type\": \"matching\",\n      \"stem_text\": \"Match the countries with their capitals:\",\n      \"options\": {\n        \"1\": \"Japan\",\n        \"2\": \"Canada\",\n        \"3\": \"Australia\",\n        \"A\": \"Ottawa\",\n        \"B\": \"Canberra\",\n        \"C\": \"Tokyo\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 478.32, 275.92, 494.84],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"geography\"\n      }\n    },\n    {\n      \"question_number\": \"6\",\n      \"question_type\": \"mcq_multi\",\n      \"stem_text\": \"Which of these are planets in our Solar System?\",\n      \"options\": {\n        \"A\": \"Mars\",\n        \"B\": \"Venus\",\n        \"C\": \"Pluto\",\n        \"D\": \"Jupiter\"\n      },\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 642.73, 406.62, 659.25],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"astronomy\"\n      }\n    },\n    {\n      \"question_number\": \"7\",\n      \"question_type\": \"short_answer\",\n      \"stem_text\": \"The largest ocean on Earth is:\",\n      \"options\": {},\n      \"positioning\": {\n        \"page\": 1,\n        \"bbox\": [31.19, 761.79, 225.25, 778.31],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"geography\"\n      }\n    },\n    {\n      \"question_number\": \"8\",\n      \"question_type\": \"true_false\",\n      \"stem_text\": \"Humans have walked on Mars.\",\n      \"options\": {\n        \"A\": \"True\",\n        \"B\": \"False\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [31.19, 189.19, 299.28, 205.71],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"general knowledge\"\n      }\n    },\n    {\n      \"question_number\": \"9\",\n      \"question_type\": \"matching\",\n      \"stem_text\": \"Match the inventions with their inventors:\",\n      \"options\": {\n        \"1\": \"Telephone\",\n        \"2\": \"Light Bulb\",\n        \"3\": \"Airplane\",\n        \"A\": \"Wright Brothers\",\n        \"B\": \"Alexander Graham Bell\",\n        \"C\": \"Thomas Edison\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [31.19, 262.89, 291.24, 279.41],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"general knowledge\"\n      }\n    },\n    {\n      \"question_number\": \"10\",\n      \"question_type\": \"mcq_multi\",\n      \"stem_text\": \"Which of the following are mammals?\",\n      \"options\": {\n        \"A\": \"Dolphin\",\n        \"B\": \"Crocodile\",\n        \"C\": \"Bat\",\n        \"D\": \"Shark\"\n      },\n      \"positioning\": {\n        \"page\": 2,\n        \"bbox\": [31.19, 427.30, 353.26, 443.82],\n        \"source\": \"pymupdf\"\n      },\n      \"confidence\": 0.95,\n      \"sources_detected\": [\"openai_vision\"],\n      \"fusion_notes\": \"Used Vision for text, PyMuPDF for position\",\n      \"metadata\": {\n        \"visual_elements\": [],\n        \"complexity\": \"medium\",\n        \"source_agreements\": 1,\n        \"subject_area\": \"general knowledge\"\n      }\n    }\n  ]\n}\n```",
+      "model": "gpt-4o",
+      "sources_used": [
+        "pymupdf",
+        "openai_vision",
+        "mistral_ocr"
+      ],
+      "orchestration": {
+        "extraction_results": {
+          "mistral_ocr": {
+            "questions_count": 0,
+            "confidence": 0.1,
+            "processing_time_ms": 5125
+          },
+          "openai_vision": {
+            "questions_count": 10,
+            "confidence": 0.9,
+            "processing_time_ms": 25751
+          }
+        },
+        "total_processing_time_ms": 74086,
+        "clients_used": [
+          "openai_vision",
+          "mistral_ocr"
+        ]
+      }
+    }
+  },
+  "ai_questions": [
+    {
+      "question_number": "1",
+      "question_type": "mcq_multi",
+      "stem_text": "Which of the following are programming languages?",
+      "options": {
+        "A": "Python",
+        "B": "HTML",
+        "C": "Java",
+        "D": "CSS"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          92.81,
+          431.26,
+          109.33
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "computer science",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "1"
+    },
+    {
+      "question_number": "2",
+      "question_type": "mcq_single",
+      "stem_text": "The capital of France is:",
+      "options": {
+        "A": "Berlin",
+        "B": "Madrid",
+        "C": "Paris",
+        "D": "Rome"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          211.87,
+          191.25,
+          228.39
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "geography",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "2"
+    },
+    {
+      "question_number": "3",
+      "question_type": "true_false",
+      "stem_text": "The Sun is a star.",
+      "options": {
+        "A": "True",
+        "B": "False"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          330.92,
+          224.59,
+          347.44
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "astronomy",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "3"
+    },
+    {
+      "question_number": "4",
+      "question_type": "true_false",
+      "stem_text": "Water freezes at 0°C.",
+      "options": {
+        "A": "True",
+        "B": "False"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          404.62,
+          244.06,
+          421.14
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "science",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "4"
+    },
+    {
+      "question_number": "5",
+      "question_type": "matching",
+      "stem_text": "Match the countries with their capitals:",
+      "options": {
+        "1": "Japan",
+        "2": "Canada",
+        "3": "Australia",
+        "A": "Ottawa",
+        "B": "Canberra",
+        "C": "Tokyo"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          478.32,
+          275.92,
+          494.84
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "geography",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "5"
+    },
+    {
+      "question_number": "6",
+      "question_type": "mcq_multi",
+      "stem_text": "Which of these are planets in our Solar System?",
+      "options": {
+        "A": "Mars",
+        "B": "Venus",
+        "C": "Pluto",
+        "D": "Jupiter"
+      },
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          642.73,
+          406.62,
+          659.25
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "astronomy",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "6"
+    },
+    {
+      "question_number": "7",
+      "question_type": "short_answer",
+      "stem_text": "The largest ocean on Earth is:",
+      "options": {},
+      "positioning": {
+        "page": 1,
+        "bbox": [
+          31.19,
+          761.79,
+          225.25,
+          778.31
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "geography",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "7"
+    },
+    {
+      "question_number": "8",
+      "question_type": "true_false",
+      "stem_text": "Humans have walked on Mars.",
+      "options": {
+        "A": "True",
+        "B": "False"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          31.19,
+          189.19,
+          299.28,
+          205.71
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "general knowledge",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "8"
+    },
+    {
+      "question_number": "9",
+      "question_type": "matching",
+      "stem_text": "Match the inventions with their inventors:",
+      "options": {
+        "1": "Telephone",
+        "2": "Light Bulb",
+        "3": "Airplane",
+        "A": "Wright Brothers",
+        "B": "Alexander Graham Bell",
+        "C": "Thomas Edison"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          31.19,
+          262.89,
+          291.24,
+          279.41
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "general knowledge",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "9"
+    },
+    {
+      "question_number": "10",
+      "question_type": "mcq_multi",
+      "stem_text": "Which of the following are mammals?",
+      "options": {
+        "A": "Dolphin",
+        "B": "Crocodile",
+        "C": "Bat",
+        "D": "Shark"
+      },
+      "positioning": {
+        "page": 2,
+        "bbox": [
+          31.19,
+          427.3,
+          353.26,
+          443.82
+        ],
+        "source": "pymupdf"
+      },
+      "confidence": 0.95,
+      "sources_detected": [
+        "openai_vision"
+      ],
+      "fusion_notes": "Used Vision for text, PyMuPDF for position",
+      "metadata": {
+        "visual_elements": [],
+        "complexity": "medium",
+        "source_agreements": 1,
+        "subject_area": "general knowledge",
+        "fusion_analysis": {
+          "total_questions_found": 10,
+          "source_agreements": {
+            "vision_mistral": 0,
+            "vision_only": 10,
+            "mistral_only": 0,
+            "conflicts_resolved": 0
+          },
+          "quality_score": 0.95
+        }
+      },
+      "q_number": "10"
+    }
+  ],
+  "question_index": [
+    {
+      "q_number": "1",
+      "page": 1,
+      "stem": {
+        "text": "Which of the following are programming languages?",
+        "bbox": [
+          31.19,
+          92.81,
+          431.26,
+          109.33
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Python"
+        },
+        "B": {
+          "text": "HTML"
+        },
+        "C": {
+          "text": "Java"
+        },
+        "D": {
+          "text": "CSS"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "2",
+      "page": 1,
+      "stem": {
+        "text": "The capital of France is:",
+        "bbox": [
+          31.19,
+          211.87,
+          191.25,
+          228.39
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Berlin"
+        },
+        "B": {
+          "text": "Madrid"
+        },
+        "C": {
+          "text": "Paris"
+        },
+        "D": {
+          "text": "Rome"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "3",
+      "page": 1,
+      "stem": {
+        "text": "The Sun is a star.",
+        "bbox": [
+          31.19,
+          330.92,
+          224.59,
+          347.44
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "True"
+        },
+        "B": {
+          "text": "False"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "4",
+      "page": 1,
+      "stem": {
+        "text": "Water freezes at 0°C.",
+        "bbox": [
+          31.19,
+          404.62,
+          244.06,
+          421.14
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "True"
+        },
+        "B": {
+          "text": "False"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "5",
+      "page": 1,
+      "stem": {
+        "text": "Match the countries with their capitals:",
+        "bbox": [
+          31.19,
+          478.32,
+          275.92,
+          494.84
+        ]
+      },
+      "options": {
+        "1": {
+          "text": "Japan"
+        },
+        "2": {
+          "text": "Canada"
+        },
+        "3": {
+          "text": "Australia"
+        },
+        "A": {
+          "text": "Ottawa"
+        },
+        "B": {
+          "text": "Canberra"
+        },
+        "C": {
+          "text": "Tokyo"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "6",
+      "page": 1,
+      "stem": {
+        "text": "Which of these are planets in our Solar System?",
+        "bbox": [
+          31.19,
+          642.73,
+          406.62,
+          659.25
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Mars"
+        },
+        "B": {
+          "text": "Venus"
+        },
+        "C": {
+          "text": "Pluto"
+        },
+        "D": {
+          "text": "Jupiter"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "7",
+      "page": 1,
+      "stem": {
+        "text": "The largest ocean on Earth is:",
+        "bbox": [
+          31.19,
+          761.79,
+          225.25,
+          778.31
+        ]
+      },
+      "options": {},
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "8",
+      "page": 2,
+      "stem": {
+        "text": "Humans have walked on Mars.",
+        "bbox": [
+          31.19,
+          189.19,
+          299.28,
+          205.71
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "True"
+        },
+        "B": {
+          "text": "False"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "9",
+      "page": 2,
+      "stem": {
+        "text": "Match the inventions with their inventors:",
+        "bbox": [
+          31.19,
+          262.89,
+          291.24,
+          279.41
+        ]
+      },
+      "options": {
+        "1": {
+          "text": "Telephone"
+        },
+        "2": {
+          "text": "Light Bulb"
+        },
+        "3": {
+          "text": "Airplane"
+        },
+        "A": {
+          "text": "Wright Brothers"
+        },
+        "B": {
+          "text": "Alexander Graham Bell"
+        },
+        "C": {
+          "text": "Thomas Edison"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    },
+    {
+      "q_number": "10",
+      "page": 2,
+      "stem": {
+        "text": "Which of the following are mammals?",
+        "bbox": [
+          31.19,
+          427.3,
+          353.26,
+          443.82
+        ]
+      },
+      "options": {
+        "A": {
+          "text": "Dolphin"
+        },
+        "B": {
+          "text": "Crocodile"
+        },
+        "C": {
+          "text": "Bat"
+        },
+        "D": {
+          "text": "Shark"
+        }
+      },
+      "provenance": {
+        "sources_detected": [
+          "openai_vision"
+        ]
+      }
+    }
+  ],
+  "global_mappings": {
+    "character_strategy": "unicode_steganography",
+    "mapping_dictionary": {
+      "A": "А",
+      "B": "В",
+      "C": "С",
+      "E": "Е",
+      "H": "Н",
+      "K": "К",
+      "M": "М",
+      "O": "О",
+      "P": "Р",
+      "T": "Т",
+      "X": "Х",
+      "Y": "Ү",
+      "a": "а",
+      "c": "с",
+      "e": "е",
+      "o": "о",
+      "p": "р",
+      "x": "х",
+      "y": "у"
+    },
+    "effectiveness_stats": {
+      "total_questions": 10,
+      "average_effectiveness": 0.0,
+      "total_characters_mapped": 19,
+      "coverage_percentage": 20.0
+    }
+  }
+}

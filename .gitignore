@@ -1,24 +1,123 @@
-# Logs
-logs
+# macOS
+.DS_Store
+.AppleDouble
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+**/node_modules/
+frontend/node_modules/
+dist/
+build/
+.next/
+.nuxt/
+.parcel-cache/
+coverage/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+.pnpm-debug.log*
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-node_modules
-dist
-dist-ssr
-*.local
+# Generated assets and data dumps
+backend/data/fairtestai.db
+backend/data/pipeline_runs/
+backend/data/config/
+extracted/
+extracted_custom/
+orig_page*.png
+overlay_page*.png
+page_diff-*.png
+diff_visual.png
+*_preview.png
+demo_assets/**/*.pdf
+demo_assets/**/*.png
+demo_assets/**/*.json
+demo_assets/**/*.csv
+developer_screenshots/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Build artifacts and previews
+**/*_preview.json
+**/*_plan.json
+**/artifacts/
+**/debug.pdf
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.cache
+bash.exe.stackdump
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Setup scripts (optional - uncomment if you don't want to track these)
+# connect_postgres.sh
+# fix_postgres_connection.sh
+# setup_local_postgres.sql
+# setup_postgres.sh
+# docker-compose.yml
+
+# Manual inputs and test data
+backend/data/manual_inputs/
+data/manual_inputs/
+
+# Documentation files (optional - uncomment if you don't want to track these)
+# *.md
+# !README.md
+
+
+
+# Temporary files from development
+*.pid
+*.log
+*_server.log
+backend/test_*.py
+backend/verify_*.py
+
+# Database files (runtime data, not code)
+*.db-shm
+*.db-wal
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

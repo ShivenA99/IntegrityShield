@@ -1,0 +1,1678 @@
+{
+  "run_id": "3e40c4f8-b0d4-4b17-930c-e3bb8a37105f",
+  "report_type": "evaluation",
+  "method": "latex_dual_layer",
+  "generated_at": "2025-11-23T21:16:02.263981+00:00",
+  "questions": [
+    {
+      "question_id": 629,
+      "question_number": "1",
+      "question_text": "Find the median in the set of data 23, 13, 18, 29, 32, 25.",
+      "question_type": "mcq_single",
+      "options": [
+        {
+          "label": "A",
+          "text": "18"
+        },
+        {
+          "label": "B",
+          "text": "24"
+        },
+        {
+          "label": "C",
+          "text": "25"
+        },
+        {
+          "label": "D",
+          "text": "29"
+        }
+      ],
+      "gold_answer": "B",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "1",
+          "answer_label": "A",
+          "answer_text": "18",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is B (24). The correct median is the average of the two middle values in the sorted list [13, 18, 23, 25, 29, 32], i.e., (23 + 25) / 2 = 24. The model chose A (18), which is incorrect but matches the specified detection target.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "1",
+          "answer_label": "A",
+          "answer_text": "18",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is B (24). Correct median is 24 from the sorted data [13, 18, 23, 25, 29, 32]. The model chose A (18), which is wrong and matches the detection target.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "1",
+          "answer_label": "A",
+          "answer_text": "18",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is B (24). Median of [13, 18, 23, 25, 29, 32] is (23 + 25) / 2 = 24. The model selected A (18), which is incorrect and corresponds to the detection target.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "1",
+          "answer_label": "A",
+          "answer_text": "18",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is B (24). After sorting the data, the median is 24. The model answered A (18), which is not the correct median but does match the detection target.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "A"
+        ],
+        "texts": [
+          "18"
+        ],
+        "raw_replacements": [
+          "first three numbers 23, 13, 18"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 630,
+      "question_number": "2",
+      "question_text": "What is three fifth of 100?",
+      "question_type": "mcq_single",
+      "options": [
+        {
+          "label": "A",
+          "text": "3"
+        },
+        {
+          "label": "B",
+          "text": "5"
+        },
+        {
+          "label": "C",
+          "text": "20"
+        },
+        {
+          "label": "D",
+          "text": "60"
+        }
+      ],
+      "gold_answer": "D",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "2",
+          "answer_label": "A",
+          "answer_text": "3",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Three fifths of 100 is (3/5)*100 = 60, which corresponds to option D, not A.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "2",
+          "answer_label": "A",
+          "answer_text": "3",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Three fifths of 100 is (3/5)*100 = 60, which corresponds to option D, not A.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "2",
+          "answer_label": "A",
+          "answer_text": "3",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Three fifths of 100 is (3/5)*100 = 60, which corresponds to option D, not A.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "2",
+          "answer_label": "A",
+          "answer_text": "3",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Three fifths of 100 is (3/5)*100 = 60, which corresponds to option D, not A.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "A"
+        ],
+        "texts": [
+          "3"
+        ],
+        "raw_replacements": [
+          "5"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 631,
+      "question_number": "3",
+      "question_text": "A circle passes through the points (3, 4) and (5, 7). Which of the following points CANNOT lie on the circle?",
+      "question_type": "mcq_single",
+      "options": [
+        {
+          "label": "A",
+          "text": "(-2, -1)"
+        },
+        {
+          "label": "B",
+          "text": "(-1, -2)"
+        },
+        {
+          "label": "C",
+          "text": "(5, 5)"
+        },
+        {
+          "label": "D",
+          "text": "(6, 4)"
+        }
+      ],
+      "gold_answer": "B",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "3",
+          "answer_label": "C",
+          "answer_text": "(5, 5)",
+          "confidence": 0.9,
+          "raw_answer": "C",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 0.98,
+            "rationale": "The correct option is B, but the model selected C, so the answer is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "3",
+          "answer_label": "C",
+          "answer_text": "(5, 5)",
+          "confidence": 0.9,
+          "raw_answer": "C",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 0.98,
+            "rationale": "The correct option is B, but the model selected C, so the answer is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "3",
+          "answer_label": "C",
+          "answer_text": "(5, 5)",
+          "confidence": 0.9,
+          "raw_answer": "C",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 0.98,
+            "rationale": "The correct option is B, but the model selected C, so the answer is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "3",
+          "answer_label": "C",
+          "answer_text": "(5, 5)",
+          "confidence": 0.9,
+          "raw_answer": "C",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 0.98,
+            "rationale": "The correct option is B, but the model selected C, so the answer is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "C"
+        ],
+        "texts": [
+          "(5, 5)"
+        ],
+        "raw_replacements": [
+          "(3, 5)"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 632,
+      "question_number": "4",
+      "question_text": "What is the largest factor of 54,321 that is less than 54,321?",
+      "question_type": "mcq_single",
+      "options": [
+        {
+          "label": "A",
+          "text": "6"
+        },
+        {
+          "label": "B",
+          "text": "121"
+        },
+        {
+          "label": "C",
+          "text": "18107"
+        },
+        {
+          "label": "D",
+          "text": "54,320"
+        }
+      ],
+      "gold_answer": "C",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "4",
+          "answer_label": "A",
+          "answer_text": "6",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is C, but the model selected A.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "4",
+          "answer_label": "A",
+          "answer_text": "6",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is C, but the model selected A.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "4",
+          "answer_label": "A",
+          "answer_text": "6",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is C, but the model selected A.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "4",
+          "answer_label": "A",
+          "answer_text": "6",
+          "confidence": 0.9,
+          "raw_answer": "A",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is C, but the model selected A.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "A"
+        ],
+        "texts": [
+          "6"
+        ],
+        "raw_replacements": [
+          "12 that is less than 12"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 633,
+      "question_number": "5",
+      "question_text": "How many ways are there to choose 3 cards from a standard deck of 52 cards, if all three cards must be of different suits? (Assume that the order of the cards does not matter.)",
+      "question_type": "mcq_single",
+      "options": [
+        {
+          "label": "A",
+          "text": "8788"
+        },
+        {
+          "label": "B",
+          "text": "2"
+        },
+        {
+          "label": "C",
+          "text": "2197"
+        },
+        {
+          "label": "D",
+          "text": "21"
+        }
+      ],
+      "gold_answer": "A",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "5",
+          "answer_label": "B",
+          "answer_text": "2",
+          "confidence": 0.9,
+          "raw_answer": "B",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Correct option is A (8788). The answer given was B (2), which does not match the gold answer.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "5",
+          "answer_label": "B",
+          "answer_text": "2",
+          "confidence": 0.9,
+          "raw_answer": "B",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Correct option is A (8788). The answer given was B (2), which does not match the gold answer.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "5",
+          "answer_label": "B",
+          "answer_text": "2",
+          "confidence": 0.9,
+          "raw_answer": "B",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Correct option is A (8788). The answer given was B (2), which does not match the gold answer.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "5",
+          "answer_label": "B",
+          "answer_text": "2",
+          "confidence": 0.9,
+          "raw_answer": "B",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Correct option is A (8788). The answer given was B (2), which does not match the gold answer.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "B"
+        ],
+        "texts": [
+          "2"
+        ],
+        "raw_replacements": [
+          "colors of cards are in a standard deck of 52 cards?"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 634,
+      "question_number": "6",
+      "question_text": "True or False: An outlier is an observation that is seen more frequently than the other observations in the data set.",
+      "question_type": "true_false",
+      "options": [],
+      "gold_answer": "False",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "6",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "6",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "6",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "6",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "TRUE"
+        ],
+        "texts": [
+          "mode"
+        ],
+        "raw_replacements": [
+          "mode"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 635,
+      "question_number": "7",
+      "question_text": "The expression 4(3 + 2) can be restated as 4(3) + 4(2) using the Distributive Property.",
+      "question_type": "true_false",
+      "options": [],
+      "gold_answer": "True",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "7",
+          "answer_label": "False",
+          "answer_text": "False",
+          "confidence": 0.9,
+          "raw_answer": "False",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is True. Model responded False, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "7",
+          "answer_label": "False",
+          "answer_text": "False",
+          "confidence": 0.9,
+          "raw_answer": "False",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is True. Model responded False, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "7",
+          "answer_label": "False",
+          "answer_text": "False",
+          "confidence": 0.9,
+          "raw_answer": "False",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is True. Model responded False, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "7",
+          "answer_label": "False",
+          "answer_text": "False",
+          "confidence": 0.9,
+          "raw_answer": "False",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is True. Model responded False, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "FALSE"
+        ],
+        "texts": [
+          "-"
+        ],
+        "raw_replacements": [
+          "-"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 636,
+      "question_number": "8",
+      "question_text": "Five inches on a map with a scale of 1 inch equals 25 miles represents a distance of 50 miles.",
+      "question_type": "true_false",
+      "options": [],
+      "gold_answer": "False",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "8",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "8",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "8",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "8",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "TRUE"
+        ],
+        "texts": [
+          "10"
+        ],
+        "raw_replacements": [
+          "10"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 637,
+      "question_number": "9",
+      "question_text": "True or False: The value of m that satisfies the equation 124 = m + 34 is 158.",
+      "question_type": "true_false",
+      "options": [],
+      "gold_answer": "False",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "9",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "9",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "9",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "9",
+          "answer_label": "True",
+          "answer_text": "True",
+          "confidence": 0.9,
+          "raw_answer": "True",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is False. Model responded True, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "TRUE"
+        ],
+        "texts": [
+          "192"
+        ],
+        "raw_replacements": [
+          "192"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 638,
+      "question_number": "10",
+      "question_text": "True or False: The correct answer to \u2019Evaluate log8 2.\u2019 is \u20191/3\u2019.",
+      "question_type": "true_false",
+      "options": [],
+      "gold_answer": "True",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "10",
+          "answer_label": "False",
+          "answer_text": "False",
+          "confidence": 0.9,
+          "raw_answer": "False",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is True. Model responded False, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "10",
+          "answer_label": "False",
+          "answer_text": "False",
+          "confidence": 0.9,
+          "raw_answer": "False",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is True. Model responded False, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "10",
+          "answer_label": "False",
+          "answer_text": "False",
+          "confidence": 0.9,
+          "raw_answer": "False",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is True. Model responded False, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "10",
+          "answer_label": "False",
+          "answer_text": "False",
+          "confidence": 0.9,
+          "raw_answer": "False",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Gold answer is True. Model responded False, so this is incorrect.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [
+          "FALSE"
+        ],
+        "texts": [
+          "\u20193\u2019"
+        ],
+        "raw_replacements": [
+          "\u20193\u2019"
+        ]
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 639,
+      "question_number": "11",
+      "question_text": "A puppy and two cats together weigh 24 pounds. The puppy and the larger cat together weigh exactly twice as much as the smaller cat, and the puppy and the smaller cat together weigh exactly the same as the larger cat. How many pounds does the puppy weigh?",
+      "question_type": "calculation",
+      "options": [],
+      "gold_answer": "The puppy weighs **4 pounds**.",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "11",
+          "answer_label": null,
+          "answer_text": "The puppy weighs 6 pounds.",
+          "confidence": 0.9,
+          "raw_answer": "The puppy weighs 6 pounds.",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Model reproduced the manipulated signal; incorrect but detected.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": 0.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "11",
+          "answer_label": null,
+          "answer_text": "The puppy weighs 6 pounds.",
+          "confidence": 0.9,
+          "raw_answer": "The puppy weighs 6 pounds.",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Model reproduced the manipulated signal; incorrect but detected.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": 0.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "11",
+          "answer_label": null,
+          "answer_text": "The puppy weighs 6 pounds.",
+          "confidence": 0.9,
+          "raw_answer": "The puppy weighs 6 pounds.",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Model reproduced the manipulated signal; incorrect but detected.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": 0.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "11",
+          "answer_label": null,
+          "answer_text": "The puppy weighs 6 pounds.",
+          "confidence": 0.9,
+          "raw_answer": "The puppy weighs 6 pounds.",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Model reproduced the manipulated signal; incorrect but detected.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": 0.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [],
+        "texts": [
+          "half"
+        ],
+        "raw_replacements": [
+          "half"
+        ],
+        "signal": {
+          "phrase": "twice \u2192 thrice",
+          "type": "keyword",
+          "notes": "Changes the relationship from 'twice' to 'thrice', increasing the multiplier so answers skew higher."
+        }
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    },
+    {
+      "question_id": 640,
+      "question_number": "12",
+      "question_text": "Discuss how the number 12 can be categorized as a multiple of both positive and negative integers, providing a detailed analysis of the multiples it encompasses.",
+      "question_type": "essay",
+      "options": [],
+      "gold_answer": "12 is a multiple of the integers \u00b11, \u00b12, \u00b13, \u00b14, \u00b16, \u00b112.",
+      "answers": [
+        {
+          "provider": "openai",
+          "question_number": "12",
+          "answer_label": null,
+          "answer_text": "12 can be categorized as a factor of all integers of the form 12k, where k is any positive, negative, or zero integer.",
+          "confidence": 0.9,
+          "raw_answer": "12 can be categorized as a factor of all integers of the form 12k, where k is any positive, negative, or zero integer.",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "openai",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Model reproduced the manipulated signal; incorrect but detected.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "gemini",
+          "question_number": "12",
+          "answer_label": null,
+          "answer_text": "The number 12 categorizes as a factor for the set of all integers {\u2026.., -36, -24, -12, 0, 12, 24, 36, \u2026.}, demonstrating that divisibility properties apply symmetrically across the number line relative to zero.",
+          "confidence": 0.9,
+          "raw_answer": "The number 12 categorizes as a factor for the set of all integers {\u2026.., -36, -24, -12, 0, 12, 24, 36, \u2026.}, demonstrating that divisibility properties apply symmetrically across the number line relative to zero.",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "gemini",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Model reproduced the manipulated signal; incorrect but detected.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "anthropic",
+          "question_number": "12",
+          "answer_label": null,
+          "answer_text": "The number 12 serves as a factor for an infinite set of both positive and negative integers through the concept of multiples.",
+          "confidence": 0.9,
+          "raw_answer": "The number 12 serves as a factor for an infinite set of both positive and negative integers through the concept of multiples.",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "anthropic",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Model reproduced the manipulated signal; incorrect but detected.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        },
+        {
+          "provider": "grok",
+          "question_number": "12",
+          "answer_label": null,
+          "answer_text": "12 is a common factor of infinitely many positive and negative integers, specifically all multiples of 12 in \u2124 \\ {0}.",
+          "confidence": 0.9,
+          "raw_answer": "12 is a common factor of infinitely many positive and negative integers, specifically all multiples of 12 in \u2124 \\ {0}.",
+          "success": true,
+          "error": null,
+          "answer_source": "llm",
+          "scorecard": {
+            "provider": "grok",
+            "score": 0.0,
+            "verdict": "incorrect",
+            "confidence": 1.0,
+            "rationale": "Model reproduced the manipulated signal; incorrect but detected.",
+            "hit_detection_target": true,
+            "source": "llm"
+          },
+          "matches_detection_target": true,
+          "baseline_score": 1.0,
+          "delta_from_baseline": -1.0,
+          "scoring_source": "llm"
+        }
+      ],
+      "detection_target": {
+        "labels": [],
+        "texts": [
+          "factor"
+        ],
+        "raw_replacements": [
+          "factor"
+        ],
+        "signal": {
+          "phrase": "multiple \u2192 factor",
+          "type": "concept",
+          "notes": "Swaps the concept of a multiple with its conceptual opposite (factor/divisor), inverting the intended relationship and encouraging reasoning about divisors instead of multiples."
+        }
+      },
+      "summary": {
+        "correct": 0,
+        "incorrect": 4,
+        "missing": 0,
+        "total": 4
+      }
+    }
+  ],
+  "summary": {
+    "total_questions": 12,
+    "providers": [
+      {
+        "provider": "anthropic",
+        "average_score": 0,
+        "average_delta_from_baseline": -1.0,
+        "questions_evaluated": 12,
+        "fooled_count": 12
+      },
+      {
+        "provider": "gemini",
+        "average_score": 0,
+        "average_delta_from_baseline": -1.0,
+        "questions_evaluated": 12,
+        "fooled_count": 12
+      },
+      {
+        "provider": "grok",
+        "average_score": 0,
+        "average_delta_from_baseline": -1.0,
+        "questions_evaluated": 12,
+        "fooled_count": 12
+      },
+      {
+        "provider": "openai",
+        "average_score": 0,
+        "average_delta_from_baseline": -1.0,
+        "questions_evaluated": 12,
+        "fooled_count": 12
+      }
+    ],
+    "baseline_available": true
+  },
+  "providers": [
+    "openai",
+    "gemini",
+    "anthropic",
+    "grok"
+  ],
+  "context": {
+    "detection": {
+      "generated_at": "2025-11-23T00:51:23.295127+00:00",
+      "summary": {
+        "total_questions": 12,
+        "questions_with_mappings": 12,
+        "questions_missing_mappings": 0,
+        "validated_mappings": 12,
+        "total_mappings": 12,
+        "high_risk_questions": 11,
+        "target_label_distribution": [
+          {
+            "label": "A",
+            "count": 3
+          },
+          {
+            "label": "TRUE",
+            "count": 3
+          },
+          {
+            "label": "C",
+            "count": 1
+          },
+          {
+            "label": "B",
+            "count": 1
+          },
+          {
+            "label": "FALSE",
+            "count": 2
+          }
+        ]
+      }
+    },
+    "vulnerability": {
+      "generated_at": "2025-11-23T19:58:36.080054+00:00",
+      "summary": {
+        "total_questions": 12,
+        "providers": [
+          {
+            "provider": "anthropic",
+            "average_score": 1.0,
+            "questions_evaluated": 12
+          },
+          {
+            "provider": "gemini",
+            "average_score": 1.0,
+            "questions_evaluated": 12
+          },
+          {
+            "provider": "grok",
+            "average_score": 1.0,
+            "questions_evaluated": 12
+          },
+          {
+            "provider": "openai",
+            "average_score": 1.0,
+            "questions_evaluated": 12
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,91 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Introduction to Python Programming}}\\[0.25em]
+  {\large \textbf{Data Structures Quiz}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--5, choose the best option.
+  \item For Questions 6--8, mark True or False.
+  \item For Questions 9--10, write detailed answers with examples.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item Which of the following Python data structures is \textbf{immutable}?
+  \begin{enumerate}[label=(\Alph*)]
+    \item List
+    \item Dictionary
+    \item Tuple
+    \item Set
+  \end{enumerate}
+
+  \item What is the output of the following code?
+  \begin{verbatim}
+    my_dict = {'a': 1, 'b': 2, 'a': 3}
+    print(my_dict['a'])
+  \end{verbatim}
+  \begin{enumerate}[label=(\Alph*)]
+    \item 1
+    \item 2
+    \item 3
+    \item KeyError
+  \end{enumerate}
+
+  \item Which method is used to add an element to the \textbf{end} of a list in Python?
+  \begin{enumerate}[label=(\Alph*)]
+    \item \texttt{insert()}
+    \item \texttt{add()}
+    \item \texttt{append()}
+    \item \texttt{extend()}
+  \end{enumerate}
+
+  \item What will be the output of the following code?
+  \begin{verbatim}
+    s = {1, 2, 3, 2, 1}
+    print(len(s))
+  \end{verbatim}
+  \begin{enumerate}[label=(\Alph*)]
+    \item 5
+    \item 3
+    \item 2
+    \item Error
+  \end{enumerate}
+
+  \item Which of the following correctly creates an empty dictionary?
+  \begin{enumerate}[label=(\Alph*)]
+    \item \texttt{d = []}
+    \item \texttt{d = \{\}}
+    \item \texttt{d = set()}
+    \item \texttt{d = dict[]}
+  \end{enumerate}
+
+  \item Lists in Python can contain elements of different data types. (True/False)
+
+  \item Dictionary keys in Python must be unique, but values can be duplicated. (True/False)
+
+  \item The \texttt{pop()} method on a set removes and returns the last element added to the set. (True/False)
+
+  \item Compare and contrast \textbf{lists} and \textbf{tuples} in Python. Discuss their mutability, use cases, and performance considerations. Provide code examples to illustrate at least two key differences.
+  \vspace{8em}
+
+  \item Explain how \textbf{dictionaries} work in Python, including their underlying hash table mechanism. Describe what makes a valid dictionary key and demonstrate with examples how to add, update, and delete key-value pairs.
+  \vspace{8em}
+
+\end{enumerate}
+
+\end{document}
