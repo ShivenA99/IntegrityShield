@@ -24,6 +24,9 @@ services:
         value: true
       - key: INTEGRITYSHIELD_PIPELINE_ROOT
         value: /tmp/pipeline_runs
+      # CORS Configuration - allow GitHub Pages
+      - key: INTEGRITYSHIELD_CORS_ORIGINS
+        value: https://shivena99.github.io
       # Database URL - will be auto-set by Render when you link the database
       - key: INTEGRITYSHIELD_DATABASE_URL
         fromDatabase:
