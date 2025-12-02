@@ -4,10 +4,13 @@ import shutil
 from pathlib import Path
 from typing import Dict
 
+from ....utils.logging import get_logger
 from ..latex_icw_service import LatexICWService
 from ..latex_dual_layer_service import LatexAttackService
 from ..latex_font_attack_service import LatexFontAttackService
 from .base_renderer import BaseRenderer
+
+logger = get_logger(__name__)
 
 
 class LatexICWRenderer(BaseRenderer):
@@ -34,9 +37,14 @@ class LatexICWRenderer(BaseRenderer):
             if final_path.exists():
                 shutil.copy2(final_path, destination)
             else:
-                destination.write_bytes(b"")
+                logger.error(
+                    f"ICW PDF compilation failed: {final_pdf_path} does not exist. "
+                    f"Check LaTeX compilation logs for run_id: {run_id}"
+                )
+                raise RuntimeError(f"ICW PDF compilation failed for latex_icw")
         else:
-            destination.write_bytes(b"")
+            logger.error(f"ICW service returned no PDF path for run_id: {run_id}")
+            raise RuntimeError(f"ICW service execution failed for latex_icw")
 
         summary = result.get("compile_summary") or {}
         metadata = {
@@ -79,14 +87,27 @@ class LatexICWDualLayerRenderer(BaseRenderer):
         final_pdf_path_str = artifacts.get("final_pdf") or artifacts.get("enhanced_pdf")
         destination.parent.mkdir(parents=True, exist_ok=True)
 
+        # Verify ICW stage succeeded
+        if not icw_tex_path or not Path(icw_tex_path).exists():
+            logger.error(
+                f"ICW+DualLayer failed at ICW stage. "
+                f"Intermediate TeX missing: {icw_tex_path} for run_id: {run_id}"
+            )
+            raise RuntimeError(f"ICW stage failed for latex_icw_dual_layer")
+
         if final_pdf_path_str:
             final_pdf_path = Path(final_pdf_path_str)
             if final_pdf_path.exists():
                 shutil.copy2(final_pdf_path, destination)
             else:
-                destination.write_bytes(b"")
+                logger.error(
+                    f"ICW+DualLayer failed at dual layer stage. "
+                    f"Final PDF missing: {final_pdf_path_str} for run_id: {run_id}"
+                )
+                raise RuntimeError(f"Dual layer stage failed for latex_icw_dual_layer")
         else:
-            destination.write_bytes(b"")
+            logger.error(f"Dual layer service returned no PDF path for run_id: {run_id}")
+            raise RuntimeError(f"Dual layer service execution failed for latex_icw_dual_layer")
 
         metadata = dual_result.get("renderer_metadata") or {}
         metadata.setdefault("prompt_count", len(icw_result.get("instructions") or []))
@@ -127,14 +148,28 @@ class LatexICWFontAttackRenderer(BaseRenderer):
         final_pdf_path = artifacts.get("final_pdf")
 
         destination.parent.mkdir(parents=True, exist_ok=True)
+
+        # Verify ICW stage succeeded
+        if not icw_tex_path or not Path(icw_tex_path).exists():
+            logger.error(
+                f"ICW+FontAttack failed at ICW stage. "
+                f"Intermediate TeX missing: {icw_tex_path} for run_id: {run_id}"
+            )
+            raise RuntimeError(f"ICW stage failed for latex_icw_font_attack")
+
         if final_pdf_path:
             final_pdf = Path(final_pdf_path)
             if final_pdf.exists():
                 shutil.copy2(final_pdf, destination)
             else:
-                destination.write_bytes(b"")
+                logger.error(
+                    f"ICW+FontAttack failed at font attack stage. "
+                    f"Final PDF missing: {final_pdf_path} for run_id: {run_id}"
+                )
+                raise RuntimeError(f"Font attack stage failed for latex_icw_font_attack")
         else:
-            destination.write_bytes(b"")
+            logger.error(f"Font attack service returned no PDF path for run_id: {run_id}")
+            raise RuntimeError(f"Font attack service execution failed for latex_icw_font_attack")
 
         compile_summary = font_result.get("compile_summary") or {}
         metadata = {

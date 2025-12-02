@@ -27,6 +27,10 @@ from .font_attack import (
     FontBuildResult,
     FontCache,
 )
+from .font_attack.prevention_font_library import (
+    get_prevention_font_library,
+    PreventionFontLibrary,
+)
 
 
 @dataclass
@@ -98,6 +102,25 @@ class LatexFontAttackService:
         run = PipelineRun.query.get(run_id)
         mode = run.pipeline_config.get("mode", "detection") if run else "detection"
         is_prevention_mode = mode == "prevention"
+
+        # Load prevention font library if in prevention mode
+        prevention_library = None
+        if is_prevention_mode:
+            library = get_prevention_font_library()
+            if not library.is_loaded():
+                self.logger.warning(
+                    "Prevention font library not loaded. "
+                    "Falling back to runtime font generation. "
+                    "Run: python scripts/generate_prevention_font_library.py"
+                )
+                prevention_library = None
+            else:
+                prevention_library = library
+                stats = library.get_library_stats()
+                self.logger.info(
+                    f"Prevention library loaded: {stats['total_fonts']} fonts available",
+                    extra={"run_id": run_id, "library_stats": stats}
+                )
 
         if tex_override is not None:
             tex_path = Path(tex_override)
@@ -483,9 +506,14 @@ class LatexFontAttackService:
         cache: FontCache,
     ) -> Tuple[str, Sequence[AttackJob], Sequence[MappingDiagnostic]]:
         """
-        Prevention mode: Apply limited-diversity character mappings to all question stems.
-        Each character has only 5 possible replacements to maximize font cache hits.
+        Prevention mode: Use pre-generated font library for instant font application.
+        Falls back to runtime generation for characters not in library.
+        All characters use universal hidden character 'a' for maximum font reuse.
         """
+        # Load prevention font library
+        library = get_prevention_font_library()
+        UNIVERSAL_HIDDEN_CHAR = 'a'  # All characters map to 'a'
+
         self._font_command_registry: Dict[str, set[str]] = {}
 
         replacements: List[Tuple[int, int, str, AttackJob]] = []
@@ -494,24 +522,12 @@ class LatexFontAttackService:
         attack_jobs: List[AttackJob] = []
         counter = 0
 
+        # Track library hit/miss statistics
+        library_hits = 0
+        runtime_builds = 0
+
         # Get all question stems from structured data
         ai_questions = structured.get("ai_questions", [])
-
-        # Available characters for random replacement (excluding special LaTeX chars)
-        available_chars = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
-
-        # OPTIMIZATION: Create stable limited-diversity mapping (5 variants per character)
-        # This dramatically improves font cache hit rates while maintaining good prevention diversity
-        MAX_VARIANTS = 5
-        char_variant_map: Dict[str, List[str]] = {}
-        for char in available_chars:
-            # For each character, deterministically select 5 different replacement characters
-            # Use seeded random to ensure consistency across runs
-            random.seed(ord(char))  # Seed based on character for determinism
-            other_chars = [c for c in available_chars if c != char]
-            random.shuffle(other_chars)
-            char_variant_map[char] = other_chars[:MAX_VARIANTS]
-        random.seed()  # Reset random seed
 
         for question in ai_questions:
             stem_text = question.get("stem_text", "")
@@ -535,20 +551,9 @@ class LatexFontAttackService:
                 continue
 
             # Process each alphanumeric character in the stem
-            char_offset = 0
             for i, char in enumerate(stem_text):
                 if not char.isalnum():
-                    char_offset += 1
                     continue
-
-                # Select replacement from limited variant pool (5 variants max for cache efficiency)
-                # Use counter modulo to cycle through variants
-                if char not in char_variant_map:
-                    # Character not in standard set, skip
-                    char_offset += 1
-                    continue
-                variants = char_variant_map[char]
-                random_replacement = variants[counter % len(variants)]
 
                 char_start = stem_index + i
                 char_end = char_start + 1
@@ -556,63 +561,90 @@ class LatexFontAttackService:
                 # Check for overlaps
                 overlap = self._find_range_overlap(occupied_ranges, char_start, char_end)
                 if overlap:
-                    char_offset += 1
                     continue
 
+                # Try library lookup first
+                font_path_in_library = None
+                if library and library.is_loaded():
+                    font_path_in_library = library.get_font_for_char(char)
+
                 try:
-                    # Plan font attack: visual shows original char, hidden text is random char
-                    plan = planner.plan(random_replacement, char)
+                    # Plan font attack using universal hidden character
+                    # Hidden: 'a' (universal), Visual: original character
+                    plan = planner.plan(UNIVERSAL_HIDDEN_CHAR, char)
                 except (KeyError, ValueError) as exc:
                     diagnostics.append(MappingDiagnostic(
                         mapping_id=None,
                         question_number=question_number,
                         status="planning_failed",
                         original=char,
-                        replacement=random_replacement,
+                        replacement=UNIVERSAL_HIDDEN_CHAR,
                         location=(char_start, char_end),
                         notes=str(exc)
                     ))
-                    char_offset += 1
                     continue
 
                 attack_id = f"pfa{counter:04d}"  # Prevention Font Attack ID
                 counter += 1
 
-                # Build fonts
-                try:
-                    raw_font_results = builder.build_fonts(
-                        plan, fonts_dir / attack_id, cache_lookup=cache
-                    )
-                except FontBuildError as exc:
-                    diagnostics.append(MappingDiagnostic(
-                        mapping_id=None,
-                        question_number=question_number,
-                        status="font_build_failed",
-                        original=char,
-                        replacement=random_replacement,
-                        location=(char_start, char_end),
-                        notes=str(exc)
-                    ))
-                    char_offset += 1
-                    continue
-
+                # Build or copy fonts
                 font_results: List[FontBuildResult] = []
                 attack_font_dir = fonts_dir / attack_id
                 attack_font_dir.mkdir(parents=True, exist_ok=True)
-                for raw in raw_font_results:
-                    target_name = f"{attack_id}_pos{raw.index}.ttf"
-                    target_path = attack_font_dir / target_name
-                    if raw.font_path != target_path:
-                        shutil.copy2(raw.font_path, target_path)
-                    font_results.append(
-                        FontBuildResult(
-                            index=raw.index,
-                            hidden_char=raw.hidden_char,
-                            visual_text=raw.visual_text,
-                            font_path=target_path,
-                            used_cache=raw.used_cache,
+
+                if font_path_in_library:
+                    # LIBRARY HIT: Copy pre-generated font
+                    for position in plan:
+                        if not position.requires_font:
+                            continue
+
+                        target_name = f"{attack_id}_pos{position.index}.ttf"
+                        target_path = attack_font_dir / target_name
+                        shutil.copy2(font_path_in_library, target_path)
+
+                        font_results.append(
+                            FontBuildResult(
+                                index=position.index,
+                                hidden_char=position.hidden_char,
+                                visual_text=position.visual_text,
+                                font_path=target_path,
+                                used_cache=True  # Library reuse
+                            )
                         )
-                    )
+
+                    library_hits += 1
+                else:
+                    # LIBRARY MISS: Build at runtime (fallback)
+                    try:
+                        raw_font_results = builder.build_fonts(
+                            plan, attack_font_dir, cache_lookup=cache
+                        )
+                        for raw in raw_font_results:
+                            target_name = f"{attack_id}_pos{raw.index}.ttf"
+                            target_path = attack_font_dir / target_name
+                            if raw.font_path != target_path:
+                                shutil.copy2(raw.font_path, target_path)
+                            font_results.append(
+                                FontBuildResult(
+                                    index=raw.index,
+                                    hidden_char=raw.hidden_char,
+                                    visual_text=raw.visual_text,
+                                    font_path=target_path,
+                                    used_cache=raw.used_cache,
+                                )
+                            )
+                        runtime_builds += 1
+                    except FontBuildError as exc:
+                        diagnostics.append(MappingDiagnostic(
+                            mapping_id=None,
+                            question_number=question_number,
+                            status="font_build_failed",
+                            original=char,
+                            replacement=UNIVERSAL_HIDDEN_CHAR,
+                            location=(char_start, char_end),
+                            notes=str(exc)
+                        ))
+                        continue
 
                 latex_replacement = self._render_replacement(attack_id, plan, font_results)
 
@@ -621,7 +653,7 @@ class LatexFontAttackService:
                     mapping_id=None,
                     question_number=question_number,
                     visual_text=char,
-                    hidden_text=random_replacement,
+                    hidden_text=UNIVERSAL_HIDDEN_CHAR,
                     plan=plan,
                     latex_replacement=latex_replacement,
                     font_results=font_results,
@@ -634,9 +666,15 @@ class LatexFontAttackService:
                     question_number=question_number,
                     status="replaced",
                     original=char,
-                    replacement=random_replacement,
+                    replacement=UNIVERSAL_HIDDEN_CHAR,
                     location=(char_start, char_end)
                 ))
+
+        # Log statistics
+        self.logger.info(
+            f"Prevention font stats: {library_hits} library hits, "
+            f"{runtime_builds} runtime builds, {counter} total characters"
+        )
 
         if not replacements:
             return tex_content, tuple(), tuple(diagnostics)

@@ -398,11 +398,13 @@ class PdfCreationService:
                 render_success = False
                 render_error = str(e)
                 self.logger.exception(
-                    "Renderer execution failed",
+                    f"Renderer failed for {record.method_name}: {e}",
                     extra={
                         "run_id": run_id,
                         "method": record.method_name,
+                        "error_type": type(e).__name__,
                     },
+                    exc_info=True,  # Include full traceback
                 )
                 live_logging_service.emit(
                     run_id,

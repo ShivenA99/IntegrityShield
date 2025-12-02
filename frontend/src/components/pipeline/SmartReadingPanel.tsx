@@ -5,6 +5,7 @@ import { usePipeline } from "@hooks/usePipeline";
 import { useNotifications } from "@contexts/NotificationContext";
 import { validatePdfFile } from "@services/utils/validators";
 import type { CorePipelineStageName } from "@services/types/pipeline";
+import PageTitle from "@components/common/PageTitle";
 
 const SmartReadingPanel: React.FC = () => {
   const { startPipeline, error, status } = usePipeline();
@@ -99,7 +100,7 @@ const SmartReadingPanel: React.FC = () => {
   return (
     <div className="panel smart-reading">
       <header className="panel-header panel-header--tight">
-        <h1>Source Document</h1>
+        <PageTitle>Source Document</PageTitle>
         <div className="panel-actions">
           {status?.run_id ? <span className="badge tag-muted">Last run: {status.run_id}</span> : null}
           <button
