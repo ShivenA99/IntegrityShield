@@ -1,0 +1,52 @@
+# Virtual environments
+venv/
+venv_host/
+.venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment files
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data (start fresh in production)
+data/fairtestai.db
+data/fairtestai.db-*
+data/pipeline_runs/
+data/*.db
+data/*.db-*
+
+# Logs
+logs/
+*.log
+
+# Test files
+test_*.py
+verify_*.py
+*.pid
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+README.md
+
+# OS files
+.DS_Store
+Thumbs.db
