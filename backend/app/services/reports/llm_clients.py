@@ -301,36 +301,87 @@ class GoogleClient(BaseLLMClient):
         if not self.api_key:
             raise LLMClientError("Google API key missing")
 
+        # Use the correct upload endpoint: /upload/v1beta/files (not /v1beta/files)
+        # Use resumable upload protocol as per Google Gemini API documentation
         upload_base = "https://generativelanguage.googleapis.com/upload/v1beta"
-        url = f"{upload_base}/files?uploadType=multipart&key={self.api_key}"
+        initiate_url = f"{upload_base}/files?key={self.api_key}"
+        
+        file_size = Path(pdf_path).stat().st_size
         connector = aiohttp.TCPConnector(ssl=SSL_CONTEXT)
-        with open(pdf_path, "rb") as handle:
-            file_bytes = handle.read()
-
-        metadata = json.dumps({"file": {"display_name": Path(pdf_path).name}})
-        boundary = uuid.uuid4().hex
-        body = self._build_related_body(boundary, metadata, file_bytes)
-        headers = {"Content-Type": f"multipart/related; boundary={boundary}"}
 
         async with aiohttp.ClientSession(connector=connector) as session:
+            # Step 1: Initiate the upload with metadata
+            metadata = {
+                "file": {
+                    "displayName": Path(pdf_path).name
+                }
+            }
+            headers = {
+                "Content-Type": "application/json",
+                "X-Goog-Upload-Protocol": "resumable",
+                "X-Goog-Upload-Command": "start",
+                "X-Goog-Upload-Header-Content-Length": str(file_size),
+                "X-Goog-Upload-Header-Content-Type": "application/pdf",
+            }
+            
             async with session.post(
-                url,
-                data=body,
+                initiate_url,
                 headers=headers,
-                timeout=aiohttp.ClientTimeout(total=120),
-            ) as resp:
-                text = await resp.text()
-                if resp.status != 200:
-                    raise LLMClientError(f"Google upload failed ({resp.status}): {text}")
-                payload = json.loads(text)
-                file_id = payload.get("file", {}).get("name")
-                if not file_id:
-                    raise LLMClientError("Google upload succeeded but no file id was returned.")
-                # The upload response should already return file_id in the correct format (e.g., "files/xxxxx")
-                # Log it for debugging
-                logger.debug("Google file upload returned file_id: %s", file_id)
-                await self._wait_for_processing(file_id, session=session)
-                return file_id
+                json=metadata,
+                timeout=aiohttp.ClientTimeout(total=30),
+            ) as init_resp:
+                if init_resp.status != 200:
+                    error_text = await init_resp.text()
+                    raise LLMClientError(f"Google upload initiation failed ({init_resp.status}): {error_text}")
+                
+                upload_url = init_resp.headers.get("X-Goog-Upload-Url")
+                if not upload_url:
+                    raise LLMClientError("Google upload initiation succeeded but no upload URL was returned.")
+            
+            # Step 2: Upload the file
+            upload_headers = {
+                "Content-Type": "application/pdf",
+                "X-Goog-Upload-Protocol": "resumable",
+                "X-Goog-Upload-Command": "upload, finalize",
+                "X-Goog-Upload-Offset": "0",
+            }
+            
+            with open(pdf_path, "rb") as handle:
+                file_data = handle.read()
+                async with session.post(
+                    upload_url,
+                    headers=upload_headers,
+                    data=file_data,
+                    timeout=aiohttp.ClientTimeout(total=120),
+                ) as upload_resp:
+                    if upload_resp.status != 200:
+                        error_text = await upload_resp.text()
+                        raise LLMClientError(f"Google file upload failed ({upload_resp.status}): {error_text}")
+                    
+                    try:
+                        payload = await upload_resp.json()
+                    except Exception as e:
+                        error_text = await upload_resp.text()
+                        raise LLMClientError(f"Google upload returned invalid JSON: {error_text[:200]}")
+                    
+                    file_id = payload.get("file", {}).get("name")
+                    if not file_id:
+                        # Try alternative response format
+                        file_id = payload.get("file", {}).get("uri", "").split("/")[-1] if payload.get("file", {}).get("uri") else None
+                        if file_id and not file_id.startswith("files/"):
+                            file_id = f"files/{file_id}"
+                    
+                    if not file_id:
+                        raise LLMClientError(f"Google upload succeeded but no file id was returned. Response: {json.dumps(payload, indent=2)}")
+                    
+                    # Ensure file_id is in correct format (files/xxxxx)
+                    if not file_id.startswith("files/"):
+                        logger.warning("Google file_id missing 'files/' prefix, adding it: %s", file_id)
+                        file_id = f"files/{file_id}"
+                    
+                    logger.debug("Google file upload returned file_id: %s", file_id)
+                    await self._wait_for_processing(file_id, session=session)
+                    return file_id
 
     @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
     async def _wait_for_processing(self, file_id: str, *, session: aiohttp.ClientSession | None = None) -> None:
@@ -485,11 +536,129 @@ class GoogleClient(BaseLLMClient):
         return meta_part + file_part + closing
 
 
+class GrokClient(BaseLLMClient):
+    """Grok client using xAI API (OpenAI-compatible interface)."""
+    name = "grok"
+
+    def __init__(self, api_key: str | None, model: str) -> None:
+        super().__init__(api_key, model)
+        self.base_url = "https://api.x.ai/v1"
+
+    @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
+    async def upload_file(self, pdf_path: str) -> str:
+        # Grok uses OpenAI-compatible API, so we return the original path
+        # The file will be uploaded as part of the query_with_file call
+        if not Path(pdf_path).exists():
+            raise LLMClientError(f"PDF not found at {pdf_path}")
+        return pdf_path
+
+    @with_exponential_backoff(max_retries=3, base_delay=1.0, max_delay=60.0)
+    async def query_with_file(
+        self,
+        file_id: str | None,
+        prompt: str,
+        question_data: Optional[dict] = None,
+    ) -> str:
+        if not self.api_key:
+            raise LLMClientError("Grok API key missing")
+
+        pdf_path = file_id or ""
+        if not pdf_path:
+            raise LLMClientError("Grok requires the original pdf path reference")
+
+        # Grok uses OpenAI-compatible API
+        upload_url = f"{self.base_url}/files"
+        headers = {"Authorization": f"Bearer {self.api_key}"}
+        connector = aiohttp.TCPConnector(ssl=SSL_CONTEXT)
+
+        async with aiohttp.ClientSession(connector=connector) as session:
+            # Upload file - xAI Grok uses OpenAI-compatible API
+            # Note: xAI may not support file uploads yet - if this fails, we'll get a clear error
+            try:
+                with open(pdf_path, "rb") as handle:
+                    data = aiohttp.FormData()
+                    data.add_field("file", handle, filename=Path(pdf_path).name, content_type="application/pdf")
+                    data.add_field("purpose", "user_data")
+                    async with session.post(upload_url, headers=headers, data=data, timeout=aiohttp.ClientTimeout(total=60)) as resp:
+                        if resp.status != 200:
+                            error_text = await resp.text()
+                            # Check if xAI doesn't support file uploads
+                            if resp.status == 404 or "not found" in error_text.lower() or "not supported" in error_text.lower():
+                                raise LLMClientError(
+                                    f"Grok file upload not supported (status {resp.status}): {error_text[:200]}. "
+                                    "xAI Grok may not support file uploads yet."
+                                )
+                            raise LLMClientError(f"Grok upload failed (status {resp.status}): {error_text[:200]}")
+                        try:
+                            payload = await resp.json()
+                        except json.JSONDecodeError:
+                            error_text = await resp.text()
+                            raise LLMClientError(f"Grok upload returned invalid JSON: {error_text[:200]}")
+                        actual_file_id = payload.get("id")
+                        if not actual_file_id:
+                            raise LLMClientError("Grok upload succeeded but no file id was returned.")
+            except LLMClientError:
+                raise  # Re-raise LLMClientError
+            except Exception as e:
+                raise LLMClientError(f"Grok file upload error: {str(e)}")
+
+            # Wait for file processing
+            file_status_url = f"{self.base_url}/files/{actual_file_id}"
+            start = time.time()
+            while time.time() - start < 90:
+                async with session.get(file_status_url, headers=headers) as status_resp:
+                    if status_resp.status == 200:
+                        file_state = await status_resp.json()
+                        if file_state.get("status") == "processed":
+                            break
+                        if file_state.get("status") == "error":
+                            raise LLMClientError(f"Grok file processing failed: {file_state}")
+                await asyncio.sleep(2)
+            else:
+                raise LLMClientError("Grok file processing timeout")
+
+            # Query with file
+            final_prompt = prompt
+            completion_payload = {
+                "model": self.model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You answer assessment questions using the attached PDF and respond ONLY with JSON.",
+                    },
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "file", "file": {"file_id": actual_file_id}},
+                            {"type": "text", "text": final_prompt},
+                        ],
+                    }
+                ],
+                "temperature": 0.2,
+                "max_tokens": 3200,
+            }
+
+            async with session.post(
+                f"{self.base_url}/chat/completions",
+                headers={**headers, "Content-Type": "application/json"},
+                data=json.dumps(completion_payload),
+                timeout=aiohttp.ClientTimeout(total=180),
+            ) as completion_resp:
+                if completion_resp.status != 200:
+                    raise LLMClientError(f"Grok completion failed: {await completion_resp.text()}")
+                result = await completion_resp.json()
+                choices = result.get("choices") or []
+                if not choices:
+                    raise LLMClientError("Grok returned no choices")
+                return choices[0]["message"]["content"].strip()
+
+
 def build_available_clients(
     *,
     openai_key: str | None,
     anthropic_key: str | None,
     google_key: str | None,
+    grok_key: str | None = None,
     model_overrides: dict[str, str],
     fallback_models: dict[str, str] | None = None,
 ) -> dict[str, BaseLLMClient]:
@@ -513,16 +682,23 @@ def build_available_clients(
     else:
         logger.info("Skipping Anthropic report client - API key missing.")
 
-    # Google/Gemini is currently disabled - only using OpenAI and Anthropic
-    # # For v1beta API with file uploads, gemini-2.0-flash-exp is the recommended model
-    # # Note: v1beta has limited model support - only certain models support file uploads
-    # # Model name should be without "models/" prefix when passed to client
-    # # The URL will add "models/" prefix automatically
-    # default_model = model_overrides.get("google", "gemini-2.0-flash-exp")
-    # google_client = GoogleClient(google_key, default_model)
-    # if google_client.is_configured():
-    #     clients[google_client.name] = google_client
-    # else:
-    #     logger.info("Skipping Google report client - API key missing.")
+    # Enable Google/Gemini client
+    # For v1beta API with file uploads, gemini-2.0-flash-exp or gemini-2.5-flash is recommended
+    # Note: v1beta has limited model support - only certain models support file uploads
+    # Model name should be without "models/" prefix when passed to client
+    # The URL will add "models/" prefix automatically
+    default_model = model_overrides.get("google", "gemini-2.5-flash")
+    google_client = GoogleClient(google_key, default_model)
+    if google_client.is_configured():
+        clients[google_client.name] = google_client
+    else:
+        logger.info("Skipping Google report client - API key missing.")
+
+    # Add Grok client (xAI - OpenAI-compatible API)
+    grok_client = GrokClient(grok_key, model_overrides.get("grok", "grok-2-latest"))
+    if grok_client.is_configured():
+        clients[grok_client.name] = grok_client
+    else:
+        logger.info("Skipping Grok report client - API key missing.")
 
     return clients

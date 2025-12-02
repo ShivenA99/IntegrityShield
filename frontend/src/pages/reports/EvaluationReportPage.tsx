@@ -13,6 +13,7 @@ const PROVIDER_META: Record<string, { label: string; glyph: string; className: s
   openai: { label: "OpenAI", glyph: "O", className: "provider-badge provider-badge--openai" },
   anthropic: { label: "Anthropic", glyph: "A", className: "provider-badge provider-badge--anthropic" },
   google: { label: "Gemini", glyph: "G", className: "provider-badge provider-badge--google" },
+  grok: { label: "Grok", glyph: "G", className: "provider-badge provider-badge--grok" },
 };
 
 type QuestionOption = { label: string; text: string };
@@ -64,20 +65,26 @@ const EvaluationReportPage: React.FC = () => {
 
   const structured = (status?.structured_data as Record<string, any> | undefined) ?? undefined;
   const reports = (structured?.reports as Record<string, any>) ?? {};
-  const evaluationBucket = (reports?.evaluation as Record<string, any>) ?? {};
-  const evaluationEntries = Object.entries(evaluationBucket);
+  // Check both evaluation and prevention_evaluation for backward compatibility
+  const allEvaluationBucket = useMemo(() => {
+    const evaluationBucket = (reports?.evaluation as Record<string, any>) ?? {};
+    const preventionEvaluationBucket = (reports?.prevention_evaluation as Record<string, any>) ?? {};
+    // Merge both, with evaluation taking precedence
+    return { ...preventionEvaluationBucket, ...evaluationBucket };
+  }, [reports?.evaluation, reports?.prevention_evaluation]);
+  const evaluationEntries = useMemo(() => Object.entries(allEvaluationBucket), [allEvaluationBucket]);
 
   useEffect(() => {
     if (!evaluationEntries.length) {
       setSelectedMethod(null);
       return;
     }
-    if (!selectedMethod || !evaluationBucket[selectedMethod]) {
+    if (!selectedMethod || !allEvaluationBucket[selectedMethod]) {
       setSelectedMethod(evaluationEntries[0][0]);
     }
-  }, [evaluationEntries, evaluationBucket, selectedMethod]);
+  }, [evaluationEntries, allEvaluationBucket, selectedMethod]);
 
-  const selectedMeta = selectedMethod ? evaluationBucket[selectedMethod] : null;
+  const selectedMeta = selectedMethod ? allEvaluationBucket[selectedMethod] : null;
   const artifactPath = selectedMeta?.artifact;
 
   useEffect(() => {
@@ -119,7 +126,35 @@ const EvaluationReportPage: React.FC = () => {
     }
   }, [selectedMeta?.generated_at]);
 
-  const providerSummary = (reportData?.summary?.providers as any[]) || [];
+  // Handle both detection and prevention evaluation report formats
+  const rawProviderSummary = (reportData?.summary?.providers as any[]) || [];
+  const isPreventionReport = reportData?.report_type === "prevention_evaluation";
+  
+  // Normalize provider summary to handle both formats
+  const providerSummary = useMemo(() => {
+    return rawProviderSummary.map((entry) => {
+      // Prevention reports have different fields - convert to common format
+      if (isPreventionReport) {
+        // Calculate average_score from prevention results if not present
+        const total = entry.total_questions ?? 0;
+        const prevented = entry.prevented_count ?? 0;
+        const fooledCorrect = entry.fooled_correct_count ?? 0;
+        // In prevention mode, "correct" answers mean the attack failed (fooled_correct)
+        // So accuracy is the inverse - how many were prevented or answered incorrectly
+        const accuracy = total > 0 ? (prevented + (entry.fooled_incorrect_count ?? 0)) / total : 0;
+        
+        return {
+          ...entry,
+          average_score: entry.average_score ?? accuracy,
+          questions_evaluated: entry.questions_evaluated ?? entry.total_questions ?? 0,
+          prevention_rate: entry.prevention_rate ?? (total > 0 ? (prevented / total) * 100 : 0),
+        };
+      }
+      // Detection reports already have the right format
+      return entry;
+    });
+  }, [rawProviderSummary, isPreventionReport]);
+  
   const questionEntries = (reportData?.questions as any[]) || [];
   const sortedQuestions = useMemo(() => {
     return [...questionEntries].sort((a, b) => {
@@ -215,25 +250,50 @@ const EvaluationReportPage: React.FC = () => {
                         <h4>{entry.provider}</h4>
                       </div>
                       <div className="performance-metrics">
-                        <div className="metric">
-                          <span className="metric-value">
-                            {((entry.average_score ?? 0) * 100).toFixed(1)}%
-                          </span>
-                          <span className="metric-label">Accuracy</span>
-                        </div>
-                        <div className="metric">
-                          <span className={`metric-value ${deltaClass}`}>
-                            {delta >= 0 ? "+" : ""}
-                            {(delta * 100).toFixed(1)}%
-                          </span>
-                          <span className="metric-label">Δ from Baseline</span>
-                        </div>
-                        <div className="metric">
-                          <span className="metric-value">{entry.questions_evaluated ?? 0}</span>
-                          <span className="metric-label">Questions</span>
-                        </div>
+                        {isPreventionReport ? (
+                          <>
+                            <div className="metric">
+                              <span className="metric-value">
+                                {(entry.prevention_rate ?? 0).toFixed(1)}%
+                              </span>
+                              <span className="metric-label">Prevention Rate</span>
+                            </div>
+                            <div className="metric">
+                              <span className="metric-value">
+                                {entry.prevented_count ?? 0}
+                              </span>
+                              <span className="metric-label">Prevented</span>
+                            </div>
+                            <div className="metric">
+                              <span className="metric-value">
+                                {(entry.fooled_correct_count ?? 0) + (entry.fooled_incorrect_count ?? 0)}
+                              </span>
+                              <span className="metric-label">Fooled</span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="metric">
+                              <span className="metric-value">
+                                {((entry.average_score ?? 0) * 100).toFixed(1)}%
+                              </span>
+                              <span className="metric-label">Accuracy</span>
+                            </div>
+                            <div className="metric">
+                              <span className={`metric-value ${deltaClass}`}>
+                                {delta >= 0 ? "+" : ""}
+                                {(delta * 100).toFixed(1)}%
+                              </span>
+                              <span className="metric-label">Δ from Baseline</span>
+                            </div>
+                            <div className="metric">
+                              <span className="metric-value">{entry.questions_evaluated ?? 0}</span>
+                              <span className="metric-label">Questions</span>
+                            </div>
+                          </>
+                        )}
                       </div>
-                      {entry.hit_detection_target_count > 0 && (
+                      {!isPreventionReport && entry.hit_detection_target_count > 0 && (
                         <div className="detection-targets-alert">
                           ⚠️ Hit {entry.hit_detection_target_count} detection target
                           {entry.hit_detection_target_count > 1 ? "s" : ""}

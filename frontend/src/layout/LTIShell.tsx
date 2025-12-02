@@ -42,8 +42,16 @@ const LTIShell: React.FC<LTIShellProps> = ({ title, subtitle, actionSlot, childr
   const navigate = useNavigate();
   const { activeRunId, resetActiveRun } = usePipelineContext();
 
-  const handleReset = () => {
-    resetActiveRun();
+  const handleReset = async () => {
+    if (!activeRunId) {
+      navigate('/dashboard');
+      return;
+    }
+
+    const message = `Reset current run? This clears the active session so you can start fresh.`;
+    if (!window.confirm(message)) return;
+
+    await resetActiveRun();
     navigate('/dashboard');
   };
 
@@ -89,36 +97,34 @@ const LTIShell: React.FC<LTIShellProps> = ({ title, subtitle, actionSlot, childr
 
           {/* Reset Button and User Avatar - Absolute positioned to right */}
           <div style={{ position: 'absolute', top: '50%', right: '1.5rem', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            {activeRunId && (
-              <button
-                onClick={handleReset}
-                style={{
-                  padding: '0.5rem 1rem',
-                  backgroundColor: '#ffffff',
-                  border: '2px solid #ffffff',
-                  borderRadius: '0.375rem',
-                  color: '#FF7F32',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  fontFamily: 'inherit',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f0f0f0';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = '#ffffff';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-                }}
-              >
-                Reset
-              </button>
-            )}
+            <button
+              onClick={handleReset}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#ffffff',
+                border: '2px solid #ffffff',
+                borderRadius: '0.375rem',
+                color: '#FF7F32',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontFamily: 'inherit',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#f0f0f0';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = '#ffffff';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+              }}
+            >
+              {activeRunId ? "Reset Run" : "Back to Dashboard"}
+            </button>
             <Avatar name="User" size="x-small" />
           </div>
         </div>

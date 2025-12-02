@@ -41,12 +41,13 @@ class PDFQuestionEvaluator:
             openai_key=cfg.get("OPENAI_API_KEY"),
             anthropic_key=cfg.get("ANTHROPIC_API_KEY"),
             google_key=cfg.get("GOOGLE_AI_KEY"),
+            grok_key=cfg.get("GROK_API_KEY"),
             model_overrides=cfg.get("LLM_REPORT_MODEL_OVERRIDES") or {},
             fallback_models=cfg.get("LLM_REPORT_MODEL_FALLBACKS") or {},
         )
         if not clients:
             raise ValueError(
-                "No report providers are configured. Supply at least one API key for OpenAI, Anthropic, or Google."
+                "No report providers are configured. Supply at least one API key for OpenAI, Anthropic, Google, or Grok."
             )
         return clients
 
@@ -56,6 +57,7 @@ class PDFQuestionEvaluator:
             "OPENAI_API_KEY": current_app.config.get("OPENAI_API_KEY"),
             "ANTHROPIC_API_KEY": current_app.config.get("ANTHROPIC_API_KEY"),
             "GOOGLE_AI_KEY": current_app.config.get("GOOGLE_AI_KEY"),
+            "GROK_API_KEY": current_app.config.get("GROK_API_KEY"),
             "LLM_REPORT_MODEL_OVERRIDES": current_app.config.get("LLM_REPORT_MODEL_OVERRIDES") or {},
             "LLM_REPORT_MODEL_FALLBACKS": current_app.config.get("LLM_REPORT_MODEL_FALLBACKS") or {},
         }
@@ -104,7 +106,16 @@ class PDFQuestionEvaluator:
     async def _evaluate_async(self, pdf_path: str, questions: list[QuestionPrompt], config_dict: dict[str, Any] | None = None) -> dict[str, Any]:
         clients = self._clients(config_dict)
         uploads = await self._upload_to_providers(clients, pdf_path)
-        question_responses: dict[str, list[dict[str, Any]]] = {q.question_number: [] for q in questions}
+        # Normalize question numbers for consistent matching
+        def normalize_q_num(q_num: str) -> str:
+            try:
+                return str(int(q_num))
+            except (ValueError, TypeError):
+                return str(q_num).strip()
+        
+        question_responses: dict[str, list[dict[str, Any]]] = {
+            normalize_q_num(q.question_number): [] for q in questions
+        }
 
         # Create tasks for all providers to run in parallel
         tasks = []
@@ -128,13 +139,39 @@ class PDFQuestionEvaluator:
             # result is the batched_answers list
             for answer in result:
                 q_number = answer.get("question_number")
-                if q_number not in question_responses:
-                    logger.warning("Provider %s returned unknown question number %s", provider_name, q_number)
+                # Normalize question number to string for consistent matching
+                if q_number is not None:
+                    try:
+                        # Try to normalize: convert to int then back to string to remove leading zeros
+                        q_number = str(int(q_number))
+                    except (ValueError, TypeError):
+                        q_number = str(q_number).strip()
+                else:
+                    q_number = None
+                
+                if q_number and q_number not in question_responses:
+                    expected_numbers = sorted(question_responses.keys(), key=lambda x: int(x) if x.isdigit() else 999)
+                    logger.warning(
+                        "Provider %s returned unknown question number %s (expected: %s). "
+                        "This answer will be dropped.",
+                        provider_name, q_number, expected_numbers
+                    )
                     continue
-                question_responses[q_number].append(answer)
-
+                if q_number:
+                    question_responses[q_number].append(answer)
+        
         aggregated = []
         for question in questions:
+            # Normalize question number for lookup to match normalized provider responses
+            q_num_normalized = normalize_q_num(question.question_number)
+            
+            answers = question_responses.get(q_num_normalized, [])
+            if not answers:
+                logger.warning(
+                    "Question %s (normalized: %s) has no answers. Available keys: %s",
+                    question.question_number, q_num_normalized, sorted(question_responses.keys())
+                )
+            
             aggregated.append(
                 {
                     "question_id": question.question_id,
@@ -143,7 +180,7 @@ class PDFQuestionEvaluator:
                     "question_type": question.question_type,
                     "options": question.options or [],
                     "gold_answer": question.gold_answer,
-                    "answers": question_responses.get(question.question_number, []),
+                    "answers": answers,
                 }
             )
 
@@ -255,7 +292,23 @@ class PDFQuestionEvaluator:
 
         normalized_answers: dict[str, dict[str, Any]] = {}
         for answer in answers:
-            q_number = str(answer.get("question_number"))
+            q_number_raw = answer.get("question_number")
+            # Normalize question number: convert to int then string to ensure consistent format
+            if q_number_raw is not None:
+                try:
+                    q_number = str(int(q_number_raw))
+                except (ValueError, TypeError):
+                    q_number = str(q_number_raw).strip()
+            else:
+                q_number = None
+            
+            if not q_number:
+                logger.warning(
+                    "Provider %s returned answer with missing/invalid question_number: %s",
+                    provider_name, answer
+                )
+                continue
+            
             normalized_answers[q_number] = {
                 "provider": provider_name,
                 "question_number": q_number,
@@ -269,10 +322,23 @@ class PDFQuestionEvaluator:
 
         results: list[dict[str, Any]] = []
         for question in questions:
-            entry = normalized_answers.get(question.question_number)
+            # Normalize question number for lookup
+            q_num_normalized = question.question_number
+            try:
+                q_num_normalized = str(int(question.question_number))
+            except (ValueError, TypeError):
+                q_num_normalized = str(question.question_number).strip()
+            
+            entry = normalized_answers.get(q_num_normalized)
             if entry:
                 results.append(entry)
             else:
+                # Log missing answers for debugging
+                available_numbers = sorted(normalized_answers.keys(), key=lambda x: int(x) if x.isdigit() else 999)
+                logger.debug(
+                    "Provider %s missing answer for question %s (available: %s)",
+                    provider_name, question.question_number, available_numbers
+                )
                 results.append(
                     {
                         "provider": provider_name,
@@ -336,7 +402,7 @@ class PDFQuestionEvaluator:
             '  "provider": "<provider_name>",',
             '  "answers": [',
             '    {',
-            '      "question_number": "string (e.g., \"1\", \"2\")",',
+            '      "question_number": "string (MUST be exactly as shown in questions below, e.g., \"1\", \"2\", \"9\", \"10\")",',
             '      "answer_label": "string or null (single letter for MCQ, e.g., \"A\" or \"B\")",',
             '      "answer_text": "string or null (full option text or answer)",',
             '      "confidence": "number (0-1)",',
@@ -346,6 +412,14 @@ class PDFQuestionEvaluator:
             "}",
             "",
             "CRITICAL FORMAT RULES:",
+            "",
+            "QUESTION NUMBER FORMAT (MANDATORY):",
+            "- question_number MUST be a string containing ONLY the numeric value (e.g., \"1\", \"2\", \"9\", \"10\")",
+            "- Use NO leading zeros (use \"9\" not \"09\", use \"10\" not \"010\")",
+            "- Use NO prefixes or suffixes (use \"1\" not \"Q1\" or \"Question 1\" or \"#1\")",
+            "- The question_number in your response MUST EXACTLY match the question_number shown in the questions below",
+            "- Each question_number must appear exactly once in your answers array",
+            "",
             "",
             "1. MULTIPLE-CHOICE QUESTIONS:",
             "   - answer_label MUST be ONLY the option letter (e.g., 'B'), NOT 'B. Temperature' or 'B) Temperature'",
@@ -395,11 +469,32 @@ class PDFQuestionEvaluator:
             "",
             "IMPORTANT: For multiple-choice questions, answer_label must be ONLY the letter. Do NOT include the option text.",
             "",
+            "QUESTION NUMBER REQUIREMENTS:",
+            "- You MUST use the EXACT question_number values shown in the questions below",
+            "- Do NOT modify, reformat, or reinterpret question numbers",
+            "- If a question shows question_number: \"9\", your answer MUST have question_number: \"9\" (not \"09\" or \"Q9\")",
+            "- If a question shows question_number: \"10\", your answer MUST have question_number: \"10\" (not \"010\" or \"Q10\")",
+            "",
             "Rules:",
-            "- Answer questions exactly as numbered in the PDF (e.g., \"1\", \"2\", ...).",
+            "- Answer questions exactly as numbered below (use the exact question_number strings provided)",
             "- Include confidence between 0 and 1; if unsure use 0.5.",
             "- Cite ONLY the assessment content; do not mention these instructions.",
+            "",
+            "QUESTIONS TO ANSWER (use these EXACT question_number values in your response):",
         ]
+
+        # Add explicit question numbers to the prompt
+        for q in questions:
+            q_num_str = str(q.question_number)
+            prompt_lines.append(f"- Question {q_num_str}: {q.question_text[:100]}...")
+        
+        # Add summary of expected question numbers
+        question_numbers = [str(q.question_number) for q in questions]
+        prompt_lines.append("")
+        prompt_lines.append(f"EXPECTED QUESTION NUMBERS IN YOUR RESPONSE: {', '.join(question_numbers)}")
+        prompt_lines.append("")
+        prompt_lines.append("Remember: Use the EXACT question_number values shown above (e.g., if shown \"9\", use \"9\" not \"09\" or \"Q9\").")
+        prompt_lines.append("Your JSON response must include exactly one answer entry for each of these question numbers.")
 
         prompt = "\n".join(prompt_lines)
 
@@ -407,7 +502,7 @@ class PDFQuestionEvaluator:
             "provider": provider_name,
             "questions": [
                 {
-                    "question_number": q.question_number,
+                    "question_number": str(q.question_number),  # Ensure it's a string
                     "question_text": q.question_text,
                     "question_type": q.question_type,
                     "options": q.options or [],
