@@ -1,0 +1,74 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+venv_host/
+env/
+ENV/
+
+# Database files
+data/pipeline_runs/
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Logs
+logs/
+*.log
+output/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Testing
+tests/
+test_*.py
+*_test.py
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Process IDs
+*.pid
+
+# Test inputs
+test_input_pdfs/
+sample_pdfs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+dist/
+build/
+*.egg-info/

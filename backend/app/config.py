@@ -24,7 +24,15 @@ class BaseConfig:
         "FAIRTESTAI_DATABASE_URL",
         f"sqlite:///{(Path.cwd() / 'data' / 'fairtestai.db').resolve()}",
     )
-    SQLALCHEMY_ENGINE_OPTIONS: dict[str, Any] = {"pool_pre_ping": True}
+    SQLALCHEMY_ENGINE_OPTIONS: dict[str, Any] = {
+        "pool_pre_ping": True,
+        # Connection pooling for Cloud SQL (prevents connection exhaustion)
+        # With 2 gunicorn workers: 2 × 15 = 30 max connections (Cloud SQL limit: 100)
+        "pool_size": 5,           # Max connections per worker
+        "max_overflow": 10,       # Extra connections when pool is full
+        "pool_recycle": 3600,     # Recycle connections every hour
+        "pool_timeout": 30,       # Wait 30s for available connection
+    }
     if SQLALCHEMY_DATABASE_URI.startswith("sqlite"):
         SQLALCHEMY_ENGINE_OPTIONS["connect_args"] = {
             "check_same_thread": False,

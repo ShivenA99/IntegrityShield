@@ -25,6 +25,8 @@ python-json-logger>=2.0
 structlog>=24.1
 uvicorn>=0.30
 gunicorn>=21.2.0
+# GCP Cloud Storage for persistent file storage
+google-cloud-storage>=2.14.0
 # Authentication dependencies
 cryptography>=41.0
 PyJWT>=2.8
