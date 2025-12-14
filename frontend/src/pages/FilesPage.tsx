@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@instructure/ui-buttons";
 import { Text } from "@instructure/ui-text";
-import { Download } from "lucide-react";
+import { Download, FileText, Shield } from "lucide-react";
 
 import LTIShell from "@layout/LTIShell";
 import { PageSection } from "@components/layout/PageSection";
@@ -11,6 +11,18 @@ import { StatusPill } from "@components/shared/StatusPill";
 import { usePipeline } from "@hooks/usePipeline";
 import { usePipelineContext } from "@contexts/PipelineContext";
 import { getMethodDisplayLabel } from "@constants/enhancementMethods";
+import { apiClient } from "@services/api";
+
+// Helper to extract relative path from absolute path
+const extractRelativePath = (fullPath: string | undefined): string | undefined => {
+  if (!fullPath) return undefined;
+  // If path contains /pipeline_runs/, extract just the filename
+  if (fullPath.includes('/pipeline_runs/')) {
+    const parts = fullPath.split('/');
+    return parts[parts.length - 1]; // Get just the filename
+  }
+  return fullPath;
+};
 
 interface ArtifactRow extends ArtifactPreview {
   category: "original" | "shielded" | "assessment" | "report";
@@ -28,6 +40,41 @@ const FilesPage: React.FC = () => {
   const { status, activeRunId, setActiveRunId, setViewMode, refreshStatus } = usePipeline();
   const [selected, setSelected] = useState<ArtifactPreview | null>(null);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
+  const [generatingVuln, setGeneratingVuln] = useState(false);
+  const [generatingEval, setGeneratingEval] = useState(false);
+  const [reportMessage, setReportMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Handler for generating vulnerability report
+  const handleGenerateVulnerabilityReport = async () => {
+    if (!activeRunId) return;
+    setGeneratingVuln(true);
+    setReportMessage(null);
+    try {
+      await apiClient.generateVulnerabilityReport(activeRunId);
+      setReportMessage({ type: 'success', text: 'Vulnerability report generated successfully!' });
+      refreshStatus(activeRunId);
+    } catch (err: any) {
+      setReportMessage({ type: 'error', text: err.message || 'Failed to generate vulnerability report' });
+    } finally {
+      setGeneratingVuln(false);
+    }
+  };
+
+  // Handler for generating evaluation report
+  const handleGenerateEvaluationReport = async () => {
+    if (!activeRunId) return;
+    setGeneratingEval(true);
+    setReportMessage(null);
+    try {
+      await apiClient.generateEvaluationReport(activeRunId, "latex_icw_font_attack");
+      setReportMessage({ type: 'success', text: 'Evaluation report generated successfully!' });
+      refreshStatus(activeRunId);
+    } catch (err: any) {
+      setReportMessage({ type: 'error', text: err.message || 'Failed to generate evaluation report' });
+    } finally {
+      setGeneratingEval(false);
+    }
+  };
 
   // Handle URL params to load specific assessment
   useEffect(() => {
@@ -55,35 +102,39 @@ const FilesPage: React.FC = () => {
     const pipelineMode = status.pipeline_config?.mode;
 
     const rows: ArtifactRow[] = [];
-    if (documentInfo?.original_path) {
+    if (documentInfo?.original_path || documentInfo?.filename) {
+      // Extract just the filename from absolute path for URL construction
+      const originalRelPath = extractRelativePath(documentInfo.original_path) || documentInfo.filename;
       rows.push({
         key: "original",
         label: "Original",
         kind: "assessment",
         category: "original",
         status: "completed",
-        relativePath: documentInfo.original_path,
+        relativePath: originalRelPath,
         sizeBytes: documentInfo.size_bytes,
         variant: null,
         method: null,
       });
     }
     const enhanced = (manipulation.enhanced_pdfs as Record<string, any>) ?? {};
-    Object.entries(enhanced).forEach(([method, meta]) => {
-      if (!meta) return;
-      const displayLabel = getMethodDisplayLabel(method, pipelineMode);
+    // Show only the primary shielded method (latex_icw_font_attack) as "Shielded"
+    const primaryMethod = "latex_icw_font_attack";
+    const primaryMeta = enhanced[primaryMethod];
+    if (primaryMeta) {
+      const relPath = primaryMeta.relative_path || extractRelativePath(primaryMeta.path) || extractRelativePath(primaryMeta.file_path);
       rows.push({
-        key: `shielded-${method}`,
+        key: "shielded",
         label: "Shielded",
         kind: "assessment",
         category: "shielded",
-        variant: displayLabel,
-        method: displayLabel,
-        status: meta.relative_path ? "completed" : "pending",
-        relativePath: meta.relative_path || meta.path || meta.file_path,
-        sizeBytes: meta.size_bytes ?? meta.file_size_bytes,
+        variant: null, // Don't show variant label for cleaner UI
+        method: null,
+        status: relPath ? "completed" : "pending",
+        relativePath: relPath,
+        sizeBytes: primaryMeta.size_bytes ?? primaryMeta.file_size_bytes,
       });
-    });
+    }
     if (reports.vulnerability) {
       rows.push({
         key: "vulnerability",
@@ -240,6 +291,30 @@ const FilesPage: React.FC = () => {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <StatusPill status={row.status as any} />
+                  {/* Report generation button for Original PDF */}
+                  {row.category === "original" && (
+                    <Button
+                      color="primary"
+                      size="small"
+                      onClick={handleGenerateVulnerabilityReport}
+                      interaction={generatingVuln ? "disabled" : "enabled"}
+                    >
+                      <FileText size={14} style={{ marginRight: '0.25rem' }} />
+                      {generatingVuln ? "Generating..." : "Vulnerability Report"}
+                    </Button>
+                  )}
+                  {/* Report generation button for Shielded PDF */}
+                  {row.category === "shielded" && (
+                    <Button
+                      color="primary"
+                      size="small"
+                      onClick={handleGenerateEvaluationReport}
+                      interaction={generatingEval ? "disabled" : "enabled"}
+                    >
+                      <Shield size={14} style={{ marginRight: '0.25rem' }} />
+                      {generatingEval ? "Generating..." : "Evaluation Report"}
+                    </Button>
+                  )}
                   <Button
                     color="secondary"
                     size="small"

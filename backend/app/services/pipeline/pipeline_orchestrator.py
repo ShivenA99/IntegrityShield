@@ -48,6 +48,7 @@ class PipelineConfig:
     mode: str = "detection"
     auto_vulnerability_report: bool = False
     auto_evaluation_reports: bool = False
+    auto_detection_report: bool = True  # Lightweight JSON report, enabled by default
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -60,6 +61,7 @@ class PipelineConfig:
             "mode": self.mode,
             "auto_vulnerability_report": self.auto_vulnerability_report,
             "auto_evaluation_reports": self.auto_evaluation_reports,
+            "auto_detection_report": self.auto_detection_report,
         }
 
 
@@ -322,101 +324,64 @@ class PipelineOrchestrator:
         pipeline_config = run.pipeline_config or {}
         auto_vuln_report = pipeline_config.get("auto_vulnerability_report", False)
         auto_eval_reports = pipeline_config.get("auto_evaluation_reports", False)
+        auto_detection_report = pipeline_config.get("auto_detection_report", True)
 
-        # Vulnerability report: after content_discovery (questions and gold answers available)
-        if stage == PipelineStageEnum.CONTENT_DISCOVERY and auto_vuln_report:
-            try:
-                from ..reports.vulnerability_report_service import VulnerabilityReportService
-                self.logger.info(f"[{run_id}] Auto-generating vulnerability report after content_discovery")
-                vuln_service = VulnerabilityReportService()
-                vuln_service.generate(run_id)
-                self.logger.info(f"[{run_id}] Vulnerability report generated successfully")
-            except Exception as e:
-                self.logger.warning(
-                    f"[{run_id}] Failed to auto-generate vulnerability report: {e}",
-                    exc_info=True
-                )
-                # Non-blocking: Continue pipeline even if report fails
+        # ═══════════════════════════════════════════════════════════════════════════════
+        # AUTO-REPORT GENERATION STRATEGY
+        # ═══════════════════════════════════════════════════════════════════════════════
+        #
+        # DISABLED (moved to on-demand UI actions):
+        # - Vulnerability report: Memory-intensive (~100-150MB), user triggers via button
+        # - Evaluation reports: Memory-intensive (~200-400MB), user triggers via button
+        #
+        # ENABLED by default:
+        # - Detection report: Lightweight JSON report (~5-10MB), auto-generates after pdf_creation
+        #   This report provides essential metadata for the evaluation workflow
+        #
+        # Reports generated on-demand via API endpoints:
+        # - POST /api/pipeline/<run_id>/generate-vulnerability-report
+        # - POST /api/pipeline/<run_id>/generate-evaluation-report
+        # ═══════════════════════════════════════════════════════════════════════════════
 
-        # Detection report: after smart_substitution (mapping validation complete)
-        if stage == PipelineStageEnum.SMART_SUBSTITUTION and auto_vuln_report:
-
+        # Auto-generate Detection Report after PDF_CREATION stage
+        if stage == PipelineStageEnum.PDF_CREATION and auto_detection_report:
             try:
                 from .detection_report_service import DetectionReportService
-                self.logger.info(f"[{run_id}] Auto-generating detection report after smart_substitution")
                 detection_service = DetectionReportService()
-                detection_service.generate(run_id)
-                self.logger.info(f"[{run_id}] Detection report generated successfully")
-            except Exception as e:
-                self.logger.warning(
-                    f"[{run_id}] Failed to auto-generate detection report: {e}",
-                    exc_info=True
-                )
-                # Non-blocking: Continue pipeline even if report fails
+                result = detection_service.generate(run_id)
 
-        # Evaluation reports: after pdf_creation (PDFs created)
-        if stage == PipelineStageEnum.PDF_CREATION and auto_eval_reports:
-            enhancement_methods = pipeline_config.get("enhancement_methods", [])
-            mode = pipeline_config.get("mode", "detection")
-            self.logger.info(
-                f"[{run_id}] Auto-generating {len(enhancement_methods)} evaluation reports "
-                f"after pdf_creation (mode: {mode})"
-            )
-
-            # Use appropriate evaluation service based on mode
-            if mode == "prevention":
-                from ..reports.prevention_evaluation_report_service import PreventionEvaluationReportService
-                eval_service = PreventionEvaluationReportService()
-                report_type = "prevention evaluation"
-            else:
-                from ..reports.evaluation_report_service import EvaluationReportService
-                eval_service = EvaluationReportService()
-                report_type = "detection evaluation"
-
-            # Parallel execution: Generate reports for all methods concurrently
-            # Use ThreadPoolExecutor since eval_service.generate() is synchronous (handles async internally)
-
-            # Get actual Flask app instance (not proxy) for use in worker threads
-            app = current_app._get_current_object()
-
-            def generate_report(method: str) -> tuple[str, bool, str | None]:
-                """Generate report for a single method. Returns (method, success, error_msg)."""
-                # Flask application context required for database access in worker threads
-                with app.app_context():
-                    try:
-                        self.logger.info(f"[{run_id}] Generating {report_type} report for method: {method}")
-                        eval_service.generate(run_id, method=method)
-                        self.logger.info(f"[{run_id}] {report_type.capitalize()} report for {method} generated successfully")
-                        return (method, True, None)
-                    except Exception as e:
-                        self.logger.warning(
-                            f"[{run_id}] Failed to generate {report_type} report for {method}: {e}",
-                            exc_info=True
-                        )
-                        return (method, False, str(e))
-
-            # Conservative concurrency: max 3 parallel method generations
-            # Each method internally handles parallel provider queries
-            max_workers = min(len(enhancement_methods), 3)
-            self.logger.info(f"[{run_id}] Generating {len(enhancement_methods)} reports in parallel (max {max_workers} workers)")
-
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                futures = {executor.submit(generate_report, method): method for method in enhancement_methods}
-
-                for future in concurrent.futures.as_completed(futures):
-                    method, success, error = future.result()
-                    if success:
-                        self.logger.info(f"[{run_id}] ✓ Report for {method} completed")
-                    else:
-                        self.logger.warning(f"[{run_id}] ✗ Report for {method} failed: {error}")
-                    # Non-blocking: Continue with other methods even if one fails
-
-            # Update structured data to signal UI that evaluation reports are complete
-            try:
+                # Update structured.json with detection report info
                 structured_manager = StructuredDataManager()
                 structured = structured_manager.load(run_id) or {}
-                structured.setdefault("pipeline_metadata", {})["evaluation_reports_generated"] = True
+                manipulation_results = structured.setdefault("manipulation_results", {})
+                manipulation_results["detection_report"] = {
+                    "relative_path": result.get("output_files", {}).get("json"),
+                    "generated_at": result.get("generated_at"),
+                    "status": "completed"
+                }
                 structured_manager.save(run_id, structured)
-                self.logger.info(f"[{run_id}] Set evaluation_reports_generated flag in structured data")
-            except Exception as e:
-                self.logger.warning(f"[{run_id}] Failed to update evaluation_reports_generated flag: {e}")
+
+                live_logging_service.emit(
+                    run_id, "pdf_creation", "INFO",
+                    "Detection report auto-generated",
+                    context={"report_path": result.get("output_files", {}).get("json")}
+                )
+                self.logger.info(
+                    f"[{run_id}] Auto-generated detection report after pdf_creation",
+                    extra={"report_path": result.get("output_files", {}).get("json")}
+                )
+            except Exception as exc:
+                # Log but don't fail pipeline - detection report can be regenerated manually
+                self.logger.warning(
+                    f"[{run_id}] Failed to auto-generate detection report: {exc}",
+                    exc_info=True
+                )
+                live_logging_service.emit(
+                    run_id, "pdf_creation", "WARNING",
+                    f"Detection report auto-generation failed: {str(exc)}"
+                )
+
+        self.logger.debug(
+            f"[{run_id}] Auto-report check completed. Stage: {stage.value}, "
+            f"config flags: vuln={auto_vuln_report}, eval={auto_eval_reports}, detection={auto_detection_report}"
+        )

@@ -180,6 +180,7 @@ def start_pipeline():
         enhancement_methods = preset["methods"]
         auto_vulnerability_report = preset["auto_vulnerability_report"]
         auto_evaluation_reports = preset["auto_evaluation_reports"]
+        auto_detection_report = preset.get("auto_detection_report", True)
     else:
         # NEW RUN: Get mode from request (default to detection)
         mode = request.form.get("mode", current_app.config["PIPELINE_DEFAULT_MODE"])
@@ -195,6 +196,7 @@ def start_pipeline():
         enhancement_methods = preset["methods"]
         auto_vulnerability_report = preset["auto_vulnerability_report"]
         auto_evaluation_reports = preset["auto_evaluation_reports"]
+        auto_detection_report = preset.get("auto_detection_report", True)
 
     if manual_mode:
         manual_dir: Path = current_app.config.get("MANUAL_INPUT_DIR")
@@ -264,6 +266,7 @@ def start_pipeline():
                 "mode": mode,
                 "auto_vulnerability_report": auto_vulnerability_report,
                 "auto_evaluation_reports": auto_evaluation_reports,
+                "auto_detection_report": auto_detection_report,
                 "manual_input": True,
                 "manual_source_paths": payload.source_paths,
             },
@@ -394,6 +397,7 @@ def start_pipeline():
                 "mode": mode,
                 "auto_vulnerability_report": auto_vulnerability_report,
                 "auto_evaluation_reports": auto_evaluation_reports,
+                "auto_detection_report": auto_detection_report,
                 "answer_key_provided": bool(answer_key_file),
             },
             structured_data={},
@@ -426,6 +430,7 @@ def start_pipeline():
         mode=mode,
         auto_vulnerability_report=auto_vulnerability_report,
         auto_evaluation_reports=auto_evaluation_reports,
+        auto_detection_report=auto_detection_report,
     )
 
     orchestrator.start_background(run.id, config)
@@ -840,6 +845,7 @@ def resume_pipeline(run_id: str, stage_name: str):
         mode=run.pipeline_config.get("mode", current_app.config["PIPELINE_DEFAULT_MODE"]),
         auto_vulnerability_report=run.pipeline_config.get("auto_vulnerability_report", False),
         auto_evaluation_reports=run.pipeline_config.get("auto_evaluation_reports", False),
+        auto_detection_report=run.pipeline_config.get("auto_detection_report", True),
     )
 
     orchestrator = PipelineOrchestrator()
@@ -1588,3 +1594,156 @@ def delete_run(run_id: str):
     db.session.commit()
 
     return "", HTTPStatus.NO_CONTENT
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ON-DEMAND REPORT GENERATION ENDPOINTS (Memory Optimization)
+# ═══════════════════════════════════════════════════════════════════════════════
+# These endpoints replace auto-report generation that was removed from the pipeline.
+# Reports are now generated on-demand when the user clicks a button in the UI.
+# Memory savings: 390-780MB during pipeline execution.
+# With 4 CPUs, parallel provider queries ensure fast report generation (10-30s).
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+@bp.post("/<run_id>/generate-vulnerability-report")
+def generate_vulnerability_report_on_demand(run_id: str):
+    """
+    Generate vulnerability report on-demand (triggered by UI button).
+
+    This endpoint generates a report showing which questions/answers were
+    successfully extracted from the original assessment PDF, using the
+    reconstructed PDF from the smart_reading stage.
+
+    Memory impact: ~100-150MB spike during generation.
+    """
+    from ..utils.logging import get_logger
+    logger = get_logger(__name__)
+
+    logger.info(
+        f"[{run_id}] On-demand vulnerability report generation requested",
+        extra={"run_id": run_id, "endpoint": "generate-vulnerability-report"}
+    )
+
+    run = PipelineRun.query.get(run_id)
+    if not run:
+        logger.warning(f"[{run_id}] Pipeline run not found")
+        return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
+
+    # Check if pipeline has reached content_discovery stage
+    if run.current_stage_order < PipelineStageEnum.CONTENT_DISCOVERY.value:
+        error_msg = (
+            f"Pipeline must complete content_discovery stage before generating "
+            f"vulnerability report. Current stage: {run.current_stage}"
+        )
+        logger.warning(f"[{run_id}] {error_msg}")
+        return jsonify({"error": error_msg}), HTTPStatus.BAD_REQUEST
+
+    try:
+        logger.info(f"[{run_id}] Generating vulnerability report...")
+        vuln_service = VulnerabilityReportService()
+        report = vuln_service.generate(run_id)
+
+        logger.info(
+            f"[{run_id}] Vulnerability report generated successfully",
+            extra={"report_id": report.get("id") if isinstance(report, dict) else None}
+        )
+
+        return jsonify({
+            "success": True,
+            "message": "Vulnerability report generated successfully",
+            "report": report
+        }), HTTPStatus.OK
+
+    except Exception as e:
+        logger.error(
+            f"[{run_id}] Failed to generate vulnerability report: {e}",
+            exc_info=True
+        )
+        return jsonify({
+            "error": "Failed to generate vulnerability report",
+            "details": str(e)
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@bp.post("/<run_id>/generate-evaluation-report")
+def generate_evaluation_report_on_demand(run_id: str):
+    """
+    Generate evaluation report on-demand (triggered by UI button).
+
+    This endpoint generates a report showing how well different LLM providers
+    can extract answers from the enhanced PDF (with ICW + Font Attack applied).
+
+    Uses parallel provider queries for fast generation (10-30s with 4 CPUs).
+    Memory impact: ~200-400MB spike during generation.
+    """
+    from ..utils.logging import get_logger
+    from ..services.reports.prevention_evaluation_report_service import PreventionEvaluationReportService
+
+    logger = get_logger(__name__)
+
+    # Get method from request body (default to our single optimized variant)
+    data = request.get_json() or {}
+    method = data.get("method", "latex_icw_font_attack")
+
+    logger.info(
+        f"[{run_id}] On-demand evaluation report generation requested",
+        extra={"run_id": run_id, "method": method, "endpoint": "generate-evaluation-report"}
+    )
+
+    run = PipelineRun.query.get(run_id)
+    if not run:
+        logger.warning(f"[{run_id}] Pipeline run not found")
+        return jsonify({"error": "Pipeline run not found"}), HTTPStatus.NOT_FOUND
+
+    # Check if pipeline has reached pdf_creation stage
+    if run.current_stage_order < PipelineStageEnum.PDF_CREATION.value:
+        error_msg = (
+            f"Pipeline must complete pdf_creation stage before generating "
+            f"evaluation report. Current stage: {run.current_stage}"
+        )
+        logger.warning(f"[{run_id}] {error_msg}")
+        return jsonify({"error": error_msg}), HTTPStatus.BAD_REQUEST
+
+    # Determine mode and select appropriate service
+    mode = run.pipeline_config.get("mode", "detection") if run.pipeline_config else "detection"
+
+    try:
+        logger.info(
+            f"[{run_id}] Generating {mode} evaluation report for method: {method}",
+            extra={"mode": mode, "method": method}
+        )
+
+        if mode == "prevention":
+            eval_service = PreventionEvaluationReportService()
+            report_type = "prevention evaluation"
+        else:
+            eval_service = EvaluationReportService()
+            report_type = "detection evaluation"
+
+        # Generate report (uses parallel provider queries internally)
+        report = eval_service.generate(run_id, method=method)
+
+        logger.info(
+            f"[{run_id}] {report_type.capitalize()} report generated successfully",
+            extra={"report_id": report.get("id") if isinstance(report, dict) else None, "method": method}
+        )
+
+        return jsonify({
+            "success": True,
+            "message": f"{report_type.capitalize()} report generated successfully",
+            "report": report,
+            "method": method,
+            "mode": mode
+        }), HTTPStatus.OK
+
+    except Exception as e:
+        logger.error(
+            f"[{run_id}] Failed to generate {mode} evaluation report for {method}: {e}",
+            exc_info=True
+        )
+        return jsonify({
+            "error": f"Failed to generate {mode} evaluation report",
+            "details": str(e),
+            "method": method
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
