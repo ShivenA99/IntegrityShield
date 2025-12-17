@@ -5,11 +5,10 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   base: process.env.GITHUB_PAGES === "true" ? "/IntegrityShield/" : "/",
-  define: {
-    "import.meta.env.VITE_API_BASE_URL": process.env.GITHUB_PAGES === "true"
-      ? JSON.stringify("https://fairtestai-llm-assessment-vulnerability.onrender.com/api")
-      : JSON.stringify("/api"),
-  },
+  // For GitHub Pages, use GCP Cloud Run backend
+  define: process.env.GITHUB_PAGES === "true" ? {
+    "import.meta.env.VITE_API_BASE_URL": JSON.stringify("https://integrityshield-backend-374966265394.us-central1.run.app/api")
+  } : {},
   build: {
     outDir: process.env.GITHUB_PAGES === "true" ? "../docs" : "dist",
     emptyOutDir: true,
@@ -32,17 +31,18 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:8000",
+        target: process.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "") || "https://integrityshield-backend-374966265394.us-central1.run.app",
         changeOrigin: true,
         ws: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
       },
       "/developer": {
-        target: "http://127.0.0.1:8000",
+        target: process.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "") || "https://integrityshield-backend-374966265394.us-central1.run.app",
         changeOrigin: true,
         ws: true,
       },
       "/ws": {
-        target: "ws://127.0.0.1:8000",
+        target: process.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "").replace('https://', 'wss://') || "wss://integrityshield-backend-374966265394.us-central1.run.app",
         ws: true
       }
     }
