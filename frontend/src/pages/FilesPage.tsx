@@ -148,7 +148,8 @@ const FilesPage: React.FC = () => {
         variant: null,
       });
     }
-    if (manipulation.detection_report) {
+    // Only show detection report in detection mode, not in prevention mode
+    if (manipulation.detection_report && pipelineMode === "detection") {
       rows.push({
         key: "detection",
         label: "Detection",
