@@ -328,7 +328,7 @@ const FilesPage: React.FC = () => {
                     color="secondary"
                     size="small"
                     withBackground={false}
-                    href={row.relativePath ? `/api/files/${status?.run_id}/${row.relativePath}` : undefined}
+                    href={row.relativePath ? `${import.meta.env.VITE_API_BASE_URL || "/api"}/files/${status?.run_id}/${row.relativePath}` : undefined}
                     interaction={!row.relativePath ? "disabled" : "enabled"}
                     download
                   >

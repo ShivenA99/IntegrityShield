@@ -58,7 +58,9 @@ const ArtifactPreviewModal: React.FC<ArtifactPreviewModalProps> = ({ artifact, r
       });
       return null;
     }
-    const url = `/api/files/${runId}/${artifact.relativePath}`;
+    // Use full API base URL to work correctly on GitHub Pages
+    const apiBase = import.meta.env.VITE_API_BASE_URL || "/api";
+    const url = `${apiBase}/files/${runId}/${artifact.relativePath}`;
     console.log('ArtifactPreviewModal: Constructed URL', url);
     return url;
   }, [artifact?.relativePath, runId]);
