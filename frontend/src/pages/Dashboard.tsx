@@ -76,12 +76,18 @@ const Dashboard: React.FC = () => {
   const manipulationBucket = (structured.manipulation_results as Record<string, any>) ?? {};
   const reports = (structured.reports as Record<string, any>) ?? {};
 
+  // Sync mode from pipeline config if available, but only when there's an active run
+  // Don't override user selection when starting a new run
   useEffect(() => {
-    const methods = Array.isArray(status?.pipeline_config?.enhancement_methods) ? (status?.pipeline_config?.enhancement_methods as string[]) : [];
-    if (methods.some((method) => method.includes("icw"))) {
-      setMode("prevention");
+    if (status?.pipeline_config?.mode && activeRunId) {
+      // Only sync mode from backend config if we have an active run
+      // This prevents switching mode when user is selecting mode for a new run
+      const configMode = status.pipeline_config.mode;
+      if (configMode === "detection" || configMode === "prevention") {
+        setMode(configMode);
+      }
     }
-  }, [status?.pipeline_config]);
+  }, [status?.pipeline_config?.mode, activeRunId]);
 
   // Handle readonly mode from URL params
   useEffect(() => {
