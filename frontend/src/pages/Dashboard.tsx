@@ -77,17 +77,25 @@ const Dashboard: React.FC = () => {
   const reports = (structured.reports as Record<string, any>) ?? {};
 
   // Sync mode from pipeline config if available, but only when there's an active run
-  // Don't override user selection when starting a new run
+  // Don't override user selection when starting a new run or if status doesn't match activeRunId
   useEffect(() => {
-    if (status?.pipeline_config?.mode && activeRunId) {
-      // Only sync mode from backend config if we have an active run
-      // This prevents switching mode when user is selecting mode for a new run
+    // Don't sync mode if we're currently starting a run (user selection should be preserved)
+    if (isStarting) return;
+    
+    // Only sync if we have both status and activeRunId, and they match
+    if (status?.pipeline_config?.mode && activeRunId && status.run_id === activeRunId) {
       const configMode = status.pipeline_config.mode;
       if (configMode === "detection" || configMode === "prevention") {
-        setMode(configMode);
+        // Only update if mode is different to avoid unnecessary re-renders
+        setMode((currentMode) => {
+          if (currentMode !== configMode) {
+            return configMode;
+          }
+          return currentMode;
+        });
       }
     }
-  }, [status?.pipeline_config?.mode, activeRunId]);
+  }, [status?.pipeline_config?.mode, status?.run_id, activeRunId, isStarting]);
 
   // Handle readonly mode from URL params
   useEffect(() => {
