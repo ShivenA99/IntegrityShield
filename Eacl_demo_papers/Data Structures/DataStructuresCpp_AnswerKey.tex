@@ -1,0 +1,113 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+
+\setlist[enumerate]{itemsep=0.6em, topsep=0.6em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{CS 225 Examination}}\\[0.25em]
+  {\large \textbf{Data Structures and Algorithms in C++ -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item \textbf{(A)} $O(\log n)$.\\
+  In a balanced BST (like AVL or Red-Black tree), the height is $O(\log n)$. Each comparison 
+  eliminates roughly half the remaining nodes, leading to logarithmic search time.
+
+  \item \textbf{(A)} A shallow copy copies pointer values; a deep copy allocates new memory and 
+  copies the data.\\
+  Shallow copy duplicates pointers, so both objects point to the same memory. Deep copy creates 
+  new memory and copies actual data, ensuring independence. This is critical for classes with 
+  dynamically allocated members.
+
+  \item \textbf{(C)} Stack.\\
+  Function calls follow LIFO (Last In, First Out) semantics: the most recently called function 
+  returns first. A stack naturally models this with push for function entry and pop for return.
+
+  \item \textbf{(B)} $O(n^2)$.\\
+  When the pivot is consistently the smallest or largest element (e.g., already sorted array with 
+  first element as pivot), each partition reduces size by only 1, leading to $n + (n-1) + \cdots + 1 
+  = O(n^2)$ comparisons.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Amortized analysis}: Analyzes the average cost per operation over a sequence of operations, 
+  rather than worst-case for a single operation.
+
+  \textbf{Dynamic array example}:
+  \begin{itemize}
+    \item When full, the array doubles in size, requiring copying $n$ elements: $O(n)$ for that insertion
+    \item However, this happens only at sizes $1, 2, 4, 8, 16, \ldots$, i.e., every $n$ insertions
+    \item Total cost for $n$ insertions: $n + (1 + 2 + 4 + \cdots + n) < n + 2n = 3n$
+    \item Average (amortized) cost per insertion: $3n/n = O(1)$
+  \end{itemize}
+
+  The occasional expensive resize is ``amortized'' over many cheap insertions, yielding constant 
+  average time.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Min-heap}: A binary tree where each parent is smaller than its children. Provides $O(\log n)$ 
+  insertion and $O(1)$ access to minimum element, $O(\log n)$ deletion of minimum.
+
+  \textbf{Priority queue}: An abstract data type (ADT) that supports insertion and extraction of 
+  the highest-priority element. A min-heap is a common implementation.
+
+  \textbf{Dijkstra's algorithm with priority queue}:
+  \begin{itemize}
+    \item Use min-heap to always extract the vertex with smallest tentative distance
+    \item Insert/update: $O(\log V)$ per operation
+    \item Each vertex inserted/extracted once, each edge causes potential decrease-key
+    \item Time complexity: $O((V + E) \log V)$ with binary heap, or $O(V \log V + E)$ with Fibonacci heap
+  \end{itemize}
+
+  \item \emph{Sample answer:}\\
+  \textbf{Rule of Three}: If a class manages resources (e.g., dynamic memory), define:
+  \begin{enumerate}
+    \item Destructor (to free resources)
+    \item Copy constructor (for deep copying)
+    \item Copy assignment operator (for deep assignment)
+  \end{enumerate}
+  This prevents double-deletion and dangling pointers.
+
+  \textbf{Rule of Five} (C++11): Also define:
+  \begin{enumerate}
+    \setcounter{enumi}{3}
+    \item Move constructor (for efficient transfer of resources)
+    \item Move assignment operator
+  \end{enumerate}
+  This enables move semantics for performance optimization.
+
+  \textbf{Rule of Zero}: Prefer using RAII classes (std::unique\_ptr, std::vector) that manage 
+  resources automatically. If no explicit resource management is needed, don't define any of the 
+  special member functions—let the compiler generate them. This is the safest and most maintainable 
+  approach.
+
+  \item \emph{Sample answer:}\\
+  \textbf{std::vector}:
+  \begin{itemize}
+    \item \textbf{Advantages}: Contiguous memory (cache-friendly), fast random access $O(1)$, 
+    good iteration performance
+    \item \textbf{Disadvantages}: Insertion/deletion in middle is $O(n)$, reallocation on growth
+    \item \textbf{Use when}: Random access needed, sequential iteration, append-heavy workload
+  \end{itemize}
+
+  \textbf{std::list} (doubly-linked list):
+  \begin{itemize}
+    \item \textbf{Advantages}: $O(1)$ insertion/deletion at any position (if iterator available), 
+    no reallocation, stable iterators
+    \item \textbf{Disadvantages}: No random access ($O(n)$ to reach element), poor cache locality, 
+    higher memory overhead (pointers per node)
+    \item \textbf{Use when}: Frequent insertions/deletions in middle, need iterator stability, 
+    splicing operations
+  \end{itemize}
+
+  \textbf{General guideline}: Default to std::vector due to cache efficiency. Use std::list only 
+  when insertion/deletion patterns specifically benefit from $O(1)$ operations at known positions.
+
+\end{enumerate}
+
+\end{document}

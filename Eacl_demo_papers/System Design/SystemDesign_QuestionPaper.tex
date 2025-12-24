@@ -1,0 +1,80 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{CS 426 Examination}}\\[0.25em]
+  {\large \textbf{Large-Scale System Design and Architecture}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--4, choose the best option.
+  \item For Questions 5--8, write brief but precise answers.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item Which caching strategy provides the strongest consistency guarantees between cache and 
+  database?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Cache-aside (lazy loading)
+    \item Write-through caching
+    \item Write-behind (write-back) caching
+    \item Read-through caching
+  \end{enumerate}
+
+  \item In the CAP theorem, which combination is achievable for a distributed database system?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Consistency, Availability, and Partition Tolerance simultaneously
+    \item Consistency and Availability, sacrificing Partition Tolerance
+    \item Any two of the three properties, but not all three
+    \item Only one property can be guaranteed in practice
+  \end{enumerate}
+
+  \item What is the primary purpose of a load balancer in a distributed system architecture?
+  \begin{enumerate}[label=(\Alph*)]
+    \item To encrypt network traffic between services
+    \item To distribute incoming requests across multiple servers for scalability and reliability
+    \item To cache frequently accessed data
+    \item To monitor system health metrics
+  \end{enumerate}
+
+  \item Which database sharding strategy distributes data based on a hash function applied to the 
+  shard key?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Range-based sharding
+    \item Hash-based sharding
+    \item Directory-based sharding
+    \item Geographic sharding
+  \end{enumerate}
+
+  \item Explain the concept of eventual consistency in distributed systems. What are the trade-offs 
+  between strong consistency and eventual consistency, and in what scenarios would you choose 
+  eventual consistency?
+
+  \item Describe the microservices architecture pattern. What are its advantages over monolithic 
+  architecture, and what additional complexities does it introduce in terms of deployment, debugging, 
+  and inter-service communication?
+
+  \item Explain the purpose and implementation of a distributed message queue (such as Kafka or 
+  RabbitMQ). How does it improve system reliability and scalability, and what patterns does it enable?
+
+  \item Discuss rate limiting strategies for API services. Compare token bucket and leaky bucket 
+  algorithms, and explain how you would implement rate limiting in a distributed system with 
+  multiple servers.
+
+\end{enumerate}
+
+\end{document}

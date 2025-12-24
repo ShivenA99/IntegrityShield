@@ -1,0 +1,79 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{MATH 221 Examination}}\\[0.25em]
+  {\large \textbf{Linear Algebra and Matrix Theory}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--4, choose the best option.
+  \item For Questions 5--8, write brief but precise answers.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item Which property distinguishes an orthogonal matrix from a general invertible matrix?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Its determinant equals zero
+    \item Its transpose equals its inverse
+    \item It has only positive eigenvalues
+    \item Its columns are linearly dependent
+  \end{enumerate}
+
+  \item For a system of linear equations $Ax = b$ where $A$ is an $m \times n$ matrix with $m > n$, 
+  which condition guarantees that the least squares solution is unique?
+  \begin{enumerate}[label=(\Alph*)]
+    \item The matrix $A$ has full row rank
+    \item The matrix $A$ has full column rank
+    \item The vector $b$ is in the column space of $A$
+    \item The null space of $A$ is trivial and $m = n$
+  \end{enumerate}
+
+  \item Given a symmetric matrix $S$, which of the following statements is always true?
+  \begin{enumerate}[label=(\Alph*)]
+    \item All eigenvalues are positive
+    \item All eigenvalues are real
+    \item All eigenvectors are orthogonal to each other regardless of eigenvalue multiplicity
+    \item The matrix is always invertible
+  \end{enumerate}
+
+  \item What is the primary geometric interpretation of the singular value decomposition (SVD) 
+  of a matrix $A = U\Sigma V^T$?
+  \begin{enumerate}[label=(\Alph*)]
+    \item It represents $A$ as a rotation followed by a scaling
+    \item It decomposes $A$ into a sequence of rotations, scaling, and another rotation
+    \item It expresses $A$ as a sum of rank-one matrices
+    \item It diagonalizes $A$ in its own basis
+  \end{enumerate}
+
+  \item Explain why the dimension of the null space and the dimension of the column space 
+  of a matrix $A$ must sum to the number of columns of $A$. What fundamental theorem supports this?
+
+  \item Consider the Gram-Schmidt process for orthogonalizing a set of linearly independent vectors. 
+  What potential numerical issues arise when implementing this algorithm in practice, and how can 
+  modified Gram-Schmidt address these concerns?
+
+  \item Describe the relationship between the eigenvalues of a matrix $A$ and the eigenvalues of 
+  $A^T A$. Why is this relationship important in the context of the singular value decomposition?
+
+  \item Explain why the condition number of a matrix, defined as $\kappa(A) = \|A\| \|A^{-1}\|$, 
+  provides a measure of how sensitive the solution to $Ax = b$ is to perturbations in $b$ or $A$. 
+  What happens when $\kappa(A)$ is very large?
+
+\end{enumerate}
+
+\end{document}

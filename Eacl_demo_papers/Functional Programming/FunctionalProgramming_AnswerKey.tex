@@ -1,0 +1,146 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+
+\setlist[enumerate]{itemsep=0.6em, topsep=0.6em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{CS 421 Examination}}\\[0.25em]
+  {\large \textbf{Functional Programming Paradigms -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item \textbf{(A)} It always returns the same output for the same input and has no side effects.\\
+  Pure functions are deterministic and have no observable effects beyond computing their return value. 
+  They don't modify external state, perform I/O, or depend on mutable data. This makes them easy to 
+  test, reason about, and parallelize.
+
+  \item \textbf{(B)} Only when their values are needed.\\
+  Lazy evaluation (or call-by-need) delays computation until the result is required. This enables 
+  working with infinite data structures and can improve performance by avoiding unnecessary computations. 
+  Haskell uses lazy evaluation by default.
+
+  \item \textbf{(B)} A type class that provides a way to chain operations while abstracting computational 
+  context.\\
+  A monad encapsulates computations with context (like optional values, state, I/O). It provides 
+  \texttt{bind} (or \texttt{>>=}) to chain operations and \texttt{return} to inject values. Examples: 
+  Maybe, List, IO monads.
+
+  \item \textbf{(A)} Functions can be replaced by their return values without changing program behavior.\\
+  Referential transparency means an expression always evaluates to the same value and can be replaced 
+  by that value anywhere. This is a consequence of purity and enables equational reasoning: you can 
+  substitute equals for equals, like in algebra.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Higher-order functions}: Functions that take other functions as arguments or return 
+  functions as results.
+
+  \textbf{Benefits for reusability}:
+  \begin{itemize}
+    \item Abstract common patterns, parameterized by behavior
+    \item Reduce code duplication by separating traversal logic from business logic
+    \item Enable declarative, composable code
+  \end{itemize}
+
+  \textbf{Examples}:
+  \begin{itemize}
+    \item \textbf{map}: Applies a function to each element: \texttt{map(f, [1,2,3]) $\to$ [f(1),f(2),f(3)]}. 
+    Reuses iteration logic for any transformation
+    \item \textbf{filter}: Selects elements matching a predicate: \texttt{filter(isEven, [1,2,3,4]) $\to$ [2,4]}. 
+    Reuses selection logic
+    \item \textbf{reduce (fold)}: Combines elements using a binary operation: 
+    \texttt{reduce(+, [1,2,3]) $\to$ 6}. Generalizes aggregation
+  \end{itemize}
+
+  These higher-order functions eliminate explicit loops and promote composition.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Eager evaluation}: Expressions evaluated immediately when bound to variables (default in most languages).
+
+  \textbf{Lazy evaluation}: Expressions evaluated only when needed (default in Haskell).
+
+  \textbf{Advantages of lazy evaluation}:
+  \begin{itemize}
+    \item Avoids unnecessary computation (short-circuiting naturally)
+    \item Enables infinite data structures
+    \item Improves modularity: separate data generation from consumption
+  \end{itemize}
+
+  \textbf{Pitfalls}:
+  \begin{itemize}
+    \item Harder to reason about time and space complexity
+    \item Risk of space leaks (accumulating thunks)
+    \item Debugging is more complex
+  \end{itemize}
+
+  \textbf{Example - Infinite list}:
+\begin{verbatim}
+-- Generate infinite list of natural numbers
+nats = [0..]
+
+-- Take first 5 elements
+take 5 nats  -- [0,1,2,3,4]
+\end{verbatim}
+  Only the needed elements are computed; the rest remain unevaluated thunks.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Currying}: Transforming a function with multiple arguments into a sequence of functions, 
+  each taking a single argument.
+\begin{verbatim}
+-- Uncurried: f(x, y) = x + y
+-- Curried: f(x)(y) = x + y
+
+add :: Int -> Int -> Int
+add x y = x + y
+
+-- add is automatically curried in Haskell
+addFive = add 5  -- partially applied
+addFive 3  -- returns 8
+\end{verbatim}
+
+  \textbf{Partial application}: Fixing some arguments of a function to create a new function with 
+  fewer parameters.
+
+  \textbf{Difference}: Currying is a transformation of function structure; partial application is 
+  using that structure to create specialized functions.
+
+  \textbf{Benefits}:
+  \begin{itemize}
+    \item Create specialized functions from general ones
+    \item Improve function composition
+    \item Enable point-free style (tacit programming)
+    \item Example: \texttt{map (+ 1) [1,2,3]} uses partial application of \texttt{(+)}
+  \end{itemize}
+
+  \item \emph{Sample answer:}\\
+  \textbf{Immutability}: Data cannot be modified after creation. Instead of changing values, create 
+  new values.
+
+  \textbf{Importance}:
+  \begin{itemize}
+    \item \textbf{Easier reasoning}: No hidden state changes; functions depend only on inputs
+    \item \textbf{Thread safety}: Immutable data is inherently thread-safe (no race conditions)
+    \item \textbf{Time-travel debugging}: Can save and restore program state
+    \item \textbf{Caching}: Safe to cache function results (pure functions with immutable inputs)
+  \end{itemize}
+
+  \textbf{Concurrency benefits}: In concurrent programs, mutable shared state requires locks, leading 
+  to deadlocks and race conditions. Immutable data eliminates these issues—threads can safely share 
+  references without synchronization.
+
+  \textbf{Performance trade-offs}:
+  \begin{itemize}
+    \item \textbf{Cost}: Creating new objects instead of mutating can be expensive
+    \item \textbf{Mitigation}: Persistent data structures (structural sharing) reuse parts of old 
+    structures, reducing copying overhead. Example: persistent trees share unchanged branches
+    \item Modern FP languages optimize heavily for immutability
+  \end{itemize}
+
+\end{enumerate}
+
+\end{document}

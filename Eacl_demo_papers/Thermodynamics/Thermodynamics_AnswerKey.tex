@@ -1,0 +1,113 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+
+\setlist[enumerate]{itemsep=0.6em, topsep=0.6em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{PHYS 320 Examination}}\\[0.25em]
+  {\large \textbf{Thermodynamics and Statistical Mechanics -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item \textbf{(C)} Gibbs free energy $G$.\\
+  At constant temperature and pressure (most common lab conditions), the Gibbs free energy 
+  $G = H - TS$ is minimized at equilibrium. The condition $dG = 0$ determines spontaneity: 
+  $\Delta G < 0$ for spontaneous processes.
+
+  \item \textbf{(B)} $TV^{\gamma-1} = \text{constant}$.\\
+  For a reversible adiabatic process ($Q = 0$), the relationship $TV^{\gamma-1} = \text{constant}$ 
+  holds, where $\gamma = C_P/C_V$ is the heat capacity ratio. Equivalently, $PV^\gamma = \text{constant}$.
+
+  \item \textbf{(C)} A sum over Boltzmann factors for all states, encoding thermodynamic information.\\
+  The partition function $Z = \sum_i e^{-\beta E_i}$ (where $\beta = 1/k_BT$) is the central object 
+  in statistical mechanics. All thermodynamic quantities can be derived from $Z$, including free 
+  energy $F = -k_B T \ln Z$.
+
+  \item \textbf{(A)} $\eta = 1 - \frac{T_C}{T_H}$.\\
+  The Carnot efficiency represents the maximum possible efficiency for any heat engine operating 
+  between two reservoirs. It depends only on the temperatures and sets a fundamental limit based 
+  on the second law of thermodynamics.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Zeroth Law}: If two systems are each in thermal equilibrium with a third system, they are 
+  in thermal equilibrium with each other. This establishes the concept of temperature as a transitive 
+  property.
+
+  \textbf{First Law}: $\Delta U = Q - W$ (energy conservation). The change in internal energy equals 
+  heat absorbed minus work done. This states that energy cannot be created or destroyed, only converted.
+
+  \textbf{Second Law}: In an isolated system, entropy never decreases: $\Delta S \geq 0$. This gives 
+  directionality to time and explains why certain processes are irreversible. It limits the efficiency 
+  of heat engines and prohibits perpetual motion machines of the second kind.
+
+  \textbf{Third Law}: As temperature approaches absolute zero, the entropy of a perfect crystal approaches 
+  zero: $S \to 0$ as $T \to 0$. This provides an absolute scale for entropy and implies that absolute 
+  zero is unattainable.
+
+  Together, these laws constrain energy conversion, establish equilibrium conditions, and explain 
+  irreversibility in nature.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Boltzmann's formula}: $S = k_B \ln \Omega$, where $\Omega$ is the number of accessible 
+  microstates corresponding to a macrostate.
+
+  \textbf{Derivation concept}:
+  \begin{itemize}
+    \item A macrostate with more microstates is more probable
+    \item Entropy must be additive for independent systems: if system 1 has $\Omega_1$ states and 
+    system 2 has $\Omega_2$ states, the combined system has $\Omega = \Omega_1 \times \Omega_2$ states
+    \item Additivity requires $S(\Omega_1 \times \Omega_2) = S(\Omega_1) + S(\Omega_2)$, which is 
+    satisfied by the logarithm: $\ln(\Omega_1 \times \Omega_2) = \ln \Omega_1 + \ln \Omega_2$
+  \end{itemize}
+
+  \textbf{Directionality}: Spontaneous processes evolve toward macrostates with larger $\Omega$ 
+  (more microstates), increasing entropy. This explains why systems naturally progress from ordered 
+  to disordered states and why time has a preferred direction (thermodynamic arrow of time).
+
+  \item \emph{Sample answer:}\\
+  \textbf{Isothermal process} (constant $T$):
+  \begin{itemize}
+    \item For ideal gas: $\Delta U = 0$ (internal energy depends only on $T$)
+    \item $Q = W = nRT \ln(V_f/V_i)$ for expansion
+    \item Entropy increases: $\Delta S = nR \ln(V_f/V_i) > 0$ for expansion
+  \end{itemize}
+
+  \textbf{Adiabatic process} ($Q = 0$):
+  \begin{itemize}
+    \item Temperature decreases during expansion: $T_f < T_i$
+    \item $\Delta U = -W$ (work comes from internal energy)
+    \item Entropy remains constant: $\Delta S = 0$ (reversible adiabatic process)
+    \item The gas cools because it does work against external pressure without heat input
+  \end{itemize}
+
+  \textbf{Key difference}: Isothermal processes maintain temperature via heat exchange; adiabatic 
+  processes are thermally isolated, so temperature changes as work is done.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Chemical potential}: $\mu$ is the change in Gibbs free energy when one particle is added 
+  to the system at constant $T$ and $P$: $\mu = \left(\frac{\partial G}{\partial N}\right)_{T,P}$.
+
+  \textbf{Phase equilibrium condition}: At equilibrium between phases (e.g., liquid and vapor), the 
+  chemical potentials must be equal: $\mu_\text{liquid} = \mu_\text{vapor}$.
+
+  \textbf{Physical meaning}:
+  \begin{itemize}
+    \item If $\mu_\text{liquid} > \mu_\text{vapor}$, particles spontaneously move from liquid to vapor 
+    (evaporation) to lower the total free energy
+    \item If $\mu_\text{liquid} < \mu_\text{vapor}$, condensation occurs
+    \item Equilibrium is reached when $\mu$ is uniform across all phases
+  \end{itemize}
+
+  \textbf{Example - Vapor-liquid coexistence}: At a given temperature, the vapor pressure adjusts 
+  until $\mu_\text{liquid}(T,P) = \mu_\text{vapor}(T,P)$. This determines the saturation vapor 
+  pressure and the coexistence curve in the phase diagram.
+
+\end{enumerate}
+
+\end{document}

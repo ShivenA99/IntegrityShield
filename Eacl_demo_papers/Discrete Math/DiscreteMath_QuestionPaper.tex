@@ -1,0 +1,77 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{CS 280 Examination}}\\[0.25em]
+  {\large \textbf{Discrete Mathematics and Combinatorics}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--4, choose the best option.
+  \item For Questions 5--8, write brief but precise answers.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item Which of the following best describes the relationship between a graph being bipartite 
+  and its chromatic number?
+  \begin{enumerate}[label=(\Alph*)]
+    \item A bipartite graph always has chromatic number 2
+    \item A bipartite graph has chromatic number at most 2
+    \item A graph is bipartite if and only if its chromatic number is even
+    \item A graph with chromatic number 2 must contain a cycle
+  \end{enumerate}
+
+  \item In the context of generating functions, what does the coefficient of $x^n$ in the 
+  expansion of $(1-x)^{-k}$ represent?
+  \begin{enumerate}[label=(\Alph*)]
+    \item The number of ways to partition $n$ into $k$ parts
+    \item The number of ways to choose $n$ objects from $k$ types with repetition
+    \item $\binom{n+k-1}{k-1}$, the number of non-negative integer solutions to $x_1 + \cdots + x_k = n$
+    \item The $n$-th Catalan number
+  \end{enumerate}
+
+  \item What is the negation of the statement $\forall x \exists y \, P(x, y)$?
+  \begin{enumerate}[label=(\Alph*)]
+    \item $\exists x \forall y \, \neg P(x, y)$
+    \item $\forall x \forall y \, \neg P(x, y)$
+    \item $\exists x \exists y \, \neg P(x, y)$
+    \item $\neg \forall x \forall y \, P(x, y)$
+  \end{enumerate}
+
+  \item Which of the following is a valid application of the Pigeonhole Principle?
+  \begin{enumerate}[label=(\Alph*)]
+    \item If 13 people are in a room, at least two were born in the same month
+    \item If $n$ objects are placed in $n$ boxes, each box contains exactly one object
+    \item If a graph has more edges than vertices, it must contain a cycle
+    \item In any sequence of $n^2 + 1$ distinct real numbers, there exists a strictly increasing or strictly decreasing subsequence of length $n+1$
+  \end{enumerate}
+
+  \item Prove that a graph is bipartite if and only if it contains no odd-length cycles. 
+  Use this to explain why the complete graph $K_n$ is bipartite only when $n \leq 2$.
+
+  \item Explain the difference between a permutation and a combination. How does the 
+  inclusion-exclusion principle extend these basic counting techniques to more complex scenarios?
+
+  \item State and prove the Handshaking Lemma for graphs. What immediate corollary follows 
+  regarding the number of vertices with odd degree?
+
+  \item Describe the difference between strong induction and weak induction. Provide an example 
+  of a problem where strong induction is more natural to apply than weak induction.
+
+\end{enumerate}
+
+\end{document}

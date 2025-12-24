@@ -1,0 +1,138 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+
+\setlist[enumerate]{itemsep=0.6em, topsep=0.6em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{CS 426 Examination}}\\[0.25em]
+  {\large \textbf{Large-Scale System Design and Architecture -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item \textbf{(B)} Write-through caching.\\
+  In write-through caching, every write operation updates both cache and database synchronously. 
+  This ensures cache and database are always consistent, though it adds latency to write operations. 
+  Write-behind is faster but risks data loss; cache-aside can have stale data.
+
+  \item \textbf{(C)} Any two of the three properties, but not all three.\\
+  The CAP theorem states that in the presence of network partitions (P), you must choose between 
+  consistency (C) and availability (A). Most systems choose CP (consistent but may be unavailable) 
+  or AP (available but eventually consistent). CA is theoretically possible but unrealistic since 
+  network partitions are inevitable.
+
+  \item \textbf{(B)} To distribute incoming requests across multiple servers for scalability and 
+  reliability.\\
+  Load balancers distribute traffic using algorithms like round-robin, least connections, or 
+  weighted distribution. This prevents any single server from being overwhelmed and provides 
+  fault tolerance—if one server fails, traffic routes to healthy servers.
+
+  \item \textbf{(B)} Hash-based sharding.\\
+  Hash-based sharding applies a hash function to the shard key (e.g., user ID) to determine which 
+  shard stores the data: $\text{shard} = \text{hash}(\text{key}) \mod N$. This distributes data 
+  relatively evenly but makes range queries difficult.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Eventual consistency}: After an update, all replicas will eventually converge to the 
+  same value, but they may temporarily differ. Reads might return stale data.
+
+  \textbf{Trade-offs}:
+  \begin{itemize}
+    \item \textbf{Strong consistency}: All reads see the latest write. Requires coordination (locks, 
+    consensus), reducing availability and increasing latency
+    \item \textbf{Eventual consistency}: Higher availability and performance, but complexity in 
+    handling conflicts and stale reads
+  \end{itemize}
+
+  \textbf{Choose eventual consistency when}:
+  \begin{itemize}
+    \item Availability is critical (e.g., social media feeds, shopping carts)
+    \item Temporary staleness is acceptable
+    \item System must tolerate network partitions
+    \item Examples: DynamoDB, Cassandra, DNS
+  \end{itemize}
+
+  \item \emph{Sample answer:}\\
+  \textbf{Microservices}: Architecture where application is composed of small, independently 
+  deployable services, each responsible for a specific business capability.
+
+  \textbf{Advantages over monolith}:
+  \begin{itemize}
+    \item Independent scaling of services based on demand
+    \item Technology diversity (each service can use different languages/frameworks)
+    \item Faster deployment cycles (teams can release independently)
+    \item Fault isolation (failure in one service doesn't crash entire system)
+  \end{itemize}
+
+  \textbf{Additional complexities}:
+  \begin{itemize}
+    \item \textbf{Deployment}: Need orchestration (Kubernetes), service discovery, configuration management
+    \item \textbf{Debugging}: Distributed tracing required, harder to track requests across services
+    \item \textbf{Communication}: Network calls are slower and less reliable than in-process calls; 
+    need to handle failures, timeouts, retries
+    \item \textbf{Data consistency}: Managing transactions across services is challenging
+  \end{itemize}
+
+  \item \emph{Sample answer:}\\
+  \textbf{Distributed message queue}: Intermediary that decouples producers (who send messages) 
+  from consumers (who process them), storing messages until consumed.
+
+  \textbf{Purpose and benefits}:
+  \begin{itemize}
+    \item \textbf{Asynchronous processing}: Producers don't wait for consumers, improving responsiveness
+    \item \textbf{Load leveling}: Queue absorbs traffic spikes; consumers process at their own pace
+    \item \textbf{Reliability}: Messages persist in queue even if consumers fail
+    \item \textbf{Scalability}: Multiple consumers can process messages in parallel
+  \end{itemize}
+
+  \textbf{Implementation (Kafka example)}:
+  \begin{itemize}
+    \item Messages organized into topics (categories)
+    \item Topics divided into partitions for parallelism
+    \item Consumer groups allow multiple consumers to process messages
+    \item Provides ordering guarantees within partitions
+  \end{itemize}
+
+  \textbf{Patterns enabled}:
+  \begin{itemize}
+    \item Event-driven architecture, pub-sub messaging, task queues, stream processing
+  \end{itemize}
+
+  \item \emph{Sample answer:}\\
+  \textbf{Token bucket algorithm}:
+  \begin{itemize}
+    \item Bucket holds tokens; tokens added at constant rate
+    \item Each request consumes one token; rejected if bucket empty
+    \item Allows bursts up to bucket capacity
+    \item Good for APIs with occasional traffic spikes
+  \end{itemize}
+
+  \textbf{Leaky bucket algorithm}:
+  \begin{itemize}
+    \item Requests enter bucket; processed at constant rate (``leak'')
+    \item If bucket full, new requests rejected
+    \item Smooths traffic, prevents bursts
+    \item Better for strict rate enforcement
+  \end{itemize}
+
+  \textbf{Distributed implementation}:
+  \begin{itemize}
+    \item \textbf{Centralized counter}: Use Redis with atomic operations (INCR, EXPIRE) to track 
+    request counts per user/IP. Fast but single point of failure
+    \item \textbf{Distributed coordination}: Use consistent hashing to route user requests to 
+    specific rate-limiting servers; reduces contention
+    \item \textbf{Approximate counting}: Each server tracks counts locally; periodically sync. 
+    Faster but less accurate
+    \item \textbf{Sliding window}: Use sorted sets in Redis to track timestamps of recent requests
+  \end{itemize}
+
+  Most production systems use Redis-based token bucket with sliding windows for accuracy and performance.
+
+\end{enumerate}
+
+\end{document}

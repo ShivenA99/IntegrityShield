@@ -1,0 +1,82 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+
+\setlist[enumerate]{itemsep=0.6em, topsep=0.6em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{MATH 221 Examination}}\\[0.25em]
+  {\large \textbf{Linear Algebra and Matrix Theory -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item \textbf{(B)} Its transpose equals its inverse.\\
+  An orthogonal matrix $Q$ satisfies $Q^T Q = I$, which means $Q^T = Q^{-1}$. This property 
+  preserves lengths and angles, making orthogonal matrices represent rotations and reflections.
+
+  \item \textbf{(B)} The matrix $A$ has full column rank.\\
+  When $A$ has full column rank (rank $n$), the matrix $A^T A$ is invertible, ensuring the 
+  normal equations $A^T A x = A^T b$ have a unique solution. This is the least squares solution.
+
+  \item \textbf{(B)} All eigenvalues are real.\\
+  The Spectral Theorem guarantees that symmetric matrices have real eigenvalues and can be 
+  orthogonally diagonalized. However, eigenvalues need not be positive (they could be negative 
+  or zero) unless the matrix is positive definite.
+
+  \item \textbf{(B)} It decomposes $A$ into a sequence of rotations, scaling, and another rotation.\\
+  The SVD $A = U\Sigma V^T$ can be interpreted as: first rotate by $V^T$, then scale by 
+  $\Sigma$, then rotate by $U$. This provides geometric insight into how $A$ transforms space.
+
+  \item \emph{Sample answer:}\\
+  This follows from the \textbf{Rank-Nullity Theorem}. For an $m \times n$ matrix $A$:
+  \begin{itemize}
+    \item $\text{rank}(A) + \text{nullity}(A) = n$
+    \item The rank equals the dimension of the column space
+    \item The nullity equals the dimension of the null space
+    \item Therefore: $\dim(\text{Col}(A)) + \dim(\text{Null}(A)) = n$
+  \end{itemize}
+  This reflects that every column either contributes to the column space or corresponds to 
+  a free variable in the null space.
+
+  \item \emph{Sample answer:}\\
+  The classical Gram-Schmidt process can suffer from:
+  \begin{itemize}
+    \item \textbf{Loss of orthogonality}: When vectors are nearly parallel, rounding errors 
+    accumulate, and computed vectors may not be truly orthogonal.
+    \item \textbf{Numerical instability}: Later vectors in the sequence lose accuracy as errors 
+    compound.
+  \end{itemize}
+  Modified Gram-Schmidt addresses this by orthogonalizing each new vector against the already-computed 
+  orthogonal vectors sequentially, rather than against the original vectors. This reduces error 
+  propagation and maintains better numerical orthogonality.
+
+  \item \emph{Sample answer:}\\
+  The eigenvalues of $A^T A$ are the squares of the singular values of $A$:
+  \begin{itemize}
+    \item If $A = U\Sigma V^T$, then $A^T A = V\Sigma^T U^T U \Sigma V^T = V\Sigma^2 V^T$
+    \item Thus $A^T A$ has eigenvalues $\sigma_i^2$ where $\sigma_i$ are singular values of $A$
+    \item This shows that singular values are always non-negative
+    \item The eigenvectors of $A^T A$ form the right singular vectors (columns of $V$)
+  \end{itemize}
+  This relationship is fundamental because it allows computation of SVD via eigenvalue decomposition.
+
+  \item \emph{Sample answer:}\\
+  The condition number measures amplification of errors:
+  \begin{itemize}
+    \item A small change $\Delta b$ in the right-hand side can cause a change $\Delta x$ in 
+    the solution with $\|\Delta x\| / \|x\| \leq \kappa(A) \cdot \|\Delta b\| / \|b\|$
+    \item When $\kappa(A)$ is large (ill-conditioned), small errors in data are magnified, 
+    leading to unreliable solutions
+    \item For very large $\kappa(A)$, the matrix is nearly singular, and numerical solutions 
+    become unstable
+    \item This is critical in applications like least squares regression and numerical PDEs
+  \end{itemize}
+
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,81 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{CS 225 Examination}}\\[0.25em]
+  {\large \textbf{Data Structures and Algorithms in C++}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--4, choose the best option.
+  \item For Questions 5--8, write brief but precise answers.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item What is the time complexity of searching for an element in a balanced binary search tree 
+  with $n$ nodes?
+  \begin{enumerate}[label=(\Alph*)]
+    \item $O(\log n)$
+    \item $O(n)$
+    \item $O(n \log n)$
+    \item $O(1)$
+  \end{enumerate}
+
+  \item In C++, which of the following correctly describes the difference between a shallow copy 
+  and a deep copy?
+  \begin{enumerate}[label=(\Alph*)]
+    \item A shallow copy copies pointer values; a deep copy allocates new memory and copies the data
+    \item A shallow copy is faster; a deep copy is always preferred
+    \item Both create independent copies of all data members
+    \item A deep copy only copies primitive types
+  \end{enumerate}
+
+  \item Which data structure would be most appropriate for implementing a function call stack in a 
+  programming language runtime?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Queue
+    \item Circular buffer
+    \item Stack
+    \item Hash table
+  \end{enumerate}
+
+  \item What is the worst-case time complexity of QuickSort when the pivot selection is poorly chosen?
+  \begin{enumerate}[label=(\Alph*)]
+    \item $O(n \log n)$
+    \item $O(n^2)$
+    \item $O(n)$
+    \item $O(\log n)$
+  \end{enumerate}
+
+  \item Explain the concept of amortized analysis. Use the dynamic array (vector) resizing operation 
+  as an example to show why insertion has $O(1)$ amortized time complexity despite occasional $O(n)$ 
+  resize operations.
+
+  \item Describe the differences between a min-heap and a priority queue. How would you implement 
+  Dijkstra's shortest path algorithm efficiently using a priority queue, and what would be the 
+  time complexity?
+
+  \item Explain the principles of the Rule of Three in C++ and why it's important for classes that 
+  manage dynamic memory. What are the Rule of Five and Rule of Zero, and when should each be applied?
+
+  \item Compare the advantages and disadvantages of using std::vector versus std::list in C++. 
+  Under what circumstances would you choose one over the other, considering factors like memory 
+  layout, cache performance, and insertion/deletion patterns?
+
+\end{enumerate}
+
+\end{document}

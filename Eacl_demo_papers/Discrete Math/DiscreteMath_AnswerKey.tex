@@ -1,0 +1,87 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+
+\setlist[enumerate]{itemsep=0.6em, topsep=0.6em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{CS 280 Examination}}\\[0.25em]
+  {\large \textbf{Discrete Mathematics and Combinatorics -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item \textbf{(B)} A bipartite graph has chromatic number at most 2.\\
+  A connected bipartite graph has chromatic number exactly 2 (color each partition with a different 
+  color). However, a disconnected bipartite graph with isolated vertices would have chromatic number 1. 
+  Thus, bipartite graphs have $\chi(G) \leq 2$.
+
+  \item \textbf{(C)} $\binom{n+k-1}{k-1}$, the number of non-negative integer solutions to 
+  $x_1 + \cdots + x_k = n$.\\
+  The expansion of $(1-x)^{-k} = \sum_{n=0}^{\infty} \binom{n+k-1}{k-1} x^n$. This counts the 
+  ``stars and bars'' problem: distributing $n$ identical objects into $k$ distinct bins.
+
+  \item \textbf{(A)} $\exists x \forall y \, \neg P(x, y)$.\\
+  To negate a quantified statement, flip each quantifier and negate the predicate. The negation 
+  of ``for all $x$ there exists $y$ such that $P(x,y)$'' is ``there exists $x$ such that for all 
+  $y$, not $P(x,y)$''.
+
+  \item \textbf{(D)} In any sequence of $n^2 + 1$ distinct real numbers, there exists a strictly 
+  increasing or strictly decreasing subsequence of length $n+1$.\\
+  This is the Erd\H{o}s-Szekeres theorem, a sophisticated application of the Pigeonhole Principle. 
+  Option (A) is correct in spirit but doesn't explicitly state ``at least'', though it's commonly 
+  cited as the standard pigeonhole example.
+
+  \item \emph{Sample answer:}\\
+  \textbf{If direction}: Suppose $G$ is bipartite with partitions $A$ and $B$. Any cycle alternates 
+  between $A$ and $B$, so it must have even length. Thus, no odd cycles exist.
+
+  \textbf{Only if direction}: Suppose $G$ has no odd cycles. Pick any vertex $v$ and perform BFS. 
+  Color vertices at even distance from $v$ with one color, and odd distance with another. If there's 
+  an edge within the same color class, it would create an odd cycle (contradiction). Thus $G$ is bipartite.
+
+  \textbf{Application to $K_n$}: The complete graph $K_n$ contains triangles (3-cycles) for $n \geq 3$, 
+  which are odd. Therefore $K_n$ is not bipartite for $n \geq 3$. For $n \leq 2$, there are no cycles 
+  at all, so $K_n$ is trivially bipartite.
+
+  \item \emph{Sample answer:}\\
+  \begin{itemize}
+    \item \textbf{Permutation}: An ordered arrangement of objects. The number of permutations of 
+    $n$ objects taken $r$ at a time is $P(n,r) = \frac{n!}{(n-r)!}$.
+    \item \textbf{Combination}: An unordered selection of objects. The number of combinations is 
+    $C(n,r) = \binom{n}{r} = \frac{n!}{r!(n-r)!}$.
+    \item \textbf{Inclusion-Exclusion}: Extends these by counting unions of sets. For sets $A_1, \ldots, A_n$:
+    $$|A_1 \cup \cdots \cup A_n| = \sum |A_i| - \sum |A_i \cap A_j| + \sum |A_i \cap A_j \cap A_k| - \cdots$$
+    This handles overcounting in complex scenarios like derangements or surjective functions.
+  \end{itemize}
+
+  \item \emph{Sample answer:}\\
+  \textbf{Handshaking Lemma}: In any graph $G = (V, E)$, $\sum_{v \in V} \deg(v) = 2|E|$.
+
+  \textbf{Proof}: Each edge contributes 2 to the total degree sum (one for each endpoint). 
+  Therefore, the sum of all degrees equals twice the number of edges.
+
+  \textbf{Corollary}: The number of vertices with odd degree is even. This follows because the 
+  sum of all degrees is even ($2|E|$), and if an odd number of vertices had odd degree, the total 
+  sum would be odd (contradiction).
+
+  \item \emph{Sample answer:}\\
+  \begin{itemize}
+    \item \textbf{Weak induction}: To prove $P(n)$, assume $P(k)$ and prove $P(k+1)$.
+    \item \textbf{Strong induction}: To prove $P(n)$, assume $P(0), P(1), \ldots, P(k)$ all hold, 
+    and prove $P(k+1)$.
+  \end{itemize}
+  Strong induction is more natural when the recursive structure depends on multiple previous cases.
+
+  \textbf{Example}: Proving every integer $n \geq 2$ can be factored into primes. In the inductive 
+  step for $n = k+1$: if $k+1$ is prime, done. Otherwise $k+1 = ab$ where $2 \leq a, b < k+1$. By 
+  strong induction, both $a$ and $b$ have prime factorizations, so $k+1$ does too. Weak induction 
+  would not easily give us information about both $a$ and $b$.
+
+\end{enumerate}
+
+\end{document}

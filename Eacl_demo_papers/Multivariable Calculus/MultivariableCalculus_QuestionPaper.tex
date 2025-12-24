@@ -1,0 +1,80 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+
+\setlist[enumerate]{itemsep=0.8em, topsep=0.8em}
+\setlist[itemize]{itemsep=0.3em, topsep=0.3em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{MATH 340 Examination}}\\[0.25em]
+  {\large \textbf{Multivariable Calculus and Vector Analysis}}\\[0.5em]
+\end{center}
+
+\noindent\textbf{Instructions:}
+\begin{itemize}
+  \item Answer all questions.
+  \item For Questions 1--4, choose the best option.
+  \item For Questions 5--8, write brief but precise answers.
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item What geometric property does the gradient vector $\nabla f$ at a point represent for a 
+  differentiable function $f: \mathbb{R}^n \to \mathbb{R}$?
+  \begin{enumerate}[label=(\Alph*)]
+    \item The direction of maximum decrease of $f$
+    \item A vector tangent to the level set of $f$ at that point
+    \item The direction of steepest ascent and perpendicular to level sets
+    \item The curvature of the surface defined by $f$
+  \end{enumerate}
+
+  \item Which of the following conditions is sufficient for a function $f: \mathbb{R}^2 \to \mathbb{R}$ 
+  to have its mixed partial derivatives equal, i.e., $f_{xy} = f_{yx}$?
+  \begin{enumerate}[label=(\Alph*)]
+    \item $f$ is differentiable at the point
+    \item $f$ has continuous first partial derivatives
+    \item $f$ has continuous second partial derivatives
+    \item $f$ is twice differentiable at the point
+  \end{enumerate}
+
+  \item The Jacobian determinant of a transformation $T: \mathbb{R}^n \to \mathbb{R}^n$ at a point 
+  provides information about:
+  \begin{enumerate}[label=(\Alph*)]
+    \item The rate of change of $T$ along coordinate axes
+    \item The local scaling factor of volumes under the transformation
+    \item Whether $T$ is injective globally
+    \item The total derivative matrix of $T$
+  \end{enumerate}
+
+  \item Which statement correctly describes the relationship between Green's Theorem and Stokes' Theorem?
+  \begin{enumerate}[label=(\Alph*)]
+    \item Green's Theorem is a special case of Stokes' Theorem in two dimensions
+    \item Stokes' Theorem generalizes the Divergence Theorem to higher dimensions
+    \item Green's Theorem applies to simply connected regions only
+    \item They are independent theorems with no direct relationship
+  \end{enumerate}
+
+  \item Explain the geometric and computational significance of the Hessian matrix in analyzing 
+  critical points of a function $f: \mathbb{R}^n \to \mathbb{R}$. How does the second derivative 
+  test for functions of several variables use the Hessian?
+
+  \item Describe the difference between a conservative vector field and a path-independent vector 
+  field. Under what conditions are these properties equivalent, and what role does the curl play?
+
+  \item State the Divergence Theorem (Gauss's Theorem) and explain its physical interpretation in 
+  the context of fluid flow. How does it relate local behavior (divergence) to global behavior (flux)?
+
+  \item Explain why changing the order of integration in a double integral requires careful 
+  consideration of the region of integration. Provide a method for determining the new limits 
+  when switching from $\int \int dx\,dy$ to $\int \int dy\,dx$.
+
+\end{enumerate}
+
+\end{document}

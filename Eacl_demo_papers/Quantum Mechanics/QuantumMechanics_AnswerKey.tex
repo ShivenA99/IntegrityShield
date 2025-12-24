@@ -1,0 +1,96 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+
+\setlist[enumerate]{itemsep=0.6em, topsep=0.6em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{PHYS 455 Examination}}\\[0.25em]
+  {\large \textbf{Quantum Mechanics and Wave Functions -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item \textbf{(B)} $\hbar/2$.\\
+  The Heisenberg uncertainty principle states $\Delta x \cdot \Delta p \geq \hbar/2$, where 
+  $\hbar = h/2\pi$ is the reduced Planck constant. This minimum is achieved for Gaussian wave packets.
+
+  \item \textbf{(B)} They scale as $n^2$ where $n$ is the quantum number.\\
+  For the infinite square well, $E_n = \frac{n^2 \pi^2 \hbar^2}{2mL^2}$ where $n = 1, 2, 3, \ldots$ 
+  The energies are quantized and scale quadratically with $n$, not evenly spaced.
+
+  \item \textbf{(C)} $|\psi(x,t)|^2$ represents the probability density for finding the particle at 
+  position $x$.\\
+  The Born rule states that $|\psi(x,t)|^2 dx$ gives the probability of finding the particle in the 
+  interval $[x, x+dx]$ at time $t$. The wave function itself is generally complex-valued.
+
+  \item \textbf{(B)} It has real eigenvalues and orthogonal eigenfunctions.\\
+  Hermitian operators satisfy $\langle \phi | \hat{A} \psi \rangle = \langle \hat{A} \phi | \psi \rangle$, 
+  which guarantees real eigenvalues (measurable quantities) and orthogonal eigenstates (distinct measurement 
+  outcomes are distinguishable).
+
+  \item \emph{Sample answer:}\\
+  The commutator $[\hat{A}, \hat{B}] = \hat{A}\hat{B} - \hat{B}\hat{A}$ measures whether two observables 
+  can be simultaneously measured with arbitrary precision:
+  \begin{itemize}
+    \item If $[\hat{A}, \hat{B}] = 0$, the observables are compatible: they share common eigenstates 
+    and can be simultaneously measured with definite values
+    \item If $[\hat{A}, \hat{B}] \neq 0$, the observables are incompatible: measuring one disturbs 
+    the other, and they cannot both have definite values simultaneously
+    \item Example: $[\hat{x}, \hat{p}] = i\hbar$ leads to the uncertainty principle 
+    $\Delta x \cdot \Delta p \geq \hbar/2$
+  \end{itemize}
+  This is fundamental to quantum complementarity and distinguishes quantum from classical physics.
+
+  \item \emph{Sample answer:}\\
+  The quantum harmonic oscillator describes a particle in a quadratic potential $V(x) = \frac{1}{2}m\omega^2 x^2$:
+  \begin{itemize}
+    \item \textbf{Energy spectrum}: $E_n = \hbar\omega(n + 1/2)$ for $n = 0, 1, 2, \ldots$ The energies 
+    are evenly spaced, and the ground state has non-zero energy $E_0 = \hbar\omega/2$ (zero-point energy)
+    \item \textbf{Wave functions}: Involve Hermite polynomials and Gaussians, symmetric (even $n$) or 
+    antisymmetric (odd $n$)
+    \item \textbf{Significance}: Models molecular vibrations, phonons in solids, quantum field theory modes, 
+    and electromagnetic field oscillations. It's exactly solvable and exhibits key quantum features like 
+    quantization and zero-point motion
+  \end{itemize}
+
+  \item \emph{Sample answer:}\\
+  \textbf{Time-dependent Schr\"odinger equation}:
+  $$i\hbar \frac{\partial \psi}{\partial t} = \hat{H}\psi$$
+  This governs the time evolution of quantum states and is the equation of motion analogous to Newton's 
+  second law in classical mechanics.
+
+  \textbf{Time-independent version}: When the Hamiltonian is time-independent, we can separate variables: 
+  $\psi(x,t) = \phi(x)e^{-iEt/\hbar}$, leading to:
+  $$\hat{H}\phi = E\phi$$
+  This eigenvalue equation determines stationary states (energy eigenstates).
+
+  \textbf{When to use each}:
+  \begin{itemize}
+    \item Time-independent: Finding energy eigenstates, bound state problems, stationary potentials
+    \item Time-dependent: Evolution of superpositions, time-varying potentials, scattering dynamics
+  \end{itemize}
+
+  \item \emph{Sample answer:}\\
+  \textbf{Quantum tunneling}: A quantum particle can penetrate and traverse potential barriers even when 
+  its energy $E$ is less than the barrier height $V_0$ (classically forbidden).
+
+  \textbf{Wave nature explanation}:
+  \begin{itemize}
+    \item The wave function doesn't abruptly vanish at a barrier; it decays exponentially inside the 
+    barrier region as $\psi \sim e^{-\kappa x}$ where $\kappa = \sqrt{2m(V_0-E)}/\hbar$
+    \item If the barrier is finite in width, the wave function has non-zero amplitude on the other side
+    \item This leads to non-zero transmission probability even for $E < V_0$
+  \end{itemize}
+
+  \textbf{Implications}: Tunneling enables radioactive alpha decay, scanning tunneling microscopy (STM), 
+  tunnel diodes, and is essential in nuclear fusion in stars. It has no classical analog and demonstrates 
+  the wave-particle duality of quantum mechanics.
+
+\end{enumerate}
+
+\end{document}

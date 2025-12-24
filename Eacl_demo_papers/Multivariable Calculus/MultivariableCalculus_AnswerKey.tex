@@ -1,0 +1,95 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+
+\setlist[enumerate]{itemsep=0.6em, topsep=0.6em}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{MATH 340 Examination}}\\[0.25em]
+  {\large \textbf{Multivariable Calculus and Vector Analysis -- Answer Key}}\\[0.5em]
+\end{center}
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item \textbf{(C)} The direction of steepest ascent and perpendicular to level sets.\\
+  The gradient $\nabla f$ points in the direction where $f$ increases most rapidly, and its magnitude 
+  equals the rate of that increase. It is always perpendicular to the level sets (curves/surfaces where 
+  $f$ is constant).
+
+  \item \textbf{(C)} $f$ has continuous second partial derivatives.\\
+  Schwarz's theorem (Clairaut's theorem) states that if the second partial derivatives $f_{xy}$ and 
+  $f_{yx}$ are continuous in a neighborhood of a point, then they are equal at that point. Continuity 
+  of second partials is sufficient; mere existence is not.
+
+  \item \textbf{(B)} The local scaling factor of volumes under the transformation.\\
+  The Jacobian determinant $|\det(J_T)|$ measures how the transformation $T$ locally stretches or 
+  compresses volumes. It appears as the scaling factor in the change of variables formula for 
+  multiple integrals.
+
+  \item \textbf{(A)} Green's Theorem is a special case of Stokes' Theorem in two dimensions.\\
+  Stokes' Theorem relates the integral of curl over a surface to the line integral around its boundary. 
+  Green's Theorem is the $2$D version where the surface is flat (in the $xy$-plane) and curl reduces 
+  to $\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}$.
+
+  \item \emph{Sample answer:}\\
+  The Hessian matrix $H_f$ is the matrix of second partial derivatives:
+  $$H_f = \begin{bmatrix} f_{x_1x_1} & \cdots & f_{x_1x_n} \\ \vdots & \ddots & \vdots \\ 
+  f_{x_nx_1} & \cdots & f_{x_nx_n} \end{bmatrix}$$
+
+  \textbf{Geometric significance}: The Hessian captures the curvature of $f$ at a critical point.
+
+  \textbf{Second derivative test}:
+  \begin{itemize}
+    \item If $H_f$ is positive definite (all eigenvalues positive), the critical point is a local minimum
+    \item If $H_f$ is negative definite (all eigenvalues negative), it's a local maximum
+    \item If $H_f$ has both positive and negative eigenvalues, it's a saddle point
+    \item If $H_f$ is singular or indefinite but not clearly positive/negative, the test is inconclusive
+  \end{itemize}
+
+  \item \emph{Sample answer:}\\
+  \textbf{Conservative field}: A vector field $\mathbf{F}$ is conservative if $\mathbf{F} = \nabla f$ 
+  for some scalar potential function $f$.
+
+  \textbf{Path-independent field}: $\int_C \mathbf{F} \cdot d\mathbf{r}$ depends only on endpoints, 
+  not on the path $C$.
+
+  \textbf{Equivalence}: In simply connected domains, these are equivalent. A field is conservative if 
+  and only if it is path-independent.
+
+  \textbf{Role of curl}: If $\mathbf{F}$ is conservative, then $\nabla \times \mathbf{F} = \mathbf{0}$ 
+  (curl is zero). Conversely, in simply connected regions, if curl is zero, then $\mathbf{F}$ is 
+  conservative. The curl being zero is a necessary local condition for conservativeness.
+
+  \item \emph{Sample answer:}\\
+  \textbf{Divergence Theorem}: For a solid region $E$ bounded by surface $S$ with outward normal $\mathbf{n}$:
+  $$\iiint_E (\nabla \cdot \mathbf{F})\, dV = \iint_S \mathbf{F} \cdot \mathbf{n}\, dS$$
+
+  \textbf{Physical interpretation}: In fluid flow, $\nabla \cdot \mathbf{F}$ measures the net rate 
+  of fluid expansion per unit volume (sources minus sinks). The theorem states:
+  \begin{itemize}
+    \item The total outward flux through the boundary equals the total divergence inside
+    \item If there are sources inside $E$, net flux is outward; if sinks, inward
+    \item It connects local property (divergence at each point) to global property (total flux)
+  \end{itemize}
+  This is fundamental in electromagnetism (Gauss's law) and fluid dynamics.
+
+  \item \emph{Sample answer:}\\
+  When changing order of integration, the limits must reflect the same region $R$:
+  \begin{itemize}
+    \item \textbf{Method}: Sketch the region $R$ in the $xy$-plane
+    \item For $\int_{x=a}^{b} \int_{y=g_1(x)}^{g_2(x)} f(x,y)\, dy\, dx$, first identify the vertical 
+    cross-sections
+    \item To switch to $\int \int dx\, dy$, consider horizontal cross-sections: for each fixed $y$, 
+    determine which $x$ values lie in $R$
+    \item Express $x$ as a function of $y$: find $h_1(y) \leq x \leq h_2(y)$ and the range of $y$
+  \end{itemize}
+  \textbf{Example}: For $R$ bounded by $y = x^2$ and $y = 1$, switching from 
+  $\int_0^1 \int_{x^2}^1 dy\,dx$ to $dy\,dx$ order gives $\int_0^1 \int_0^{\sqrt{y}} dx\,dy$.
+
+\end{enumerate}
+
+\end{document}
